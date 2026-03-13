@@ -1,5 +1,7 @@
 # Nanowork MVP
 
+<!-- todo -->
+
 AI platform that turns a prompt into a fullstack business. Built with **React** (frontend) and **Python** (backend + AI).
 
 ## Monorepo Structure
