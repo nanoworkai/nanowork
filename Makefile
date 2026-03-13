@@ -1,12 +1,12 @@
 .PHONY: dev dev-frontend dev-backend install-all
 
 install-all:
-	cd frontend && npm install
-	cd backend && uv sync
-	cd generator && uv sync
+	cd apps/frontend && npm install
+	cd apps/backend && uv sync
+	cd apps/generator && uv sync
 
 dev-frontend:
-	cd frontend && npm run dev
+	cd apps/frontend && npm run dev
 
 dev-backend:
-	cd backend && uv run uvicorn app.main:app --reload --port 8000
+	cd apps/backend && uv run uvicorn app.main:app --reload --port 8000
