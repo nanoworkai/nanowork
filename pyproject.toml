@@ -1,7 +1,7 @@
 [project]
 name = "nanowork-mvp"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI platform: prompt → fullstack business (React + Python)"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.11"
 dependencies = []

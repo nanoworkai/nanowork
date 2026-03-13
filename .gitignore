@@ -1,0 +1,27 @@
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+.venv
+venv
+.python-version
+*.egg-info
+.eggs
+dist
+build
+
+# Node
+node_modules
+*.local
+
+# IDE
+.idea
+.vscode/*
+!.vscode/extensions.json
+*.swp
+.DS_Store
+
+# Env
+.env
+.env.local
+.env.*.local
