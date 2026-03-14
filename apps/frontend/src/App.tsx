@@ -8,6 +8,7 @@ import {
 } from './OAuthSuccess.js'
 
 import OAuthSuccess from './OAuthSuccess.js'
+const profilePath = '/profile'
 
 function LandingPage() {
   const navigate = useNavigate()
@@ -55,21 +56,47 @@ function DashboardPage() {
 
   return (
     <main className="dashboard-page">
+      <button
+        className={`sidebar-backdrop ${isSidebarOpen ? 'open' : ''}`}
+        type="button"
+        aria-label="Close sidebar"
+        onClick={() => setIsSidebarOpen(false)}
+      />
       <aside className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <span>Nanowork</span>
+          <button
+            className="sidebar-close"
+            type="button"
+            aria-label="Close sidebar"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            ×
+          </button>
         </div>
         <nav className="sidebar-nav">
-          <button className="sidebar-item" type="button">
-            New chat
+          <div className="sidebar-section-title">Chat History</div>
+          <button className="sidebar-item active" type="button">
+            Today
           </button>
           <button className="sidebar-item" type="button">
-            Prompt history
+            AI consulting workspace
           </button>
           <button className="sidebar-item" type="button">
-            Saved businesses
+            E-commerce automation
+          </button>
+          <button className="sidebar-item" type="button">
+            Creator monetization plan
           </button>
         </nav>
+        <div className="sidebar-footer">
+          <button className="sidebar-footer-item" type="button">
+            Connect your wallet
+          </button>
+          <a className="sidebar-footer-item profile-link" href={profilePath}>
+            Profile
+          </a>
+        </div>
       </aside>
 
       <section className="dashboard-shell">
@@ -124,6 +151,7 @@ function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path={dashboardPath} element={<DashboardPage />} />
+      <Route path={profilePath} element={<main className="profile-page" />} />
       <Route path={oauthSuccessPath} element={<OAuthSuccess />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

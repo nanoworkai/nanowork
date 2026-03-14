@@ -18,16 +18,34 @@
   overflow: hidden;
 }
 
+.sidebar-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.24s ease;
+  z-index: 1;
+}
+
+.sidebar-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .dashboard-sidebar {
   position: absolute;
   inset: 0 auto 0 0;
   width: 280px;
-  padding: 1.25rem;
-  background: #0d0d0d;
+  padding: 1rem;
+  background: #0b0b0b;
   border-right: 1px solid #1f1f1f;
   transform: translateX(-100%);
   transition: transform 0.24s ease;
-  z-index: 2;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
 }
 
 .dashboard-sidebar.open {
@@ -35,27 +53,83 @@
 }
 
 .sidebar-header {
-  padding: 0.9rem 0.75rem 1.5rem;
+  padding: 0.35rem 0.25rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: 0.95rem;
   color: #d6d6d6;
+}
+
+.sidebar-close {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #262626;
+  border-radius: 10px;
+  background: #111111;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
 }
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
+}
+
+.sidebar-section-title {
+  padding: 0.75rem 0.75rem 0.55rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7e7e7e;
 }
 
 .sidebar-item {
   width: 100%;
-  padding: 0.85rem 1rem;
-  border: 1px solid #252525;
-  border-radius: 14px;
-  background: #121212;
-  color: #f5f5f5;
+  padding: 0.9rem 0.75rem;
+  border: 0;
+  border-bottom: 1px solid #1f1f1f;
+  border-radius: 0;
+  background: transparent;
+  color: #d8d8d8;
   text-align: left;
   font: inherit;
   cursor: pointer;
+}
+
+.sidebar-item.active,
+.sidebar-item:hover,
+.sidebar-footer-item:hover {
+  background: #121212;
+  color: #ffffff;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-footer-item {
+  display: block;
+  width: 100%;
+  padding: 0.95rem 0.9rem;
+  border: 1px solid #1f1f1f;
+  border-radius: 14px;
+  background: #0f0f0f;
+  color: #f1f1f1;
+  text-align: left;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.profile-link {
+  display: block;
 }
 
 .dashboard-shell {
@@ -170,6 +244,11 @@
   color: #000000;
   font: inherit;
   cursor: pointer;
+}
+
+.profile-page {
+  min-height: 100vh;
+  background: #000000;
 }
 
 .topbar {
