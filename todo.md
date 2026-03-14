@@ -17,3 +17,10 @@ Nanowork, Inc • Privacy Policy • Terms of Service
 - We will add something catchy as the hero text. Make $100k with AI, something like that. We will also need to add a financial disclaimer because we could be legally liable if someone doesn't make that much money. 
 
 
+
+FAQ:
+
+What do we do?:
+
+We build AI that launches and runs self-sustaining businesses from a single prompt.
+
