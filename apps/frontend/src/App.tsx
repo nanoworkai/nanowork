@@ -12,6 +12,41 @@ const profilePath = '/profile'
 const walletPath = '/wallet'
 const reportBugsPath = '/reportbugs'
 
+function StandardFooter({ className = 'dashboard-footer' }: { className?: string }) {
+  return (
+    <footer className={className}>
+      <p>
+        <span className="dashboard-copyright-icon" aria-hidden="true">©</span>
+        <span>All rights reserved</span>
+      </p>
+    </footer>
+  )
+}
+
+function AppHeader() {
+  const navigate = useNavigate()
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1)
+      return
+    }
+
+    navigate('/')
+  }
+
+  return (
+    <header className="dashboard-topbar app-page-header">
+      <button className="app-back-button" type="button" onClick={handleBack}>
+        ↩
+      </button>
+      <button className="dashboard-home-button" type="button" onClick={() => navigate('/')}>
+        <span className="dashboard-title">Nanowork</span>
+      </button>
+    </header>
+  )
+}
+
 function LandingPage() {
   const navigate = useNavigate()
 
@@ -45,10 +80,7 @@ function LandingPage() {
         </div>
       </section>
 
-      <footer className="footer">
-        <p>Copyright 2026 Nanowork. All rights reserved.</p>
-        <a href="mailto:founders@nanowork.ai">Contact us at founders@nanowork.ai</a>
-      </footer>
+      <StandardFooter />
     </main>
   )
 }
@@ -189,13 +221,7 @@ function DashboardPage() {
               ↑
             </button>
           </form>
-
-          <footer className="dashboard-footer">
-            <p>
-              <span className="dashboard-copyright-icon" aria-hidden="true">©</span>
-              <span>All rights reserved</span>
-            </p>
-          </footer>
+          <StandardFooter className="dashboard-footer" />
         </div>
       </section>
     </main>
@@ -204,9 +230,9 @@ function DashboardPage() {
 
 function ProfilePage() {
   const businesses = [
-    { id: 'consulting', name: 'AI consulting workspace', revenue: 18760, profit: 8240, share: 44, accuracy: '96.1%' },
-    { id: 'commerce', name: 'E-commerce automation', revenue: 13240, profit: 5810, share: 31, accuracy: '92.8%' },
-    { id: 'creator', name: 'Creator monetization plan', revenue: 10780, profit: 4380, share: 25, accuracy: '93.7%' },
+    { id: 'consulting', name: 'AI consulting workspace', revenue: 18760, profit: 8240, share: 44, customers: 482 },
+    { id: 'commerce', name: 'E-commerce automation', revenue: 13240, profit: 5810, share: 31, customers: 391 },
+    { id: 'creator', name: 'Creator monetization plan', revenue: 10780, profit: 4380, share: 25, customers: 411 },
   ]
   const [selectedBusinessId, setSelectedBusinessId] = useState(businesses[0].id)
   const selectedBusiness =
@@ -214,6 +240,7 @@ function ProfilePage() {
 
   return (
     <main className="profile-page">
+      <AppHeader />
       <section className="profile-shell">
         <header className="profile-header">
           <p className="profile-kicker">Business Analytics</p>
@@ -301,8 +328,8 @@ function ProfilePage() {
                   <strong>${selectedBusiness.profit.toLocaleString()}</strong>
                 </div>
                 <div className="selected-business-row">
-                  <span>Accuracy</span>
-                  <strong>{selectedBusiness.accuracy}</strong>
+                  <span>Active Users</span>
+                  <strong>{selectedBusiness.customers}</strong>
                 </div>
               </div>
             </div>
@@ -349,6 +376,16 @@ function ProfilePage() {
           </article>
         </section>
       </section>
+      <StandardFooter className="profile-footer" />
+    </main>
+  )
+}
+
+function EmptyPage() {
+  return (
+    <main className="profile-page">
+      <AppHeader />
+      <StandardFooter className="profile-footer" />
     </main>
   )
 }
@@ -359,8 +396,8 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path={dashboardPath} element={<DashboardPage />} />
       <Route path={profilePath} element={<ProfilePage />} />
-      <Route path={walletPath} element={<main className="profile-page" />} />
-      <Route path={reportBugsPath} element={<main className="profile-page" />} />
+      <Route path={walletPath} element={<EmptyPage />} />
+      <Route path={reportBugsPath} element={<EmptyPage />} />
       <Route path={oauthSuccessPath} element={<OAuthSuccess />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

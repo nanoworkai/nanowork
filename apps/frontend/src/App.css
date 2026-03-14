@@ -287,6 +287,37 @@
   padding: 1rem 1.25rem;
 }
 
+.app-page-header {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.app-back-button {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  color: #8d8d8d;
+  font: inherit;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.app-back-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #d6d6d6;
+}
+
 .menu-button {
   width: 28px;
   height: 28px;
@@ -328,10 +359,23 @@
 }
 
 .dashboard-home-button {
-  padding: 0;
-  border: 0;
-  background: transparent;
+  padding: 0.55rem 1rem;
+  border: 1px solid #1f1f1f;
+  border-radius: 999px;
+  background: #111111;
   cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.dashboard-home-button:hover {
+  background: #171717;
+  border-color: #2b2b2b;
+}
+
+.app-page-header .dashboard-home-button {
+  margin-left: auto;
 }
 
 .chat-layout {
@@ -352,24 +396,28 @@
 .dashboard-footer {
   display: flex;
   justify-content: center;
+  align-items: center;
   color: #6f6f6f;
   font-size: 0.82rem;
 }
 
-.dashboard-footer p {
+.dashboard-footer p,
+.profile-footer p {
   margin: 0;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
 }
 
-.dashboard-copyright-icon {
-  display: inline-flex;
-  align-items: center;
+.profile-footer {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 0 1.25rem 2rem;
+  display: flex;
   justify-content: center;
-  font-size: 0.78rem;
-  line-height: 1;
+  align-items: center;
   color: #8a8a8a;
+  font-size: 0.82rem;
 }
 
 .chat-thread {
@@ -790,6 +838,11 @@
   .profile-metrics-grid,
   .profile-breakdown {
     grid-template-columns: 1fr;
+  }
+
+  .profile-footer {
+    justify-content: center;
+    text-align: center;
   }
 
   .pie-panel-body {
