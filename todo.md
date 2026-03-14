@@ -12,3 +12,8 @@ Nanowork, Inc • Privacy Policy • Terms of Service
 
 - Profile needs to always be persistent across pages for a smooth experience
 
+- Learn More and Sign Up: We won't offer a try now. We need users to pay
+
+- We will add something catchy as the hero text. Make $100k with AI, something like that. We will also need to add a financial disclaimer because we could be legally liable if someone doesn't make that much money. 
+
+
