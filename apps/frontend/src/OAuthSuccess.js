@@ -5,9 +5,7 @@ export const dashboardPath = '/dashboard'
 export const oauthSuccessPath = '/oauth-success'
 export const authStorageKey = 'nanowork-auth'
 export const tokenStorageKey = 'token'
-export const authStartUrl = `${
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
-}/auth/google`
+export const authStartUrl = 'https://accounts.google.com/signin'
 
 export function isSignedIn() {
   return Boolean(window.localStorage.getItem(tokenStorageKey))

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 import {
@@ -50,7 +51,72 @@ function LandingPage() {
 }
 
 function DashboardPage() {
-  return <main className="dashboard-page" />
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  return (
+    <main className="dashboard-page">
+      <aside className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <span>Nanowork</span>
+        </div>
+        <nav className="sidebar-nav">
+          <button className="sidebar-item" type="button">
+            New chat
+          </button>
+          <button className="sidebar-item" type="button">
+            Prompt history
+          </button>
+          <button className="sidebar-item" type="button">
+            Saved businesses
+          </button>
+        </nav>
+      </aside>
+
+      <section className="dashboard-shell">
+        <header className="dashboard-topbar">
+          <button
+            className="menu-button"
+            type="button"
+            aria-label="Toggle sidebar"
+            onClick={() => setIsSidebarOpen((open) => !open)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+          <span className="dashboard-title">Nanowork</span>
+        </header>
+
+        <div className="chat-layout">
+          <div className="chat-thread">
+            <article className="message message-assistant">
+              <p>What would you like Nanowork to build today?</p>
+            </article>
+            <article className="message message-user">
+              <p>Create an AI-first business from a single prompt.</p>
+            </article>
+            <article className="message message-assistant">
+              <p>
+                I can help shape the business, workflows, tooling, and launch
+                plan. Start with your idea and constraints.
+              </p>
+            </article>
+          </div>
+
+          <form className="chat-composer">
+            <textarea
+              className="chat-input"
+              placeholder="Describe the business you want to launch..."
+              rows={3}
+            />
+            <button className="chat-send" type="submit">
+              Send
+            </button>
+          </form>
+        </div>
+      </section>
+    </main>
+  )
 }
 
 function App() {
