@@ -24,7 +24,14 @@ function getWindowCustomerId() {
 }
 
 export function handleCtaRedirection(navigate) {
-  navigate(getWindowCustomerId() ? dashboardPath : checkoutPath)
+  const hasCustomerId = Boolean(getWindowCustomerId())
+
+  if (!hasCustomerId) {
+    navigate(checkoutPath)
+    return
+  }
+
+  navigate(isSignedIn() ? dashboardPath : '/signin')
 }
 
 const OAuthSuccess = () => {

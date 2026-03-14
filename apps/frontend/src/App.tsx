@@ -6,6 +6,7 @@ import {
   checkoutPath,
   dashboardPath,
   handleCtaRedirection,
+  isSignedIn,
   oauthSuccessPath,
   tokenStorageKey,
 } from './OAuthSuccess.js'
@@ -14,12 +15,15 @@ import OAuthSuccess from './OAuthSuccess.js'
 const profilePath = '/profile'
 const walletPath = '/wallet'
 const reportBugsPath = '/reportbugs'
+const signInPath = '/signin'
 const fallbackStripeFeesUrl = 'https://stripe.com/payments/checkout'
 
 type WindowCheckoutContext = {
   customerId?: string
   stripeCheckoutUrl?: string
   stripeFeeCheckoutUrl?: string
+  adminEmail?: string
+  adminPassword?: string
 }
 
 function getWindowCheckoutContext(): WindowCheckoutContext {
@@ -50,11 +54,24 @@ function getStripeFeesUrl() {
   )
 }
 
+function getPortalCredentials() {
+  const context = getWindowCheckoutContext()
+
+  return {
+    email: context.adminEmail?.trim() ?? '',
+    password: context.adminPassword?.trim() ?? '',
+  }
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const customerId = getWindowCustomerId()
 
   if (!customerId) {
     return <Navigate to={checkoutPath} replace />
+  }
+
+  if (!isSignedIn()) {
+    return <Navigate to={signInPath} replace />
   }
 
   return <>{children}</>
@@ -158,12 +175,87 @@ function LandingPage() {
 
         <div className="actions">
           <button className="cta-button" type="button" onClick={handleTryNow}>
-            Try now
+            SignUp
+          </button>
+          <button className="cta-button cta-button-secondary" type="button" onClick={() => navigate(signInPath)}>
+            Sign in
           </button>
         </div>
       </section>
 
       <StandardFooter className="dashboard-footer" />
+    </main>
+  )
+}
+
+function SignInPage() {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const credentials = getPortalCredentials()
+    const isValidEmail = credentials.email.length > 0 && email.trim() === credentials.email
+    const isValidPassword =
+      credentials.password.length > 0 && password.trim() === credentials.password
+
+    if (!isValidEmail || !isValidPassword) {
+      setErrorMessage('Incorrect email or password.')
+      return
+    }
+
+    window.localStorage.setItem(authStorageKey, 'true')
+    window.localStorage.setItem(tokenStorageKey, 'portal-session')
+    navigate(getWindowCustomerId() ? dashboardPath : checkoutPath)
+  }
+
+  return (
+    <main className="profile-page signin-page">
+      <AppHeader />
+      <section className="signin-shell">
+        <div className="signin-card">
+          <div className="signin-copy">
+            <h1>Sign in to your Nanowork portal.</h1>
+            <p className="profile-subtitle">
+              Enter your email and password to get back into your workspace.
+            </p>
+          </div>
+
+          <form className="signin-form" onSubmit={handleSubmit}>
+            <label className="checkout-field">
+              <span>Email</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="founder@nanowork.ai"
+              />
+            </label>
+
+            <label className="checkout-field">
+              <span>Password</span>
+              <input
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Enter your password"
+              />
+            </label>
+
+            {errorMessage ? <p className="signin-error">{errorMessage}</p> : null}
+
+            <button className="checkout-primary-button" type="submit">
+              Sign in
+            </button>
+          </form>
+        </div>
+      </section>
+      <footer className="profile-footer">
+        <StandardFooter className="profile-footer-content" />
+      </footer>
     </main>
   )
 }
@@ -731,6 +823,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path={signInPath} element={<SignInPage />} />
       <Route path={checkoutPath} element={<CheckoutPage />} />
       <Route
         path={dashboardPath}

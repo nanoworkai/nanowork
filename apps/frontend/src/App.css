@@ -554,6 +554,55 @@
   flex-direction: column;
 }
 
+.signin-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.signin-shell {
+  width: min(640px, 100%);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+.signin-card {
+  padding: 1.5rem;
+  border: 1px solid #1d1d1d;
+  border-radius: 28px;
+  background: #0d0d0d;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.signin-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.signin-copy h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 4vw, 2.35rem);
+  font-weight: 400;
+}
+
+.signin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.signin-form .checkout-field span {
+  color: #ffffff;
+}
+
+.signin-error {
+  margin: 0;
+  color: #ff8f8f;
+  font-size: 0.92rem;
+}
+
 .checkout-shell {
   width: min(980px, 100%);
   margin: 0 auto;
@@ -1267,6 +1316,11 @@
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(255, 255, 255, 0.16);
   color: #ffffff;
+}
+
+.cta-button-secondary {
+  background: transparent;
+  color: #cfcfcf;
 }
 
 @media (max-width: 640px) {

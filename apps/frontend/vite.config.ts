@@ -6,6 +6,8 @@ import react from '@vitejs/plugin-react'
 type LocalAdminBypass = {
   enabled?: boolean
   customerId?: string
+  adminEmail?: string
+  adminPassword?: string
 }
 
 function loadLocalAdminBypass() {
@@ -42,6 +44,8 @@ function localAdminBypassPlugin() {
 
       const injectedContext = JSON.stringify({
         customerId: bypass.customerId,
+        adminEmail: bypass.adminEmail ?? '',
+        adminPassword: bypass.adminPassword ?? '',
       })
 
       return html.replace(
