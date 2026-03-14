@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { useNavigate, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 import {
+  authStorageKey,
   dashboardPath,
   handleCtaRedirection,
   oauthSuccessPath,
+  tokenStorageKey,
 } from './OAuthSuccess.js'
 
 import OAuthSuccess from './OAuthSuccess.js'
@@ -17,9 +19,32 @@ function StandardFooter({ className = 'dashboard-footer' }: { className?: string
     <footer className={className}>
       <p>
         <span className="dashboard-copyright-icon" aria-hidden="true">©</span>
-        <span>All rights reserved</span>
+        <span>Nanowork, Inc</span>
+        <span>•</span>
+        <span>Privacy Policy</span>
+        <span>•</span>
+        <span>Terms of Service</span>
       </p>
     </footer>
+  )
+}
+
+function ExitButton({ className = 'exit-button' }: { className?: string }) {
+  const navigate = useNavigate()
+
+  const handleExit = () => {
+    window.localStorage.removeItem(tokenStorageKey)
+    window.localStorage.removeItem(authStorageKey)
+    navigate('/')
+  }
+
+  return (
+    <button className={className} type="button" onClick={handleExit}>
+      <span className="exit-icon" aria-hidden="true">
+        <span />
+        <span />
+      </span>
+    </button>
   )
 }
 
@@ -178,7 +203,7 @@ function DashboardPage() {
       <section className="dashboard-shell">
         <header className="dashboard-topbar">
           <button
-            className="menu-button"
+            className={`menu-button ${isSidebarOpen ? 'menu-button-hidden' : ''}`}
             type="button"
             aria-label="Toggle sidebar"
             onClick={() => setIsSidebarOpen((open) => !open)}
@@ -194,6 +219,7 @@ function DashboardPage() {
           >
             <span className="dashboard-title">Nanowork</span>
           </button>
+          <ExitButton className="exit-button dashboard-exit-button" />
         </header>
 
         <div className="chat-layout">
@@ -376,7 +402,10 @@ function ProfilePage() {
           </article>
         </section>
       </section>
-      <StandardFooter className="profile-footer" />
+      <footer className="profile-footer profile-footer-with-exit">
+        <StandardFooter className="profile-footer-content" />
+        <ExitButton className="exit-button footer-exit-button" />
+      </footer>
     </main>
   )
 }
@@ -484,7 +513,10 @@ function ReportBugsPage() {
           </div>
         </form>
       </section>
-      <StandardFooter className="profile-footer" />
+      <footer className="profile-footer profile-footer-with-exit">
+        <StandardFooter className="profile-footer-content" />
+        <ExitButton className="exit-button footer-exit-button" />
+      </footer>
     </main>
   )
 }
@@ -493,7 +525,10 @@ function EmptyPage() {
   return (
     <main className="profile-page">
       <AppHeader />
-      <StandardFooter className="profile-footer" />
+      <footer className="profile-footer profile-footer-with-exit">
+        <StandardFooter className="profile-footer-content" />
+        <ExitButton className="exit-button footer-exit-button" />
+      </footer>
     </main>
   )
 }

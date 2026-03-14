@@ -353,6 +353,11 @@
   height: 1.5px;
 }
 
+.menu-button-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .dashboard-title {
   font-size: 0.95rem;
   color: #d0d0d0;
@@ -418,6 +423,18 @@
   align-items: center;
   color: #5f5f5f;
   font-size: 0.72rem;
+}
+
+.profile-footer-with-exit {
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.profile-footer-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
 }
 
 .chat-thread {
@@ -812,6 +829,8 @@
   width: 100%;
   display: flex;
   justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
 }
 
 .navbar {
@@ -831,6 +850,54 @@
   font-family: "ABC Diatype", sans-serif;
   font-size: 16px;
   font-weight: 400;
+}
+
+.exit-button {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #d7d7d7;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.dashboard-exit-button {
+  margin-left: auto;
+}
+
+.footer-exit-button {
+  position: static;
+}
+
+.exit-icon {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+
+.exit-icon span:first-child {
+  position: absolute;
+  inset: 2px 6px 2px 2px;
+  border: 1.5px solid currentColor;
+  border-right: 0;
+  border-radius: 4px 0 0 4px;
+}
+
+.exit-icon span:last-child {
+  position: absolute;
+  top: 7px;
+  right: 0;
+  width: 10px;
+  height: 1.5px;
+  background: currentColor;
+  box-shadow: 3px 0 0 0 currentColor;
+  clip-path: polygon(0 0, 70% 0, 70% -60%, 100% 50%, 70% 160%, 70% 100%, 0 100%);
 }
 
 .hero {
@@ -902,6 +969,10 @@
   .profile-footer {
     justify-content: center;
     text-align: center;
+  }
+
+  .profile-footer-with-exit {
+    justify-content: center;
   }
 
   .pie-panel-body {
