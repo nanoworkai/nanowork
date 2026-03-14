@@ -147,25 +147,38 @@
 }
 
 .menu-button {
-  width: 44px;
-  height: 44px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border: 1px solid #222222;
+  border: 0;
   border-radius: 12px;
-  background: #0d0d0d;
+  background: transparent;
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   gap: 4px;
   cursor: pointer;
+  padding-left: 0;
 }
 
 .menu-button span {
   display: block;
-  width: 18px;
   height: 1.5px;
   background: #ffffff;
+}
+
+.menu-button span:nth-child(1) {
+  width: 20px;
+}
+
+.menu-button span:nth-child(2) {
+  width: 14px;
+}
+
+.menu-button span:nth-child(3) {
+  width: 9px;
+  height: 1.5px;
 }
 
 .dashboard-title {
@@ -213,37 +226,63 @@
 
 .chat-composer {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.75rem;
-  padding: 0.85rem;
-  border: 1px solid #1f1f1f;
-  border-radius: 22px;
-  background: #0d0d0d;
+  padding: 0.5rem 0.8rem 0.5rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: #101010;
 }
 
 .chat-input {
-  flex: 1;
-  min-height: 72px;
+  flex: 2;
+  height: 44px;
   border: 0;
-  resize: none;
   background: transparent;
   color: #ffffff;
   font: inherit;
   outline: none;
+  padding: 0 0.9rem;
+  caret-color: #ffffff;
 }
 
 .chat-input::placeholder {
   color: #7e7e7e;
 }
 
+.chat-input:focus {
+  animation: chat-caret-blink 1s step-end infinite;
+}
+
 .chat-send {
-  padding: 0.85rem 1.1rem;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   border: 1px solid #ffffff;
-  border-radius: 16px;
+  border-radius: 999px;
   background: #ffffff;
   color: #000000;
   font: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  min-width: 0;
+}
+
+@keyframes chat-caret-blink {
+  0%,
+  50% {
+    caret-color: #ffffff;
+  }
+
+  50.01%,
+  100% {
+    caret-color: transparent;
+  }
 }
 
 .profile-page {

@@ -131,13 +131,12 @@ function DashboardPage() {
           </div>
 
           <form className="chat-composer">
-            <textarea
+            <input
               className="chat-input"
               placeholder="Describe the business you want to launch..."
-              rows={3}
             />
             <button className="chat-send" type="submit">
-              Send
+              ↑
             </button>
           </form>
         </div>
