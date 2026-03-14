@@ -29,7 +29,7 @@ FAQ:
 What do we do?:
 
 We build AI that launches and runs self-sustaining businesses from a single prompt.
--> adding FAQs navigation on footer at /faq
+-> adding FAQs navigation on footer or  at /faq?
 
 Model Selector:
 
