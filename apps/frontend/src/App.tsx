@@ -50,6 +50,16 @@ function getStripeFeesUrl() {
   )
 }
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const customerId = getWindowCustomerId()
+
+  if (!customerId) {
+    return <Navigate to={checkoutPath} replace />
+  }
+
+  return <>{children}</>
+}
+
 function StandardFooter({ className = 'dashboard-footer' }: { className?: string }) {
   return (
     <footer className={className}>
@@ -126,6 +136,18 @@ function LandingPage() {
         <a className="navbar" href="/" onClick={handleNavClick}>
           <span className="brand">Nanowork</span>
         </a>
+        <button
+          className="landing-bug-button"
+          type="button"
+          aria-label="Report a bug"
+          onClick={() => navigate(reportBugsPath)}
+        >
+          <span className="bug-icon" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
+        </button>
       </header>
 
       <section className="hero">
@@ -710,9 +732,30 @@ function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path={checkoutPath} element={<CheckoutPage />} />
-      <Route path={dashboardPath} element={<DashboardPage />} />
-      <Route path={profilePath} element={<ProfilePage />} />
-      <Route path={walletPath} element={<EmptyPage />} />
+      <Route
+        path={dashboardPath}
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={profilePath}
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={walletPath}
+        element={
+          <ProtectedRoute>
+            <EmptyPage />
+          </ProtectedRoute>
+        }
+      />
       <Route path={reportBugsPath} element={<ReportBugsPage />} />
       <Route path={oauthSuccessPath} element={<OAuthSuccess />} />
       <Route path="*" element={<Navigate to="/" replace />} />
