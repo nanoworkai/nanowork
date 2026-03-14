@@ -2,6 +2,7 @@ import { createElement, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 export const dashboardPath = '/dashboard'
+export const checkoutPath = '/checkout'
 export const oauthSuccessPath = '/oauth-success'
 export const authStorageKey = 'nanowork-auth'
 export const tokenStorageKey = 'token'
@@ -12,7 +13,7 @@ export function isSignedIn() {
 }
 
 export function handleCtaRedirection(navigate) {
-  navigate(dashboardPath)
+  navigate(checkoutPath)
 }
 
 const OAuthSuccess = () => {

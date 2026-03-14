@@ -3,6 +3,7 @@ import { useNavigate, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 import {
   authStorageKey,
+  checkoutPath,
   dashboardPath,
   handleCtaRedirection,
   oauthSuccessPath,
@@ -13,6 +14,41 @@ import OAuthSuccess from './OAuthSuccess.js'
 const profilePath = '/profile'
 const walletPath = '/wallet'
 const reportBugsPath = '/reportbugs'
+const fallbackStripeFeesUrl = 'https://stripe.com/payments/checkout'
+
+type WindowCheckoutContext = {
+  customerId?: string
+  stripeCheckoutUrl?: string
+  stripeFeeCheckoutUrl?: string
+}
+
+function getWindowCheckoutContext(): WindowCheckoutContext {
+  const checkoutWindow = window as Window & {
+    contextWindow?: WindowCheckoutContext
+    nanoworkContext?: WindowCheckoutContext
+    __NANOWORK_CONTEXT__?: WindowCheckoutContext
+  }
+
+  return (
+    checkoutWindow.contextWindow ??
+    checkoutWindow.nanoworkContext ??
+    checkoutWindow.__NANOWORK_CONTEXT__ ??
+    {}
+  )
+}
+
+function getWindowCustomerId() {
+  return getWindowCheckoutContext().customerId?.trim() ?? ''
+}
+
+function getStripeFeesUrl() {
+  const context = getWindowCheckoutContext()
+  return (
+    context.stripeFeeCheckoutUrl?.trim() ??
+    context.stripeCheckoutUrl?.trim() ??
+    fallbackStripeFeesUrl
+  )
+}
 
 function StandardFooter({ className = 'dashboard-footer' }: { className?: string }) {
   return (
@@ -250,6 +286,142 @@ function DashboardPage() {
           <StandardFooter className="dashboard-footer" />
         </div>
       </section>
+    </main>
+  )
+}
+
+function CheckoutPage() {
+  const navigate = useNavigate()
+  const customerId = getWindowCustomerId()
+  const stripeFeesUrl = getStripeFeesUrl()
+  const hasCustomerId = customerId.length > 0
+  const walletValue = '$80'
+
+  const handleProceed = () => {
+    if (hasCustomerId) {
+      navigate(dashboardPath)
+      return
+    }
+
+    window.location.href = stripeFeesUrl
+  }
+
+  return (
+    <main className="profile-page checkout-page">
+      <AppHeader />
+      <section className="checkout-shell">
+        <div className="checkout-copy">
+          <h1>Subscribe & let Nanowork build your multi dollar business today.</h1>
+          <p className="profile-subtitle">
+            Secure your workspace with a quick one step setup, then start
+            building wealth using Nanowork.
+          </p>
+        </div>
+
+        <section className="checkout-grid">
+          <article className="checkout-overview-panel">
+            <div className="checkout-brand-row">
+              <span className="checkout-brand-mark" aria-hidden="true" />
+              <span>Nanowork</span>
+            </div>
+
+            <div className="checkout-price-block">
+              <p className="checkout-plan-name">Subscribe to Nanowork standard</p>
+              <div className="checkout-price-row">
+                <strong>{walletValue}</strong>
+                <span>Per month</span>
+              </div>
+              <p className="checkout-plan-description">
+                Unlimited AI business creation, dashboard access, and autonomous
+                operating workflows.
+              </p>
+            </div>
+
+            <div className="checkout-overview-card">
+              <div className="checkout-overview-header">
+                <div>
+                  <strong>Nanowork Standard</strong>
+                  <span>Billed monthly</span>
+                </div>
+                <strong>{walletValue}</strong>
+              </div>
+            </div>
+
+            <div className="checkout-breakdown">
+              <div className="checkout-breakdown-row">
+                <span>Subtotal</span>
+                <strong>{walletValue}</strong>
+              </div>
+              <div className="checkout-breakdown-row checkout-breakdown-link">
+                <span>Add promotion code</span>
+              </div>
+              <div className="checkout-breakdown-row">
+                <span>Tax</span>
+                <strong>$0</strong>
+              </div>
+              <div className="checkout-breakdown-row checkout-breakdown-total">
+                <span>Total due today</span>
+                <strong>{walletValue}</strong>
+              </div>
+            </div>
+
+            <div className="checkout-status-panel">
+              <span className={`checkout-status ${hasCustomerId ? 'ready' : 'pending'}`}>
+                {hasCustomerId ? 'Verified account' : 'Awaiting verification'}
+              </span>
+              <p>
+                {hasCustomerId
+                  ? 'Your account is verified and ready to continue into the dashboard.'
+                  : 'Checkout and build autonomous businesses right away'}
+              </p>
+            </div>
+          </article>
+
+          <article className="checkout-payment-panel">
+            <div className="checkout-payment-header">
+              <div>
+                <p className="checkout-label">Account setup</p>
+                <h2>Create your account</h2>
+              </div>
+              <strong>{walletValue}</strong>
+            </div>
+
+            <form className="checkout-form">
+              <label className="checkout-field">
+                <span>Email</span>
+                <input type="email" placeholder="example@gmail.com" />
+              </label>
+
+              <label className="checkout-field">
+                <span>Full name</span>
+                <input type="text" placeholder="John Smith" />
+              </label>
+
+              <label className="checkout-field">
+                <span>Company name</span>
+                <input type="text" placeholder="Nanowork Studio" />
+              </label>
+
+              <label className="checkout-field">
+                <span>Phone number</span>
+                <input type="tel" placeholder="+1 555 123 4567" />
+              </label>
+
+              <label className="checkout-field">
+                <span>Password</span>
+                <input type="password" placeholder="Create a password" />
+              </label>
+              <button className="checkout-primary-button" type="button" onClick={handleProceed}>
+                {hasCustomerId ? 'Continue to dashboard' : 'Subscribe'}
+              </button>
+            </form>
+          </article>
+        </section>
+      </section>
+      <footer className="profile-footer profile-footer-with-exit">
+        <StandardFooter className="profile-footer-content" />
+        <ExitButton className="exit-button footer-exit-button" />
+      </footer>
     </main>
   )
 }
@@ -537,6 +709,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path={checkoutPath} element={<CheckoutPage />} />
       <Route path={dashboardPath} element={<DashboardPage />} />
       <Route path={profilePath} element={<ProfilePage />} />
       <Route path={walletPath} element={<EmptyPage />} />

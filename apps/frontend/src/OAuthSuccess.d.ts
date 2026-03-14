@@ -1,4 +1,5 @@
 export const dashboardPath: string
+export const checkoutPath: string
 export const oauthSuccessPath: string
 export const authStorageKey: string
 export const tokenStorageKey: string
