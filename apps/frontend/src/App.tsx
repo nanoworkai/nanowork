@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 import {
   authStorageKey,
@@ -17,6 +17,18 @@ const walletPath = '/wallet'
 const reportBugsPath = '/reportbugs'
 const signInPath = '/signin'
 const fallbackStripeFeesUrl = 'https://stripe.com/payments/checkout'
+const chatStorageKey = 'nanowork-dashboard-chats'
+
+type ChatMessage = {
+  role: 'assistant' | 'user'
+  content: string
+}
+
+type ChatThread = {
+  id: string
+  title: string
+  messages: ChatMessage[]
+}
 
 type WindowCheckoutContext = {
   customerId?: string
@@ -60,6 +72,39 @@ function getPortalCredentials() {
   return {
     email: context.adminEmail?.trim() ?? '',
     password: context.adminPassword?.trim() ?? '',
+  }
+}
+
+function loadStoredChats() {
+  try {
+    const rawValue = window.localStorage.getItem(chatStorageKey)
+
+    if (!rawValue) {
+      return [] as ChatThread[]
+    }
+
+    return JSON.parse(rawValue) as ChatThread[]
+  } catch (error) {
+    console.error('Failed to read stored chats:', error)
+    return []
+  }
+}
+
+function createChatThread(message: string) {
+  const trimmedMessage = message.trim()
+
+  return {
+    id: `chat-${window.crypto.randomUUID()}`,
+    title: trimmedMessage,
+    messages: [
+      { role: 'assistant' as const, content: 'What would you like Nanowork to build today?' },
+      { role: 'user' as const, content: trimmedMessage },
+      {
+        role: 'assistant' as const,
+        content:
+          'I can help shape the business, workflows, tooling, and launch plan. Start with your idea and constraints.',
+      },
+    ],
   }
 }
 
@@ -262,7 +307,73 @@ function SignInPage() {
 
 function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [composerText, setComposerText] = useState('')
+  const [isCreatingNewChat, setIsCreatingNewChat] = useState(false)
+  const [chatThreads, setChatThreads] = useState<ChatThread[]>(() => loadStoredChats())
   const navigate = useNavigate()
+  const { chatId } = useParams()
+  const activeChat = chatThreads.find((thread) => thread.id === chatId) ?? null
+  const visibleMessages =
+    activeChat?.messages ?? [
+      { role: 'assistant' as const, content: 'What would you like Nanowork to build today?' },
+      { role: 'assistant' as const, content: 'Start a new chat with the + icon and send a message to create a thread.' },
+    ]
+
+  useEffect(() => {
+    window.localStorage.setItem(chatStorageKey, JSON.stringify(chatThreads))
+  }, [chatThreads])
+
+  const handleStartNewChat = () => {
+    setIsCreatingNewChat(true)
+    setComposerText('')
+    navigate(dashboardPath)
+    setIsSidebarOpen(false)
+  }
+
+  const handleOpenChat = (threadId: string) => {
+    setIsCreatingNewChat(false)
+    navigate(`${dashboardPath}/${threadId}`)
+    setIsSidebarOpen(false)
+  }
+
+  const handleComposerSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const trimmedMessage = composerText.trim()
+
+    if (!trimmedMessage) {
+      return
+    }
+
+    if (isCreatingNewChat || !activeChat) {
+      const newThread = createChatThread(trimmedMessage)
+      setChatThreads((currentThreads) => [newThread, ...currentThreads])
+      setIsCreatingNewChat(false)
+      setComposerText('')
+      navigate(`${dashboardPath}/${newThread.id}`)
+      return
+    }
+
+    setChatThreads((currentThreads) =>
+      currentThreads.map((thread) =>
+        thread.id === activeChat.id
+          ? {
+              ...thread,
+              messages: [
+                ...thread.messages,
+                { role: 'user' as const, content: trimmedMessage },
+                {
+                  role: 'assistant' as const,
+                  content:
+                    'I can help shape the business, workflows, tooling, and launch plan. Start with your idea and constraints.',
+                },
+              ],
+            }
+          : thread,
+      ),
+    )
+    setComposerText('')
+  }
 
   return (
     <main className="dashboard-page">
@@ -292,19 +403,21 @@ function DashboardPage() {
           </button>
         </div>
         <nav className="sidebar-nav">
-          <div className="sidebar-section-title">Your Businesses</div>
-          <button className="sidebar-item active" type="button">
-            Today
-          </button>
-          <button className="sidebar-item" type="button">
-            AI consulting workspace
-          </button>
-          <button className="sidebar-item" type="button">
-            E-commerce automation
-          </button>
-          <button className="sidebar-item" type="button">
-            Creator monetization plan
-          </button>
+          <div className="sidebar-section-title">Your Chats</div>
+          {chatThreads.length ? (
+            chatThreads.map((thread) => (
+              <button
+                key={thread.id}
+                className={`sidebar-item ${thread.id === chatId ? 'active' : ''}`}
+                type="button"
+                onClick={() => handleOpenChat(thread.id)}
+              >
+                {thread.title}
+              </button>
+            ))
+          ) : (
+            <div className="sidebar-empty-state">No chats yet</div>
+          )}
         </nav>
         <div className="sidebar-footer">
           <a
@@ -352,16 +465,26 @@ function DashboardPage() {
 
       <section className="dashboard-shell">
         <header className="dashboard-topbar">
-          <button
-            className={`menu-button ${isSidebarOpen ? 'menu-button-hidden' : ''}`}
-            type="button"
-            aria-label="Toggle sidebar"
-            onClick={() => setIsSidebarOpen((open) => !open)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+          <div className={`dashboard-menu-group ${isSidebarOpen ? 'menu-button-hidden' : ''}`}>
+            <button
+              className="menu-button"
+              type="button"
+              aria-label="Toggle sidebar"
+              onClick={() => setIsSidebarOpen((open) => !open)}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+            <button
+              className="new-chat-button"
+              type="button"
+              aria-label="Create new chat"
+              onClick={handleStartNewChat}
+            >
+              +
+            </button>
+          </div>
           <button
             className="dashboard-home-button"
             type="button"
@@ -374,23 +497,23 @@ function DashboardPage() {
 
         <div className="chat-layout">
           <div className="chat-thread">
-            <article className="message message-assistant">
-              <p>What would you like Nanowork to build today?</p>
-            </article>
-            <article className="message message-user">
-              <p>Create an AI-first business from a single prompt.</p>
-            </article>
-            <article className="message message-assistant">
-              <p>
-                I can help shape the business, workflows, tooling, and launch
-                plan. Start with your idea and constraints.
-              </p>
-            </article>
+            {visibleMessages.map((message, index) => (
+              <article
+                key={`${message.role}-${index}`}
+                className={`message ${
+                  message.role === 'assistant' ? 'message-assistant' : 'message-user'
+                }`}
+              >
+                <p>{message.content}</p>
+              </article>
+            ))}
           </div>
 
-          <form className="chat-composer">
+          <form className="chat-composer" onSubmit={handleComposerSubmit}>
             <input
               className="chat-input"
+              value={composerText}
+              onChange={(event) => setComposerText(event.target.value)}
               placeholder="Describe the business you want to launch..."
             />
             <button className="chat-send" type="submit">
@@ -827,6 +950,14 @@ function App() {
       <Route path={checkoutPath} element={<CheckoutPage />} />
       <Route
         path={dashboardPath}
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={`${dashboardPath}/:chatId`}
         element={
           <ProtectedRoute>
             <DashboardPage />

@@ -103,6 +103,12 @@
   gap: 0.25rem;
 }
 
+.sidebar-empty-state {
+  padding: 0.7rem 0.55rem;
+  color: #6f6f6f;
+  font-size: 0.86rem;
+}
+
 .sidebar-section-title {
   padding: 0.55rem 0.55rem 0.4rem;
   font-size: 1rem;
@@ -287,6 +293,12 @@
   padding: 1rem 1.25rem;
 }
 
+.dashboard-menu-group {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
 .app-page-header {
   width: min(1120px, 100%);
   margin: 0 auto;
@@ -356,6 +368,23 @@
 .menu-button-hidden {
   opacity: 0;
   pointer-events: none;
+}
+
+.new-chat-button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .dashboard-title {
