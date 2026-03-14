@@ -463,6 +463,237 @@
 .profile-page {
   min-height: 100vh;
   background: #000000;
+  color: #ffffff;
+}
+
+.profile-shell {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.profile-kicker {
+  margin: 0;
+  color: #8b8b8b;
+  font-size: 0.88rem;
+}
+
+.profile-header h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: 400;
+}
+
+.profile-subtitle {
+  margin: 0;
+  max-width: 680px;
+  color: #9a9a9a;
+}
+
+.profile-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  padding: 1.2rem;
+  border: 1px solid #1d1d1d;
+  border-radius: 24px;
+  background: #0d0d0d;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.metric-card.featured {
+  background: linear-gradient(160deg, #171717, #0d0d0d);
+}
+
+.metric-label {
+  color: #8b8b8b;
+  font-size: 0.85rem;
+}
+
+.metric-value {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 500;
+}
+
+.metric-note {
+  margin: 0;
+  color: #7d7d7d;
+  font-size: 0.88rem;
+}
+
+.profile-breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.profile-breakdown-focus {
+  align-items: stretch;
+}
+
+.breakdown-panel {
+  padding: 1.2rem;
+  border: 1px solid #1d1d1d;
+  border-radius: 24px;
+  background: #0d0d0d;
+}
+
+.revenue-panel,
+.pie-panel {
+  min-height: 100%;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.panel-heading h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.panel-heading span {
+  color: #7d7d7d;
+  font-size: 0.82rem;
+}
+
+.breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 0;
+  border-top: 1px solid #1a1a1a;
+}
+
+.breakdown-row:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.breakdown-row span {
+  color: #8f8f8f;
+}
+
+.breakdown-row strong {
+  font-weight: 500;
+}
+
+.revenue-tiles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.revenue-tile {
+  padding: 0.95rem 1rem;
+  border: 1px solid #1d1d1d;
+  border-radius: 18px;
+  background: #111111;
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font: inherit;
+}
+
+.revenue-tile.active {
+  border-color: #383838;
+  background: #171717;
+}
+
+.revenue-tile-name {
+  max-width: 70%;
+  color: #a0a0a0;
+}
+
+.pie-panel-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.business-pie-chart {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background:
+    conic-gradient(
+      #f1f1f1 0 var(--segment-one),
+      #8e8e8e var(--segment-one) var(--segment-two),
+      #3c3c3c var(--segment-two) 100%
+    );
+  display: grid;
+  place-items: center;
+}
+
+.business-pie-hole {
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  background: #0d0d0d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.business-pie-hole strong {
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+
+.business-pie-hole span {
+  color: #8d8d8d;
+  font-size: 0.82rem;
+}
+
+.selected-business-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.selected-business-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.selected-business-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #1a1a1a;
+}
+
+.selected-business-row span {
+  color: #8f8f8f;
 }
 
 .topbar {
@@ -554,6 +785,26 @@
 
   .dashboard-sidebar {
     width: min(232px, 82vw);
+  }
+
+  .profile-metrics-grid,
+  .profile-breakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .pie-panel-body {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .business-pie-chart {
+    width: 180px;
+    height: 180px;
+  }
+
+  .business-pie-hole {
+    width: 98px;
+    height: 98px;
   }
 
   .chat-layout {
