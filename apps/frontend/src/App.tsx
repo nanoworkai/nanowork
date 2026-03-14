@@ -9,6 +9,8 @@ import {
 
 import OAuthSuccess from './OAuthSuccess.js'
 const profilePath = '/profile'
+const walletPath = '/wallet'
+const reportBugsPath = '/reportbugs'
 
 function LandingPage() {
   const navigate = useNavigate()
@@ -71,11 +73,12 @@ function DashboardPage() {
             aria-label="Close sidebar"
             onClick={() => setIsSidebarOpen(false)}
           >
-            ×
+            <span />
+            <span />
           </button>
         </div>
         <nav className="sidebar-nav">
-          <div className="sidebar-section-title">Chat History</div>
+          <div className="sidebar-section-title">Your Businesses</div>
           <button className="sidebar-item active" type="button">
             Today
           </button>
@@ -90,11 +93,45 @@ function DashboardPage() {
           </button>
         </nav>
         <div className="sidebar-footer">
-          <button className="sidebar-footer-item" type="button">
-            Connect your wallet
-          </button>
-          <a className="sidebar-footer-item profile-link" href={profilePath}>
-            Profile
+          <a
+            className="sidebar-icon-button profile-link"
+            href={profilePath}
+            aria-label="Profile"
+          >
+            <span className="profile-icon" aria-hidden="true">
+              <span />
+              <span />
+            </span>
+          </a>
+          <a
+            className="sidebar-icon-button"
+            href={walletPath}
+            aria-label="Connect wallet"
+          >
+            <span className="wallet-icon" aria-hidden="true">
+              <span />
+              <span />
+            </span>
+          </a>
+          <a
+            className="sidebar-icon-button"
+            href="mailto:founders@nanowork.ai"
+            aria-label="Email founders@nanowork.ai"
+          >
+            <span className="mail-icon" aria-hidden="true">
+              <span />
+            </span>
+          </a>
+          <a
+            className="sidebar-icon-button"
+            href={reportBugsPath}
+            aria-label="Bug reports"
+          >
+            <span className="bug-icon" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
           </a>
         </div>
       </aside>
@@ -139,6 +176,13 @@ function DashboardPage() {
               ↑
             </button>
           </form>
+
+          <footer className="dashboard-footer">
+            <p>
+              <span className="dashboard-copyright-icon" aria-hidden="true">©</span>
+              <span>All rights reserved</span>
+            </p>
+          </footer>
         </div>
       </section>
     </main>
@@ -151,6 +195,8 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path={dashboardPath} element={<DashboardPage />} />
       <Route path={profilePath} element={<main className="profile-page" />} />
+      <Route path={walletPath} element={<main className="profile-page" />} />
+      <Route path={reportBugsPath} element={<main className="profile-page" />} />
       <Route path={oauthSuccessPath} element={<OAuthSuccess />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
