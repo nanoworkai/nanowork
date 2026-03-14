@@ -80,7 +80,7 @@ function LandingPage() {
         </div>
       </section>
 
-      <StandardFooter />
+      <StandardFooter className="dashboard-footer" />
     </main>
   )
 }
