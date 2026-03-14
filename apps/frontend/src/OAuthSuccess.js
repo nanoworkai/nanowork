@@ -12,8 +12,19 @@ export function isSignedIn() {
   return Boolean(window.localStorage.getItem(tokenStorageKey))
 }
 
+function getWindowCustomerId() {
+  const checkoutWindow = window
+
+  return (
+    checkoutWindow.contextWindow?.customerId?.trim() ??
+    checkoutWindow.nanoworkContext?.customerId?.trim() ??
+    checkoutWindow.__NANOWORK_CONTEXT__?.customerId?.trim() ??
+    ''
+  )
+}
+
 export function handleCtaRedirection(navigate) {
-  navigate(checkoutPath)
+  navigate(getWindowCustomerId() ? dashboardPath : checkoutPath)
 }
 
 const OAuthSuccess = () => {
