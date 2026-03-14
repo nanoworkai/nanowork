@@ -55,6 +55,7 @@ function LandingPage() {
 
 function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const navigate = useNavigate()
 
   return (
     <main className="dashboard-page">
@@ -66,7 +67,13 @@ function DashboardPage() {
       />
       <aside className={`dashboard-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <span>Nanowork</span>
+          <button
+            className="sidebar-home-button"
+            type="button"
+            onClick={() => navigate('/')}
+          >
+            <span>Nanowork</span>
+          </button>
           <button
             className="sidebar-close"
             type="button"
@@ -148,7 +155,13 @@ function DashboardPage() {
             <span />
             <span />
           </button>
-          <span className="dashboard-title">Nanowork</span>
+          <button
+            className="dashboard-home-button"
+            type="button"
+            onClick={() => navigate('/')}
+          >
+            <span className="dashboard-title">Nanowork</span>
+          </button>
         </header>
 
         <div className="chat-layout">

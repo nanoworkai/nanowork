@@ -61,6 +61,15 @@
   color: #d6d6d6;
 }
 
+.sidebar-home-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
 .sidebar-close {
   width: 18px;
   height: 18px;
@@ -316,6 +325,13 @@
 .dashboard-title {
   font-size: 0.95rem;
   color: #d0d0d0;
+}
+
+.dashboard-home-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
 }
 
 .chat-layout {
