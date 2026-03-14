@@ -1,49 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useNavigate, Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
+import {
+  dashboardPath,
+  handleCtaRedirection,
+  oauthSuccessPath,
+} from './OAuthSuccess.js'
 
-const googleAuthUrl = 'https://accounts.google.com/signin'
-const homePath = '/home'
+import OAuthSuccess from './OAuthSuccess.js'
 
-function getIsSignedIn() {
-  const authKeys = [
-    'nanowork-auth',
-    'nanowork-user',
-    'google-auth-token',
-    'authToken',
-  ]
-
-  return authKeys.some((key) => window.localStorage.getItem(key))
-}
-
-function App() {
-  const [pathname, setPathname] = useState(() => window.location.pathname)
-
-  useEffect(() => {
-    const handlePopState = () => setPathname(window.location.pathname)
-
-    window.addEventListener('popstate', handlePopState)
-
-    return () => window.removeEventListener('popstate', handlePopState)
-  }, [])
+function LandingPage() {
+  const navigate = useNavigate()
 
   const handleTryNow = () => {
-    if (getIsSignedIn()) {
-      window.history.pushState({}, '', homePath)
-      setPathname(homePath)
-      return
-    }
-
-    window.location.href = googleAuthUrl
+    handleCtaRedirection(navigate)
   }
 
-  if (pathname === homePath) {
-    return <main className="home-page" />
+  const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    navigate('/')
   }
 
   return (
     <main className="landing-page">
       <header className="topbar">
-        <a className="navbar" href={googleAuthUrl}>
+        <a className="navbar" href="/" onClick={handleNavClick}>
           <span className="brand">Nanowork</span>
         </a>
       </header>
@@ -66,6 +46,21 @@ function App() {
         <a href="mailto:founders@nanowork.ai">Contact us at founders@nanowork.ai</a>
       </footer>
     </main>
+  )
+}
+
+function DashboardPage() {
+  return <main className="dashboard-page" />
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path={dashboardPath} element={<DashboardPage />} />
+      <Route path={oauthSuccessPath} element={<OAuthSuccess />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 
