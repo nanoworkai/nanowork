@@ -381,6 +381,114 @@ function ProfilePage() {
   )
 }
 
+function ReportBugsPage() {
+  const navigate = useNavigate()
+  const [pageUrl, setPageUrl] = useState('')
+  const [brokenPart, setBrokenPart] = useState('')
+  const [bugDetails, setBugDetails] = useState('')
+  const [contactName, setContactName] = useState('')
+  const [contactEmail, setContactEmail] = useState('')
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const subject = encodeURIComponent('Nanowork bug report')
+    const body = encodeURIComponent(
+      [
+        'A user reported a bug on Nanowork.',
+        '',
+        `Page URL: ${pageUrl || 'Not provided'}`,
+        `Broken part: ${brokenPart || 'Not provided'}`,
+        '',
+        'What is broken:',
+        bugDetails || 'Not provided',
+        '',
+        'User contact details:',
+        `Name: ${contactName || 'Not provided'}`,
+        `Email: ${contactEmail || 'Not provided'}`,
+      ].join('\n'),
+    )
+
+    window.location.href = `mailto:founders@nanowork.ai?subject=${subject}&body=${body}`
+    window.setTimeout(() => navigate(dashboardPath), 150)
+  }
+
+  return (
+    <main className="profile-page">
+      <AppHeader />
+      <section className="report-shell">
+        <header className="profile-header">
+          <p className="profile-kicker">Bug Reports</p>
+          <h1>Tell us what broke</h1>
+          <p className="profile-subtitle">
+            Send the exact page, broken area, and your contact details so we can
+            investigate and send a thank-you note back.
+          </p>
+        </header>
+
+        <form className="report-form" onSubmit={handleSubmit}>
+          <label className="report-field">
+            <span>Page URL</span>
+            <input
+              type="url"
+              value={pageUrl}
+              onChange={(event) => setPageUrl(event.target.value)}
+              placeholder="https://nanowork.ai/dashboard"
+            />
+          </label>
+
+          <label className="report-field">
+            <span>What part is broken?</span>
+            <input
+              type="text"
+              value={brokenPart}
+              onChange={(event) => setBrokenPart(event.target.value)}
+              placeholder="Sidebar, analytics chart, profile form..."
+            />
+          </label>
+
+          <label className="report-field report-field-wide">
+            <span>Describe the bug</span>
+            <textarea
+              value={bugDetails}
+              onChange={(event) => setBugDetails(event.target.value)}
+              placeholder="What did you expect to happen and what actually happened?"
+              rows={6}
+            />
+          </label>
+
+          <label className="report-field">
+            <span>Your name</span>
+            <input
+              type="text"
+              value={contactName}
+              onChange={(event) => setContactName(event.target.value)}
+              placeholder="Jane Doe"
+            />
+          </label>
+
+          <label className="report-field">
+            <span>Your email</span>
+            <input
+              type="email"
+              value={contactEmail}
+              onChange={(event) => setContactEmail(event.target.value)}
+              placeholder="jane@example.com"
+            />
+          </label>
+
+          <div className="report-actions">
+            <button className="report-submit" type="submit">
+              Fix it
+            </button>
+          </div>
+        </form>
+      </section>
+      <StandardFooter className="profile-footer" />
+    </main>
+  )
+}
+
 function EmptyPage() {
   return (
     <main className="profile-page">
@@ -397,7 +505,7 @@ function App() {
       <Route path={dashboardPath} element={<DashboardPage />} />
       <Route path={profilePath} element={<ProfilePage />} />
       <Route path={walletPath} element={<EmptyPage />} />
-      <Route path={reportBugsPath} element={<EmptyPage />} />
+      <Route path={reportBugsPath} element={<ReportBugsPage />} />
       <Route path={oauthSuccessPath} element={<OAuthSuccess />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

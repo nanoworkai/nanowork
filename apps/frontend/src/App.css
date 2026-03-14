@@ -319,8 +319,8 @@
 }
 
 .menu-button {
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   padding: 0;
   border: 0;
   border-radius: 12px;
@@ -341,15 +341,15 @@
 }
 
 .menu-button span:nth-child(1) {
-  width: 20px;
-}
-
-.menu-button span:nth-child(2) {
   width: 14px;
 }
 
+.menu-button span:nth-child(2) {
+  width: 10px;
+}
+
 .menu-button span:nth-child(3) {
-  width: 9px;
+  width: 6px;
   height: 1.5px;
 }
 
@@ -523,6 +523,15 @@
   gap: 1.5rem;
 }
 
+.report-shell {
+  width: min(920px, 100%);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .profile-header {
   display: flex;
   flex-direction: column;
@@ -587,6 +596,61 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
+}
+
+.report-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.report-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.report-field span {
+  color: #9a9a9a;
+  font-size: 0.9rem;
+}
+
+.report-field input,
+.report-field textarea {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid #1d1d1d;
+  border-radius: 18px;
+  background: #0d0d0d;
+  color: #ffffff;
+  font: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.report-field input::placeholder,
+.report-field textarea::placeholder {
+  color: #6f6f6f;
+}
+
+.report-field-wide {
+  grid-column: 1 / -1;
+}
+
+.report-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.report-submit {
+  padding: 0.8rem 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: #121212;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
 }
 
 .profile-breakdown-focus {
@@ -828,6 +892,10 @@
 
   .profile-metrics-grid,
   .profile-breakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .report-form {
     grid-template-columns: 1fr;
   }
 
