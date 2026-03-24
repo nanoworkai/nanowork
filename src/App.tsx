@@ -10,7 +10,7 @@ export default function App() {
             The future is automated. Your income should be too.
           </p>
         </main>
-        <footer>copyright Nanowork, Inc 2026</footer>
+        <footer>© Nanowork, Inc 2026</footer>
       </div>
     </>
   );
