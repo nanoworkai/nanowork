@@ -90,6 +90,10 @@ main {
   letter-spacing: 0.02em;
 }
 
+.tagline + .tagline {
+  margin-top: 0.35em;
+}
+
 footer {
   padding: 1.5rem clamp(1.5rem, 4vw, 2rem) 2rem;
   text-align: center;
