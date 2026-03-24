@@ -1,9 +1,0 @@
-[project]
-name = "nanowork-generator"
-version = "0.1.0"
-description = "AI prompt → spec/code generation for nanowork platform"
-requires-python = ">=3.11"
-dependencies = []
-
-[project.optional-dependencies]
-llm = ["openai>=1.0.0", "anthropic>=0.40.0"]
