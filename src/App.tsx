@@ -7,6 +7,11 @@ const CHAT_USER =
 const CHAT_ASSISTANT =
   "On it—drafting copy, structure, and a signup flow. I’ll ping you here when it’s ready to ship.";
 
+/** Nanowork SMS / iMessage line — E.164 for sms: links; display for humans. */
+const NANOWORK_SMS_E164 = "+16506740193";
+const NANOWORK_SMS_DISPLAY = "(650) 674-0193";
+const NANOWORK_SMS_HREF = `sms:${NANOWORK_SMS_E164}`;
+
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(
     () =>
@@ -122,6 +127,41 @@ function ChatDemo() {
   );
 }
 
+function PricingSection() {
+  return (
+    <section className="pricing" aria-labelledby="pricing-heading">
+      <h2 id="pricing-heading" className="pricing__heading">
+        Pricing
+      </h2>
+      <p className="pricing__intro">
+        One monthly plan. Everything runs in iMessage—text us to work like you would
+        with a cofounder.
+      </p>
+      <div className="pricing__card-wrap">
+        <article className="pricing-card">
+          <h3 className="pricing-card__name">Nanowork</h3>
+          <p className="pricing-card__price">
+            <span className="pricing-card__amount">$99</span>
+            <span className="pricing-card__period">/ month</span>
+          </p>
+          <ul className="pricing-card__features">
+            <li>Full iMessage access</li>
+            <li>Generous usage for real builds and launches</li>
+            <li>Multiple projects in flight</li>
+            <li>Priority in beta as we add features</li>
+          </ul>
+          <a className="pricing-card__cta" href={NANOWORK_SMS_HREF}>
+            Text us to start
+          </a>
+        </article>
+      </div>
+      <p className="pricing__footnote">
+        Beta pricing—we may adjust as we learn what builders need. No hidden fees.
+      </p>
+    </section>
+  );
+}
+
 function formatSanFranciscoClock(date: Date) {
   return new Intl.DateTimeFormat("en-US", {
     timeZone: SF_TIMEZONE,
@@ -185,7 +225,48 @@ export default function App() {
             We’re an AI that goes from your prompt to a complete startup—inside
             iMessage.
           </h1>
+          <div className="text-us">
+            <p className="text-us__lead">
+              Text us anytime in iMessage (or SMS)—same as messaging a friend.
+            </p>
+            <a
+              className="text-us__number"
+              href={NANOWORK_SMS_HREF}
+              aria-label={`Text Nanowork at ${NANOWORK_SMS_DISPLAY}`}
+            >
+              {NANOWORK_SMS_DISPLAY}
+            </a>
+            <p className="text-us__note">Tap the number to open Messages.</p>
+          </div>
           <ChatDemo />
+          <form
+            className="phone-signup"
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+            aria-label="Join the waitlist with your phone number"
+          >
+            <label className="phone-signup__label" htmlFor="waitlist-phone">
+              Your number for the beta
+            </label>
+            <div className="phone-signup__row">
+              <input
+                id="waitlist-phone"
+                className="phone-signup__input"
+                name="phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="626-666-9675"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+              <button className="phone-signup__submit" type="submit">
+                Join waitlist
+              </button>
+            </div>
+          </form>
+          <PricingSection />
         </main>
       </div>
       <footer className="site-footer">
@@ -195,7 +276,7 @@ export default function App() {
         </span>
         <a
           className="site-footer__link"
-          href="https://x.com/nanowork"
+          href="https://x.com/nanoworkai"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -211,6 +292,16 @@ export default function App() {
           rel="noopener noreferrer"
         >
           LinkedIn
+        </a>
+        <span className="site-footer__sep" aria-hidden>
+          ·
+        </span>
+        <a
+          className="site-footer__link"
+          href={NANOWORK_SMS_HREF}
+          aria-label={`Text Nanowork at ${NANOWORK_SMS_DISPLAY}`}
+        >
+          Text us
         </a>
       </footer>
       <aside

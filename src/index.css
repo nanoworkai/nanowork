@@ -133,7 +133,55 @@ body {
 }
 
 .simple-main .simple-headline {
-  margin-bottom: clamp(1.75rem, 5vw, 2.25rem);
+  margin-bottom: clamp(0.75rem, 2.5vw, 1.1rem);
+}
+
+.text-us {
+  margin-bottom: clamp(1.35rem, 4vw, 1.85rem);
+  max-width: 26rem;
+  margin-inline: auto;
+}
+
+.text-us__lead {
+  font-size: clamp(0.9375rem, 2.8vw, 1.0625rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(232, 230, 225, 0.82);
+  margin-bottom: 0.65rem;
+}
+
+.text-us__number {
+  display: inline-block;
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(196, 165, 116, 0.35);
+  padding-bottom: 0.1rem;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.text-us__number:hover {
+  color: #d4b88a;
+  border-bottom-color: rgba(212, 184, 138, 0.55);
+}
+
+.text-us__number:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 4px;
+  border-bottom-color: transparent;
+}
+
+.text-us__note {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  line-height: 1.4;
 }
 
 .chat-demo {
@@ -141,6 +189,244 @@ body {
   max-width: 22.5rem;
   margin-inline: auto;
   text-align: left;
+}
+
+.simple-main .phone-signup {
+  margin-top: clamp(1.75rem, 5vw, 2.25rem);
+}
+
+.phone-signup {
+  width: 100%;
+  max-width: 22.5rem;
+  margin-inline: auto;
+  text-align: left;
+}
+
+.phone-signup__label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.9;
+}
+
+.phone-signup__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.phone-signup__input {
+  flex: 1 1 10rem;
+  min-width: 0;
+  padding: 0.65rem 0.85rem;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.phone-signup__input::placeholder {
+  color: var(--muted);
+  opacity: 0.75;
+}
+
+.phone-signup__input:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.phone-signup__input:focus-visible {
+  border-color: rgba(196, 165, 116, 0.45);
+  box-shadow: 0 0 0 3px rgba(196, 165, 116, 0.12);
+}
+
+.phone-signup__submit {
+  flex: 0 0 auto;
+  padding: 0.65rem 1rem;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: linear-gradient(145deg, var(--accent) 0%, #9a7b4a 100%);
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition:
+    filter 0.15s ease,
+    transform 0.12s ease;
+}
+
+.phone-signup__submit:hover {
+  filter: brightness(1.06);
+}
+
+.phone-signup__submit:active {
+  transform: scale(0.98);
+}
+
+.phone-signup__submit:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.pricing {
+  margin-top: clamp(2.5rem, 7vw, 3.5rem);
+  padding-top: clamp(2rem, 5vw, 2.75rem);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.pricing__heading {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(1.65rem, 4.5vw, 2.15rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: rgba(245, 242, 236, 0.96);
+  margin-bottom: 0.65rem;
+}
+
+.pricing__intro {
+  max-width: 28rem;
+  margin-inline: auto;
+  margin-bottom: clamp(1.35rem, 4vw, 1.85rem);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: rgba(232, 230, 225, 0.72);
+}
+
+.pricing__card-wrap {
+  max-width: 22.5rem;
+  margin-inline: auto;
+  text-align: left;
+}
+
+.pricing-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 1.35rem 1.35rem;
+  border-radius: 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(
+    165deg,
+    rgba(28, 29, 34, 0.88) 0%,
+    rgba(18, 19, 23, 0.94) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.3),
+    0 12px 36px rgba(0, 0, 0, 0.35);
+}
+
+.pricing-card__name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+
+.pricing-card__price {
+  margin-bottom: 1rem;
+  line-height: 1.1;
+}
+
+.pricing-card__amount {
+  font-family: "Instrument Serif", Georgia, serif;
+  font-size: clamp(2rem, 5vw, 2.35rem);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  color: rgba(245, 242, 236, 0.98);
+}
+
+.pricing-card__period {
+  margin-left: 0.2rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.pricing-card__features {
+  list-style: none;
+  flex: 1;
+  margin-bottom: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgba(232, 230, 225, 0.78);
+}
+
+.pricing-card__features li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.pricing-card__features li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.65;
+}
+
+.pricing-card__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--bg);
+  background: linear-gradient(145deg, var(--accent) 0%, #9a7b4a 100%);
+  border-radius: 0.75rem;
+  transition:
+    filter 0.15s ease,
+    transform 0.12s ease;
+}
+
+.pricing-card__cta:hover {
+  filter: brightness(1.06);
+}
+
+.pricing-card__cta:active {
+  transform: scale(0.99);
+}
+
+.pricing-card__cta:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.pricing__footnote {
+  margin-top: clamp(1.25rem, 3.5vw, 1.65rem);
+  max-width: 26rem;
+  margin-inline: auto;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--muted);
 }
 
 .chat-demo__shell {
