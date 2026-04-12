@@ -189,8 +189,6 @@ function sanFranciscoWallTimeISO(date: Date) {
 }
 
 export default function App() {
-  const [phone, setPhone] = useState("");
-
   const [clock, setClock] = useState(() => {
     const d = new Date();
     return {
@@ -239,33 +237,6 @@ export default function App() {
             <p className="text-us__note">Tap the number to open Messages.</p>
           </div>
           <ChatDemo />
-          <form
-            className="phone-signup"
-            onSubmit={(e) => {
-              e.preventDefault();
-            }}
-            aria-label="Join the waitlist with your phone number"
-          >
-            <label className="phone-signup__label" htmlFor="waitlist-phone">
-              Your number for the beta
-            </label>
-            <div className="phone-signup__row">
-              <input
-                id="waitlist-phone"
-                className="phone-signup__input"
-                name="phone"
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                placeholder="626-666-9675"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-              <button className="phone-signup__submit" type="submit">
-                Join waitlist
-              </button>
-            </div>
-          </form>
           <PricingSection />
         </main>
       </div>
