@@ -89,6 +89,7 @@ function TopNav() {
         <a href="#build">Ideas</a>
         <Link to="/gallery">Gallery</Link>
         <a href="#agents">API</a>
+        <Link to="/changelog">Changelog</Link>
         <a href="#philosophy">Why</a>
         <a href="#faq">FAQ</a>
       </nav>
@@ -687,6 +688,9 @@ function SiteFooter() {
               </li>
               <li>
                 <a href="#agents">API &amp; agents</a>
+              </li>
+              <li>
+                <Link to="/changelog">Changelog</Link>
               </li>
               <li>
                 <a href="#philosophy">Why Nanowork</a>
