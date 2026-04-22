@@ -2400,6 +2400,16 @@ summary:focus-visible {
   padding-top: clamp(2rem, 4vw, 3rem);
 }
 
+.log__empty {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 3rem 0;
+  text-align: center;
+  color: var(--muted-2);
+  font-size: 0.95rem;
+  border-top: 1px solid var(--border);
+}
+
 .log__entry {
   display: grid;
   grid-template-columns: 14rem minmax(0, 1fr);
