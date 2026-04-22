@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import {
+  NANOWORK_SMS_DISPLAY,
+  NANOWORK_SMS_HREF,
+  SiteFooter,
+  TopNav,
+} from "../components/SiteChrome";
 import { Link } from "react-router-dom";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 /** Nanowork SMS / iMessage line — E.164 for sms: links; display for humans. */
 const NANOWORK_SMS_E164 = "+16506740193";
@@ -93,6 +100,7 @@ function TopNav() {
         <a href="#philosophy">Why</a>
         <a href="#faq">FAQ</a>
       </nav>
+      <ThemeToggle />
       <a className="site-nav__cta" href={NANOWORK_SMS_HREF}>
         <span className="status-dot" aria-hidden />
         Text us
@@ -739,7 +747,7 @@ function SiteFooter() {
 export default function Home() {
   return (
     <>
-      <TopNav />
+      <TopNav onHome />
       <main className="page page--pro">
         <Hero />
         <HowItWorks />
@@ -749,7 +757,7 @@ export default function Home() {
         <FAQ />
         <ClosingCTA />
       </main>
-      <SiteFooter />
+      <SiteFooter onHome />
     </>
   );
 }
