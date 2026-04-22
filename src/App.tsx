@@ -1,7 +1,38 @@
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
+import Changelog from "./pages/Changelog";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Changelog from "./pages/Changelog";
 import DemoPage from "./pages/Demo";
+import { BUSINESSES } from "./data/businesses";
+
+const RESERVED_PATHS = new Set([
+  "gallery",
+  "changelog",
+  "demo",
+  "api",
+  "assets",
+  "static",
+]);
+
+function LegacyDemoRedirect() {
+  const { slug } = useParams<{ slug: string }>();
+  if (!slug) return <Navigate to="/gallery" replace />;
+  return <Navigate to={`/${slug}`} replace />;
+}
+
+function SlugRouter() {
+  const { slug } = useParams<{ slug: string }>();
+  if (!slug || RESERVED_PATHS.has(slug)) {
+    return <Navigate to="/" replace />;
+  }
+  const isBusiness = BUSINESSES.some((b) => b.slug === slug);
+  if (!isBusiness) {
+    return <Navigate to="/" replace />;
+  }
+  return <DemoPage />;
+}
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -12,6 +43,12 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/changelog" element={<Changelog />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/changelog" element={<Changelog />} />
+        <Route path="/demo/:slug" element={<LegacyDemoRedirect />} />
+        <Route path="/:slug" element={<SlugRouter />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/demo/:slug" element={<DemoPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

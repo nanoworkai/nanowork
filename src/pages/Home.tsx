@@ -1,4 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import {
+  NANOWORK_SMS_DISPLAY,
+  NANOWORK_SMS_HREF,
+  SiteFooter,
+  TopNav,
+} from "../components/SiteChrome";
 import { Link } from "react-router-dom";
 import { ThemeToggle } from "../components/ThemeToggle";
 
@@ -735,7 +741,7 @@ function SiteFooter() {
 export default function Home() {
   return (
     <>
-      <TopNav />
+      <TopNav onHome />
       <main className="page page--pro">
         <Hero />
         <HowItWorks />
@@ -745,7 +751,7 @@ export default function Home() {
         <FAQ />
         <ClosingCTA />
       </main>
-      <SiteFooter />
+      <SiteFooter onHome />
     </>
   );
 }
