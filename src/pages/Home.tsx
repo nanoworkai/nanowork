@@ -12,11 +12,11 @@ export default function Home() {
             <span className="status-dot" aria-hidden />
             In early beta
           </span>
-          <h1 className="simple-headline">from idea to revenue</h1>
+          <h1 className="simple-headline">From idea to revenue</h1>
           <p className="simple-subhead">
             We’re the fastest way for people to build and explore ideas—without
             the capital cost of a typical startup. It all happens inside your
-            phone.
+            messages
           </p>
           <div className="text-us">
             <p className="text-us__lead">iMessage or SMS.</p>
