@@ -1,8 +1,5 @@
 import { Link } from "react-router-dom";
-
-export const NANOWORK_SMS_E164 = "+16506740193";
-export const NANOWORK_SMS_DISPLAY = "(650) 674-0193";
-export const NANOWORK_SMS_HREF = `sms:${NANOWORK_SMS_E164}`;
+import { TextUsLink } from "./PhoneReveal";
 
 export function BrandMark() {
   return (
@@ -47,10 +44,10 @@ export function TopNav({ onHome = false }: TopNavProps) {
         <a href={href("#faq")}>FAQ</a>
         <Link to="/changelog">Changelog</Link>
       </nav>
-      <a className="site-nav__cta" href={NANOWORK_SMS_HREF}>
+      <TextUsLink className="site-nav__cta">
         <span className="status-dot" aria-hidden />
         Text us
-      </a>
+      </TextUsLink>
     </header>
   );
 }
@@ -92,7 +89,7 @@ export function SiteFooter({ onHome = false }: TopNavProps) {
             <p className="footer__heading">Contact</p>
             <ul>
               <li>
-                <a href={NANOWORK_SMS_HREF}>Text {NANOWORK_SMS_DISPLAY}</a>
+                <TextUsLink>Text us</TextUsLink>
               </li>
               <li>
                 <a

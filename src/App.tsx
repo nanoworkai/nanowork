@@ -1,10 +1,9 @@
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
-import { Navigate, Route, Routes } from "react-router-dom";
-import Changelog from "./pages/Changelog";
-import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Changelog from "./pages/Changelog";
 import DemoPage from "./pages/Demo";
+import Gallery from "./pages/Gallery";
+import NotFound from "./pages/NotFound";
 import { BUSINESSES } from "./data/businesses";
 
 const RESERVED_PATHS = new Set([
@@ -29,11 +28,10 @@ function SlugRouter() {
   }
   const isBusiness = BUSINESSES.some((b) => b.slug === slug);
   if (!isBusiness) {
-    return <Navigate to="/" replace />;
+    return <NotFound />;
   }
   return <DemoPage />;
 }
-import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
@@ -42,14 +40,10 @@ export default function App() {
       <div className="glow" aria-hidden />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/changelog" element={<Changelog />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/changelog" element={<Changelog />} />
         <Route path="/demo/:slug" element={<LegacyDemoRedirect />} />
         <Route path="/:slug" element={<SlugRouter />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-        <Route path="/demo/:slug" element={<DemoPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
