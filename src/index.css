@@ -2567,3 +2567,116 @@ summary:focus-visible {
 .log__foot a:hover {
   border-bottom-color: var(--accent);
 }
+
+/* =========================================================================
+   404 / Not found page
+   ========================================================================= */
+
+.page--notfound {
+  padding-top: 62px;
+}
+
+.notfound {
+  padding: clamp(3.5rem, 9vw, 7rem) clamp(1rem, 4vw, 2rem)
+    clamp(4rem, 8vw, 6rem);
+}
+
+.notfound__inner {
+  max-width: 46rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.notfound__inner .platform-pill {
+  margin-bottom: 1.75rem;
+}
+
+.notfound__code {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(5rem, 18vw, 11rem);
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  margin: 0 0 0.75rem;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 247, 240, 0.18) 0%,
+    rgba(184, 179, 169, 0.04) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  user-select: none;
+}
+
+.notfound__title {
+  max-width: 20ch;
+  margin: 0 auto 1.35rem;
+  font-size: clamp(2.25rem, 5.5vw, 3.75rem);
+}
+
+.notfound__lede {
+  margin: 0 auto 2rem;
+  max-width: 38rem;
+}
+
+.notfound__cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+.notfound__links {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 0;
+  border-top: 1px solid var(--border);
+  padding-top: clamp(1.5rem, 3vw, 2.25rem);
+  text-align: left;
+}
+
+@media (max-width: 720px) {
+  .notfound__links {
+    grid-template-columns: 1fr;
+  }
+}
+
+.notfound__links > li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-surface);
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.notfound__links > li:hover {
+  border-color: var(--accent-border);
+  transform: translateY(-1px);
+}
+
+.notfound__links a {
+  color: var(--fg);
+  text-decoration: none;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+
+.notfound__links a:hover {
+  color: var(--accent-bright);
+}
+
+.notfound__links span {
+  font-size: 0.88rem;
+  color: var(--muted-2);
+  line-height: 1.45;
+}
+
