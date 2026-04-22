@@ -352,6 +352,7 @@ function TopNav() {
           Gallery
         </Link>
         <Link to="/#agents">API</Link>
+        <Link to="/changelog">Changelog</Link>
         <Link to="/#faq">FAQ</Link>
       </nav>
       <a className="site-nav__cta" href={NANOWORK_SMS_HREF}>
@@ -941,6 +942,9 @@ function SiteFooter() {
               </li>
               <li>
                 <Link to="/#agents">API &amp; agents</Link>
+              </li>
+              <li>
+                <Link to="/changelog">Changelog</Link>
               </li>
               <li>
                 <Link to="/#faq">FAQ</Link>
