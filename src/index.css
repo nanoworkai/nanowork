@@ -17,6 +17,23 @@
   --accent-border: rgba(196, 165, 116, 0.32);
   --imsg-blue: #0a84ff;
   --imsg-gray: #262a32;
+  /* Semantic neutral tints (swap per theme so light mode doesn't paint white on white) */
+  --tint-1: rgba(255, 255, 255, 0.02);
+  --tint-2: rgba(255, 255, 255, 0.04);
+  --tint-3: rgba(255, 255, 255, 0.06);
+  --tint-4: rgba(255, 255, 255, 0.08);
+  --tint-5: rgba(255, 255, 255, 0.12);
+  /* Text color to use on top of solid --accent fills (buttons, pills, etc.) */
+  --on-accent: #0a0b0e;
+  /* Headline gradients */
+  --headline-grad: linear-gradient(180deg, #faf7f0 0%, #b8b3a9 100%);
+  --headline-grad-soft: linear-gradient(180deg, #faf7f0 0%, #d6cfc1 100%);
+  --notfound-grad: linear-gradient(
+    180deg,
+    rgba(250, 247, 240, 0.18) 0%,
+    rgba(184, 179, 169, 0.04) 100%
+  );
+  --selection-fg: #fff;
   --radius-sm: 10px;
   --radius: 14px;
   --radius-lg: 20px;
@@ -48,6 +65,22 @@
   --accent-border: rgba(160, 120, 64, 0.3);
   --imsg-blue: #0a84ff;
   --imsg-gray: #e0dedd;
+  /* Dark ink tints so surfaces pick up depth against a warm paper bg */
+  --tint-1: rgba(26, 25, 22, 0.025);
+  --tint-2: rgba(26, 25, 22, 0.05);
+  --tint-3: rgba(26, 25, 22, 0.08);
+  --tint-4: rgba(26, 25, 22, 0.1);
+  --tint-5: rgba(26, 25, 22, 0.14);
+  /* On light mode, the accent is brown; white text reads best on top */
+  --on-accent: #ffffff;
+  --headline-grad: linear-gradient(180deg, #2a2722 0%, #5c564c 100%);
+  --headline-grad-soft: linear-gradient(180deg, #2a2722 0%, #7a7064 100%);
+  --notfound-grad: linear-gradient(
+    180deg,
+    rgba(26, 25, 22, 0.16) 0%,
+    rgba(122, 120, 112, 0.04) 100%
+  );
+  --selection-fg: #fff;
   --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.8) inset,
     0 10px 30px -12px rgba(0, 0, 0, 0.12);
   --shadow-2: 0 1px 0 rgba(255, 255, 255, 0.8) inset,
@@ -90,8 +123,8 @@ body {
 }
 
 ::selection {
-  background: rgba(196, 165, 116, 0.35);
-  color: #fff;
+  background: var(--accent-soft);
+  color: var(--fg);
 }
 
 /* Ambient background ------------------------------------------------------ */
@@ -146,7 +179,7 @@ body {
   align-items: center;
   gap: 1rem;
   padding: 0.85rem clamp(1.25rem, 8vw, 6rem);
-  background: rgba(10, 11, 14, 0.72);
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
   backdrop-filter: saturate(160%) blur(14px);
   -webkit-backdrop-filter: saturate(160%) blur(14px);
   border-bottom: 1px solid var(--border);
@@ -221,7 +254,7 @@ html {
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: -0.005em;
-  color: var(--bg);
+  color: var(--on-accent);
   background: var(--accent);
   border-radius: 999px;
   text-decoration: none;
@@ -241,8 +274,8 @@ html {
 }
 
 .site-nav__cta .status-dot {
-  background: #0a0b0e;
-  box-shadow: 0 0 0 0 rgba(10, 11, 14, 0.6);
+  background: var(--on-accent);
+  box-shadow: 0 0 0 0 transparent;
 }
 
 @media (max-width: 760px) {
@@ -311,7 +344,7 @@ html {
     linear-gradient(
       180deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.02) 50%,
+      var(--tint-1) 50%,
       transparent 100%
     );
   border-top: 1px solid var(--border);
@@ -421,7 +454,7 @@ html {
   letter-spacing: -0.025em;
   line-height: 1;
   color: var(--fg);
-  background: linear-gradient(180deg, #faf7f0 0%, #b8b3a9 100%);
+  background: var(--headline-grad);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -482,7 +515,7 @@ html {
 }
 
 .btn--primary {
-  color: #0a0b0e;
+  color: var(--on-accent);
   background: var(--accent);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.3),
@@ -585,7 +618,7 @@ html {
 .chat__chrome {
   padding: 0.7rem 1rem 0.6rem;
   border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--tint-1);
 }
 
 .chat__bar {
@@ -604,7 +637,7 @@ html {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--tint-5);
 }
 
 .chat__dots span:nth-child(1) {
@@ -635,7 +668,7 @@ html {
   border-radius: 50%;
   font-size: 0.7rem;
   font-weight: 700;
-  color: #0a0b0e;
+  color: var(--on-accent);
   background: linear-gradient(
     135deg,
     var(--accent-bright),
@@ -693,7 +726,7 @@ html {
 .bubble__meta {
   display: block;
   font-size: 0.66rem;
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.8);
   text-align: right;
   margin-top: 0.25rem;
   letter-spacing: 0.02em;
@@ -726,7 +759,7 @@ html {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: rgba(232, 230, 225, 0.55);
+  background: var(--muted-2);
   animation: typing 1.2s ease-in-out infinite;
 }
 
@@ -763,7 +796,7 @@ html {
   flex: 1;
   padding: 0.55rem 0.85rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--tint-2);
   border: 1px solid var(--border);
   color: var(--muted);
   font-size: 0.82rem;
@@ -796,7 +829,7 @@ html {
   font-size: 0.86em;
   letter-spacing: -0.005em;
   color: var(--fg);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--tint-2);
   padding: 0.1rem 0.4rem;
   border-radius: 6px;
   border: 1px solid var(--border);
@@ -875,7 +908,7 @@ html {
   gap: 0.75rem;
   padding: 0.7rem 1rem;
   border-bottom: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--tint-1);
   font-size: 0.76rem;
   color: var(--muted);
   letter-spacing: 0.01em;
@@ -916,7 +949,7 @@ html {
 }
 
 .code__block::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--tint-4);
   border-radius: 4px;
 }
 
@@ -1688,7 +1721,7 @@ html {
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--fg);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--tint-2);
   border: 1px solid var(--border-strong);
   border-radius: 999px;
 }
@@ -1738,7 +1771,7 @@ html {
 }
 
 .log-entry--highlight .log-entry__title {
-  background: linear-gradient(180deg, #faf7f0 0%, #d6cfc1 100%);
+  background: var(--headline-grad-soft);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -1785,7 +1818,7 @@ html {
 
 .tag {
   --tag-color: var(--muted);
-  --tag-bg: rgba(255, 255, 255, 0.04);
+  --tag-bg: var(--tint-2);
   --tag-border: var(--border-strong);
   display: inline-flex;
   align-items: center;
@@ -1933,7 +1966,7 @@ summary:focus-visible {
   padding: 0.3rem;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--tint-1);
   flex-wrap: wrap;
 }
 
@@ -1960,7 +1993,7 @@ summary:focus-visible {
 
 .gallery-filter.is-active {
   background: var(--accent);
-  color: #0a0b0e;
+  color: var(--on-accent);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
@@ -2131,7 +2164,7 @@ summary:focus-visible {
   font-weight: 500;
   letter-spacing: 0.005em;
   color: var(--fg-dim);
-  background: rgba(255, 255, 255, 0.035);
+  background: var(--tint-1);
   border: 1px solid var(--border);
   border-radius: 999px;
 }
@@ -2196,7 +2229,7 @@ summary:focus-visible {
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--tint-1);
   border: 1px solid var(--border);
   border-radius: 999px;
 }
@@ -2221,7 +2254,7 @@ summary:focus-visible {
   text-transform: uppercase;
   border-radius: 999px;
   border: 1px solid var(--border-strong);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--tint-1);
 }
 
 .status-tag__dot {
@@ -2677,7 +2710,7 @@ summary:focus-visible {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.02) 50%,
+    var(--tint-1) 50%,
     transparent 100%
   );
 }
@@ -2967,11 +3000,7 @@ summary:focus-visible {
   letter-spacing: -0.04em;
   line-height: 0.9;
   margin: 0 0 0.75rem;
-  background: linear-gradient(
-    180deg,
-    rgba(250, 247, 240, 0.18) 0%,
-    rgba(184, 179, 169, 0.04) 100%
-  );
+  background: var(--notfound-grad);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -3049,11 +3078,7 @@ summary:focus-visible {
   line-height: 1.45;
 }
 
-/* Light-mode overrides for hardcoded dark values ----------------------------- */
-
-[data-theme="light"] .site-nav {
-  background: rgba(245, 244, 240, 0.82);
-}
+/* Light-mode overrides for values that can't be expressed as theme vars ------- */
 
 [data-theme="light"] .glow {
   background:
@@ -3072,6 +3097,23 @@ summary:focus-visible {
 
 [data-theme="light"] .noise {
   opacity: 0.02;
+}
+
+/* The chat mock keeps an iMessage-authentic look with a blue user bubble.
+   Force its meta + typing colors for readability in either theme. */
+[data-theme="light"] .bubble--nanowork .bubble__meta {
+  color: var(--muted);
+}
+
+/* The hero chat visual is already tinted dark — ensure the compose field
+   doesn't pick up too much contrast on light mode. */
+[data-theme="light"] .chat__dots span {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] ::selection {
+  background: var(--accent-soft);
+  color: var(--fg);
 }
 
 /* Theme toggle button -------------------------------------------------------- */
