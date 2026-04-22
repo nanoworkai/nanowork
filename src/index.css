@@ -31,6 +31,30 @@
   --maxw: 72rem;
 }
 
+[data-theme="light"] {
+  --bg: #f5f4f0;
+  --bg-elevated: #ffffff;
+  --bg-surface: #eeede9;
+  --bg-surface-2: #e6e5e0;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.14);
+  --fg: #1a1916;
+  --fg-dim: rgba(26, 25, 22, 0.72);
+  --muted: #7a7870;
+  --muted-2: rgba(26, 25, 22, 0.5);
+  --accent: #a07840;
+  --accent-bright: #b98c52;
+  --accent-soft: rgba(160, 120, 64, 0.1);
+  --accent-border: rgba(160, 120, 64, 0.3);
+  --imsg-blue: #0a84ff;
+  --imsg-gray: #e0dedd;
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 10px 30px -12px rgba(0, 0, 0, 0.12);
+  --shadow-2: 0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 30px 60px -20px rgba(0, 0, 0, 0.14),
+    0 10px 20px -10px rgba(0, 0, 0, 0.08);
+}
+
 *,
 *::before,
 *::after {
@@ -2678,5 +2702,64 @@ summary:focus-visible {
   font-size: 0.88rem;
   color: var(--muted-2);
   line-height: 1.45;
+}
+
+/* Light-mode overrides for hardcoded dark values ----------------------------- */
+
+[data-theme="light"] .site-nav {
+  background: rgba(245, 244, 240, 0.82);
+}
+
+[data-theme="light"] .glow {
+  background:
+    radial-gradient(
+      ellipse 60% 50% at 50% 35%,
+      rgba(160, 120, 64, 0.12) 0%,
+      rgba(160, 120, 64, 0.04) 40%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 40% 30% at 30% 20%,
+      rgba(70, 110, 180, 0.06) 0%,
+      transparent 70%
+    );
+}
+
+[data-theme="light"] .noise {
+  opacity: 0.02;
+}
+
+/* Theme toggle button -------------------------------------------------------- */
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-surface);
+  color: var(--fg-dim);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-surface-2);
+  border-color: var(--accent-border);
+  color: var(--fg);
+  transform: scale(1.08);
+}
+
+.theme-toggle svg {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
 }
 

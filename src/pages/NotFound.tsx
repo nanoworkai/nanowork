@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 const NANOWORK_SMS_E164 = "+16506740193";
 const NANOWORK_SMS_DISPLAY = "(650) 674-0193";
@@ -34,6 +35,7 @@ function TopNav() {
         <Link to="/changelog">Changelog</Link>
         <Link to="/#faq">FAQ</Link>
       </nav>
+      <ThemeToggle />
       <a className="site-nav__cta" href={NANOWORK_SMS_HREF}>
         <span className="status-dot" aria-hidden />
         Text us
