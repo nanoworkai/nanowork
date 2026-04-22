@@ -64,20 +64,14 @@ function useReveal<T extends HTMLElement>() {
 function BrandMark() {
   return (
     <span className="brand" aria-label="Nanowork">
-      <span className="brand__glyph" aria-hidden>
-        <svg
-          viewBox="0 0 24 24"
-          width="18"
-          height="18"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M4 19V5l16 14V5" />
-        </svg>
-      </span>
+      <img
+        className="brand__logo"
+        src="/logo.png"
+        alt=""
+        width={28}
+        height={28}
+        aria-hidden
+      />
       <span className="brand__word">Nanowork</span>
     </span>
   );
@@ -90,9 +84,9 @@ function TopNav() {
         <BrandMark />
       </a>
       <nav className="site-nav__links" aria-label="Primary">
-        <a href="#how-it-works">How it works</a>
-        <a href="#build">What you can build</a>
-        <a href="#philosophy">Why Nanowork</a>
+        <a href="#how-it-works">Process</a>
+        <a href="#build">Ideas</a>
+        <a href="#philosophy">Why</a>
         <a href="#faq">FAQ</a>
       </nav>
       <a className="site-nav__cta" href={NANOWORK_SMS_HREF}>
@@ -118,10 +112,9 @@ function Hero() {
             <span className="display-headline__accent">over text.</span>
           </h1>
           <p className="lede">
-            Nanowork is a new kind of startup studio that lives inside your
-            messages. Text an idea. We help you shape it, ship it, and find
-            your first customers — without the capital cost of a typical
-            startup.
+            Nanowork lives inside your messages. Text an idea. We help you
+            shape it, ship it, and find your first customers — without the
+            capital cost of a typical startup.
           </p>
           <div className="hero__cta-row">
             <a className="btn btn--primary" href={NANOWORK_SMS_HREF}>
@@ -320,21 +313,10 @@ function BuildGrid() {
         </p>
 
         <ul className="cards">
-          {items.map((item) => (
+          {items.map((item, i) => (
             <li className="card" key={item.title}>
-              <span className="card__mark" aria-hidden>
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M5 12h14M13 5l7 7-7 7" />
-                </svg>
+              <span className="card__index" aria-hidden>
+                {String(i + 1).padStart(2, "0")}
               </span>
               <h3 className="card__title">{item.title}</h3>
               <p className="card__body">{item.body}</p>
@@ -411,15 +393,15 @@ function FAQ() {
     },
     {
       q: "What does it cost?",
-      a: "Early beta is invite-only and free for the first project. After that, we work under a clear flat fee or a small equity stake — whichever fits the shape of what we're building together.",
+      a: "A flat $99 per month. No tiers, no per-seat upsells, no usage meters, no equity. One price, cancel any time.",
     },
     {
       q: "Who owns what we build?",
-      a: "You do. Nanowork is the studio; the company is yours. We help you set it up clean from day one, including entity, payments, and IP.",
+      a: "You do. The company is yours. We help you set it up clean from day one, including entity, payments, and IP.",
     },
     {
-      q: "Is this a fund?",
-      a: "No. Nanowork is a studio, not a fund. We don't take board seats, and we don't pressure you toward venture scale. We're here to help you build something real and durable.",
+      q: "Is this a fund or an accelerator?",
+      a: "Neither. We don't take equity, we don't take board seats, and we don't pressure you toward venture scale. We're here to help you build something real and durable for a flat monthly fee.",
     },
   ];
   return (
@@ -498,7 +480,7 @@ function SiteFooter() {
         <div className="footer__brand">
           <BrandMark />
           <p className="footer__tag">
-            A new kind of startup studio. Built inside your messages.
+            A new kind of company. Built inside your messages.
           </p>
         </div>
         <div className="footer__cols">
