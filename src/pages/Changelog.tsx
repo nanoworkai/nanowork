@@ -407,11 +407,7 @@ function TopNav() {
       <nav className="site-nav__links" aria-label="Primary">
         <Link to="/#how-it-works">Process</Link>
         <Link to="/#build">Ideas</Link>
-        <Link to="/gallery">Gallery</Link>
-        <Link to="/#agents">API</Link>
-        <Link to="/changelog" aria-current="page" className="is-active">
-          Changelog
-        </Link>
+        <Link to="/#philosophy">Why</Link>
         <Link to="/#faq">FAQ</Link>
       </nav>
       <ThemeToggle />
@@ -534,9 +530,6 @@ function SiteFooter() {
               </li>
               <li>
                 <Link to="/#build">What you can build</Link>
-              </li>
-              <li>
-                <Link to="/gallery">Gallery</Link>
               </li>
               <li>
                 <Link to="/#agents">API &amp; agents</Link>

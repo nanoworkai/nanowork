@@ -3,7 +3,6 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Changelog from "./pages/Changelog";
 import { Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
-import Gallery from "./pages/Gallery";
 import Changelog from "./pages/Changelog";
 import DemoPage from "./pages/Demo";
 import { BUSINESSES } from "./data/businesses";

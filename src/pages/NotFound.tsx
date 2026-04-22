@@ -30,9 +30,7 @@ function TopNav() {
       <nav className="site-nav__links" aria-label="Primary">
         <Link to="/#how-it-works">Process</Link>
         <Link to="/#build">Ideas</Link>
-        <Link to="/gallery">Gallery</Link>
-        <Link to="/#agents">API</Link>
-        <Link to="/changelog">Changelog</Link>
+        <Link to="/#philosophy">Why</Link>
         <Link to="/#faq">FAQ</Link>
       </nav>
       <ThemeToggle />
@@ -64,9 +62,6 @@ function SiteFooter() {
               </li>
               <li>
                 <Link to="/#build">What you can build</Link>
-              </li>
-              <li>
-                <Link to="/gallery">Gallery</Link>
               </li>
               <li>
                 <Link to="/#agents">API &amp; agents</Link>
@@ -162,10 +157,6 @@ export default function NotFound() {
               </a>
             </div>
             <ul className="notfound__links" aria-label="Popular destinations">
-              <li>
-                <Link to="/gallery">Gallery</Link>
-                <span>See what we&rsquo;ve built with founders.</span>
-              </li>
               <li>
                 <Link to="/changelog">Changelog</Link>
                 <span>A running list of everything new.</span>

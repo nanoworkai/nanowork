@@ -145,7 +145,7 @@ body {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.85rem clamp(1rem, 3vw, 1.75rem);
+  padding: 0.85rem clamp(1.25rem, 8vw, 6rem);
   background: rgba(10, 11, 14, 0.72);
   backdrop-filter: saturate(160%) blur(14px);
   -webkit-backdrop-filter: saturate(160%) blur(14px);

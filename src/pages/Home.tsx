@@ -94,9 +94,6 @@ function TopNav() {
       <nav className="site-nav__links" aria-label="Primary">
         <a href="#how-it-works">Process</a>
         <a href="#build">Ideas</a>
-        <Link to="/gallery">Gallery</Link>
-        <a href="#agents">API</a>
-        <Link to="/changelog">Changelog</Link>
         <a href="#philosophy">Why</a>
         <a href="#faq">FAQ</a>
       </nav>
@@ -690,9 +687,6 @@ function SiteFooter() {
               </li>
               <li>
                 <a href="#build">What you can build</a>
-              </li>
-              <li>
-                <Link to="/gallery">Gallery</Link>
               </li>
               <li>
                 <a href="#agents">API &amp; agents</a>
