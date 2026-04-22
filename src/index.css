@@ -100,15 +100,24 @@ html,
 body,
 #root {
   min-height: 100%;
+  /* Guard against horizontal scroll on mobile when any descendant accidentally
+     extends past the viewport (decorative bleeds, long tokens, wide tables). */
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/* Older iOS Safari doesn't support overflow-x: clip; fall back to hidden. */
+@supports not (overflow-x: clip) {
+  html,
+  body,
+  #root {
+    overflow-x: hidden;
+  }
 }
 
 html {
   height: -webkit-fill-available;
   scroll-behavior: smooth;
-}
-
-html {
-  overflow-x: clip;
 }
 
 body {
@@ -120,6 +129,23 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Break extremely long, unbreakable tokens (URLs, phone numbers) so they
+     don't push the viewport wider than the screen on mobile. Only kicks in
+     as a last resort when a word would overflow its container. */
+  overflow-wrap: break-word;
+}
+
+/* Preserve code/monospace content as-is — it has its own overflow:auto. */
+pre,
+code,
+.mono {
+  overflow-wrap: normal;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
 }
 
 ::selection {
@@ -279,8 +305,17 @@ html {
 }
 
 @media (max-width: 760px) {
+  .site-nav {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    gap: 0.5rem;
+  }
   .site-nav__links {
     display: none;
+  }
+  .site-nav__cta {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
   }
 }
 
@@ -583,6 +618,7 @@ html {
   justify-content: center;
   align-items: center;
   min-width: 0;
+  max-width: 100%;
   position: relative;
 }
 
@@ -1430,6 +1466,8 @@ html {
   text-decoration: none;
   border-bottom: 1px solid rgba(196, 165, 116, 0.35);
   padding-bottom: 0.15rem;
+  max-width: 100%;
+  word-break: break-word;
   transition:
     color 0.15s ease,
     border-color 0.15s ease;
