@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   NANOWORK_SMS_DISPLAY,
   NANOWORK_SMS_HREF,
-  SiteFooter,
-  TopNav,
 } from "../components/SiteChrome";
+import { CHANGELOG_ENTRIES, type EntryTag } from "../changelog/loader";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 type ChangeKind = "new" | "improved" | "fixed" | "note";
 
@@ -211,14 +212,6 @@ function formatShortDate(iso: string): string {
     timeZone: "UTC",
   });
 }
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { CHANGELOG_ENTRIES, type EntryTag } from "../changelog/loader";
-import { ThemeToggle } from "../components/ThemeToggle";
-
-const NANOWORK_SMS_E164 = "+16506740193";
-const NANOWORK_SMS_DISPLAY = "(650) 674-0193";
-const NANOWORK_SMS_HREF = `sms:${NANOWORK_SMS_E164}`;
 
 const ENTRIES = CHANGELOG_ENTRIES;
 const LATEST_DATE = ENTRIES[0]?.date ?? "";
@@ -240,7 +233,6 @@ function useReveal<T extends HTMLElement>() {
           observer.disconnect();
         }
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
       { threshold: 0.08, rootMargin: "0px 0px -40px 0px" },
     );
     observer.observe(node);
@@ -382,6 +374,9 @@ function ChangelogTimeline() {
         </div>
       </div>
     </section>
+  );
+}
+
 function BrandMark() {
   return (
     <span className="brand" aria-label="Nanowork">
