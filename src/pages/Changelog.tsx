@@ -1,130 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { CHANGELOG_ENTRIES, type EntryTag } from "../changelog/loader";
 
 const NANOWORK_SMS_E164 = "+16506740193";
 const NANOWORK_SMS_DISPLAY = "(650) 674-0193";
 const NANOWORK_SMS_HREF = `sms:${NANOWORK_SMS_E164}`;
 
-type EntryTag = "new" | "improved" | "fixed" | "shipped";
-
-type ChangelogEntry = {
-  version: string;
-  date: string;
-  title: string;
-  summary?: string;
-  items: { tag: EntryTag; text: string }[];
-};
-
-const ENTRIES: ChangelogEntry[] = [
-  {
-    version: "0.12",
-    date: "April 18, 2026",
-    title: "Gallery goes live",
-    summary:
-      "You can now browse — and buy — complete companies already built by the Nanowork team.",
-    items: [
-      { tag: "new", text: "Launched /gallery with eight listings ready to transfer." },
-      {
-        tag: "new",
-        text: "Live demo previews on each listing, themed to the brand.",
-      },
-      {
-        tag: "improved",
-        text: "Escrow, domain, and Stripe transfer now handled in one guided thread.",
-      },
-    ],
-  },
-  {
-    version: "0.11",
-    date: "April 2, 2026",
-    title: "Agents API · early access",
-    summary:
-      "Every agent that powers Nanowork is now exposed as a single HTTP endpoint.",
-    items: [
-      {
-        tag: "new",
-        text: "POST /v1/agents/{sharpener,namer,researcher,landing,launch,ads}.",
-      },
-      { tag: "new", text: "Bearer-key auth and typed JSON contracts per agent." },
-      {
-        tag: "improved",
-        text: "Median agent latency down to 412 ms across the six endpoints.",
-      },
-    ],
-  },
-  {
-    version: "0.10",
-    date: "March 14, 2026",
-    title: "iMessage is the front door",
-    summary:
-      "Text an idea and we text back a plan — no app, no login, no dashboard.",
-    items: [
-      {
-        tag: "shipped",
-        text: "One phone number for every Nanowork customer: (650) 674-0193.",
-      },
-      {
-        tag: "new",
-        text: "Voice memos accepted — we transcribe and pressure-test the idea in the same thread.",
-      },
-      {
-        tag: "fixed",
-        text: "Delivery receipts now match iMessage’s native cadence on iOS 18.",
-      },
-    ],
-  },
-  {
-    version: "0.9",
-    date: "February 26, 2026",
-    title: "Flat $99 pricing",
-    summary:
-      "One price for everything Nanowork does. No tiers, no seats, no usage meters.",
-    items: [
-      {
-        tag: "new",
-        text: "Single $99/mo plan replaces every previous bundle and add-on.",
-      },
-      {
-        tag: "improved",
-        text: "Cancel any time, from the same thread you signed up in.",
-      },
-    ],
-  },
-  {
-    version: "0.8",
-    date: "February 5, 2026",
-    title: "Ship-in-a-week playbook",
-    summary:
-      "The internal playbook that moves an idea from message to live product in under seven days.",
-    items: [
-      {
-        tag: "new",
-        text: "Automatic landing page scaffolds generated from the Sharpener output.",
-      },
-      {
-        tag: "new",
-        text: "Stripe + domain + analytics wired on day one of every build.",
-      },
-      {
-        tag: "improved",
-        text: "Launch-week cadence now pre-loaded for X, LinkedIn, and cold outreach.",
-      },
-    ],
-  },
-  {
-    version: "0.7",
-    date: "January 12, 2026",
-    title: "Public beta",
-    summary: "Nanowork opens to its first batch of invited operators.",
-    items: [
-      { tag: "shipped", text: "First 24 founders onboarded via text." },
-      {
-        tag: "new",
-        text: "Design system and brand finalized — quiet, editorial, dark-first.",
-      },
-    ],
-  },
-];
+const ENTRIES = CHANGELOG_ENTRIES;
+const LATEST_DATE = ENTRIES[0]?.date ?? "";
 
 function useReveal<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
@@ -198,7 +81,7 @@ function Hero() {
       <div className="changelog-hero__inner">
         <span className="platform-pill">
           <span className="status-dot" aria-hidden />
-          Changelog · Updated {ENTRIES[0].date}
+          Changelog{LATEST_DATE ? ` · Updated ${LATEST_DATE}` : ""}
         </span>
         <h1 className="display-headline changelog-hero__title">
           What we’ve been
@@ -235,32 +118,43 @@ function Timeline() {
         ref={ref}
         className={`section__inner reveal ${visible ? "is-visible" : ""}`}
       >
-        <ol className="log">
-          {ENTRIES.map((entry) => (
-            <li className="log__entry" key={entry.version}>
-              <div className="log__meta">
-                <time className="log__date" dateTime={entry.date}>
-                  {entry.date}
-                </time>
-                <span className="log__version mono">v{entry.version}</span>
-              </div>
-              <div className="log__body">
-                <h2 className="log__title">{entry.title}</h2>
-                {entry.summary && (
-                  <p className="log__summary">{entry.summary}</p>
-                )}
-                <ul className="log__items">
-                  {entry.items.map((item, i) => (
-                    <li key={i}>
-                      <TagPill tag={item.tag} />
-                      <span>{item.text}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </li>
-          ))}
-        </ol>
+        {ENTRIES.length === 0 ? (
+          <p className="log__empty">No changelog entries yet.</p>
+        ) : (
+          <ol className="log">
+            {ENTRIES.map((entry) => (
+              <li
+                className="log__entry"
+                key={`${entry.dateISO}-${entry.title}`}
+              >
+                <div className="log__meta">
+                  <time className="log__date" dateTime={entry.dateISO}>
+                    {entry.date}
+                  </time>
+                  {entry.version && (
+                    <span className="log__version mono">v{entry.version}</span>
+                  )}
+                </div>
+                <div className="log__body">
+                  <h2 className="log__title">{entry.title}</h2>
+                  {entry.summary && (
+                    <p className="log__summary">{entry.summary}</p>
+                  )}
+                  {entry.items.length > 0 && (
+                    <ul className="log__items">
+                      {entry.items.map((item, i) => (
+                        <li key={i}>
+                          <TagPill tag={item.tag} />
+                          <span>{item.text}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
 
         <p className="log__foot">
           Want to be the first to know when something ships?{" "}
