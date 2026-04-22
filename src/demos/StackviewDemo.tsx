@@ -202,7 +202,7 @@ export default function StackviewDemo({ business }: { business: Business }) {
                 >
                   <div className="stackview-card__head">
                     <span className="stackview-card__mono mono">
-                      stackview.dev/{p.handle}
+                      nanowork.ai/stackview/{p.handle}
                     </span>
                   </div>
                   <h3>{p.name}</h3>
@@ -221,7 +221,7 @@ export default function StackviewDemo({ business }: { business: Business }) {
             <header className="stackview__profile-head">
               <div>
                 <span className="stackview__mono mono">
-                  stackview.dev/{current.handle}
+                  nanowork.ai/stackview/{current.handle}
                 </span>
                 <h2>{current.name}</h2>
                 <p>{current.role} · {current.location}</p>
@@ -299,7 +299,7 @@ export default function StackviewDemo({ business }: { business: Business }) {
             record away.
           </p>
           <div className="stackview__cta-row">
-            <span className="mono">stackview.dev/</span>
+            <span className="mono">nanowork.ai/stackview/</span>
             <input placeholder="your-handle" aria-label="Desired handle" />
             <button>Claim</button>
           </div>

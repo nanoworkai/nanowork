@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Business } from "../data/businesses";
 import { DemoShell } from "./DemoShell";
+import { callAi } from "./ai";
 
 type Habit = {
   id: string;
@@ -46,6 +47,7 @@ function signal(streak: number[]): number {
 export default function LaminaDemo({ business }: { business: Business }) {
   const [habits, setHabits] = useState<Habit[]>(SEED);
   const [draft, setDraft] = useState("");
+  const [suggesting, setSuggesting] = useState(false);
 
   const overall = useMemo(() => {
     const avg =
@@ -159,6 +161,21 @@ export default function LaminaDemo({ business }: { business: Business }) {
               aria-label="New habit"
             />
             <button type="submit">Add</button>
+            <button
+              type="button"
+              className="lamina__suggest"
+              disabled={suggesting}
+              onClick={async () => {
+                setSuggesting(true);
+                const result = await callAi("lamina.suggest", {
+                  existing: habits.map((h) => h.name),
+                });
+                if (result.text) setDraft(result.text);
+                setSuggesting(false);
+              }}
+            >
+              {suggesting ? "Thinking…" : "Suggest with AI"}
+            </button>
           </form>
         </section>
 

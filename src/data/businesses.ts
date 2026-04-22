@@ -67,7 +67,7 @@ export const BUSINESSES: Business[] = [
     includes: [
       "Full codebase + assets",
       "Stripe + billing wired",
-      "Domain transfer (lamina.app)",
+      "Domain transfer (lamina.app) at handoff",
       "30 days post-launch support",
     ],
     theme: {

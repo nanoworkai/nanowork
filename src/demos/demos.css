@@ -381,6 +381,17 @@
   cursor: pointer;
 }
 
+.lamina__add button.lamina__suggest {
+  background: transparent;
+  color: var(--g-accent);
+  border: 1px solid var(--g-accent);
+}
+
+.lamina__add button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .lamina__week {
   margin-top: 2.5rem;
   background: var(--g-surface);
