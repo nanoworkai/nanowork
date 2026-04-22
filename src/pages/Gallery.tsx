@@ -275,7 +275,7 @@ function DemoPreview({ b }: { b: Business }) {
               <path d="M8 11V7a4 4 0 0 1 8 0v4" />
             </svg>
           </span>
-          nanowork.ai/demo/{b.slug}
+          nanowork.ai/{b.slug}
         </span>
       </div>
       <div className="gbrowser__surface">
@@ -459,7 +459,7 @@ function Listings() {
                       </a>
                       <Link
                         className="btn btn--ghost"
-                        to={`/demo/${b.slug}`}
+                        to={`/${b.slug}`}
                       >
                         Open live demo →
                       </Link>
@@ -478,7 +478,7 @@ function Listings() {
                       </a>
                       <Link
                         className="btn btn--ghost"
-                        to={`/demo/${b.slug}`}
+                        to={`/${b.slug}`}
                       >
                         Open live demo →
                       </Link>

@@ -270,7 +270,7 @@ export default function ParcelDemo({ business }: { business: Business }) {
                   <div>
                     <dt>Branded page</dt>
                     <dd className="mono">
-                      mossandfern.com/track/{active.id.toLowerCase()}
+                      nanowork.ai/parcel/track/{active.id.toLowerCase()}
                     </dd>
                   </div>
                 </dl>

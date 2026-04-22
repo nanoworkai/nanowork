@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { Business } from "../data/businesses";
 import { DemoShell } from "./DemoShell";
+import { callAi } from "./ai";
 
 type Journalist = {
   id: string;
@@ -92,6 +93,7 @@ type Pitch = {
   journalist: string;
   status: "draft" | "sent" | "replied" | "covered";
   sentDays: number;
+  body?: string;
 };
 
 const INITIAL_PITCHES: Pitch[] = [
@@ -105,7 +107,9 @@ export default function PressroomDemo({ business }: { business: Business }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [tab, setTab] = useState<"kit" | "db" | "pipeline">("db");
-  const [pitches, setPitches] = useState(INITIAL_PITCHES);
+  const [pitches, setPitches] = useState<Pitch[]>(INITIAL_PITCHES);
+  const [drafting, setDrafting] = useState(false);
+  const [openPitch, setOpenPitch] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -128,21 +132,43 @@ export default function PressroomDemo({ business }: { business: Business }) {
     });
   }
 
-  function addToPipeline() {
-    const added: Pitch[] = [];
-    for (const id of selected) {
-      const j = JOURNALISTS.find((x) => x.id === id);
-      if (!j) continue;
-      added.push({
-        id: `p-${Date.now()}-${id}`,
-        journalist: j.name,
-        status: "draft",
-        sentDays: 0,
-      });
-    }
+  async function addToPipeline() {
+    const targets = [...selected]
+      .map((id) => JOURNALISTS.find((x) => x.id === id))
+      .filter((j): j is Journalist => !!j);
+    if (targets.length === 0) return;
+
+    setDrafting(true);
+    const added: Pitch[] = targets.map((j) => ({
+      id: `p-${Date.now()}-${j.id}`,
+      journalist: j.name,
+      status: "draft",
+      sentDays: 0,
+      body: "Drafting…",
+    }));
     setPitches((prev) => [...added, ...prev]);
     setSelected(new Set());
     setTab("pipeline");
+    setOpenPitch(added[0]?.id ?? null);
+
+    await Promise.all(
+      targets.map(async (j, i) => {
+        const result = await callAi("pressroom.pitch", {
+          journalist: j.name,
+          outlet: j.outlet,
+          beat: j.beats.join(" + "),
+          company: "Lumen",
+          wedge:
+            "mid-market data platforms finally beating Snowflake on time-to-first-query",
+        });
+        setPitches((prev) =>
+          prev.map((p) =>
+            p.id === added[i].id ? { ...p, body: result.text || p.body } : p,
+          ),
+        );
+      }),
+    );
+    setDrafting(false);
   }
 
   return (
@@ -336,11 +362,12 @@ export default function PressroomDemo({ business }: { business: Business }) {
               </span>
               <button
                 type="button"
-                disabled={selected.size === 0}
+                disabled={selected.size === 0 || drafting}
                 onClick={addToPipeline}
               >
-                Draft pitch to {selected.size || "…"} journalist
-                {selected.size === 1 ? "" : "s"}
+                {drafting
+                  ? "Drafting with AI…"
+                  : `Draft pitch${selected.size === 1 ? "" : "es"} with AI for ${selected.size || "…"} journalist${selected.size === 1 ? "" : "s"}`}
               </button>
             </footer>
           </section>
@@ -356,29 +383,59 @@ export default function PressroomDemo({ business }: { business: Business }) {
               </p>
             </header>
             <ul className="pressroom__pipeline-list">
-              {pitches.map((p) => (
-                <li key={p.id} className={`pressroom-pitch pressroom-pitch--${p.status}`}>
-                  <span className="pressroom-pitch__status">
-                    {p.status === "draft"
-                      ? "Draft"
-                      : p.status === "sent"
-                        ? "Sent"
-                        : p.status === "replied"
-                          ? "Replied"
-                          : "Covered"}
-                  </span>
-                  <strong>{p.journalist}</strong>
-                  <span>
-                    {p.status === "draft"
-                      ? "Ready to send"
-                      : p.status === "sent"
-                        ? `Sent ${p.sentDays}d ago · awaiting reply`
-                        : p.status === "replied"
-                          ? `Replied ${p.sentDays}d ago · open the thread`
-                          : `Covered ${p.sentDays}d ago · logged to kit`}
-                  </span>
-                </li>
-              ))}
+              {pitches.map((p) => {
+                const isOpen = openPitch === p.id;
+                return (
+                  <li
+                    key={p.id}
+                    className={`pressroom-pitch pressroom-pitch--${p.status}`}
+                  >
+                    <button
+                      type="button"
+                      className="pressroom-pitch__row"
+                      onClick={() =>
+                        setOpenPitch((curr) => (curr === p.id ? null : p.id))
+                      }
+                      aria-expanded={isOpen}
+                    >
+                      <span className="pressroom-pitch__status">
+                        {p.status === "draft"
+                          ? "Draft"
+                          : p.status === "sent"
+                            ? "Sent"
+                            : p.status === "replied"
+                              ? "Replied"
+                              : "Covered"}
+                      </span>
+                      <strong>{p.journalist}</strong>
+                      <span>
+                        {p.status === "draft"
+                          ? p.body
+                            ? p.body === "Drafting…"
+                              ? "AI drafting pitch…"
+                              : "Ready to send · tap to review"
+                            : "Ready to send"
+                          : p.status === "sent"
+                            ? `Sent ${p.sentDays}d ago · awaiting reply`
+                            : p.status === "replied"
+                              ? `Replied ${p.sentDays}d ago · open the thread`
+                              : `Covered ${p.sentDays}d ago · logged to kit`}
+                      </span>
+                    </button>
+                    {isOpen && p.body && (
+                      <div className="pressroom-pitch__body">
+                        {p.body === "Drafting…" ? (
+                          <span className="pressroom-pitch__spinner">
+                            Drafting with Nanowork AI…
+                          </span>
+                        ) : (
+                          <pre>{p.body}</pre>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}

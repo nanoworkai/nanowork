@@ -1847,14 +1847,49 @@
 }
 
 .pressroom-pitch {
+  background: var(--g-surface);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pressroom-pitch__row {
   display: grid;
   grid-template-columns: 110px 180px 1fr;
   align-items: center;
   gap: 1rem;
   padding: 0.85rem 1rem;
-  background: var(--g-surface);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.pressroom-pitch__row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.pressroom-pitch__body {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.9rem 1rem 1rem;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.pressroom-pitch__body pre {
+  white-space: pre-wrap;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--g-text);
+  margin: 0;
+  line-height: 1.55;
+}
+
+.pressroom-pitch__spinner {
+  color: var(--g-muted);
+  font-size: 0.9rem;
 }
 
 .pressroom-pitch__status {
@@ -1908,7 +1943,7 @@
     display: block;
     overflow-x: auto;
   }
-  .pressroom-pitch {
+  .pressroom-pitch__row {
     grid-template-columns: 1fr;
     gap: 0.4rem;
   }
