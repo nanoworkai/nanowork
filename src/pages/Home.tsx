@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 /** Nanowork SMS / iMessage line — E.164 for sms: links; display for humans. */
 const NANOWORK_SMS_E164 = "+16506740193";
@@ -86,6 +87,7 @@ function TopNav() {
       <nav className="site-nav__links" aria-label="Primary">
         <a href="#how-it-works">Process</a>
         <a href="#build">Ideas</a>
+        <Link to="/gallery">Gallery</Link>
         <a href="#agents">API</a>
         <a href="#philosophy">Why</a>
         <a href="#faq">FAQ</a>
@@ -679,6 +681,9 @@ function SiteFooter() {
               </li>
               <li>
                 <a href="#build">What you can build</a>
+              </li>
+              <li>
+                <Link to="/gallery">Gallery</Link>
               </li>
               <li>
                 <a href="#agents">API &amp; agents</a>
