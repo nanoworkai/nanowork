@@ -190,7 +190,7 @@ function ChatMock() {
           <li
             key={i}
             className={`bubble bubble--${m.from}`}
-            style={{ animationDelay: `${i * 120}ms` }}
+            style={{ animationDelay: `${i * 300 + 200}ms` }}
           >
             <p>{m.text}</p>
             {m.meta ? <span className="bubble__meta">{m.meta}</span> : null}

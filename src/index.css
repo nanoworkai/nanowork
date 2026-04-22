@@ -50,6 +50,10 @@ html {
   scroll-behavior: smooth;
 }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   min-height: 100dvh;
   font-family: var(--font-sans);
@@ -59,7 +63,6 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: clip;
 }
 
 ::selection {
@@ -110,8 +113,10 @@ body {
 /* Nav --------------------------------------------------------------------- */
 
 .site-nav {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 30;
   display: flex;
   align-items: center;
@@ -121,6 +126,15 @@ body {
   backdrop-filter: saturate(160%) blur(14px);
   -webkit-backdrop-filter: saturate(160%) blur(14px);
   border-bottom: 1px solid var(--border);
+}
+
+/* Offset page content so the fixed nav doesn't overlap the hero */
+.page--pro {
+  padding-top: 62px;
+}
+
+html {
+  scroll-padding-top: 74px;
 }
 
 .site-nav__brand {
@@ -636,8 +650,8 @@ body {
   line-height: 1.4;
   position: relative;
   opacity: 0;
-  transform: translateY(6px);
-  animation: bubble-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  transform: translateY(10px) scale(0.96);
+  animation: bubble-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .bubble p {
@@ -681,7 +695,7 @@ body {
 
 .bubble--typing {
   padding: 0.6rem 0.85rem;
-  animation-delay: 720ms;
+  animation-delay: 1800ms;
 }
 
 .typing {
