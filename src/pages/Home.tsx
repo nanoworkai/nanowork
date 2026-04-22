@@ -64,20 +64,14 @@ function useReveal<T extends HTMLElement>() {
 function BrandMark() {
   return (
     <span className="brand" aria-label="Nanowork">
-      <span className="brand__glyph" aria-hidden>
-        <svg
-          viewBox="0 0 24 24"
-          width="18"
-          height="18"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M4 19V5l16 14V5" />
-        </svg>
-      </span>
+      <img
+        className="brand__logo"
+        src="/logo.png"
+        alt=""
+        width={28}
+        height={28}
+        aria-hidden
+      />
       <span className="brand__word">Nanowork</span>
     </span>
   );
@@ -90,9 +84,10 @@ function TopNav() {
         <BrandMark />
       </a>
       <nav className="site-nav__links" aria-label="Primary">
-        <a href="#how-it-works">How it works</a>
-        <a href="#build">What you can build</a>
-        <a href="#philosophy">Why Nanowork</a>
+        <a href="#how-it-works">Process</a>
+        <a href="#build">Ideas</a>
+        <a href="#agents">API</a>
+        <a href="#philosophy">Why</a>
         <a href="#faq">FAQ</a>
       </nav>
       <a className="site-nav__cta" href={NANOWORK_SMS_HREF}>
@@ -118,10 +113,9 @@ function Hero() {
             <span className="display-headline__accent">over text.</span>
           </h1>
           <p className="lede">
-            Nanowork is a new kind of startup studio that lives inside your
-            messages. Text an idea. We help you shape it, ship it, and find
-            your first customers — without the capital cost of a typical
-            startup.
+            Nanowork lives inside your messages. Text an idea. We help you
+            shape it, ship it, and find your first customers — without the
+            capital cost of a typical startup.
           </p>
           <div className="hero__cta-row">
             <a className="btn btn--primary" href={NANOWORK_SMS_HREF}>
@@ -190,7 +184,7 @@ function ChatMock() {
           <li
             key={i}
             className={`bubble bubble--${m.from}`}
-            style={{ animationDelay: `${i * 120}ms` }}
+            style={{ animationDelay: `${i * 300 + 200}ms` }}
           >
             <p>{m.text}</p>
             {m.meta ? <span className="bubble__meta">{m.meta}</span> : null}
@@ -320,27 +314,198 @@ function BuildGrid() {
         </p>
 
         <ul className="cards">
-          {items.map((item) => (
+          {items.map((item, i) => (
             <li className="card" key={item.title}>
-              <span className="card__mark" aria-hidden>
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M5 12h14M13 5l7 7-7 7" />
-                </svg>
+              <span className="card__index" aria-hidden>
+                {String(i + 1).padStart(2, "0")}
               </span>
               <h3 className="card__title">{item.title}</h3>
               <p className="card__body">{item.body}</p>
             </li>
           ))}
         </ul>
+      </div>
+    </section>
+  );
+}
+
+type Agent = {
+  name: string;
+  slug: string;
+  purpose: string;
+  returns: string;
+};
+
+const AGENTS: Agent[] = [
+  {
+    name: "Sharpener",
+    slug: "sharpener",
+    purpose:
+      "Takes a rough idea and returns a tight one-liner, the real customer, and the sharpest wedge.",
+    returns: "pitch · ICP · wedge",
+  },
+  {
+    name: "Namer",
+    slug: "namer",
+    purpose:
+      "Generates a shortlist of brandable names with .com + handle availability signals.",
+    returns: "names[] · domain · handles",
+  },
+  {
+    name: "Researcher",
+    slug: "researcher",
+    purpose:
+      "Scans the market, pulls incumbents, pricing, and surfaces the gap worth attacking.",
+    returns: "report · competitors · gap",
+  },
+  {
+    name: "Landing",
+    slug: "landing",
+    purpose:
+      "Produces landing-page copy + a section outline tuned to a specific audience and offer.",
+    returns: "headline · sections · copy",
+  },
+  {
+    name: "Launch",
+    slug: "launch",
+    purpose:
+      "Builds the week-one launch plan: where to post, what to say, how to pace the drops.",
+    returns: "plan · channels · cadence",
+  },
+  {
+    name: "Ads",
+    slug: "ads",
+    purpose:
+      "Writes performance-oriented ad creative variants with hooks, angles, and CTAs to test.",
+    returns: "variants[] · hooks · CTAs",
+  },
+];
+
+function CodePreview() {
+  return (
+    <div
+      className="code"
+      role="img"
+      aria-label="Example API request and response for the Sharpener agent"
+    >
+      <div className="code__chrome">
+        <span className="chat__dots" aria-hidden>
+          <span /> <span /> <span />
+        </span>
+        <span className="code__title">POST /v1/agents/sharpener</span>
+        <span className="code__title code__title--meta">200 · 412 ms</span>
+      </div>
+      <pre className="code__block" tabIndex={0}>
+        <code>
+          <span className="tok-c"># Request</span>
+          {"\n"}
+          <span className="tok-k">curl</span> https://api.nanowork.ai
+          <span className="tok-s">/v1/agents/sharpener</span> \{"\n"}
+          {"  "}-H <span className="tok-s">"Authorization: Bearer $NW_KEY"</span> \{"\n"}
+          {"  "}-H <span className="tok-s">"Content-Type: application/json"</span> \{"\n"}
+          {"  "}-d <span className="tok-s">{`'{"idea":"a morning brief tailored to my calendar"}'`}</span>
+          {"\n\n"}
+          <span className="tok-c"># Response</span>
+          {"\n"}
+          {"{"}
+          {"\n  "}
+          <span className="tok-p">"agent"</span>: <span className="tok-s">"sharpener"</span>,
+          {"\n  "}
+          <span className="tok-p">"pitch"</span>:{" "}
+          <span className="tok-s">
+            "A daily brief written around the meetings you actually have."
+          </span>
+          ,{"\n  "}
+          <span className="tok-p">"icp"</span>:{" "}
+          <span className="tok-s">"founders + execs, 10-40 meetings / wk"</span>,
+          {"\n  "}
+          <span className="tok-p">"wedge"</span>:{" "}
+          <span className="tok-s">"calendar-aware, not news-aware"</span>
+          {"\n}"}
+        </code>
+      </pre>
+    </div>
+  );
+}
+
+function Agents() {
+  const { ref, visible } = useReveal<HTMLDivElement>();
+  return (
+    <section className="section" id="agents">
+      <div
+        ref={ref}
+        className={`section__inner reveal ${visible ? "is-visible" : ""}`}
+      >
+        <p className="eyebrow">API · Early access</p>
+        <div className="agents__head">
+          <h2 className="section__title">
+            Every agent that powers Nanowork,
+            <br />
+            <span className="muted-title">exposed as a single endpoint.</span>
+          </h2>
+          <p className="section__lede">
+            You don't need our iMessage interface to get the value. Each
+            Nanowork agent is a small, purpose-built model with a typed
+            contract. Ping one directly, build your own workflow on top, or
+            chain them however you want.
+          </p>
+        </div>
+
+        <div className="agents__layout">
+          <div className="agents__code">
+            <CodePreview />
+            <p className="agents__foot">
+              Base URL{" "}
+              <code className="mono">https://api.nanowork.ai/v1</code> ·
+              Authenticated with a bearer key · JSON in, JSON out.
+            </p>
+          </div>
+
+          <ol className="agents__list" aria-label="Available agents">
+            {AGENTS.map((a, i) => (
+              <li className="agent" key={a.slug}>
+                <span className="agent__index" aria-hidden>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="agent__body">
+                  <div className="agent__row">
+                    <h3 className="agent__name">{a.name}</h3>
+                    <code className="agent__endpoint mono">
+                      POST /v1/agents/{a.slug}
+                    </code>
+                  </div>
+                  <p className="agent__purpose">{a.purpose}</p>
+                  <p className="agent__returns">
+                    <span>Returns</span> <code className="mono">{a.returns}</code>
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="agents__cta">
+          <a className="btn btn--primary" href={NANOWORK_SMS_HREF}>
+            <span aria-hidden className="btn__icon">
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14l-4-4H6a2 2 0 0 1-2-2z" />
+              </svg>
+            </span>
+            Request API access
+          </a>
+          <span className="agents__cta-note">
+            API is in early access — text us to get on the list.
+          </span>
+        </div>
       </div>
     </section>
   );
@@ -411,15 +576,19 @@ function FAQ() {
     },
     {
       q: "What does it cost?",
-      a: "Early beta is invite-only and free for the first project. After that, we work under a clear flat fee or a small equity stake — whichever fits the shape of what we're building together.",
+      a: "A flat $99 per month. No tiers, no per-seat upsells, no usage meters, no equity. One price, cancel any time.",
     },
     {
       q: "Who owns what we build?",
-      a: "You do. Nanowork is the studio; the company is yours. We help you set it up clean from day one, including entity, payments, and IP.",
+      a: "You do. The company is yours. We help you set it up clean from day one, including entity, payments, and IP.",
     },
     {
-      q: "Is this a fund?",
-      a: "No. Nanowork is a studio, not a fund. We don't take board seats, and we don't pressure you toward venture scale. We're here to help you build something real and durable.",
+      q: "Can I use the agents without iMessage?",
+      a: "Yes. Every agent that powers Nanowork is also exposed as its own HTTP endpoint under api.nanowork.ai/v1/agents/*. Ping one directly, chain them into your own workflow, or build something entirely new on top — no iMessage required. The API is in early access; text us to get a key.",
+    },
+    {
+      q: "Is this a fund or an accelerator?",
+      a: "Neither. We don't take equity, we don't take board seats, and we don't pressure you toward venture scale. We're here to help you build something real and durable for a flat monthly fee.",
     },
   ];
   return (
@@ -498,7 +667,7 @@ function SiteFooter() {
         <div className="footer__brand">
           <BrandMark />
           <p className="footer__tag">
-            A new kind of startup studio. Built inside your messages.
+            A new kind of company. Built inside your messages.
           </p>
         </div>
         <div className="footer__cols">
@@ -510,6 +679,9 @@ function SiteFooter() {
               </li>
               <li>
                 <a href="#build">What you can build</a>
+              </li>
+              <li>
+                <a href="#agents">API &amp; agents</a>
               </li>
               <li>
                 <a href="#philosophy">Why Nanowork</a>
@@ -563,6 +735,7 @@ export default function Home() {
         <Hero />
         <HowItWorks />
         <BuildGrid />
+        <Agents />
         <Philosophy />
         <FAQ />
         <ClosingCTA />
