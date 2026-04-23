@@ -176,6 +176,16 @@ export function PhoneProvider({ children }: { children: ReactNode }) {
         number?: RevealedNumber;
       };
 
+      if (data.status === "invalid_region") {
+        setState((s) => ({
+          ...s,
+          status: "error",
+          number: null,
+          message: "That region isn't recognized. Please pick a region from the list.",
+        }));
+        return;
+      }
+
       if (data.status === "revealed" && data.number) {
         writeCachedReveal(code, data.number);
         setState((s) => ({
@@ -218,15 +228,12 @@ export function PhoneProvider({ children }: { children: ReactNode }) {
         number: null,
         message: "Something went wrong. Please try again.",
       }));
-    } catch (err) {
+    } catch {
       setState((s) => ({
         ...s,
         status: "error",
         number: null,
-        message:
-          err instanceof Error
-            ? err.message
-            : "Could not reach the server. Please try again.",
+        message: "Could not reach the server. Please try again.",
       }));
     }
   }, []);

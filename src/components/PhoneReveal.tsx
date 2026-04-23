@@ -23,7 +23,7 @@ export function TextUsLink({
 
   const href = revealed
     ? bodyTemplate
-      ? `${number.href}&body=${encodeURIComponent(bodyTemplate)}`
+      ? `${number.href}?body=${encodeURIComponent(bodyTemplate)}`
       : number.href
     : "#text-us";
 
