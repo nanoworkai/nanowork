@@ -114,6 +114,15 @@ export function SiteFooter({ onHome = false }: TopNavProps) {
         </div>
       </div>
       <div className="footer__bottom">
+        <iframe
+          src="https://status.nanowork.ai/badge?theme=dark"
+          width="250"
+          height="30"
+          frameBorder="0"
+          scrolling="no"
+          title="Nanowork uptime status"
+          style={{ colorScheme: "normal" }}
+        />
         <span>© {year} Nanowork, Inc. All rights reserved.</span>
         <span className="footer__made">Made with care in California.</span>
       </div>
