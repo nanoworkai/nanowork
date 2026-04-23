@@ -217,6 +217,7 @@ function formatShortDate(iso: string): string {
     timeZone: "UTC",
   });
 }
+
 const ENTRIES = CHANGELOG_ENTRIES;
 const LATEST_DATE = ENTRIES[0]?.date ?? "";
 
