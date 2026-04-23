@@ -37,9 +37,6 @@ export function TopNav({ onHome = false }: TopNavProps) {
         <BrandMark />
       </Link>
       <nav className="site-nav__links" aria-label="Primary">
-        <a href={href("#how-it-works")}>Process</a>
-        <a href={href("#build")}>Ideas</a>
-        <a href={href("#agents")}>API</a>
         <a href={href("#philosophy")}>Why</a>
         <a href={href("#faq")}>FAQ</a>
         <Link to="/changelog">Changelog</Link>
