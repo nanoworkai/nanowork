@@ -5,6 +5,14 @@ import DemoPage from "./pages/Demo";
 import Gallery from "./pages/Gallery";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import DashboardLayout from "./dashboard/DashboardLayout";
+import Overview from "./dashboard/Overview";
+import Usage from "./dashboard/Usage";
+import Domains from "./dashboard/Domains";
+import Plan from "./dashboard/Plan";
+import Settings from "./dashboard/Settings";
+import { useAuth } from "./context/AuthContext";
 
 const RESERVED_PATHS = new Set([
   "gallery",
@@ -13,6 +21,8 @@ const RESERVED_PATHS = new Set([
   "api",
   "assets",
   "static",
+  "login",
+  "dashboard",
 ]);
 
 function LegacyDemoRedirect() {
@@ -33,6 +43,13 @@ function SlugRouter() {
   return <DemoPage />;
 }
 
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return null;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
     <>
@@ -42,6 +59,21 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/changelog" element={<Changelog />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <DashboardLayout />
+            </RequireAuth>
+          }
+        >
+          <Route index element={<Overview />} />
+          <Route path="usage" element={<Usage />} />
+          <Route path="domains" element={<Domains />} />
+          <Route path="plan" element={<Plan />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
         <Route path="/demo/:slug" element={<LegacyDemoRedirect />} />
         <Route path="/:slug" element={<SlugRouter />} />
         <Route path="*" element={<NotFound />} />

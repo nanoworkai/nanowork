@@ -4,9 +4,11 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import "./demos/demos.css";
 import "./demos/demos-extra.css";
+import "./dashboard/dashboard.css";
 import App from "./App";
 import { ThemeProvider } from "./context/ThemeContext";
 import { PhoneProvider } from "./context/PhoneContext";
+import { AuthProvider } from "./context/AuthContext";
 import { PhoneRevealModal } from "./components/PhoneReveal";
 
 const root = document.getElementById("root");
@@ -18,10 +20,12 @@ createRoot(root).render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider>
-        <PhoneProvider>
-          <App />
-          <PhoneRevealModal />
-        </PhoneProvider>
+        <AuthProvider>
+          <PhoneProvider>
+            <App />
+            <PhoneRevealModal />
+          </PhoneProvider>
+        </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
   </StrictMode>,
