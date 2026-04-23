@@ -1571,11 +1571,16 @@ html {
   padding-top: 1.25rem;
   border-top: 1px solid var(--border);
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
   font-size: 0.82rem;
   color: var(--muted);
+}
+
+.footer__bottom iframe {
+  flex-shrink: 0;
 }
 
 .footer__made {
