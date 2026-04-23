@@ -1581,6 +1581,8 @@ html {
 
 .footer__bottom iframe {
   flex-shrink: 0;
+  vertical-align: middle;
+  display: block;
 }
 
 .footer__made {

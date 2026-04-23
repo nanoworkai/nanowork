@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { TextUsLink } from "./PhoneReveal";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
 export function BrandMark() {
   return (
@@ -61,6 +62,7 @@ export function TopNav({ onHome = false }: TopNavProps) {
 export function SiteFooter({ onHome = false }: TopNavProps) {
   const href = (hash: string) => (onHome ? hash : `/${hash}`);
   const year = new Date().getFullYear();
+  const { theme } = useTheme();
   return (
     <footer className="footer">
       <div className="footer__inner">
@@ -121,7 +123,7 @@ export function SiteFooter({ onHome = false }: TopNavProps) {
       </div>
       <div className="footer__bottom">
         <iframe
-          src="https://status.nanowork.ai/badge?theme=dark"
+          src={`https://status.nanowork.ai/badge?theme=${theme}`}
           width="250"
           height="30"
           frameBorder="0"
