@@ -5,6 +5,12 @@ import DemoPage from "./pages/Demo";
 import Gallery from "./pages/Gallery";
 import NotFound from "./pages/NotFound";
 import { BUSINESSES } from "./data/businesses";
+import { BUSINESSES } from "./data/businesses";
+import Changelog from "./pages/Changelog";
+import DemoPage from "./pages/Demo";
+import Gallery from "./pages/Gallery";
+import Home from "./pages/Home";
+import NotFound from "./pages/NotFound";
 
 const RESERVED_PATHS = new Set([
   "gallery",
@@ -24,7 +30,7 @@ function LegacyDemoRedirect() {
 function SlugRouter() {
   const { slug } = useParams<{ slug: string }>();
   if (!slug || RESERVED_PATHS.has(slug)) {
-    return <Navigate to="/" replace />;
+    return <NotFound />;
   }
   const isBusiness = BUSINESSES.some((b) => b.slug === slug);
   if (!isBusiness) {

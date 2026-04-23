@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { SiteFooter, TopNav } from "../components/SiteChrome";
 import { PhoneDisplay, TextUsLink } from "../components/PhoneReveal";
+import { Link } from "react-router-dom";
+import { ThemeToggle } from "../components/ThemeToggle";
+
+/** Nanowork SMS / iMessage line — E.164 for sms: links; display for humans. */
+const NANOWORK_SMS_E164 = "+16506740193";
+const NANOWORK_SMS_DISPLAY = "(650) 674-0193";
+const NANOWORK_SMS_HREF = `sms:${NANOWORK_SMS_E164}`;
 
 type ChatMessage = {
   from: "user" | "nanowork";
@@ -620,7 +627,7 @@ function ClosingCTA() {
 export default function Home() {
   return (
     <>
-      <TopNav onHome />
+      <TopNav />
       <main className="page page--pro">
         <Hero />
         <HowItWorks />
@@ -630,7 +637,7 @@ export default function Home() {
         <FAQ />
         <ClosingCTA />
       </main>
-      <SiteFooter onHome />
+      <SiteFooter />
     </>
   );
 }
