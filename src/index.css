@@ -3150,3 +3150,318 @@ summary:focus-visible {
   fill: currentColor;
 }
 
+
+/* Region-gated phone reveal -------------------------------------------- */
+
+.phone-masked {
+  appearance: none;
+  background: transparent;
+  border: 1px dashed var(--accent-border);
+  color: var(--fg);
+  cursor: pointer;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.9rem 1.4rem;
+  border-radius: 14px;
+  text-decoration: none;
+  font: inherit;
+  font-feature-settings: "tnum" 1;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.15s ease;
+}
+
+.phone-masked:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.phone-masked:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.phone-masked__hint {
+  font-family: var(--font-sans, inherit);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+.cta-number.phone-masked {
+  display: inline-flex;
+}
+
+.phone-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.75rem, 3vw, 2rem);
+  background: color-mix(in srgb, #000 58%, transparent);
+  backdrop-filter: blur(10px);
+  animation: phone-modal-fade 0.18s ease-out;
+}
+
+@keyframes phone-modal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.phone-modal__card {
+  width: min(520px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--bg-elevated);
+  color: var(--fg);
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  padding: 1.6rem;
+  box-shadow:
+    0 30px 80px -30px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  animation: phone-modal-rise 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+
+@keyframes phone-modal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.phone-modal__head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-right: 2.5rem;
+}
+
+.phone-modal__title {
+  margin: 0;
+  font-family: var(--font-display, inherit);
+  font-size: clamp(1.3rem, 2.5vw, 1.6rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.phone-modal__lede {
+  margin: 0;
+  color: var(--fg-dim);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.phone-modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--fg-dim);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.phone-modal__close:hover {
+  color: var(--fg);
+  border-color: var(--border-strong);
+}
+
+.phone-modal__body {
+  margin-top: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.phone-modal__foot {
+  margin-top: 1.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--fg-dim);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.phone-modal__muted {
+  margin: 0;
+  color: var(--fg-dim);
+  font-size: 0.88rem;
+}
+
+.phone-modal__error {
+  background: var(--tint-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  color: var(--fg-dim);
+  font-size: 0.9rem;
+}
+
+.phone-modal__notice {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  color: var(--fg);
+  font-size: 0.9rem;
+}
+
+.phone-modal__notice code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  background: var(--tint-3);
+  padding: 0.1rem 0.35rem;
+  border-radius: 6px;
+  font-size: 0.82em;
+}
+
+.phone-regions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+
+@media (max-width: 440px) {
+  .phone-regions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.phone-region {
+  appearance: none;
+  background: var(--tint-1);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 0.9rem;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.phone-region:hover:not(:disabled) {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.phone-region:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.phone-region.is-selected {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.phone-region.is-waitlist {
+  color: var(--fg-dim);
+}
+
+.phone-region__label {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.phone-region__state {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.phone-region.is-waitlist .phone-region__state {
+  color: var(--fg-dim);
+}
+
+.phone-revealed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.2rem 0.5rem 0.4rem;
+  text-align: center;
+}
+
+.phone-revealed__region {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.phone-revealed__number {
+  font-family: var(--font-display, inherit);
+  font-size: clamp(2rem, 7vw, 2.8rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  text-decoration: none;
+  font-feature-settings: "tnum" 1;
+  line-height: 1.1;
+}
+
+.phone-revealed__number:hover {
+  color: var(--accent);
+}
+
+.phone-revealed__hint {
+  margin: 0;
+  color: var(--fg-dim);
+  font-size: 0.82rem;
+}
+
+.phone-revealed__row {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: center;
+}
+
+.btn--sm {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.82rem;
+}

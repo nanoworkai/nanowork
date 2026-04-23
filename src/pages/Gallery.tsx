@@ -6,12 +6,8 @@ import {
   formatPrice,
   type Business,
 } from "../data/businesses";
-import { ThemeToggle } from "../components/ThemeToggle";
-
-const NANOWORK_SMS_E164 = "+16506740193";
-const NANOWORK_SMS_DISPLAY = "(650) 674-0193";
-const NANOWORK_SMS_HREF = `sms:${NANOWORK_SMS_E164}`;
-
+import { SiteFooter, TopNav } from "../components/SiteChrome";
+import { PhoneDisplay, TextUsLink } from "../components/PhoneReveal";
 
 function useReveal<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
@@ -37,47 +33,6 @@ function useReveal<T extends HTMLElement>() {
   }, []);
 
   return { ref, visible };
-}
-
-function BrandMark() {
-  return (
-    <span className="brand" aria-label="Nanowork">
-      <img
-        className="brand__logo"
-        src="/logo.png"
-        alt=""
-        width={28}
-        height={28}
-        aria-hidden
-      />
-      <span className="brand__word">Nanowork</span>
-    </span>
-  );
-}
-
-function TopNav() {
-  return (
-    <header className="site-nav">
-      <Link to="/" className="site-nav__brand" aria-label="Nanowork home">
-        <BrandMark />
-      </Link>
-      <nav className="site-nav__links" aria-label="Primary">
-        <Link to="/#how-it-works">Process</Link>
-        <Link to="/#build">Ideas</Link>
-        <Link to="/gallery" aria-current="page" className="is-active">
-          Gallery
-        </Link>
-        <Link to="/#agents">API</Link>
-        <Link to="/changelog">Changelog</Link>
-        <Link to="/#faq">FAQ</Link>
-      </nav>
-      <ThemeToggle />
-      <a className="site-nav__cta" href={NANOWORK_SMS_HREF}>
-        <span className="status-dot" aria-hidden />
-        Text us
-      </a>
-    </header>
-  );
 }
 
 function StatusTag({ status }: { status: Business["status"] }) {
@@ -317,9 +272,9 @@ function Hero() {
           <a className="btn btn--primary" href="#listings">
             Browse the gallery
           </a>
-          <a className="btn btn--ghost" href={NANOWORK_SMS_HREF}>
+          <TextUsLink className="btn btn--ghost">
             Text us about a listing
-          </a>
+          </TextUsLink>
         </div>
         <dl className="hero__stats gallery-hero__stats" aria-label="What's included">
           <div>
@@ -449,16 +404,14 @@ function Listings() {
                 <div className="listing__actions">
                   {b.status === "available" ? (
                     <>
-                      <a
+                      <TextUsLink
                         className="btn btn--primary"
-                        href={`${NANOWORK_SMS_HREF}&body=${encodeURIComponent(
-                          `Hey Nanowork — I want to buy ${b.name} (${formatPrice(
-                            b.price,
-                          )}). What are the next steps?`,
-                        )}`}
+                        bodyTemplate={`Hey Nanowork — I want to buy ${b.name} (${formatPrice(
+                          b.price,
+                        )}). What are the next steps?`}
                       >
                         Buy {b.name} · {formatPrice(b.price)}
-                      </a>
+                      </TextUsLink>
                       <Link
                         className="btn btn--ghost"
                         to={`/${b.slug}`}
@@ -468,16 +421,14 @@ function Listings() {
                     </>
                   ) : b.status === "pending" ? (
                     <>
-                      <a
+                      <TextUsLink
                         className="btn btn--ghost"
-                        href={`${NANOWORK_SMS_HREF}&body=${encodeURIComponent(
-                          `Hey — put me on the waitlist for ${b.name} if ${formatPrice(
-                            b.price,
-                          )} falls through.`,
-                        )}`}
+                        bodyTemplate={`Hey — put me on the waitlist for ${b.name} if ${formatPrice(
+                          b.price,
+                        )} falls through.`}
                       >
                         Join waitlist
-                      </a>
+                      </TextUsLink>
                       <Link
                         className="btn btn--ghost"
                         to={`/${b.slug}`}
@@ -490,9 +441,9 @@ function Listings() {
                       <span className="listing__sold">
                         Sold {b.mrr ? `— was generating ${b.mrr}` : ""}
                       </span>
-                      <a className="btn btn--ghost" href={NANOWORK_SMS_HREF}>
+                      <TextUsLink className="btn btn--ghost">
                         Commission similar
-                      </a>
+                      </TextUsLink>
                     </>
                   )}
                 </div>
@@ -591,7 +542,7 @@ function ProofStrip() {
 function ClosingCTA() {
   const { ref, visible } = useReveal<HTMLDivElement>();
   return (
-    <section className="section section--cta">
+    <section className="section section--cta" id="text-us">
       <div
         ref={ref}
         className={`section__inner reveal ${visible ? "is-visible" : ""}`}
@@ -603,87 +554,10 @@ function ClosingCTA() {
           specific wedge in mind, we'll build it around you — and give you first
           right of refusal at the listing price.
         </p>
-        <a
-          className="cta-number"
-          href={NANOWORK_SMS_HREF}
-          aria-label={`Text Nanowork at ${NANOWORK_SMS_DISPLAY}`}
-        >
-          {NANOWORK_SMS_DISPLAY}
-        </a>
+        <PhoneDisplay className="cta-number" />
         <p className="cta-note">iMessage or SMS · Tap to chat</p>
       </div>
     </section>
-  );
-}
-
-function SiteFooter() {
-  const year = new Date().getFullYear();
-  return (
-    <footer className="footer">
-      <div className="footer__inner">
-        <div className="footer__brand">
-          <BrandMark />
-          <p className="footer__tag">
-            A new kind of company. Built inside your messages.
-          </p>
-        </div>
-        <div className="footer__cols">
-          <div className="footer__col">
-            <p className="footer__heading">Company</p>
-            <ul>
-              <li>
-                <Link to="/#how-it-works">How it works</Link>
-              </li>
-              <li>
-                <Link to="/#build">What you can build</Link>
-              </li>
-              <li>
-                <Link to="/gallery">Gallery</Link>
-              </li>
-              <li>
-                <Link to="/#agents">API &amp; agents</Link>
-              </li>
-              <li>
-                <Link to="/changelog">Changelog</Link>
-              </li>
-              <li>
-                <Link to="/#faq">FAQ</Link>
-              </li>
-            </ul>
-          </div>
-          <div className="footer__col">
-            <p className="footer__heading">Contact</p>
-            <ul>
-              <li>
-                <a href={NANOWORK_SMS_HREF}>Text {NANOWORK_SMS_DISPLAY}</a>
-              </li>
-              <li>
-                <a
-                  href="https://x.com/nanoworkai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Twitter
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.linkedin.com/company/nanowork/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  LinkedIn
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div className="footer__bottom">
-        <span>© {year} Nanowork, Inc. All rights reserved.</span>
-        <span className="footer__made">Made with care in California.</span>
-      </div>
-    </footer>
   );
 }
 

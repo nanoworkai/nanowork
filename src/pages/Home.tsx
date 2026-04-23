@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { SiteFooter, TopNav } from "../components/SiteChrome";
+import { PhoneDisplay, TextUsLink } from "../components/PhoneReveal";
 import { Link } from "react-router-dom";
 import { ThemeToggle } from "../components/ThemeToggle";
 
@@ -63,43 +65,6 @@ function useReveal<T extends HTMLElement>() {
   return { ref, visible };
 }
 
-function BrandMark() {
-  return (
-    <span className="brand" aria-label="Nanowork">
-      <img
-        className="brand__logo"
-        src="/logo.png"
-        alt=""
-        width={28}
-        height={28}
-        aria-hidden
-      />
-      <span className="brand__word">Nanowork</span>
-    </span>
-  );
-}
-
-function TopNav() {
-  return (
-    <header className="site-nav">
-      <a href="#top" className="site-nav__brand" aria-label="Nanowork home">
-        <BrandMark />
-      </a>
-      <nav className="site-nav__links" aria-label="Primary">
-        <a href="#how-it-works">Process</a>
-        <a href="#build">Ideas</a>
-        <a href="#philosophy">Why</a>
-        <a href="#faq">FAQ</a>
-      </nav>
-      <ThemeToggle />
-      <a className="site-nav__cta" href={NANOWORK_SMS_HREF}>
-        <span className="status-dot" aria-hidden />
-        Text us
-      </a>
-    </header>
-  );
-}
-
 function Hero() {
   return (
     <section className="hero" id="top">
@@ -120,7 +85,7 @@ function Hero() {
             capital cost of a typical startup.
           </p>
           <div className="hero__cta-row">
-            <a className="btn btn--primary" href={NANOWORK_SMS_HREF}>
+            <TextUsLink className="btn btn--primary">
               <span aria-hidden className="btn__icon">
                 <svg
                   viewBox="0 0 24 24"
@@ -135,8 +100,8 @@ function Hero() {
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
               </span>
-              Text {NANOWORK_SMS_DISPLAY}
-            </a>
+              Text us
+            </TextUsLink>
             <a className="btn btn--ghost" href="#how-it-works">
               See how it works
             </a>
@@ -487,7 +452,7 @@ function Agents() {
         </div>
 
         <div className="agents__cta">
-          <a className="btn btn--primary" href={NANOWORK_SMS_HREF}>
+          <TextUsLink className="btn btn--primary">
             <span aria-hidden className="btn__icon">
               <svg
                 viewBox="0 0 24 24"
@@ -503,7 +468,7 @@ function Agents() {
               </svg>
             </span>
             Request API access
-          </a>
+          </TextUsLink>
           <span className="agents__cta-note">
             API is in early access — text us to get on the list.
           </span>
@@ -573,6 +538,10 @@ function FAQ() {
       a: "That's the front door. Behind it is a small, opinionated team plus a set of internal tools that help us move from idea to live product fast. You won't need to learn any of it.",
     },
     {
+      q: "Why is the number hidden until I pick a region?",
+      a: "We run regional lines, not a single global one. To make sure each region gets the right number — and to keep scrapers from harvesting them — we verify your connection server-side before we reveal the digits.",
+    },
+    {
       q: "Who's it for?",
       a: "Operators, designers, engineers, and domain experts who have ideas they've been sitting on — and who would rather test one in the open than talk about it for another quarter.",
     },
@@ -635,7 +604,7 @@ function FAQ() {
 function ClosingCTA() {
   const { ref, visible } = useReveal<HTMLDivElement>();
   return (
-    <section className="section section--cta">
+    <section className="section section--cta" id="text-us">
       <div
         ref={ref}
         className={`section__inner reveal ${visible ? "is-visible" : ""}`}
@@ -646,89 +615,12 @@ function ClosingCTA() {
         </h2>
         <p className="cta-sub">
           One sentence is enough. We'll take it from there — and you'll hear
-          back today.
+          back today. Pick your region to unlock the right number.
         </p>
-        <a
-          className="cta-number"
-          href={NANOWORK_SMS_HREF}
-          aria-label={`Text Nanowork at ${NANOWORK_SMS_DISPLAY}`}
-        >
-          {NANOWORK_SMS_DISPLAY}
-        </a>
+        <PhoneDisplay className="cta-number" />
         <p className="cta-note">iMessage or SMS · Tap to chat</p>
       </div>
     </section>
-  );
-}
-
-function SiteFooter() {
-  const year = new Date().getFullYear();
-  return (
-    <footer className="footer">
-      <div className="footer__inner">
-        <div className="footer__brand">
-          <BrandMark />
-          <p className="footer__tag">
-            A new kind of company. Built inside your messages.
-          </p>
-        </div>
-        <div className="footer__cols">
-          <div className="footer__col">
-            <p className="footer__heading">Company</p>
-            <ul>
-              <li>
-                <a href="#how-it-works">How it works</a>
-              </li>
-              <li>
-                <a href="#build">What you can build</a>
-              </li>
-              <li>
-                <a href="#agents">API &amp; agents</a>
-              </li>
-              <li>
-                <Link to="/changelog">Changelog</Link>
-              </li>
-              <li>
-                <a href="#philosophy">Why Nanowork</a>
-              </li>
-              <li>
-                <a href="#faq">FAQ</a>
-              </li>
-            </ul>
-          </div>
-          <div className="footer__col">
-            <p className="footer__heading">Contact</p>
-            <ul>
-              <li>
-                <a href={NANOWORK_SMS_HREF}>Text {NANOWORK_SMS_DISPLAY}</a>
-              </li>
-              <li>
-                <a
-                  href="https://x.com/nanoworkai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Twitter
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.linkedin.com/company/nanowork/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  LinkedIn
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div className="footer__bottom">
-        <span>© {year} Nanowork, Inc. All rights reserved.</span>
-        <span className="footer__made">Made with care in California.</span>
-      </div>
-    </footer>
   );
 }
 
