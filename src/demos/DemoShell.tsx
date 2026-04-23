@@ -5,9 +5,7 @@ import {
   formatPrice,
   type Business,
 } from "../data/businesses";
-
-const NANOWORK_SMS_E164 = "+16506740193";
-const NANOWORK_SMS_HREF = `sms:${NANOWORK_SMS_E164}`;
+import { TextUsLink } from "../components/PhoneReveal";
 
 export function DemoShell({
   business,
@@ -16,11 +14,12 @@ export function DemoShell({
   business: Business;
   children: ReactNode;
 }) {
-  const buyHref = `${NANOWORK_SMS_HREF}&body=${encodeURIComponent(
-    `Hey Nanowork — I want to buy ${business.name} (${formatPrice(
-      business.price,
-    )}). What are the next steps?`,
-  )}`;
+  const buyBody = `Hey Nanowork — I want to buy ${business.name} (${formatPrice(
+    business.price,
+  )}). What are the next steps?`;
+  const waitlistBody = `Hey — put me on the waitlist for ${business.name} if ${formatPrice(
+    business.price,
+  )} falls through.`;
 
   return (
     <div className="demo-shell" style={businessStyle(business)}>
@@ -37,14 +36,17 @@ export function DemoShell({
           </div>
           <div className="demo-bar__actions">
             {business.status === "available" && (
-              <a className="demo-bar__cta" href={buyHref}>
+              <TextUsLink className="demo-bar__cta" bodyTemplate={buyBody}>
                 Buy for {formatPrice(business.price)} →
-              </a>
+              </TextUsLink>
             )}
             {business.status === "pending" && (
-              <a className="demo-bar__cta demo-bar__cta--ghost" href={buyHref}>
+              <TextUsLink
+                className="demo-bar__cta demo-bar__cta--ghost"
+                bodyTemplate={waitlistBody}
+              >
                 In escrow · Join waitlist
-              </a>
+              </TextUsLink>
             )}
             {business.status === "sold" && (
               <span className="demo-bar__sold">Sold · Commission similar</span>

@@ -6,6 +6,8 @@ import "./demos/demos.css";
 import "./demos/demos-extra.css";
 import App from "./App";
 import { ThemeProvider } from "./context/ThemeContext";
+import { PhoneProvider } from "./context/PhoneContext";
+import { PhoneRevealModal } from "./components/PhoneReveal";
 
 const root = document.getElementById("root");
 if (!root) {
@@ -16,7 +18,10 @@ createRoot(root).render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider>
-        <App />
+        <PhoneProvider>
+          <App />
+          <PhoneRevealModal />
+        </PhoneProvider>
       </ThemeProvider>
     </BrowserRouter>
   </StrictMode>,

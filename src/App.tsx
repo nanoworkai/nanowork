@@ -1,4 +1,10 @@
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import Home from "./pages/Home";
+import Changelog from "./pages/Changelog";
+import DemoPage from "./pages/Demo";
+import Gallery from "./pages/Gallery";
+import NotFound from "./pages/NotFound";
+import { BUSINESSES } from "./data/businesses";
 import { BUSINESSES } from "./data/businesses";
 import Changelog from "./pages/Changelog";
 import DemoPage from "./pages/Demo";
