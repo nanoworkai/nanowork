@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { TextUsLink } from "./PhoneReveal";
+import { useAuth } from "../context/AuthContext";
 
 export function BrandMark() {
   return (
@@ -27,6 +28,7 @@ type TopNavProps = {
 
 export function TopNav({ onHome = false }: TopNavProps) {
   const href = (hash: string) => (onHome ? hash : `/${hash}`);
+  const { isAuthenticated } = useAuth();
   return (
     <header className="site-nav">
       <Link
@@ -41,10 +43,17 @@ export function TopNav({ onHome = false }: TopNavProps) {
         <a href={href("#faq")}>FAQ</a>
         <Link to="/changelog">Changelog</Link>
       </nav>
-      <TextUsLink className="site-nav__cta">
-        <span className="status-dot" aria-hidden />
-        Text us
-      </TextUsLink>
+      {isAuthenticated ? (
+        <Link to="/dashboard" className="site-nav__cta">
+          <span className="status-dot" aria-hidden />
+          Dashboard
+        </Link>
+      ) : (
+        <TextUsLink className="site-nav__cta">
+          <span className="status-dot" aria-hidden />
+          Text us
+        </TextUsLink>
+      )}
     </header>
   );
 }
