@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const DAILY_USAGE = [
@@ -37,10 +38,14 @@ const BREAKDOWN = [
 type Period = "7d" | "30d" | "all";
 
 export default function Usage() {
-  const { agent } = useAuth();
+  const { agent, updateAgent } = useAuth();
   const [period, setPeriod] = useState<Period>("30d");
   const [limitInput, setLimitInput] = useState(String(agent?.spending.limit || 200));
   const [limitSaved, setLimitSaved] = useState(false);
+
+  useEffect(() => {
+    if (agent) setLimitInput(String(agent.spending.limit));
+  }, [agent?.spending.limit]);
 
   if (!agent) return null;
 
@@ -48,6 +53,10 @@ export default function Usage() {
   const maxDay = Math.max(...visibleDays.map((d) => d.api + d.compute + d.storage));
 
   const handleLimitSave = () => {
+    const n = parseInt(limitInput, 10);
+    if (Number.isFinite(n) && n >= 10) {
+      updateAgent({ spending: { ...agent.spending, limit: n } });
+    }
     setLimitSaved(true);
     setTimeout(() => setLimitSaved(false), 2000);
   };
@@ -59,7 +68,11 @@ export default function Usage() {
           <h1 className="dash-page__title">Usage</h1>
           <p className="dash-page__subtitle">Track how your agent spends</p>
         </div>
-        <div className="dash-period-toggle">
+        <div className="dash-header-actions">
+          <Link to="/dashboard/plan" className="btn btn--primary btn--sm">
+            Upgrade plan
+          </Link>
+          <div className="dash-period-toggle">
           {(["7d", "30d", "all"] as const).map((p) => (
             <button
               key={p}
@@ -69,6 +82,7 @@ export default function Usage() {
               {p === "7d" ? "7 days" : p === "30d" ? "30 days" : "All time"}
             </button>
           ))}
+          </div>
         </div>
       </div>
 
@@ -138,7 +152,14 @@ export default function Usage() {
 
       <div className="dash-section">
         <h2 className="dash-section__title">Spending limit</h2>
-        <p className="dash-section__desc">Set a monthly spending cap. Your agent will pause when this limit is reached.</p>
+        <p className="dash-section__desc">
+          Set a monthly spending cap. Your agent will pause when this limit is reached. Need more
+          headroom?{" "}
+          <Link to="/dashboard/plan" className="dash-link">
+            Increase your plan
+          </Link>{" "}
+          or raise the cap below.
+        </p>
         <div className="dash-inline-form">
           <div className="dash-input-group">
             <span className="dash-input-prefix">$</span>

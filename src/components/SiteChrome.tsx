@@ -44,17 +44,24 @@ export function TopNav({ onHome = false }: TopNavProps) {
         <a href={href("#faq")}>FAQ</a>
         <Link to="/changelog">Changelog</Link>
       </nav>
-      {isAuthenticated ? (
-        <Link to="/dashboard" className="site-nav__cta">
-          <span className="status-dot" aria-hidden />
-          Dashboard
-        </Link>
-      ) : (
-        <TextUsLink className="site-nav__cta">
-          <span className="status-dot" aria-hidden />
-          Text us
-        </TextUsLink>
-      )}
+      <div className="site-nav__right">
+        {!isAuthenticated && (
+          <Link to="/login" className="site-nav__login">
+            Log in
+          </Link>
+        )}
+        {isAuthenticated ? (
+          <Link to="/dashboard" className="site-nav__cta">
+            <span className="status-dot" aria-hidden />
+            Dashboard
+          </Link>
+        ) : (
+          <TextUsLink className="site-nav__cta">
+            <span className="status-dot" aria-hidden />
+            Text us
+          </TextUsLink>
+        )}
+      </div>
     </header>
   );
 }

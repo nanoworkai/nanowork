@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import { BUSINESSES } from "./data/businesses";
 import Changelog from "./pages/Changelog";
 import DemoPage from "./pages/Demo";
@@ -13,6 +13,13 @@ import Domains from "./dashboard/Domains";
 import Plan from "./dashboard/Plan";
 import Settings from "./dashboard/Settings";
 import { useAuth } from "./context/AuthContext";
+import UserAppEntry from "./pages/user-app/UserAppEntry";
+import UserAppLayout from "./pages/user-app/UserAppLayout";
+import UserAppHome from "./pages/user-app/UserAppHome";
+import UserAppLeads from "./pages/user-app/UserAppLeads";
+import UserAppAPI from "./pages/user-app/UserAppAPI";
+import UserAppSettings from "./pages/user-app/UserAppSettings";
+import UserAppRedeem from "./pages/user-app/UserAppRedeem";
 
 const RESERVED_PATHS = new Set([
   "gallery",
@@ -23,6 +30,7 @@ const RESERVED_PATHS = new Set([
   "static",
   "login",
   "dashboard",
+  "app",
 ]);
 
 function LegacyDemoRedirect() {
@@ -51,15 +59,30 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const { pathname } = useLocation();
+  const showAmbient = !pathname.startsWith("/app");
   return (
     <>
-      <div className="noise" aria-hidden />
-      <div className="glow" aria-hidden />
+      {showAmbient && (
+        <>
+          <div className="noise" aria-hidden />
+          <div className="glow" aria-hidden />
+        </>
+      )}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/changelog" element={<Changelog />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/app" element={<UserAppEntry />}>
+          <Route element={<UserAppLayout />}>
+            <Route index element={<UserAppHome />} />
+            <Route path="leads" element={<UserAppLeads />} />
+            <Route path="api" element={<UserAppAPI />} />
+            <Route path="settings" element={<UserAppSettings />} />
+            <Route path="redeem" element={<UserAppRedeem />} />
+          </Route>
+        </Route>
         <Route
           path="/dashboard"
           element={

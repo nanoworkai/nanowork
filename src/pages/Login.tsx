@@ -1,13 +1,21 @@
 import { useState, useRef, useEffect, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { BrandMark } from "../components/SiteChrome";
 
 type Step = "phone" | "otp";
 
+function safeNextPath(raw: string | null): string {
+  if (!raw || !raw.startsWith("/")) return "/dashboard";
+  if (raw.startsWith("//") || raw.includes(":")) return "/dashboard";
+  return raw;
+}
+
 export default function Login() {
   const { requestOtp, verifyOtp, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextPath = safeNextPath(searchParams.get("next"));
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -16,8 +24,8 @@ export default function Login() {
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    if (isAuthenticated) navigate("/dashboard", { replace: true });
-  }, [isAuthenticated, navigate]);
+    if (isAuthenticated) navigate(nextPath, { replace: true });
+  }, [isAuthenticated, navigate, nextPath]);
 
   const handlePhoneSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -79,7 +87,7 @@ export default function Login() {
     try {
       const ok = await verifyOtp(code);
       if (ok) {
-        navigate("/dashboard", { replace: true });
+        navigate(nextPath, { replace: true });
       } else {
         setError("Invalid code. Please try again.");
         setOtp(["", "", "", "", "", ""]);

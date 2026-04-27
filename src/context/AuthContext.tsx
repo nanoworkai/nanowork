@@ -7,15 +7,26 @@ import {
   type ReactNode,
 } from "react";
 
+export interface PaymentMethod {
+  brand: string;
+  last4: string;
+  expMonth: number;
+  expYear: number;
+}
+
 export interface AgentProfile {
   id: string;
   name: string;
   phone: string;
   email: string;
+  /** Hostname of primary custom domain, e.g. morningbrief.ai */
   domain: string;
+  /** Subdomain slug on the platform, e.g. "morning-brief" → morning-brief.nanowork.app */
+  subdomain: string;
   plan: "starter" | "growth" | "scale";
   status: "active" | "paused" | "error";
   createdAt: string;
+  paymentMethod: PaymentMethod;
   spending: {
     currentMonth: number;
     limit: number;
@@ -54,9 +65,11 @@ const MOCK_AGENT: AgentProfile = {
   phone: "+1 (555) 012-3456",
   email: "hello@morningbrief.ai",
   domain: "morningbrief.ai",
+  subdomain: "morning-brief",
   plan: "growth",
   status: "active",
   createdAt: "2025-11-14T08:00:00Z",
+  paymentMethod: { brand: "Visa", last4: "4242", expMonth: 8, expYear: 2027 },
   spending: {
     currentMonth: 47.82,
     limit: 200,
@@ -75,6 +88,17 @@ const MOCK_AGENT: AgentProfile = {
   ],
 };
 
+function withAgentDefaults(stored: Partial<AgentProfile> | undefined): AgentProfile {
+  const base = { ...MOCK_AGENT, ...stored } as AgentProfile;
+  if (!stored?.paymentMethod) base.paymentMethod = MOCK_AGENT.paymentMethod;
+  if (!stored?.subdomain) {
+    base.subdomain = stored?.domain
+      ? String(stored.domain).split(".")[0].replace(/[^a-z0-9-]/gi, "-").toLowerCase() || "app"
+      : MOCK_AGENT.subdomain;
+  }
+  return base;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -87,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (stored) {
         const parsed = JSON.parse(stored);
         setPhone(parsed.phone);
-        setAgent(parsed.agent || MOCK_AGENT);
+        setAgent(parsed.agent ? withAgentDefaults(parsed.agent) : MOCK_AGENT);
         setIsAuthenticated(true);
       }
     } catch {
@@ -105,7 +129,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (code: string) => {
       await new Promise((r) => setTimeout(r, 600));
       if (code.length >= 4) {
-        const agentData = { ...MOCK_AGENT, phone: phone || MOCK_AGENT.phone };
+        const agentData = withAgentDefaults({
+          ...MOCK_AGENT,
+          phone: phone || MOCK_AGENT.phone,
+        });
         setAgent(agentData);
         setIsAuthenticated(true);
         try {

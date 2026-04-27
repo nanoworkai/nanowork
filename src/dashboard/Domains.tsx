@@ -1,13 +1,48 @@
-import { useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+
+const PLATFORM_HOST = "nanowork.app";
+
+function normalizeSubdomain(raw: string): string {
+  return raw
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 40);
+}
 
 export default function Domains() {
   const { agent, updateAgent } = useAuth();
   const [newDomain, setNewDomain] = useState("");
   const [adding, setAdding] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  const [subdomainInput, setSubdomainInput] = useState(() => agent?.subdomain || "");
+  const [subdomainSaved, setSubdomainSaved] = useState(false);
+  const [subError, setSubError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (agent?.subdomain) setSubdomainInput(agent.subdomain);
+  }, [agent?.subdomain]);
 
   if (!agent) return null;
+
+  const fullSubUrl = `https://${subdomainInput || "your-app"}.${PLATFORM_HOST}`;
+
+  const saveSubdomain = (e: FormEvent) => {
+    e.preventDefault();
+    setSubError(null);
+    const next = normalizeSubdomain(subdomainInput);
+    if (next.length < 2) {
+      setSubError("Use at least 2 characters (letters, numbers, hyphens).");
+      return;
+    }
+    updateAgent({ subdomain: next });
+    setSubdomainInput(next);
+    setSubdomainSaved(true);
+    setTimeout(() => setSubdomainSaved(false), 2000);
+  };
 
   const handleAdd = async () => {
     if (!newDomain.trim()) return;
@@ -40,11 +75,49 @@ export default function Domains() {
       <div className="dash-page__header">
         <div>
           <h1 className="dash-page__title">Domains</h1>
-          <p className="dash-page__subtitle">Manage domains connected to your agent</p>
+          <p className="dash-page__subtitle">Subdomain and custom domains for your app</p>
         </div>
         <button className="btn btn--primary btn--sm" onClick={() => setShowAdd(!showAdd)}>
           {showAdd ? "Cancel" : "+ Add domain"}
         </button>
+      </div>
+
+      <div className="dash-settings-section">
+        <div className="dash-settings-section__header">
+          <h2 className="dash-section__title">Platform subdomain</h2>
+          <p className="dash-section__desc">
+            Your app is served at <span className="mono">{`*.${PLATFORM_HOST}`}</span>. Choose
+            a unique slug. Custom domains below can be primary for branding.
+          </p>
+        </div>
+        <form className="dash-settings-form dash-settings-form--stack" onSubmit={saveSubdomain}>
+          <div className="dash-subdomain-field">
+            <span className="dash-subdomain-field__https">https://</span>
+            <input
+              className="dash-input dash-subdomain-field__input"
+              type="text"
+              name="subdomain"
+              autoComplete="off"
+              value={subdomainInput}
+              onChange={(e) => setSubdomainInput(normalizeSubdomain(e.target.value))}
+              placeholder="your-app"
+              aria-invalid={!!subError}
+            />
+            <span className="dash-subdomain-field__host mono">.{PLATFORM_HOST}</span>
+          </div>
+          {subError && <p className="login-error" role="alert">{subError}</p>}
+          <p className="dash-section__desc dash-subdomain-hint">
+            Live URL: <a href={fullSubUrl} className="dash-link" target="_blank" rel="noreferrer">{fullSubUrl}</a>
+          </p>
+          <div className="dash-inline-form">
+            <button className="btn btn--primary btn--sm" type="submit">
+              {subdomainSaved ? "Saved!" : "Save subdomain"}
+            </button>
+            <Link to="/dashboard/plan" className="btn btn--ghost btn--sm">
+              Increase limits &amp; plan
+            </Link>
+          </div>
+        </form>
       </div>
 
       {showAdd && (

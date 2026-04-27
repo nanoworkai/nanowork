@@ -102,6 +102,12 @@ export default function Overview() {
             <span className="dash-detail__value">{agent.email}</span>
           </div>
           <div className="dash-detail">
+            <span className="dash-detail__label">Platform subdomain</span>
+            <span className="dash-detail__value mono">
+              {agent.subdomain}.nanowork.app
+            </span>
+          </div>
+          <div className="dash-detail">
             <span className="dash-detail__label">Primary domain</span>
             <span className="dash-detail__value">{agent.domain}</span>
           </div>

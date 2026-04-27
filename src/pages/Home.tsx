@@ -1,36 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import BuildFromPrompt from "../components/BuildFromPrompt";
 import { SiteFooter, TopNav } from "../components/SiteChrome";
 import { PhoneDisplay, TextUsLink } from "../components/PhoneReveal";
-
-type ChatMessage = {
-  from: "user" | "nanowork";
-  text: string;
-  meta?: string;
-};
-
-const CHAT_SCRIPT: ChatMessage[] = [
-  {
-    from: "user",
-    text: "I keep thinking about a tiny tool that emails me a morning brief tailored to my calendar.",
-  },
-  {
-    from: "nanowork",
-    text: "Love it. That's a real pain — most briefings ignore what you're actually doing that day.",
-  },
-  {
-    from: "nanowork",
-    text: "I drafted a name, a one-line pitch, and a $9/mo pricing test. Want me to spin up a waitlist page and start collecting signups tonight?",
-  },
-  {
-    from: "user",
-    text: "Yes. Let's go.",
-  },
-  {
-    from: "nanowork",
-    text: "Shipping. I'll text you when the page is live and when the first signup lands.",
-    meta: "Delivered",
-  },
-];
 
 function useReveal<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
@@ -56,125 +27,6 @@ function useReveal<T extends HTMLElement>() {
   }, []);
 
   return { ref, visible };
-}
-
-function Hero() {
-  return (
-    <section className="hero" id="top">
-      <div className="hero__inner">
-        <div className="hero__copy">
-          <span className="platform-pill">
-            <span className="status-dot" aria-hidden />
-            In early beta · Invite only
-          </span>
-          <h1 className="display-headline">
-            From idea to revenue,
-            <br />
-            <span className="display-headline__accent">over text.</span>
-          </h1>
-          <p className="lede">
-            Nanowork lives inside your messages. Text an idea. We help you
-            shape it, ship it, and find your first customers — without the
-            capital cost of a typical startup.
-          </p>
-          <div className="hero__cta-row">
-            <TextUsLink className="btn btn--primary">
-              <span aria-hidden className="btn__icon">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-              </span>
-              Text us
-            </TextUsLink>
-            <a className="btn btn--ghost" href="#how-it-works">
-              See how it works
-            </a>
-          </div>
-          <dl className="hero__stats" aria-label="What you get">
-            <div>
-              <dt>No deck</dt>
-              <dd>Just a message</dd>
-            </div>
-            <div>
-              <dt>No code required</dt>
-              <dd>We build alongside you</dd>
-            </div>
-            <div>
-              <dt>Keep ownership</dt>
-              <dd>It's your company</dd>
-            </div>
-          </dl>
-        </div>
-        <div className="hero__visual" aria-hidden>
-          <ChatMock />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ChatMock() {
-  return (
-    <div className="chat" role="img" aria-label="Example conversation with Nanowork">
-      <div className="chat__chrome">
-        <div className="chat__bar">
-          <span className="chat__dots">
-            <span /> <span /> <span />
-          </span>
-          <span className="chat__title">
-            <span className="chat__avatar" aria-hidden>
-              N
-            </span>
-            Nanowork
-          </span>
-          <span className="chat__time">iMessage</span>
-        </div>
-      </div>
-      <ol className="chat__stream">
-        {CHAT_SCRIPT.map((m, i) => (
-          <li
-            key={i}
-            className={`bubble bubble--${m.from}`}
-            style={{ animationDelay: `${i * 300 + 200}ms` }}
-          >
-            <p>{m.text}</p>
-            {m.meta ? <span className="bubble__meta">{m.meta}</span> : null}
-          </li>
-        ))}
-        <li className="bubble bubble--nanowork bubble--typing" aria-hidden>
-          <span className="typing">
-            <span /> <span /> <span />
-          </span>
-        </li>
-      </ol>
-      <div className="chat__compose" aria-hidden>
-        <span className="chat__compose-field">iMessage</span>
-        <span className="chat__compose-send">
-          <svg
-            viewBox="0 0 24 24"
-            width="14"
-            height="14"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M5 12l14-7-7 14-2-5-5-2z" />
-          </svg>
-        </span>
-      </div>
-    </div>
-  );
 }
 
 function HowItWorks() {
@@ -620,9 +472,9 @@ function ClosingCTA() {
 export default function Home() {
   return (
     <>
-      <TopNav />
+      <TopNav onHome />
       <main className="page page--pro">
-        <Hero />
+        <BuildFromPrompt />
         <HowItWorks />
         <BuildGrid />
         <Agents />

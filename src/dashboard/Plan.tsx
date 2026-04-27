@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useAuth, type AgentProfile } from "../context/AuthContext";
+import { useEffect, useState, type FormEvent } from "react";
+import { useAuth, type AgentProfile, type PaymentMethod } from "../context/AuthContext";
 
 type PlanTier = AgentProfile["plan"];
 
@@ -60,8 +60,41 @@ export default function Plan() {
   const { agent, updateAgent } = useAuth();
   const [switching, setSwitching] = useState<PlanTier | null>(null);
   const [showConfirm, setShowConfirm] = useState<PlanTier | null>(null);
+  const [showPay, setShowPay] = useState(false);
+  const [cardBrand, setCardBrand] = useState("Visa");
+  const [cardLast4, setCardLast4] = useState("4242");
+  const [cardExp, setCardExp] = useState("08/27");
+  const [paySaving, setPaySaving] = useState(false);
+
+  useEffect(() => {
+    if (!agent) return;
+    setCardBrand(agent.paymentMethod.brand);
+    setCardLast4(agent.paymentMethod.last4);
+    setCardExp(
+      `${String(agent.paymentMethod.expMonth).padStart(2, "0")}/${String(agent.paymentMethod.expYear).slice(-2)}`,
+    );
+  }, [agent]);
 
   if (!agent) return null;
+
+  const onPaymentSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setPaySaving(true);
+    const [mm, yy] = cardExp.split("/").map((s) => s.trim());
+    const month = Math.min(12, Math.max(1, parseInt(mm, 10) || 1));
+    const year = yy?.length === 2 ? 2000 + parseInt(yy, 10) : parseInt(yy || "2030", 10);
+    const next: PaymentMethod = {
+      brand: cardBrand || "Card",
+      last4: cardLast4.replace(/\D/g, "").slice(-4) || "0000",
+      expMonth: month,
+      expYear: year,
+    };
+    setTimeout(() => {
+      updateAgent({ paymentMethod: next });
+      setPaySaving(false);
+      setShowPay(false);
+    }, 600);
+  };
 
   const handleSwitch = async (tier: PlanTier) => {
     setSwitching(tier);
@@ -78,6 +111,110 @@ export default function Plan() {
           <h1 className="dash-page__title">Plan</h1>
           <p className="dash-page__subtitle">Manage your subscription and billing</p>
         </div>
+      </div>
+
+      <div className="dash-settings-section">
+        <div className="dash-settings-section__header">
+          <h2 className="dash-section__title">Payment method</h2>
+          <p className="dash-section__desc">
+            Card on file for subscription and usage. Changes apply to the next invoice.
+          </p>
+        </div>
+        {!showPay ? (
+          <div className="dash-payment-row">
+            <div className="dash-payment-card">
+              <span className="dash-payment-card__brand">{agent.paymentMethod.brand}</span>
+              <span className="mono">···· {agent.paymentMethod.last4}</span>
+              <span className="dash-table__muted">
+                Exp {String(agent.paymentMethod.expMonth).padStart(2, "0")}/
+                {String(agent.paymentMethod.expYear).slice(-2)}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="btn btn--ghost btn--sm"
+              onClick={() => {
+                setCardBrand(agent.paymentMethod.brand);
+                setCardLast4(agent.paymentMethod.last4);
+                setCardExp(
+                  `${String(agent.paymentMethod.expMonth).padStart(2, "0")}/${String(agent.paymentMethod.expYear).slice(-2)}`,
+                );
+                setShowPay(true);
+              }}
+            >
+              Change payment method
+            </button>
+          </div>
+        ) : (
+          <form className="dash-payment-form" onSubmit={onPaymentSubmit}>
+            <div className="dash-payment-form__grid">
+              <label className="dash-label">
+                Name on card
+                <input
+                  className="dash-input"
+                  name="name"
+                  autoComplete="cc-name"
+                  placeholder="Name as printed"
+                />
+              </label>
+              <label className="dash-label">
+                Card number
+                <input
+                  className="dash-input"
+                  name="number"
+                  inputMode="numeric"
+                  autoComplete="cc-number"
+                  placeholder="1234 1234 1234 1234"
+                />
+              </label>
+              <label className="dash-label">
+                Brand
+                <select
+                  className="dash-input"
+                  value={cardBrand}
+                  onChange={(e) => setCardBrand(e.target.value)}
+                >
+                  <option>Visa</option>
+                  <option>Mastercard</option>
+                  <option>Amex</option>
+                </select>
+              </label>
+              <label className="dash-label">
+                Last 4 (for display)
+                <input
+                  className="dash-input mono"
+                  value={cardLast4}
+                  onChange={(e) => setCardLast4(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                  inputMode="numeric"
+                  maxLength={4}
+                />
+              </label>
+              <label className="dash-label">
+                Expires (MM/YY)
+                <input
+                  className="dash-input mono"
+                  value={cardExp}
+                  onChange={(e) => setCardExp(e.target.value)}
+                  autoComplete="cc-exp"
+                  placeholder="08/27"
+                />
+              </label>
+            </div>
+            <div className="dash-modal__actions" style={{ marginTop: "1rem" }}>
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm"
+                onClick={() => setShowPay(false)}
+                disabled={paySaving}
+              >
+                Cancel
+              </button>
+              <button className="btn btn--primary btn--sm" type="submit" disabled={paySaving}>
+                {paySaving ? "Saving…" : "Save payment method"}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
 
       <div className="dash-plans">
