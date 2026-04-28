@@ -4,6 +4,8 @@ export type AiTask =
   | "fieldnote.summary"
   | "sharpener.sharpen";
 
+import { apiUrl } from "../lib/apiBase";
+
 export type AiResult = {
   text: string;
   source: "live" | "stub" | "stub_after_error" | "stub_after_throw" | "stub_empty";
@@ -14,7 +16,7 @@ export async function callAi(
   input: Record<string, unknown>,
 ): Promise<AiResult> {
   try {
-    const res = await fetch("/api/ai", {
+    const res = await fetch(apiUrl("/api/ai"), {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ task, input }),
