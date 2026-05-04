@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { TextUsLink } from "./PhoneReveal";
 import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
 
 export function BrandMark() {
   return (
@@ -40,6 +39,7 @@ export function TopNav({ onHome = false }: TopNavProps) {
         <BrandMark />
       </Link>
       <nav className="site-nav__links" aria-label="Primary">
+        <a href={href("#pricing")}>Pricing</a>
         <a href={href("#philosophy")}>Why</a>
         <a href={href("#faq")}>FAQ</a>
         <Link to="/changelog">Changelog</Link>
@@ -69,7 +69,6 @@ export function TopNav({ onHome = false }: TopNavProps) {
 export function SiteFooter({ onHome = false }: TopNavProps) {
   const href = (hash: string) => (onHome ? hash : `/${hash}`);
   const year = new Date().getFullYear();
-  const { theme } = useTheme();
   return (
     <footer className="footer">
       <div className="footer__inner">
@@ -87,10 +86,10 @@ export function SiteFooter({ onHome = false }: TopNavProps) {
                 <a href={href("#how-it-works")}>How it works</a>
               </li>
               <li>
-                <a href={href("#build")}>What you can build</a>
+                <a href={href("#pricing")}>Pricing</a>
               </li>
               <li>
-                <a href={href("#agents")}>API &amp; agents</a>
+                <a href={href("#build")}>What we ship</a>
               </li>
               <li>
                 <a href={href("#philosophy")}>Why Nanowork</a>
@@ -129,15 +128,6 @@ export function SiteFooter({ onHome = false }: TopNavProps) {
         </div>
       </div>
       <div className="footer__bottom">
-        <iframe
-          src={`https://status.nanowork.ai/badge?theme=${theme}`}
-          width="250"
-          height="30"
-          frameBorder="0"
-          scrolling="no"
-          title="Nanowork uptime status"
-          style={{ colorScheme: "normal" }}
-        />
         <span>© {year} Nanowork, Inc. All rights reserved.</span>
         <span className="footer__made">Made with care in California.</span>
       </div>

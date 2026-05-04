@@ -52,8 +52,8 @@ export default function NotFound() {
                 <span>A running list of everything new.</span>
               </li>
               <li>
-                <Link to="/#agents">API &amp; agents</Link>
-                <span>The models behind Nanowork, over HTTP.</span>
+                <Link to="/#pricing">Pricing</Link>
+                <span>$99/mo — ship your idea with Nanowork.</span>
               </li>
             </ul>
           </div>

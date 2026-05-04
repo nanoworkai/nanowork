@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import BuildFromPrompt from "../components/BuildFromPrompt";
+import HomeHero from "../components/HomeHero";
 import { SiteFooter, TopNav } from "../components/SiteChrome";
 import { PhoneDisplay, TextUsLink } from "../components/PhoneReveal";
 
@@ -29,6 +29,31 @@ function useReveal<T extends HTMLElement>() {
   return { ref, visible };
 }
 
+function PricingBand() {
+  const { ref, visible } = useReveal<HTMLDivElement>();
+  return (
+    <section className="section section--muted" id="pricing">
+      <div
+        ref={ref}
+        className={`section__inner reveal ${visible ? "is-visible" : ""}`}
+      >
+        <p className="eyebrow">Pricing</p>
+        <h2 className="pricing-band__title" id="pricing-headline">
+          <span className="pricing-band__amount">$99</span>
+          <span className="pricing-band__period">/mo</span>
+        </h2>
+        <p className="section__lede">
+          One membership. We help you turn texts into live pages, payments, and launches. Cancel
+          anytime — no equity, no tiers.
+        </p>
+        <div className="pricing-band__cta">
+          <TextUsLink className="btn btn--primary">Text us to subscribe</TextUsLink>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function HowItWorks() {
   const { ref, visible } = useReveal<HTMLDivElement>();
   return (
@@ -38,41 +63,34 @@ function HowItWorks() {
         className={`section__inner reveal ${visible ? "is-visible" : ""}`}
       >
         <p className="eyebrow">How it works</p>
-        <h2 className="section__title">
-          Three messages between you and your next company.
-        </h2>
+        <h2 className="section__title">Three beats: text, subscribe, ship.</h2>
         <p className="section__lede">
-          No dashboards to learn. No forms to fill out. You text, we respond,
-          and the work starts happening in the background — the moment the idea
-          leaves your head.
+          No forms. No backlog tickets. You describe what you want in plain language — we respond in
+          the thread and start building.
         </p>
 
         <ol className="steps">
           <li className="step">
             <span className="step__num">01</span>
-            <h3 className="step__title">Send us the spark</h3>
+            <h3 className="step__title">Text your idea</h3>
             <p className="step__body">
-              A sentence is enough. A voice memo works too. Describe the
-              problem, the person, or the outcome — whichever is clearest in
-              your head right now.
+              One sentence or a voice memo. Who it’s for and what “paid” looks like is enough.
             </p>
           </li>
           <li className="step">
             <span className="step__num">02</span>
-            <h3 className="step__title">We pressure-test and plan</h3>
+            <h3 className="step__title">Subscribe when it clicks</h3>
             <p className="step__body">
-              We sharpen the pitch, scope the smallest version that can earn
-              revenue, and lay out a tight path: what to build, what to buy,
-              and what to skip.
+              $99/mo — flat and simple. We align on scope in thread, then you turn it on when you’re
+              ready.
             </p>
           </li>
           <li className="step">
             <span className="step__num">03</span>
-            <h3 className="step__title">We ship, you decide</h3>
+            <h3 className="step__title">We ship in days</h3>
             <p className="step__body">
-              Landing pages, waitlists, payment links, ad creative, small
-              tools — built and launched within days. You stay the final call
-              on everything that ships in your name.
+              Landing pages, checkout, creative, small tools — whatever earns your first dollars
+              fastest.
             </p>
           </li>
         </ol>
@@ -85,44 +103,40 @@ function BuildGrid() {
   const { ref, visible } = useReveal<HTMLDivElement>();
   const items = [
     {
-      title: "Productized services",
-      body: "Turn what you're already good at into a $X/mo offer with a waitlist, pricing, and a real payment link.",
+      title: "Paid offers",
+      body: "Pricing page, checkout, and the smallest funnel that takes money this week.",
     },
     {
-      title: "Niche software",
-      body: "Small, sharp tools for a specific audience — built from a spec, launched with a real page and first users.",
+      title: "Tiny products",
+      body: "Focused tools for one audience — shipped with a real URL and first users.",
     },
     {
-      title: "Content → commerce",
-      body: "If you already have an audience, we help you turn it into a product, a course, or a subscription that pays.",
+      title: "Audience → cash",
+      body: "Turn subscribers or followers into something people actually buy.",
     },
     {
-      title: "Local + physical",
-      body: "Cleaning, events, coaching, curated goods. We handle the site, the booking flow, and the launch playbook.",
+      title: "Local services",
+      body: "Bookings, deposits, and a clean presence without wrestling the stack solo.",
     },
     {
-      title: "B2B experiments",
-      body: "Validate a wedge with a short pilot, a clear price, and 3–5 design partners before writing real code.",
+      title: "B2B pilots",
+      body: "Short wedge, clear price, a handful of design partners before heavy build.",
     },
     {
       title: "Newsletters & media",
-      body: "From a cold domain to a paid list with real distribution — landing page, signup, and week-one cadence.",
+      body: "Landing page, signup, and week-one cadence so attention turns into revenue.",
     },
   ];
   return (
-    <section className="section section--muted" id="build">
+    <section className="section" id="build">
       <div
         ref={ref}
         className={`section__inner reveal ${visible ? "is-visible" : ""}`}
       >
-        <p className="eyebrow">What you can build</p>
-        <h2 className="section__title">
-          Small companies, shipped in the open.
-        </h2>
+        <p className="eyebrow">What we ship</p>
+        <h2 className="section__title">If it can earn, we can help you launch it.</h2>
         <p className="section__lede">
-          Nanowork is built for the kind of founder who would rather test a
-          real offer this week than raise a round next year. Here's the range
-          of things people bring us.
+          Bring something sized for your life — not a ten-year roadmap. Common starting points:
         </p>
 
         <ul className="cards">
@@ -141,192 +155,10 @@ function BuildGrid() {
   );
 }
 
-type Agent = {
-  name: string;
-  slug: string;
-  purpose: string;
-  returns: string;
-};
-
-const AGENTS: Agent[] = [
-  {
-    name: "Sharpener",
-    slug: "sharpener",
-    purpose:
-      "Takes a rough idea and returns a tight one-liner, the real customer, and the sharpest wedge.",
-    returns: "pitch · ICP · wedge",
-  },
-  {
-    name: "Namer",
-    slug: "namer",
-    purpose:
-      "Generates a shortlist of brandable names with .com + handle availability signals.",
-    returns: "names[] · domain · handles",
-  },
-  {
-    name: "Researcher",
-    slug: "researcher",
-    purpose:
-      "Scans the market, pulls incumbents, pricing, and surfaces the gap worth attacking.",
-    returns: "report · competitors · gap",
-  },
-  {
-    name: "Landing",
-    slug: "landing",
-    purpose:
-      "Produces landing-page copy + a section outline tuned to a specific audience and offer.",
-    returns: "headline · sections · copy",
-  },
-  {
-    name: "Launch",
-    slug: "launch",
-    purpose:
-      "Builds the week-one launch plan: where to post, what to say, how to pace the drops.",
-    returns: "plan · channels · cadence",
-  },
-  {
-    name: "Ads",
-    slug: "ads",
-    purpose:
-      "Writes performance-oriented ad creative variants with hooks, angles, and CTAs to test.",
-    returns: "variants[] · hooks · CTAs",
-  },
-];
-
-function CodePreview() {
-  return (
-    <div
-      className="code"
-      role="img"
-      aria-label="Example API request and response for the Sharpener agent"
-    >
-      <div className="code__chrome">
-        <span className="chat__dots" aria-hidden>
-          <span /> <span /> <span />
-        </span>
-        <span className="code__title">POST /v1/agents/sharpener</span>
-        <span className="code__title code__title--meta">200 · 412 ms</span>
-      </div>
-      <pre className="code__block" tabIndex={0}>
-        <code>
-          <span className="tok-c"># Request</span>
-          {"\n"}
-          <span className="tok-k">curl</span> https://api.nanowork.ai
-          <span className="tok-s">/v1/agents/sharpener</span> \{"\n"}
-          {"  "}-H <span className="tok-s">"Authorization: Bearer $NW_KEY"</span> \{"\n"}
-          {"  "}-H <span className="tok-s">"Content-Type: application/json"</span> \{"\n"}
-          {"  "}-d <span className="tok-s">{`'{"idea":"a morning brief tailored to my calendar"}'`}</span>
-          {"\n\n"}
-          <span className="tok-c"># Response</span>
-          {"\n"}
-          {"{"}
-          {"\n  "}
-          <span className="tok-p">"agent"</span>: <span className="tok-s">"sharpener"</span>,
-          {"\n  "}
-          <span className="tok-p">"pitch"</span>:{" "}
-          <span className="tok-s">
-            "A daily brief written around the meetings you actually have."
-          </span>
-          ,{"\n  "}
-          <span className="tok-p">"icp"</span>:{" "}
-          <span className="tok-s">"founders + execs, 10-40 meetings / wk"</span>,
-          {"\n  "}
-          <span className="tok-p">"wedge"</span>:{" "}
-          <span className="tok-s">"calendar-aware, not news-aware"</span>
-          {"\n}"}
-        </code>
-      </pre>
-    </div>
-  );
-}
-
-function Agents() {
-  const { ref, visible } = useReveal<HTMLDivElement>();
-  return (
-    <section className="section" id="agents">
-      <div
-        ref={ref}
-        className={`section__inner reveal ${visible ? "is-visible" : ""}`}
-      >
-        <p className="eyebrow">API · Early access</p>
-        <div className="agents__head">
-          <h2 className="section__title">
-            Every agent that powers Nanowork,
-            <br />
-            <span className="muted-title">exposed as a single endpoint.</span>
-          </h2>
-          <p className="section__lede">
-            You don't need our iMessage interface to get the value. Each
-            Nanowork agent is a small, purpose-built model with a typed
-            contract. Ping one directly, build your own workflow on top, or
-            chain them however you want.
-          </p>
-        </div>
-
-        <div className="agents__layout">
-          <div className="agents__code">
-            <CodePreview />
-            <p className="agents__foot">
-              Base URL{" "}
-              <code className="mono">https://api.nanowork.ai/v1</code> ·
-              Authenticated with a bearer key · JSON in, JSON out.
-            </p>
-          </div>
-
-          <ol className="agents__list" aria-label="Available agents">
-            {AGENTS.map((a, i) => (
-              <li className="agent" key={a.slug}>
-                <span className="agent__index" aria-hidden>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div className="agent__body">
-                  <div className="agent__row">
-                    <h3 className="agent__name">{a.name}</h3>
-                    <code className="agent__endpoint mono">
-                      POST /v1/agents/{a.slug}
-                    </code>
-                  </div>
-                  <p className="agent__purpose">{a.purpose}</p>
-                  <p className="agent__returns">
-                    <span>Returns</span> <code className="mono">{a.returns}</code>
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        <div className="agents__cta">
-          <TextUsLink className="btn btn--primary">
-            <span aria-hidden className="btn__icon">
-              <svg
-                viewBox="0 0 24 24"
-                width="16"
-                height="16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14l-4-4H6a2 2 0 0 1-2-2z" />
-              </svg>
-            </span>
-            Request API access
-          </TextUsLink>
-          <span className="agents__cta-note">
-            API is in early access — text us to get on the list.
-          </span>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Philosophy() {
   const { ref, visible } = useReveal<HTMLDivElement>();
   return (
-    <section className="section" id="philosophy">
+    <section className="section section--muted" id="philosophy">
       <div
         ref={ref}
         className={`section__inner reveal ${visible ? "is-visible" : ""}`}
@@ -335,37 +167,25 @@ function Philosophy() {
         <div className="philosophy">
           <div className="philosophy__col">
             <h2 className="section__title section__title--editorial">
-              Most startups die waiting
+              Built for revenue,
               <br />
-              <span className="muted-title">
-                for permission, capital, or the perfect time.
-              </span>
+              <span className="muted-title">not slide decks.</span>
             </h2>
           </div>
           <div className="philosophy__col">
             <p className="philosophy__body">
-              We believe the next generation of companies will be small,
-              focused, and profitable from the first month. They won't be built
-              in 18-month stealth runs or 90-slide decks — they'll be built in
-              conversations, shipped in weeks, and iterated in public.
-            </p>
-            <p className="philosophy__body">
-              Nanowork is the tissue between a good idea and a real company.
-              You bring the taste, the judgment, and the customer relationship.
-              We bring the operators, the tooling, and the relentless pace.
+              Most ideas die waiting for permission or perfect decks. We’re for operators who want a
+              paying customer, a live URL, and momentum — for one predictable monthly fee.
             </p>
             <ul className="tenets">
               <li>
-                <strong>Text is the interface.</strong> If it doesn't work in a
-                thread with a friend, it's too heavy.
+                <strong>Text is the door.</strong> Fast answers, no ticket queues.
               </li>
               <li>
-                <strong>Revenue is the receipt.</strong> A paying customer is
-                worth more than a hundred signups.
+                <strong>You keep the company.</strong> Your name, your upside.
               </li>
               <li>
-                <strong>You keep the upside.</strong> Your idea, your company,
-                your name on the door.
+                <strong>We chase first dollars.</strong> Launch lean, iterate in public.
               </li>
             </ul>
           </div>
@@ -379,42 +199,30 @@ function FAQ() {
   const { ref, visible } = useReveal<HTMLDivElement>();
   const faqs = [
     {
-      q: "Is Nanowork actually just a phone number?",
-      a: "That's the front door. Behind it is a small, opinionated team plus a set of internal tools that help us move from idea to live product fast. You won't need to learn any of it.",
+      q: "How do I pay?",
+      a: "Text us from this site. We confirm scope, walk you through billing, and you subscribe at $99/mo — cancel anytime.",
     },
     {
-      q: "Why is the number hidden until I pick a region?",
-      a: "We run regional lines, not a single global one. To make sure each region gets the right number — and to keep scrapers from harvesting them — we verify your connection server-side before we reveal the digits.",
+      q: "What’s included?",
+      a: "Hands-on help turning your thread into something live: pages, payments, creative, and iteration toward revenue — one monthly price, no equity.",
     },
     {
-      q: "Who's it for?",
-      a: "Operators, designers, engineers, and domain experts who have ideas they've been sitting on — and who would rather test one in the open than talk about it for another quarter.",
-    },
-    {
-      q: "What does it cost?",
-      a: "A flat $99 per month. No tiers, no per-seat upsells, no usage meters, no equity. One price, cancel any time.",
+      q: "Why is the number gated?",
+      a: "We route regional lines and verify server-side so founders get the right number — not bots scraping the site.",
     },
     {
       q: "Who owns what we build?",
-      a: "You do. The company is yours. We help you set it up clean from day one, including entity, payments, and IP.",
-    },
-    {
-      q: "Can I use the agents without iMessage?",
-      a: "Yes. Every agent that powers Nanowork is also exposed as its own HTTP endpoint under api.nanowork.ai/v1/agents/*. Ping one directly, chain them into your own workflow, or build something entirely new on top — no iMessage required. The API is in early access; text us to get a key.",
-    },
-    {
-      q: "Is this a fund or an accelerator?",
-      a: "Neither. We don't take equity, we don't take board seats, and we don't pressure you toward venture scale. We're here to help you build something real and durable for a flat monthly fee.",
+      a: "You do. We help keep entity, payments, and IP clean from day one.",
     },
   ];
   return (
-    <section className="section section--muted" id="faq">
+    <section className="section" id="faq">
       <div
         ref={ref}
         className={`section__inner reveal ${visible ? "is-visible" : ""}`}
       >
         <p className="eyebrow">FAQ</p>
-        <h2 className="section__title">Questions people text us first.</h2>
+        <h2 className="section__title">Before you text.</h2>
         <ul className="faq">
           {faqs.map((item) => (
             <li key={item.q}>
@@ -454,16 +262,13 @@ function ClosingCTA() {
         ref={ref}
         className={`section__inner reveal ${visible ? "is-visible" : ""}`}
       >
-        <p className="eyebrow">The next move</p>
-        <h2 className="cta-title">
-          Text us the thing you've been thinking about.
-        </h2>
+        <p className="eyebrow">Ready</p>
+        <h2 className="cta-title">Text us — become a paying member today.</h2>
         <p className="cta-sub">
-          One sentence is enough. We'll take it from there — and you'll hear
-          back today. Pick your region to unlock the right number.
+          Same-day reply · $99/mo · Tap below for your region’s line.
         </p>
         <PhoneDisplay className="cta-number" />
-        <p className="cta-note">iMessage or SMS · Tap to chat</p>
+        <p className="cta-note">iMessage or SMS</p>
       </div>
     </section>
   );
@@ -474,10 +279,10 @@ export default function Home() {
     <>
       <TopNav onHome />
       <main className="page page--pro">
-        <BuildFromPrompt />
+        <HomeHero />
         <HowItWorks />
+        <PricingBand />
         <BuildGrid />
-        <Agents />
         <Philosophy />
         <FAQ />
         <ClosingCTA />
