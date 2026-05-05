@@ -39,8 +39,9 @@ export function TopNav({ onHome = false }: TopNavProps) {
         <BrandMark />
       </Link>
       <nav className="site-nav__links" aria-label="Primary">
+        <a href={href("#not-a-tool")}>Not this</a>
+        <a href={href("#company")}>Company</a>
         <a href={href("#pricing")}>Pricing</a>
-        <a href={href("#philosophy")}>Why</a>
         <a href={href("#faq")}>FAQ</a>
         <Link to="/changelog">Changelog</Link>
       </nav>
@@ -75,7 +76,8 @@ export function SiteFooter({ onHome = false }: TopNavProps) {
         <div className="footer__brand">
           <BrandMark />
           <p className="footer__tag">
-            A new kind of company. Built inside your messages.
+            One prompt spawns a revenue-ready company — legal, brand, web, GTM, sales, finance, and
+            ops, run in parallel by AI agents.
           </p>
         </div>
         <div className="footer__cols">
@@ -83,13 +85,16 @@ export function SiteFooter({ onHome = false }: TopNavProps) {
             <p className="footer__heading">Company</p>
             <ul>
               <li>
+                <a href={href("#not-a-tool")}>What it&apos;s not</a>
+              </li>
+              <li>
+                <a href={href("#company")}>Full company</a>
+              </li>
+              <li>
                 <a href={href("#how-it-works")}>How it works</a>
               </li>
               <li>
                 <a href={href("#pricing")}>Pricing</a>
-              </li>
-              <li>
-                <a href={href("#build")}>What we ship</a>
               </li>
               <li>
                 <a href={href("#philosophy")}>Why Nanowork</a>
