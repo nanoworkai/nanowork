@@ -373,7 +373,7 @@ const FAQS = [
   },
   {
     q: "How detailed does my first prompt need to be?",
-    a: "Clear enough to name the customer, the offer, and what "paid" means. We tighten the rest in-thread before agents spin up in parallel.",
+    a: 'Clear enough to name the customer, the offer, and what "paid" means. We tighten the rest in-thread before agents spin up in parallel.',
   },
   {
     q: "How many agents are actually running right now?",
