@@ -13,6 +13,7 @@ ENVIRONMENT = "production"
 # STRIPE_SECRET_KEY
 # STRIPE_WEBHOOK_SECRET
 
-[[routes]]
-pattern = "api.nanowork.ai/*"
-zone_name = "nanowork.ai"
+# Uncomment once nanowork.ai is added to this Cloudflare account:
+# [[routes]]
+# pattern = "api.nanowork.ai/*"
+# zone_name = "nanowork.ai"
