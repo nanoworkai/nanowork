@@ -17,7 +17,22 @@ class Settings(BaseSettings):
     supabase_url: str | None = None
     supabase_service_role_key: str | None = None
 
-    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    linq_stripe_secret_key: str | None = None
+    stripe_secret_key: str | None = None
+    stripe_webhook_secret: str | None = None
+
+    @property
+    def effective_stripe_key(self) -> str | None:
+        """Prefer STRIPE_SECRET_KEY; fall back to legacy LINQ_STRIPE_SECRET_KEY."""
+        return (self.stripe_secret_key or self.linq_stripe_secret_key or "").strip() or None
+
+    cors_origins: str = (
+        "https://nanowork.app,"
+        "https://www.nanowork.app,"
+        "http://localhost:3000,"
+        "http://localhost:5173,"
+        "http://127.0.0.1:5173"
+    )
 
 
 @lru_cache

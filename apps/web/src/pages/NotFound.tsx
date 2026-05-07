@@ -1,65 +1,26 @@
 import { Link } from "react-router-dom";
-import { SiteFooter, TopNav } from "../components/SiteChrome";
-import { TextUsLink } from "../components/PhoneReveal";
 
 export default function NotFound() {
   return (
-    <>
-      <TopNav />
-      <main className="page page--pro page--notfound">
-        <section className="notfound">
-          <div className="notfound__inner">
-            <span className="platform-pill">
-              <span className="status-dot" aria-hidden />
-              404 · Page not found
-            </span>
-            <p className="notfound__code" aria-hidden>
-              404
-            </p>
-            <h1 className="display-headline notfound__title">
-              That page{" "}
-              <span className="display-headline__accent">wandered off.</span>
-            </h1>
-            <p className="lede notfound__lede">
-              The link you followed is broken, or the page has moved. No harm
-              done — head home, browse what we&rsquo;ve shipped, or text us and
-              we&rsquo;ll point you the right way.
-            </p>
-            <div className="notfound__cta-row">
-              <Link className="btn btn--primary" to="/">
-                <span aria-hidden className="btn__icon">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.75"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 12l9-9 9 9" />
-                    <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
-                  </svg>
-                </span>
-                Take me home
-              </Link>
-              <TextUsLink className="btn btn--ghost">Text us</TextUsLink>
-            </div>
-            <ul className="notfound__links" aria-label="Popular destinations">
-              <li>
-                <Link to="/changelog">Changelog</Link>
-                <span>A running list of everything new.</span>
-              </li>
-              <li>
-                <Link to="/#pricing">Pricing</Link>
-                <span>$99/mo — ship your idea with Nanowork.</span>
-              </li>
-            </ul>
-          </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </>
+    <div className="min-h-screen bg-surface-0 flex flex-col items-center justify-center px-4 text-center">
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-80 h-80 bg-brand-600/8 rounded-full blur-3xl" />
+      </div>
+
+      <p className="text-7xl font-bold text-surface-4 mb-4">404</p>
+      <h1 className="text-2xl font-bold text-white mb-3">Page not found</h1>
+      <p className="text-zinc-500 max-w-sm mb-8">
+        The link you followed is broken, or the page has moved.
+      </p>
+      <Link
+        to="/"
+        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold transition-colors"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 12l9-9 9 9" /><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+        </svg>
+        Back to home
+      </Link>
+    </div>
   );
 }

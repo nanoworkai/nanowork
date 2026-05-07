@@ -1,227 +1,147 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { useState, type FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const PLATFORM_HOST = "nanowork.app";
 
 function normalizeSubdomain(raw: string): string {
-  return raw
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 40);
+  return raw.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/, "").slice(0, 40);
 }
 
 export default function Domains() {
-  const { agent, updateAgent } = useAuth();
+  const { profile, updateProfile } = useAuth();
+  const [subdomain, setSubdomain] = useState(profile?.subdomain ?? "");
+  const [subSaved, setSubSaved] = useState(false);
+  const [subError, setSubError] = useState("");
   const [newDomain, setNewDomain] = useState("");
-  const [adding, setAdding] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
-  const [subdomainInput, setSubdomainInput] = useState(() => agent?.subdomain || "");
-  const [subdomainSaved, setSubdomainSaved] = useState(false);
-  const [subError, setSubError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (agent?.subdomain) setSubdomainInput(agent.subdomain);
-  }, [agent?.subdomain]);
+  const fullUrl = `https://${subdomain || "your-app"}.${PLATFORM_HOST}`;
 
-  if (!agent) return null;
-
-  const fullSubUrl = `https://${subdomainInput || "your-app"}.${PLATFORM_HOST}`;
-
-  const saveSubdomain = (e: FormEvent) => {
+  const handleSubdomainSave = async (e: FormEvent) => {
     e.preventDefault();
-    setSubError(null);
-    const next = normalizeSubdomain(subdomainInput);
-    if (next.length < 2) {
-      setSubError("Use at least 2 characters (letters, numbers, hyphens).");
-      return;
-    }
-    updateAgent({ subdomain: next });
-    setSubdomainInput(next);
-    setSubdomainSaved(true);
-    setTimeout(() => setSubdomainSaved(false), 2000);
+    const next = normalizeSubdomain(subdomain);
+    if (next.length < 2) { setSubError("At least 2 characters required."); return; }
+    setSubError("");
+    await updateProfile({ subdomain: next });
+    setSubDomain(next);
+    setSubSaved(true);
+    setTimeout(() => setSubSaved(false), 2500);
   };
 
-  const handleAdd = async () => {
+  const handleAddDomain = async () => {
     if (!newDomain.trim()) return;
-    setAdding(true);
-    await new Promise((r) => setTimeout(r, 800));
-    updateAgent({
-      domains: [
-        ...agent.domains,
-        { domain: newDomain.trim(), status: "pending", addedAt: new Date().toISOString() },
-      ],
-    });
+    await updateProfile({ customDomain: newDomain.trim() });
     setNewDomain("");
-    setAdding(false);
     setShowAdd(false);
   };
 
-  const handleRemove = (domain: string) => {
-    if (!confirm(`Remove ${domain}?`)) return;
-    updateAgent({
-      domains: agent.domains.filter((d) => d.domain !== domain),
-    });
-  };
-
-  const handleSetPrimary = (domain: string) => {
-    updateAgent({ domain });
-  };
+  function setSubDomain(v: string) { setSubdomain(v); }
 
   return (
-    <div className="dash-page">
-      <div className="dash-page__header">
-        <div>
-          <h1 className="dash-page__title">Domains</h1>
-          <p className="dash-page__subtitle">Subdomain and custom domains for your app</p>
-        </div>
-        <button className="btn btn--primary btn--sm" onClick={() => setShowAdd(!showAdd)}>
-          {showAdd ? "Cancel" : "+ Add domain"}
-        </button>
+    <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-white">Domains</h1>
+        <p className="text-zinc-500 text-sm mt-1">Platform subdomain and custom domains for your business.</p>
       </div>
 
-      <div className="dash-settings-section">
-        <div className="dash-settings-section__header">
-          <h2 className="dash-section__title">Platform subdomain</h2>
-          <p className="dash-section__desc">
-            Your app is served at <span className="mono">{`*.${PLATFORM_HOST}`}</span>. Choose
-            a unique slug. Custom domains below can be primary for branding.
-          </p>
-        </div>
-        <form className="dash-settings-form dash-settings-form--stack" onSubmit={saveSubdomain}>
-          <div className="dash-subdomain-field">
-            <span className="dash-subdomain-field__https">https://</span>
+      {/* Subdomain */}
+      <div className="p-6 rounded-2xl bg-surface-1 border border-white/5 mb-4">
+        <h2 className="text-base font-semibold text-white mb-1">Platform subdomain</h2>
+        <p className="text-sm text-zinc-500 mb-4">
+          Your business is served at <span className="font-mono text-zinc-400">*.{PLATFORM_HOST}</span>
+        </p>
+        <form onSubmit={handleSubdomainSave} className="flex flex-col gap-3">
+          <div className="flex items-center gap-1 px-3 py-2 rounded-xl bg-surface-2 border border-white/10 focus-within:border-brand-500/60 transition-colors">
+            <span className="text-xs text-zinc-600">https://</span>
             <input
-              className="dash-input dash-subdomain-field__input"
+              className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-600 outline-none min-w-0"
               type="text"
-              name="subdomain"
-              autoComplete="off"
-              value={subdomainInput}
-              onChange={(e) => setSubdomainInput(normalizeSubdomain(e.target.value))}
+              value={subdomain}
+              onChange={(e) => setSubdomain(normalizeSubdomain(e.target.value))}
               placeholder="your-app"
-              aria-invalid={!!subError}
             />
-            <span className="dash-subdomain-field__host mono">.{PLATFORM_HOST}</span>
+            <span className="text-xs text-zinc-600 whitespace-nowrap">.{PLATFORM_HOST}</span>
           </div>
-          {subError && <p className="login-error" role="alert">{subError}</p>}
-          <p className="dash-section__desc dash-subdomain-hint">
-            Live URL: <a href={fullSubUrl} className="dash-link" target="_blank" rel="noreferrer">{fullSubUrl}</a>
+          {subError && <p className="text-xs text-red-400">{subError}</p>}
+          <p className="text-xs text-zinc-600">
+            Live URL: <a href={fullUrl} className="text-brand-400 hover:text-brand-300 transition-colors" target="_blank" rel="noreferrer">{fullUrl}</a>
           </p>
-          <div className="dash-inline-form">
-            <button className="btn btn--primary btn--sm" type="submit">
-              {subdomainSaved ? "Saved!" : "Save subdomain"}
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                subSaved ? "bg-green-500/15 text-green-400 border border-green-500/20" : "bg-brand-600 hover:bg-brand-500 text-white"
+              }`}
+            >
+              {subSaved ? "✓ Saved" : "Save subdomain"}
             </button>
-            <Link to="/dashboard/plan" className="btn btn--ghost btn--sm">
-              Increase limits &amp; plan
-            </Link>
           </div>
         </form>
       </div>
 
-      {showAdd && (
-        <div className="dash-add-card">
-          <h3 className="dash-add-card__title">Add a new domain</h3>
-          <p className="dash-add-card__desc">
-            Enter the domain you want to connect. We'll verify ownership via DNS.
-          </p>
-          <div className="dash-inline-form">
-            <input
-              className="dash-input dash-input--full"
-              type="text"
-              placeholder="example.com"
-              value={newDomain}
-              onChange={(e) => setNewDomain(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-              autoFocus
-            />
-            <button className="btn btn--primary btn--sm" onClick={handleAdd} disabled={adding || !newDomain.trim()}>
-              {adding ? "Adding…" : "Add domain"}
-            </button>
+      {/* Custom domain */}
+      <div className="p-6 rounded-2xl bg-surface-1 border border-white/5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-base font-semibold text-white">Custom domain</h2>
+            <p className="text-sm text-zinc-500 mt-0.5">Connect your own domain.</p>
           </div>
-          <div className="dash-dns-hint">
-            <span className="dash-dns-hint__title">DNS Configuration</span>
-            <div className="dash-dns-hint__row">
-              <span className="mono">CNAME</span>
-              <span className="mono">cname.nanowork.ai</span>
-            </div>
-            <div className="dash-dns-hint__row">
-              <span className="mono">TXT</span>
-              <span className="mono">nanowork-verify={agent.id}</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="dash-table-wrap">
-        <table className="dash-table">
-          <thead>
-            <tr>
-              <th>Domain</th>
-              <th>Status</th>
-              <th>Added</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {agent.domains.map((d) => (
-              <tr key={d.domain}>
-                <td>
-                  <div className="dash-domain-cell">
-                    <span className="dash-domain-name">{d.domain}</span>
-                    {d.domain === agent.domain && (
-                      <span className="dash-domain-primary">Primary</span>
-                    )}
-                  </div>
-                </td>
-                <td>
-                  <span className={`dash-status dash-status--${d.status}`}>
-                    <span className="dash-status__dot" />
-                    {d.status}
-                  </span>
-                </td>
-                <td className="dash-table__muted">
-                  {new Date(d.addedAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </td>
-                <td>
-                  <div className="dash-table__actions">
-                    {d.domain !== agent.domain && d.status === "active" && (
-                      <button
-                        className="dash-table__action"
-                        onClick={() => handleSetPrimary(d.domain)}
-                        title="Set as primary"
-                      >
-                        Set primary
-                      </button>
-                    )}
-                    <button
-                      className="dash-table__action dash-table__action--danger"
-                      onClick={() => handleRemove(d.domain)}
-                      title="Remove domain"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {agent.domains.length === 0 && (
-        <div className="dash-empty">
-          <p>No domains connected yet.</p>
-          <button className="btn btn--primary btn--sm" onClick={() => setShowAdd(true)}>
-            Add your first domain
+          <button
+            onClick={() => setShowAdd(!showAdd)}
+            className="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold transition-colors"
+          >
+            {showAdd ? "Cancel" : "+ Add domain"}
           </button>
         </div>
-      )}
+
+        {showAdd && (
+          <div className="mb-4 p-4 rounded-xl bg-surface-2 border border-white/5">
+            <div className="flex gap-2 mb-3">
+              <input
+                className="flex-1 px-3 py-2 rounded-lg bg-surface-3 border border-white/10 focus:border-brand-500/60 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors"
+                type="text"
+                placeholder="yourbrand.com"
+                value={newDomain}
+                onChange={(e) => setNewDomain(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleAddDomain()}
+                autoFocus
+              />
+              <button
+                onClick={handleAddDomain}
+                disabled={!newDomain.trim()}
+                className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 disabled:opacity-40 text-white text-sm font-semibold transition-colors"
+              >
+                Add
+              </button>
+            </div>
+            {newDomain && (
+              <div className="text-xs text-zinc-500 space-y-1">
+                <p className="font-medium text-zinc-400">DNS configuration</p>
+                <p>Add a CNAME record:</p>
+                <p className="font-mono text-zinc-300 bg-surface-3 px-2 py-1 rounded">
+                  {newDomain} → nanowork.app
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {profile?.customDomain ? (
+          <div className="flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-white/5">
+            <div>
+              <p className="text-sm text-zinc-200 font-medium">{profile.customDomain}</p>
+              <p className="text-xs text-zinc-600 mt-0.5">Custom domain</p>
+            </div>
+            <span className="text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full">
+              Connected
+            </span>
+          </div>
+        ) : (
+          <div className="text-center py-8 text-zinc-600 text-sm">
+            No custom domain connected yet.
+          </div>
+        )}
+      </div>
     </div>
   );
 }

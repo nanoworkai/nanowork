@@ -1,263 +1,144 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { useAuth, type AgentProfile, type PaymentMethod } from "../context/AuthContext";
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import type { UserProfile } from "../context/AuthContext";
 
-type PlanTier = AgentProfile["plan"];
+type PlanTier = UserProfile["plan"];
 
-const PLANS: {
-  tier: PlanTier;
-  name: string;
-  price: number;
-  desc: string;
-  features: string[];
-}[] = [
+const PLANS: { tier: PlanTier; name: string; price: number; desc: string; features: string[] }[] = [
+  {
+    tier: "free",
+    name: "Free",
+    price: 0,
+    desc: "Preview mode — see what's possible",
+    features: ["1 business build", "All 7 agent departments", "Dashboard access", "Community support"],
+  },
   {
     tier: "starter",
     name: "Starter",
-    price: 0,
-    desc: "For getting started with your first AI agent",
-    features: [
-      "1 AI agent",
-      "1,000 API calls/mo",
-      "1 custom domain",
-      "Community support",
-      "Basic analytics",
-    ],
+    price: 99,
+    desc: "Full company built and running",
+    features: ["Everything in Free", "Live agents 24/7", "1 custom domain", "Priority support", "Revenue dashboard"],
   },
   {
     tier: "growth",
     name: "Growth",
-    price: 49,
-    desc: "For scaling your agent with more power and reach",
-    features: [
-      "3 AI agents",
-      "25,000 API calls/mo",
-      "5 custom domains",
-      "Priority support",
-      "Advanced analytics",
-      "Custom branding",
-      "Webhook integrations",
-    ],
+    price: 249,
+    desc: "Scaling with more power",
+    features: ["Everything in Starter", "3 business builds", "5 custom domains", "Advanced analytics", "Webhook integrations", "Custom branding"],
   },
   {
     tier: "scale",
     name: "Scale",
-    price: 199,
-    desc: "For production workloads with enterprise needs",
-    features: [
-      "Unlimited agents",
-      "Unlimited API calls",
-      "Unlimited domains",
-      "Dedicated support",
-      "Full analytics suite",
-      "White-label options",
-      "SLA guarantees",
-      "SOC 2 compliance",
-    ],
+    price: 499,
+    desc: "Enterprise-grade, unlimited",
+    features: ["Everything in Growth", "Unlimited builds", "Unlimited domains", "Dedicated support", "SLA guarantees", "White-label options"],
   },
 ];
 
 export default function Plan() {
-  const { agent, updateAgent } = useAuth();
-  const [switching, setSwitching] = useState<PlanTier | null>(null);
-  const [showConfirm, setShowConfirm] = useState<PlanTier | null>(null);
-  const [showPay, setShowPay] = useState(false);
-  const [cardBrand, setCardBrand] = useState("Visa");
-  const [cardLast4, setCardLast4] = useState("4242");
-  const [cardExp, setCardExp] = useState("08/27");
-  const [paySaving, setPaySaving] = useState(false);
-
-  useEffect(() => {
-    if (!agent) return;
-    setCardBrand(agent.paymentMethod.brand);
-    setCardLast4(agent.paymentMethod.last4);
-    setCardExp(
-      `${String(agent.paymentMethod.expMonth).padStart(2, "0")}/${String(agent.paymentMethod.expYear).slice(-2)}`,
-    );
-  }, [agent]);
-
-  if (!agent) return null;
-
-  const onPaymentSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    setPaySaving(true);
-    const [mm, yy] = cardExp.split("/").map((s) => s.trim());
-    const month = Math.min(12, Math.max(1, parseInt(mm, 10) || 1));
-    const year = yy?.length === 2 ? 2000 + parseInt(yy, 10) : parseInt(yy || "2030", 10);
-    const next: PaymentMethod = {
-      brand: cardBrand || "Card",
-      last4: cardLast4.replace(/\D/g, "").slice(-4) || "0000",
-      expMonth: month,
-      expYear: year,
-    };
-    setTimeout(() => {
-      updateAgent({ paymentMethod: next });
-      setPaySaving(false);
-      setShowPay(false);
-    }, 600);
-  };
+  const { profile, updateProfile } = useAuth();
+  const [confirm, setConfirm] = useState<PlanTier | null>(null);
+  const [switching, setSwitching] = useState(false);
 
   const handleSwitch = async (tier: PlanTier) => {
-    setSwitching(tier);
-    await new Promise((r) => setTimeout(r, 1000));
-    updateAgent({ plan: tier });
-    setSwitching(null);
-    setShowConfirm(null);
+    setSwitching(true);
+    await updateProfile({ plan: tier });
+    setSwitching(false);
+    setConfirm(null);
+  };
+
+  const openBillingPortal = async () => {
+    try {
+      const res = await fetch("/api/billing/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ return_url: window.location.href }),
+      });
+      const { url } = await res.json();
+      if (url) window.location.href = url;
+    } catch {
+      alert("Billing portal coming soon.");
+    }
   };
 
   return (
-    <div className="dash-page">
-      <div className="dash-page__header">
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="dash-page__title">Plan</h1>
-          <p className="dash-page__subtitle">Manage your subscription and billing</p>
+          <h1 className="text-2xl font-bold text-white">Plan</h1>
+          <p className="text-zinc-500 text-sm mt-1">Manage your subscription.</p>
         </div>
-      </div>
-
-      <div className="dash-settings-section">
-        <div className="dash-settings-section__header">
-          <h2 className="dash-section__title">Payment method</h2>
-          <p className="dash-section__desc">
-            Card on file for subscription and usage. Changes apply to the next invoice.
-          </p>
-        </div>
-        {!showPay ? (
-          <div className="dash-payment-row">
-            <div className="dash-payment-card">
-              <span className="dash-payment-card__brand">{agent.paymentMethod.brand}</span>
-              <span className="mono">···· {agent.paymentMethod.last4}</span>
-              <span className="dash-table__muted">
-                Exp {String(agent.paymentMethod.expMonth).padStart(2, "0")}/
-                {String(agent.paymentMethod.expYear).slice(-2)}
-              </span>
-            </div>
-            <button
-              type="button"
-              className="btn btn--ghost btn--sm"
-              onClick={() => {
-                setCardBrand(agent.paymentMethod.brand);
-                setCardLast4(agent.paymentMethod.last4);
-                setCardExp(
-                  `${String(agent.paymentMethod.expMonth).padStart(2, "0")}/${String(agent.paymentMethod.expYear).slice(-2)}`,
-                );
-                setShowPay(true);
-              }}
-            >
-              Change payment method
-            </button>
-          </div>
-        ) : (
-          <form className="dash-payment-form" onSubmit={onPaymentSubmit}>
-            <div className="dash-payment-form__grid">
-              <label className="dash-label">
-                Name on card
-                <input
-                  className="dash-input"
-                  name="name"
-                  autoComplete="cc-name"
-                  placeholder="Name as printed"
-                />
-              </label>
-              <label className="dash-label">
-                Card number
-                <input
-                  className="dash-input"
-                  name="number"
-                  inputMode="numeric"
-                  autoComplete="cc-number"
-                  placeholder="1234 1234 1234 1234"
-                />
-              </label>
-              <label className="dash-label">
-                Brand
-                <select
-                  className="dash-input"
-                  value={cardBrand}
-                  onChange={(e) => setCardBrand(e.target.value)}
-                >
-                  <option>Visa</option>
-                  <option>Mastercard</option>
-                  <option>Amex</option>
-                </select>
-              </label>
-              <label className="dash-label">
-                Last 4 (for display)
-                <input
-                  className="dash-input mono"
-                  value={cardLast4}
-                  onChange={(e) => setCardLast4(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                  inputMode="numeric"
-                  maxLength={4}
-                />
-              </label>
-              <label className="dash-label">
-                Expires (MM/YY)
-                <input
-                  className="dash-input mono"
-                  value={cardExp}
-                  onChange={(e) => setCardExp(e.target.value)}
-                  autoComplete="cc-exp"
-                  placeholder="08/27"
-                />
-              </label>
-            </div>
-            <div className="dash-modal__actions" style={{ marginTop: "1rem" }}>
-              <button
-                type="button"
-                className="btn btn--ghost btn--sm"
-                onClick={() => setShowPay(false)}
-                disabled={paySaving}
-              >
-                Cancel
-              </button>
-              <button className="btn btn--primary btn--sm" type="submit" disabled={paySaving}>
-                {paySaving ? "Saving…" : "Save payment method"}
-              </button>
-            </div>
-          </form>
+        {profile?.stripeCustomerId && (
+          <button
+            onClick={openBillingPortal}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-300 hover:text-white transition-all font-medium"
+          >
+            Manage billing
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+          </button>
         )}
       </div>
 
-      <div className="dash-plans">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {PLANS.map((plan) => {
-          const isCurrent = agent.plan === plan.tier;
+          const isCurrent = profile?.plan === plan.tier;
+          const isRecommended = plan.tier === "starter";
           return (
             <div
               key={plan.tier}
-              className={`dash-plan-card${isCurrent ? " is-current" : ""}${plan.tier === "growth" ? " is-recommended" : ""}`}
+              className={`relative p-5 rounded-2xl border flex flex-col transition-all ${
+                isCurrent
+                  ? "border-brand-500/40 bg-brand-600/10"
+                  : isRecommended
+                  ? "border-white/15 bg-surface-1"
+                  : "border-white/5 bg-surface-1"
+              }`}
             >
-              {plan.tier === "growth" && (
-                <span className="dash-plan-card__badge">Recommended</span>
+              {isRecommended && !isCurrent && (
+                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-brand-600 text-white px-2.5 py-0.5 rounded-full">
+                  Popular
+                </span>
               )}
               {isCurrent && (
-                <span className="dash-plan-card__badge dash-plan-card__badge--current">Current plan</span>
+                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-green-500 text-white px-2.5 py-0.5 rounded-full">
+                  Current
+                </span>
               )}
-              <h3 className="dash-plan-card__name">{plan.name}</h3>
-              <div className="dash-plan-card__price">
-                <span className="dash-plan-card__amount">${plan.price}</span>
-                <span className="dash-plan-card__period">/month</span>
+
+              <h3 className="text-base font-bold text-white">{plan.name}</h3>
+              <div className="flex items-baseline gap-1 mt-1 mb-2">
+                <span className="text-2xl font-bold text-white">${plan.price}</span>
+                <span className="text-xs text-zinc-500">/mo</span>
               </div>
-              <p className="dash-plan-card__desc">{plan.desc}</p>
-              <ul className="dash-plan-card__features">
+              <p className="text-xs text-zinc-500 mb-4">{plan.desc}</p>
+
+              <ul className="flex-1 flex flex-col gap-1.5 mb-5">
                 {plan.features.map((f) => (
-                  <li key={f}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <li key={f} className="flex items-start gap-1.5 text-xs text-zinc-400">
+                    <svg className="flex-shrink-0 mt-0.5 text-green-400" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     {f}
                   </li>
                 ))}
               </ul>
+
               {isCurrent ? (
-                <button className="btn btn--ghost btn--sm dash-plan-card__btn" disabled>
+                <button disabled className="w-full py-2 rounded-lg text-xs font-semibold bg-surface-3 text-zinc-600 cursor-default">
                   Current plan
                 </button>
               ) : (
                 <button
-                  className={`btn btn--sm dash-plan-card__btn ${plan.tier === "growth" ? "btn--primary" : "btn--ghost"}`}
-                  onClick={() => setShowConfirm(plan.tier)}
-                  disabled={switching !== null}
+                  onClick={() => setConfirm(plan.tier)}
+                  className={`w-full py-2 rounded-lg text-xs font-semibold transition-colors ${
+                    isRecommended ? "bg-brand-600 hover:bg-brand-500 text-white" : "bg-surface-2 hover:bg-surface-3 border border-white/10 text-zinc-300 hover:text-white"
+                  }`}
                 >
-                  {switching === plan.tier ? "Switching…" : `Switch to ${plan.name}`}
+                  Switch to {plan.name}
                 </button>
               )}
             </div>
@@ -265,60 +146,32 @@ export default function Plan() {
         })}
       </div>
 
-      {showConfirm && (
-        <div className="dash-modal-overlay" onClick={() => setShowConfirm(null)}>
-          <div className="dash-modal" onClick={(e) => e.stopPropagation()}>
-            <h3 className="dash-modal__title">Change plan</h3>
-            <p className="dash-modal__body">
-              Switch to the <strong>{PLANS.find((p) => p.tier === showConfirm)?.name}</strong> plan?
-              {" "}Changes take effect immediately and billing will be prorated.
+      {/* Confirm modal */}
+      {confirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4" onClick={() => setConfirm(null)}>
+          <div className="w-full max-w-sm bg-surface-1 border border-white/10 rounded-2xl p-6 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-white mb-2">Switch plan</h3>
+            <p className="text-sm text-zinc-400 mb-6">
+              Switch to the <span className="text-white font-semibold">{PLANS.find((p) => p.tier === confirm)?.name}</span> plan? Changes take effect immediately.
             </p>
-            <div className="dash-modal__actions">
-              <button className="btn btn--ghost btn--sm" onClick={() => setShowConfirm(null)}>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setConfirm(null)}
+                className="flex-1 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors"
+              >
                 Cancel
               </button>
               <button
-                className="btn btn--primary btn--sm"
-                onClick={() => handleSwitch(showConfirm)}
-                disabled={switching !== null}
+                onClick={() => handleSwitch(confirm)}
+                disabled={switching}
+                className="flex-1 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white text-sm font-semibold transition-colors"
               >
-                {switching ? "Switching…" : "Confirm switch"}
+                {switching ? "Switching…" : "Confirm"}
               </button>
             </div>
           </div>
         </div>
       )}
-
-      <div className="dash-section">
-        <h2 className="dash-section__title">Billing history</h2>
-        <div className="dash-table-wrap">
-          <table className="dash-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {agent.spending.history.slice().reverse().map((entry, i) => (
-                <tr key={i}>
-                  <td className="dash-table__muted">{entry.month}</td>
-                  <td>Agent usage — {agent.plan} plan</td>
-                  <td className="mono">${entry.amount.toFixed(2)}</td>
-                  <td>
-                    <span className="dash-status dash-status--active">
-                      <span className="dash-status__dot" />
-                      Paid
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 }
