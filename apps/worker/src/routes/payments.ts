@@ -33,7 +33,7 @@ function resolvePlan(subscription: Stripe.Subscription): string {
 app.post('/portal', async (c) => {
   let phone: string
   try { phone = await getPhone(c) } catch (e) { return c.json({ error: String(e) }, 401) }
-  const { return_url = 'https://nanowork.app/dashboard/settings' } = await c.req.json<{ return_url?: string }>()
+  const { return_url = 'https://nanowork.ai/dashboard/settings' } = await c.req.json<{ return_url?: string }>()
   const sb = getSupabase(c.env)
   const { data } = await sb.from('profiles').select('stripe_customer_id').eq('phone', phone).maybeSingle()
   if (!data?.stripe_customer_id) return c.json({ error: 'No Stripe customer found — subscribe first' }, 404)
@@ -47,8 +47,8 @@ app.post('/checkout', async (c) => {
   try { phone = await getPhone(c) } catch (e) { return c.json({ error: String(e) }, 401) }
   const {
     price_id,
-    success_url = 'https://nanowork.app/dashboard?subscribed=1',
-    cancel_url = 'https://nanowork.app/dashboard/plan',
+    success_url = 'https://nanowork.ai/dashboard?subscribed=1',
+    cancel_url = 'https://nanowork.ai/dashboard/plan',
   } = await c.req.json<{ price_id: string; success_url?: string; cancel_url?: string }>()
   const sb = getSupabase(c.env)
   const { data: profile } = await sb.from('profiles').select('stripe_customer_id,email').eq('phone', phone).maybeSingle()

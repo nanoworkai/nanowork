@@ -14,5 +14,5 @@ ENVIRONMENT = "production"
 # STRIPE_WEBHOOK_SECRET
 
 [[routes]]
-pattern = "api.nanowork.app/*"
-zone_name = "nanowork.app"
+pattern = "api.nanowork.ai/*"
+zone_name = "nanowork.ai"
