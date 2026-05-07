@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     environment: Literal["development", "production"] = "development"
 
     anthropic_api_key: str | None = None
-    anthropic_model: str = "claude-3-5-haiku-20241022"
+    anthropic_model: str = "claude-haiku-4-5-20251001"
 
     supabase_url: str | None = None
     supabase_service_role_key: str | None = None

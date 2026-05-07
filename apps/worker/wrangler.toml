@@ -1,0 +1,18 @@
+name = "nanowork-api"
+main = "src/index.ts"
+compatibility_date = "2025-05-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+
+# Secrets — set via: wrangler secret put <NAME>
+# ANTHROPIC_API_KEY
+# SUPABASE_URL
+# SUPABASE_SERVICE_ROLE_KEY
+# STRIPE_SECRET_KEY
+# STRIPE_WEBHOOK_SECRET
+
+[[routes]]
+pattern = "api.nanowork.app/*"
+zone_name = "nanowork.app"
