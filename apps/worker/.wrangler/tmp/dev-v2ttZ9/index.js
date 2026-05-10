@@ -37,14 +37,14 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 
-// .wrangler/tmp/bundle-q2qssg/strip-cf-connecting-ip-header.js
+// .wrangler/tmp/bundle-MOPvAC/strip-cf-connecting-ip-header.js
 function stripCfConnectingIPHeader(input, init) {
   const request = new Request(input, init);
   request.headers.delete("CF-Connecting-IP");
   return request;
 }
 var init_strip_cf_connecting_ip_header = __esm({
-  ".wrangler/tmp/bundle-q2qssg/strip-cf-connecting-ip-header.js"() {
+  ".wrangler/tmp/bundle-MOPvAC/strip-cf-connecting-ip-header.js"() {
     "use strict";
     __name(stripCfConnectingIPHeader, "stripCfConnectingIPHeader");
     globalThis.fetch = new Proxy(globalThis.fetch, {
@@ -3866,14 +3866,14 @@ var require_lib = __commonJS({
   }
 });
 
-// .wrangler/tmp/bundle-q2qssg/middleware-loader.entry.ts
+// .wrangler/tmp/bundle-MOPvAC/middleware-loader.entry.ts
 init_strip_cf_connecting_ip_header();
 init_modules_watch_stub();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_process();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_console();
 init_performance2();
 
-// .wrangler/tmp/bundle-q2qssg/middleware-insertion-facade.js
+// .wrangler/tmp/bundle-MOPvAC/middleware-insertion-facade.js
 init_strip_cf_connecting_ip_header();
 init_modules_watch_stub();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_process();
@@ -5123,14 +5123,14 @@ var Hono = /* @__PURE__ */ __name(class _Hono {
    * app.route("/api", app2) // GET /api/user
    * ```
    */
-  route(path2, app15) {
+  route(path2, app16) {
     const subApp = this.basePath(path2);
-    app15.routes.map((r) => {
+    app16.routes.map((r) => {
       let handler;
-      if (app15.errorHandler === errorHandler) {
+      if (app16.errorHandler === errorHandler) {
         handler = r.handler;
       } else {
-        handler = /* @__PURE__ */ __name(async (c, next) => (await compose([], app15.errorHandler)(c, () => r.handler(c, next))).res, "handler");
+        handler = /* @__PURE__ */ __name(async (c, next) => (await compose([], app16.errorHandler)(c, () => r.handler(c, next))).res, "handler");
         handler[COMPOSED_HANDLER] = r.handler;
       }
       subApp.#addRoute(r.method, r.path, handler);
@@ -38211,6 +38211,7 @@ init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_process();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_console();
 init_performance2();
 var MOCK_RENT_ITEMS = [
+  // ===== COMPUTE RESOURCES =====
   {
     id: "00000000-0000-0000-0000-000000000001",
     user_id: "00000000-0000-0000-0000-000000000000",
@@ -38219,7 +38220,7 @@ var MOCK_RENT_ITEMS = [
     tagline: "High-performance ML training",
     description: "On-demand access to NVIDIA A100 GPUs for deep learning training and large-scale inference. Pre-configured with CUDA, PyTorch, and TensorFlow.",
     category: "compute",
-    status: "coming_soon",
+    status: "preview",
     icon_emoji: "\u26A1",
     price_preview: "$2.50/hour",
     location: "Remote",
@@ -38232,12 +38233,85 @@ var MOCK_RENT_ITEMS = [
   {
     id: "00000000-0000-0000-0000-000000000002",
     user_id: "00000000-0000-0000-0000-000000000000",
+    name: "H100 GPU Cluster",
+    slug: "h100-gpu-cluster",
+    tagline: "Next-gen AI training",
+    description: "8x NVIDIA H100 GPUs in NVLink configuration. Perfect for training large language models and frontier AI research. 640GB total HBM3 memory.",
+    category: "compute",
+    status: "waitlist_only",
+    icon_emoji: "\u{1F680}",
+    price_preview: "$28/hour",
+    location: "Remote",
+    approved: true,
+    featured: true,
+    view_count: 128,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000003",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Raspberry Pi Cluster",
+    slug: "raspberry-pi-cluster",
+    tagline: "Distributed edge computing",
+    description: "32-node Raspberry Pi 5 cluster for edge AI, IoT testing, and distributed systems development. Kubernetes pre-installed.",
+    category: "compute",
+    status: "preview",
+    icon_emoji: "\u{1F353}",
+    price_preview: "$0.50/hour",
+    location: "Remote",
+    approved: true,
+    featured: false,
+    view_count: 67,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000004",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Quantum Computing Access",
+    slug: "quantum-computing",
+    tagline: "IBM Quantum System",
+    description: "Time slots on IBM Quantum processors. 127-qubit system for quantum algorithm development and research. Includes Qiskit environment.",
+    category: "compute",
+    status: "coming_soon",
+    icon_emoji: "\u269B\uFE0F",
+    price_preview: "$150/hour",
+    location: "Remote",
+    approved: true,
+    featured: true,
+    view_count: 203,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000005",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "ASIC Mining Rig",
+    slug: "asic-mining-rig",
+    tagline: "Cryptocurrency mining hardware",
+    description: "SHA-256 ASIC miner for Bitcoin and compatible cryptocurrencies. 110 TH/s hashrate. Perfect for testing mining strategies.",
+    category: "compute",
+    status: "preview",
+    icon_emoji: "\u{1F48E}",
+    price_preview: "$5/hour",
+    location: "Remote",
+    approved: true,
+    featured: false,
+    view_count: 45,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  // ===== LAB EQUIPMENT =====
+  {
+    id: "00000000-0000-0000-0000-000000000006",
+    user_id: "00000000-0000-0000-0000-000000000000",
     name: "Benchtop PCR Machine",
     slug: "pcr-machine",
     tagline: "Remote biotech lab access",
     description: "Schedule time slots on a professional PCR thermal cycler. Upload protocols, receive results via API. For biotech research and synthetic biology projects.",
     category: "lab_equipment",
-    status: "coming_soon",
+    status: "preview",
     icon_emoji: "\u{1F52C}",
     price_preview: "$200/session",
     location: "San Francisco, CA",
@@ -38248,14 +38322,123 @@ var MOCK_RENT_ITEMS = [
     updated_at: (/* @__PURE__ */ new Date()).toISOString()
   },
   {
-    id: "00000000-0000-0000-0000-000000000003",
+    id: "00000000-0000-0000-0000-000000000007",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "DNA Sequencer",
+    slug: "dna-sequencer",
+    tagline: "Next-gen sequencing access",
+    description: "Illumina NovaSeq 6000 for whole genome sequencing. Submit samples via mail, receive FASTQ files via API. Perfect for genomics research.",
+    category: "lab_equipment",
+    status: "waitlist_only",
+    icon_emoji: "\u{1F9EC}",
+    price_preview: "$800/run",
+    location: "Boston, MA",
+    approved: true,
+    featured: true,
+    view_count: 156,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000008",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Electron Microscope",
+    slug: "electron-microscope",
+    tagline: "Nanoscale imaging",
+    description: "Transmission Electron Microscope (TEM) with 0.2nm resolution. Remote operation for materials science, biology, and nanotechnology research.",
+    category: "lab_equipment",
+    status: "preview",
+    icon_emoji: "\u{1F52D}",
+    price_preview: "$400/hour",
+    location: "Cambridge, MA",
+    approved: true,
+    featured: false,
+    view_count: 89,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000009",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "3D Bioprinter",
+    slug: "3d-bioprinter",
+    tagline: "Tissue engineering platform",
+    description: "Print living cells into 3D structures. Upload STL files, specify cell types, receive printed constructs. For regenerative medicine research.",
+    category: "lab_equipment",
+    status: "coming_soon",
+    icon_emoji: "\u{1F9EB}",
+    price_preview: "$500/print",
+    location: "San Diego, CA",
+    approved: true,
+    featured: true,
+    view_count: 234,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000010",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Mass Spectrometer",
+    slug: "mass-spectrometer",
+    tagline: "Chemical analysis",
+    description: "High-resolution mass spectrometer for proteomics, metabolomics, and small molecule analysis. Submit samples, receive data files via API.",
+    category: "lab_equipment",
+    status: "preview",
+    icon_emoji: "\u2697\uFE0F",
+    price_preview: "$300/sample",
+    location: "San Francisco, CA",
+    approved: true,
+    featured: false,
+    view_count: 72,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000011",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Flow Cytometer",
+    slug: "flow-cytometer",
+    tagline: "Cell analysis and sorting",
+    description: "5-laser flow cytometer for cell analysis and FACS sorting. Remote sample submission, receive sorted populations and data files.",
+    category: "lab_equipment",
+    status: "preview",
+    icon_emoji: "\u{1F9A0}",
+    price_preview: "$250/session",
+    location: "New York, NY",
+    approved: true,
+    featured: false,
+    view_count: 61,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000012",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Cleanroom Access",
+    slug: "cleanroom-access",
+    tagline: "ISO Class 5 fabrication",
+    description: "Book time in ISO Class 5 cleanroom. Photolithography, plasma etching, and deposition equipment available. Perfect for chip fabrication and MEMS.",
+    category: "lab_equipment",
+    status: "waitlist_only",
+    icon_emoji: "\u{1F3ED}",
+    price_preview: "$200/hour",
+    location: "Palo Alto, CA",
+    approved: true,
+    featured: true,
+    view_count: 145,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  // ===== STORES & PHYSICAL SPACES =====
+  {
+    id: "00000000-0000-0000-0000-000000000013",
     user_id: "00000000-0000-0000-0000-000000000000",
     name: "Hardware Store Access",
     slug: "hardware-store",
     tagline: "Same-day tool pickup",
     description: "Need a drill, saw, or specialty tool? Book same-day pickup from our hardware store. Perfect for one-off projects without buying equipment.",
     category: "stores",
-    status: "coming_soon",
+    status: "preview",
     icon_emoji: "\u{1F528}",
     price_preview: "$25/day",
     location: "Oakland, CA",
@@ -38266,14 +38449,123 @@ var MOCK_RENT_ITEMS = [
     updated_at: (/* @__PURE__ */ new Date()).toISOString()
   },
   {
-    id: "00000000-0000-0000-0000-000000000004",
+    id: "00000000-0000-0000-0000-000000000014",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Makerspace Workshop",
+    slug: "makerspace-workshop",
+    tagline: "Full fabrication facility",
+    description: "CNC mills, laser cutters, 3D printers, welding equipment, and electronics lab. Book by the hour or day. Training available.",
+    category: "stores",
+    status: "preview",
+    icon_emoji: "\u{1F6E0}\uFE0F",
+    price_preview: "$40/hour",
+    location: "Brooklyn, NY",
+    approved: true,
+    featured: true,
+    view_count: 198,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000015",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Commercial Kitchen",
+    slug: "commercial-kitchen",
+    tagline: "Licensed food production",
+    description: "FDA-approved commercial kitchen for food startups and R&D. Industrial ovens, mixers, packaging equipment. Health department certified.",
+    category: "stores",
+    status: "preview",
+    icon_emoji: "\u{1F468}\u200D\u{1F373}",
+    price_preview: "$60/hour",
+    location: "Austin, TX",
+    approved: true,
+    featured: true,
+    view_count: 142,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000016",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Photography Studio",
+    slug: "photography-studio",
+    tagline: "Professional photo/video",
+    description: "2,000 sq ft studio with cyc wall, lighting equipment, and backdrop options. 4K cameras available. Perfect for product photography and content.",
+    category: "stores",
+    status: "preview",
+    icon_emoji: "\u{1F4F8}",
+    price_preview: "$80/hour",
+    location: "Los Angeles, CA",
+    approved: true,
+    featured: false,
+    view_count: 87,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000017",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Electronics Lab",
+    slug: "electronics-lab",
+    tagline: "Hardware prototyping",
+    description: "Oscilloscopes, logic analyzers, soldering stations, and PCB milling. Component library on-site. Perfect for hardware startups.",
+    category: "stores",
+    status: "preview",
+    icon_emoji: "\u{1F50C}",
+    price_preview: "$35/hour",
+    location: "Seattle, WA",
+    approved: true,
+    featured: false,
+    view_count: 93,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000018",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Textile Studio",
+    slug: "textile-studio",
+    tagline: "Fashion and fabric design",
+    description: "Industrial sewing machines, digital loom, fabric printer, and pattern-making tools. Sample library included.",
+    category: "stores",
+    status: "coming_soon",
+    icon_emoji: "\u{1F9F5}",
+    price_preview: "$45/hour",
+    location: "Portland, OR",
+    approved: true,
+    featured: false,
+    view_count: 54,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000019",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Greenhouse Space",
+    slug: "greenhouse-space",
+    tagline: "Climate-controlled growing",
+    description: "Book greenhouse space for plant research and breeding. Automated climate control, grow lights, and irrigation. Perfect for AgTech R&D.",
+    category: "stores",
+    status: "preview",
+    icon_emoji: "\u{1F331}",
+    price_preview: "$100/month/sqft",
+    location: "Davis, CA",
+    approved: true,
+    featured: false,
+    view_count: 76,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  // ===== HUMAN SERVICES =====
+  {
+    id: "00000000-0000-0000-0000-000000000020",
     user_id: "00000000-0000-0000-0000-000000000000",
     name: "Licensed Electrician",
     slug: "electrician-services",
     tagline: "Certified electrical work",
     description: "Book a licensed electrician for commercial or residential projects. Available for consultations, installations, and emergency repairs.",
     category: "human_services",
-    status: "coming_soon",
+    status: "preview",
     icon_emoji: "\u{1F477}",
     price_preview: "$85/hour",
     location: "Bay Area, CA",
@@ -38282,11 +38574,468 @@ var MOCK_RENT_ITEMS = [
     view_count: 33,
     created_at: (/* @__PURE__ */ new Date()).toISOString(),
     updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000021",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "CAD Designer",
+    slug: "cad-designer",
+    tagline: "Mechanical design services",
+    description: "Professional CAD designer for product design, prototyping, and manufacturing. Expert in SolidWorks, Fusion 360. DFM consulting included.",
+    category: "human_services",
+    status: "preview",
+    icon_emoji: "\u{1F4D0}",
+    price_preview: "$75/hour",
+    location: "Remote",
+    approved: true,
+    featured: true,
+    view_count: 167,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000022",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Industrial Designer",
+    slug: "industrial-designer",
+    tagline: "Product design expertise",
+    description: "Award-winning industrial designer for consumer products. From concept sketches to production-ready designs. Portfolio includes Fortune 500 clients.",
+    category: "human_services",
+    status: "waitlist_only",
+    icon_emoji: "\u{1F3A8}",
+    price_preview: "$150/hour",
+    location: "Remote",
+    approved: true,
+    featured: true,
+    view_count: 245,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000023",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Biotech Consultant",
+    slug: "biotech-consultant",
+    tagline: "PhD-level consulting",
+    description: "PhD in molecular biology with 15 years biotech experience. Protocol design, experiment planning, and data analysis. FDA regulatory expertise.",
+    category: "human_services",
+    status: "preview",
+    icon_emoji: "\u{1F469}\u200D\u{1F52C}",
+    price_preview: "$200/hour",
+    location: "Remote",
+    approved: true,
+    featured: false,
+    view_count: 112,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000024",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Embedded Systems Engineer",
+    slug: "embedded-engineer",
+    tagline: "Firmware and hardware",
+    description: "Senior embedded engineer specializing in IoT devices and edge computing. C/C++, RTOS, ARM Cortex. Hardware bring-up to production.",
+    category: "human_services",
+    status: "preview",
+    icon_emoji: "\u{1F4BB}",
+    price_preview: "$120/hour",
+    location: "Remote",
+    approved: true,
+    featured: false,
+    view_count: 98,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000025",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Patent Attorney",
+    slug: "patent-attorney",
+    tagline: "IP protection",
+    description: "Registered patent attorney with technical background in computer science and biotech. Prior art searches, patent drafting, and prosecution.",
+    category: "human_services",
+    status: "preview",
+    icon_emoji: "\u2696\uFE0F",
+    price_preview: "$350/hour",
+    location: "Remote",
+    approved: true,
+    featured: true,
+    view_count: 189,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000026",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "CNC Machinist",
+    slug: "cnc-machinist",
+    tagline: "Precision manufacturing",
+    description: "Master machinist with 20 years experience. 5-axis CNC milling, turning, and Swiss machining. Aerospace and medical device quality.",
+    category: "human_services",
+    status: "preview",
+    icon_emoji: "\u2699\uFE0F",
+    price_preview: "$65/hour",
+    location: "Denver, CO",
+    approved: true,
+    featured: false,
+    view_count: 71,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000027",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Lab Technician",
+    slug: "lab-technician",
+    tagline: "Hands-on lab work",
+    description: "Experienced lab tech available for sample prep, assay running, and routine lab operations. Molecular biology and chemistry background.",
+    category: "human_services",
+    status: "preview",
+    icon_emoji: "\u{1F9EA}",
+    price_preview: "$45/hour",
+    location: "San Francisco, CA",
+    approved: true,
+    featured: false,
+    view_count: 58,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000028",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Data Analyst",
+    slug: "data-analyst",
+    tagline: "Statistical analysis",
+    description: "MS in Statistics with expertise in experimental design and data analysis. R, Python, and specialized tools for scientific computing.",
+    category: "human_services",
+    status: "preview",
+    icon_emoji: "\u{1F4CA}",
+    price_preview: "$90/hour",
+    location: "Remote",
+    approved: true,
+    featured: false,
+    view_count: 134,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000029",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Technical Writer",
+    slug: "technical-writer",
+    tagline: "Documentation expert",
+    description: "Create clear technical documentation, user manuals, and API docs. Background in engineering. Portfolio includes major open-source projects.",
+    category: "human_services",
+    status: "preview",
+    icon_emoji: "\u{1F4DD}",
+    price_preview: "$80/hour",
+    location: "Remote",
+    approved: true,
+    featured: false,
+    view_count: 92,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000030",
+    user_id: "00000000-0000-0000-0000-000000000000",
+    name: "Robotics Engineer",
+    slug: "robotics-engineer",
+    tagline: "Autonomous systems",
+    description: "Robotics engineer specializing in perception, motion planning, and control. ROS2, computer vision, and simulation. Hands-on prototyping.",
+    category: "human_services",
+    status: "waitlist_only",
+    icon_emoji: "\u{1F916}",
+    price_preview: "$140/hour",
+    location: "Remote",
+    approved: true,
+    featured: true,
+    view_count: 276,
+    created_at: (/* @__PURE__ */ new Date()).toISOString(),
+    updated_at: (/* @__PURE__ */ new Date()).toISOString()
   }
 ];
 
-// src/routes/rent.ts
+// src/routes/rent-bookings.ts
+init_strip_cf_connecting_ip_header();
+init_modules_watch_stub();
+init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_process();
+init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_console();
+init_performance2();
 var app11 = new Hono2();
+app11.get("/:id/availability", async (c) => {
+  const sb = getSupabase(c.env);
+  const itemId = c.req.param("id");
+  const start = c.req.query("start");
+  const durationHours = parseInt(c.req.query("duration_hours") ?? "1");
+  if (!start) {
+    return c.json({ error: "start time is required" }, 400);
+  }
+  const startTime2 = new Date(start);
+  const endTime2 = new Date(startTime2.getTime() + durationHours * 60 * 60 * 1e3);
+  const { data: conflicts } = await sb.from("rent_bookings").select("id").eq("item_id", itemId).in("status", ["confirmed", "active"]).or(`and(start_time.lte.${startTime2.toISOString()},end_time.gt.${startTime2.toISOString()}),and(start_time.lt.${endTime2.toISOString()},end_time.gte.${endTime2.toISOString()}),and(start_time.gte.${startTime2.toISOString()},end_time.lte.${endTime2.toISOString()})`);
+  const available = !conflicts || conflicts.length === 0;
+  return c.json({
+    available,
+    start_time: startTime2.toISOString(),
+    end_time: endTime2.toISOString(),
+    duration_hours: durationHours,
+    conflicts: conflicts?.length ?? 0
+  });
+});
+app11.post("/:id/book", async (c) => {
+  const sb = getSupabase(c.env);
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return c.json({ error: "Missing authorization token" }, 401);
+  }
+  const token = authHeader.slice(7);
+  const { data: { user }, error: authError } = await sb.auth.getUser(token);
+  if (authError || !user) {
+    return c.json({ error: "Invalid token" }, 401);
+  }
+  try {
+    const itemId = c.req.param("id");
+    const body = await c.req.json();
+    const startTime2 = /* @__PURE__ */ new Date(`${body.date}T${body.time}:00`);
+    const endTime2 = new Date(startTime2.getTime() + body.duration_hours * 60 * 60 * 1e3);
+    if (startTime2 < /* @__PURE__ */ new Date()) {
+      return c.json({ error: "Cannot book in the past" }, 400);
+    }
+    const { data: conflicts } = await sb.from("rent_bookings").select("id").eq("item_id", itemId).in("status", ["confirmed", "active"]).or(`and(start_time.lte.${startTime2.toISOString()},end_time.gt.${startTime2.toISOString()}),and(start_time.lt.${endTime2.toISOString()},end_time.gte.${endTime2.toISOString()}),and(start_time.gte.${startTime2.toISOString()},end_time.lte.${endTime2.toISOString()})`);
+    if (conflicts && conflicts.length > 0) {
+      return c.json({ error: "Time slot not available" }, 409);
+    }
+    const { data: item } = await sb.from("rent_items").select("name, price_preview").eq("id", itemId).single();
+    if (!item) {
+      return c.json({ error: "Item not found" }, 404);
+    }
+    let amountCents = 5e3;
+    if (item.price_preview) {
+      const match2 = item.price_preview.match(/\$?([\d.]+)/);
+      if (match2) {
+        const pricePerHour = parseFloat(match2[1]);
+        amountCents = Math.round(pricePerHour * 100 * body.duration_hours);
+      }
+    }
+    let paymentIntentId = null;
+    if (c.env.STRIPE_SECRET_KEY) {
+    }
+    const { data: booking, error: error3 } = await sb.from("rent_bookings").insert({
+      item_id: itemId,
+      user_id: user.id,
+      start_time: startTime2.toISOString(),
+      end_time: endTime2.toISOString(),
+      duration_hours: body.duration_hours,
+      amount_cents: amountCents,
+      currency: "usd",
+      status: paymentIntentId ? "pending" : "confirmed",
+      payment_status: paymentIntentId ? "pending" : "succeeded",
+      stripe_payment_intent_id: paymentIntentId,
+      notes: body.notes
+    }).select().single();
+    if (error3) {
+      return c.json({ error: error3.message }, 503);
+    }
+    return c.json({
+      ...booking,
+      message: "Booking created successfully"
+    }, 201);
+  } catch (err) {
+    return c.json({ error: "Invalid request body" }, 400);
+  }
+});
+app11.get("/bookings/:booking_id", async (c) => {
+  const sb = getSupabase(c.env);
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return c.json({ error: "Missing authorization token" }, 401);
+  }
+  const token = authHeader.slice(7);
+  const { data: { user }, error: authError } = await sb.auth.getUser(token);
+  if (authError || !user) {
+    return c.json({ error: "Invalid token" }, 401);
+  }
+  const bookingId = c.req.param("booking_id");
+  const { data: booking, error: error3 } = await sb.from("rent_bookings").select(`
+      *,
+      item:rent_items(*)
+    `).eq("id", bookingId).eq("user_id", user.id).single();
+  if (error3 || !booking) {
+    return c.json({ error: "Booking not found" }, 404);
+  }
+  return c.json(booking);
+});
+app11.get("/bookings/:booking_id/credentials", async (c) => {
+  const sb = getSupabase(c.env);
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return c.json({ error: "Missing authorization token" }, 401);
+  }
+  const token = authHeader.slice(7);
+  const { data: { user }, error: authError } = await sb.auth.getUser(token);
+  if (authError || !user) {
+    return c.json({ error: "Invalid token" }, 401);
+  }
+  const bookingId = c.req.param("booking_id");
+  const { data: booking, error: error3 } = await sb.from("rent_bookings").select("*").eq("id", bookingId).eq("user_id", user.id).single();
+  if (error3 || !booking) {
+    return c.json({ error: "Booking not found" }, 404);
+  }
+  if (!["confirmed", "active"].includes(booking.status)) {
+    return c.json({ error: "Booking not active" }, 403);
+  }
+  const now = /* @__PURE__ */ new Date();
+  const startTime2 = new Date(booking.start_time);
+  const fifteenMinutesBefore = new Date(startTime2.getTime() - 15 * 60 * 1e3);
+  if (now < fifteenMinutesBefore) {
+    return c.json({
+      error: "Access not available yet",
+      available_at: fifteenMinutesBefore.toISOString()
+    }, 403);
+  }
+  const credentials = booking.access_credentials || {
+    username: `user-${booking.user_id.slice(0, 8)}`,
+    password: `temp-${booking.id.slice(0, 8)}`,
+    api_key: `nw_${booking.id}`,
+    host: "resource.nanowork.app",
+    expires_at: booking.end_time
+  };
+  return c.json({
+    booking_id: booking.id,
+    credentials,
+    access_url: booking.access_url,
+    valid_until: booking.end_time
+  });
+});
+app11.delete("/bookings/:booking_id", async (c) => {
+  const sb = getSupabase(c.env);
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return c.json({ error: "Missing authorization token" }, 401);
+  }
+  const token = authHeader.slice(7);
+  const { data: { user }, error: authError } = await sb.auth.getUser(token);
+  if (authError || !user) {
+    return c.json({ error: "Invalid token" }, 401);
+  }
+  const bookingId = c.req.param("booking_id");
+  const { data: booking } = await sb.from("rent_bookings").select("*").eq("id", bookingId).eq("user_id", user.id).single();
+  if (!booking) {
+    return c.json({ error: "Booking not found" }, 404);
+  }
+  if (!["pending", "confirmed"].includes(booking.status)) {
+    return c.json({ error: "Cannot cancel this booking" }, 400);
+  }
+  const now = /* @__PURE__ */ new Date();
+  const startTime2 = new Date(booking.start_time);
+  const hoursUntilStart = (startTime2.getTime() - now.getTime()) / (1e3 * 60 * 60);
+  if (hoursUntilStart < 24) {
+    return c.json({
+      error: "Must cancel at least 24 hours before start time",
+      refund_amount: 0
+    }, 400);
+  }
+  const { error: error3 } = await sb.from("rent_bookings").update({
+    status: "cancelled",
+    cancelled_at: now.toISOString(),
+    payment_status: "refunded"
+    // In production, process actual refund
+  }).eq("id", bookingId);
+  if (error3) {
+    return c.json({ error: error3.message }, 503);
+  }
+  return c.json({
+    success: true,
+    message: "Booking cancelled successfully",
+    refund_amount_cents: booking.amount_cents
+  });
+});
+app11.patch("/bookings/:booking_id/extend", async (c) => {
+  const sb = getSupabase(c.env);
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return c.json({ error: "Missing authorization token" }, 401);
+  }
+  const token = authHeader.slice(7);
+  const { data: { user }, error: authError } = await sb.auth.getUser(token);
+  if (authError || !user) {
+    return c.json({ error: "Invalid token" }, 401);
+  }
+  try {
+    const bookingId = c.req.param("booking_id");
+    const body = await c.req.json();
+    const { data: booking } = await sb.from("rent_bookings").select("*").eq("id", bookingId).eq("user_id", user.id).single();
+    if (!booking) {
+      return c.json({ error: "Booking not found" }, 404);
+    }
+    if (booking.status !== "active") {
+      return c.json({ error: "Can only extend active bookings" }, 400);
+    }
+    const newEndTime = new Date(
+      new Date(booking.end_time).getTime() + body.additional_hours * 60 * 60 * 1e3
+    );
+    const { data: conflicts } = await sb.from("rent_bookings").select("id").eq("item_id", booking.item_id).neq("id", bookingId).in("status", ["confirmed", "active"]).lte("start_time", newEndTime.toISOString()).gte("end_time", booking.end_time);
+    if (conflicts && conflicts.length > 0) {
+      return c.json({ error: "Cannot extend - time slot not available" }, 409);
+    }
+    const hourlyRate = booking.amount_cents / booking.duration_hours;
+    const additionalCost = Math.round(hourlyRate * body.additional_hours);
+    const { data: updated, error: error3 } = await sb.from("rent_bookings").update({
+      end_time: newEndTime.toISOString(),
+      duration_hours: booking.duration_hours + body.additional_hours,
+      amount_cents: booking.amount_cents + additionalCost
+    }).eq("id", bookingId).select().single();
+    if (error3) {
+      return c.json({ error: error3.message }, 503);
+    }
+    return c.json({
+      ...updated,
+      additional_cost_cents: additionalCost,
+      message: `Booking extended by ${body.additional_hours} hours`
+    });
+  } catch (err) {
+    return c.json({ error: "Invalid request body" }, 400);
+  }
+});
+app11.get("/bookings", async (c) => {
+  const sb = getSupabase(c.env);
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return c.json({ error: "Missing authorization token" }, 401);
+  }
+  const token = authHeader.slice(7);
+  const { data: { user }, error: authError } = await sb.auth.getUser(token);
+  if (authError || !user) {
+    return c.json({ error: "Invalid token" }, 401);
+  }
+  const status = c.req.query("status");
+  const limit = Math.min(parseInt(c.req.query("limit") ?? "20"), 100);
+  const offset = parseInt(c.req.query("offset") ?? "0");
+  let query = sb.from("rent_bookings").select(`
+      *,
+      item:rent_items(id, name, slug, icon_emoji, category)
+    `).eq("user_id", user.id).order("start_time", { ascending: false }).range(offset, offset + limit - 1);
+  if (status) {
+    query = query.eq("status", status);
+  }
+  const { data: bookings, error: error3 } = await query;
+  if (error3) {
+    return c.json({ error: error3.message }, 503);
+  }
+  return c.json({
+    data: bookings ?? [],
+    limit,
+    offset,
+    total: bookings?.length ?? 0
+  });
+});
+var rent_bookings_default = app11;
+
+// src/routes/rent.ts
+var app12 = new Hono2();
+app12.route("/", rent_bookings_default);
 function isSupabaseConfigured(env2) {
   return !!(env2.SUPABASE_URL && env2.SUPABASE_SERVICE_ROLE_KEY);
 }
@@ -38295,7 +39044,7 @@ function generateSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 __name(generateSlug, "generateSlug");
-app11.get("/", async (c) => {
+app12.get("/", async (c) => {
   if (!isSupabaseConfigured(c.env)) {
     const category2 = c.req.query("category");
     const status2 = c.req.query("status");
@@ -38347,7 +39096,7 @@ app11.get("/", async (c) => {
     total: data?.length ?? 0
   });
 });
-app11.get("/:slug", async (c) => {
+app12.get("/:slug", async (c) => {
   const sb = getSupabase(c.env);
   const slug = c.req.param("slug");
   const { data, error: error3 } = await sb.from("rent_items").select("*").eq("slug", slug).eq("approved", true).maybeSingle();
@@ -38360,7 +39109,7 @@ app11.get("/:slug", async (c) => {
   await sb.from("rent_items").update({ view_count: data.view_count + 1 }).eq("id", data.id);
   return c.json(data);
 });
-app11.post("/", async (c) => {
+app12.post("/", async (c) => {
   const sb = getSupabase(c.env);
   const authHeader = c.req.header("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
@@ -38405,7 +39154,7 @@ app11.post("/", async (c) => {
     return c.json({ error: "Invalid request body" }, 400);
   }
 });
-app11.patch("/:id", async (c) => {
+app12.patch("/:id", async (c) => {
   const sb = getSupabase(c.env);
   const authHeader = c.req.header("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
@@ -38445,7 +39194,7 @@ app11.patch("/:id", async (c) => {
     return c.json({ error: "Invalid request body" }, 400);
   }
 });
-app11.delete("/:id", async (c) => {
+app12.delete("/:id", async (c) => {
   const sb = getSupabase(c.env);
   const authHeader = c.req.header("Authorization");
   if (!authHeader?.startsWith("Bearer ")) {
@@ -38470,7 +39219,7 @@ app11.delete("/:id", async (c) => {
   }
   return c.json({ success: true });
 });
-app11.post("/waitlist", async (c) => {
+app12.post("/waitlist", async (c) => {
   try {
     const body = await c.req.json();
     if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
@@ -38528,7 +39277,7 @@ app11.post("/waitlist", async (c) => {
     }, 400);
   }
 });
-app11.get("/waitlist/check/:email", async (c) => {
+app12.get("/waitlist/check/:email", async (c) => {
   const sb = getSupabase(c.env);
   const email = c.req.param("email").toLowerCase().trim();
   const { data } = await sb.from("rent_waitlist").select("id, item_id, created_at").eq("email", email).limit(10);
@@ -38537,7 +39286,7 @@ app11.get("/waitlist/check/:email", async (c) => {
     entries: data ?? []
   });
 });
-var rent_default = app11;
+var rent_default = app12;
 
 // src/routes/stripe.ts
 init_strip_cf_connecting_ip_header();
@@ -38545,8 +39294,8 @@ init_modules_watch_stub();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_process();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_console();
 init_performance2();
-var app12 = new Hono2();
-app12.post("/create-checkout", async (c) => {
+var app13 = new Hono2();
+app13.post("/create-checkout", async (c) => {
   try {
     const stripe2 = new stripe_esm_worker_default(c.env.STRIPE_SECRET_KEY, {
       apiVersion: "2024-11-20.acacia"
@@ -38590,7 +39339,7 @@ app12.post("/create-checkout", async (c) => {
     );
   }
 });
-app12.post("/create-portal", async (c) => {
+app13.post("/create-portal", async (c) => {
   try {
     const stripe2 = new stripe_esm_worker_default(c.env.STRIPE_SECRET_KEY, {
       apiVersion: "2024-11-20.acacia"
@@ -38613,7 +39362,7 @@ app12.post("/create-portal", async (c) => {
     );
   }
 });
-app12.get("/subscription/:subscriptionId", async (c) => {
+app13.get("/subscription/:subscriptionId", async (c) => {
   try {
     const stripe2 = new stripe_esm_worker_default(c.env.STRIPE_SECRET_KEY, {
       apiVersion: "2024-11-20.acacia"
@@ -38636,7 +39385,7 @@ app12.get("/subscription/:subscriptionId", async (c) => {
     );
   }
 });
-app12.post("/subscription/:subscriptionId/cancel", async (c) => {
+app13.post("/subscription/:subscriptionId/cancel", async (c) => {
   try {
     const stripe2 = new stripe_esm_worker_default(c.env.STRIPE_SECRET_KEY, {
       apiVersion: "2024-11-20.acacia"
@@ -38657,7 +39406,7 @@ app12.post("/subscription/:subscriptionId/cancel", async (c) => {
     );
   }
 });
-app12.post("/subscription/:subscriptionId/resume", async (c) => {
+app13.post("/subscription/:subscriptionId/resume", async (c) => {
   try {
     const stripe2 = new stripe_esm_worker_default(c.env.STRIPE_SECRET_KEY, {
       apiVersion: "2024-11-20.acacia"
@@ -38675,7 +39424,7 @@ app12.post("/subscription/:subscriptionId/resume", async (c) => {
     );
   }
 });
-var stripe_default = app12;
+var stripe_default = app13;
 
 // src/routes/stripe-webhooks.ts
 init_strip_cf_connecting_ip_header();
@@ -38683,7 +39432,7 @@ init_modules_watch_stub();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_process();
 init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_console();
 init_performance2();
-var app13 = new Hono2();
+var app14 = new Hono2();
 async function verifyStripeWebhook(payload, signature, secret) {
   try {
     const stripe2 = new stripe_esm_worker_default(secret, { apiVersion: "2024-11-20.acacia" });
@@ -38950,7 +39699,7 @@ function getPlanLimits(plan) {
   return limitsMap[plan] || limitsMap.free;
 }
 __name(getPlanLimits, "getPlanLimits");
-app13.post("/", async (c) => {
+app14.post("/", async (c) => {
   const signature = c.req.header("stripe-signature");
   if (!signature) {
     return c.json({ error: "Missing stripe-signature header" }, 400);
@@ -38994,12 +39743,12 @@ app13.post("/", async (c) => {
     return c.json({ error: "Webhook processing failed" }, 500);
   }
 });
-var stripe_webhooks_default = app13;
+var stripe_webhooks_default = app14;
 
 // src/index.ts
-var app14 = new Hono2();
-app14.use("*", timing());
-app14.use("*", cors({
+var app15 = new Hono2();
+app15.use("*", timing());
+app15.use("*", cors({
   origin: [
     "https://nanowork.ai",
     "https://www.nanowork.ai",
@@ -39011,27 +39760,27 @@ app14.use("*", cors({
   allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   credentials: true
 }));
-app14.route("/api/ai", ai_default);
-app14.route("/api/build", build_default);
-app14.route("/api/builds", builds_default);
-app14.route("/api/analytics", analytics_default);
-app14.route("/api/customers", customers_default);
-app14.route("/api/keys", keys_default);
-app14.route("/api/payments", payments_default);
-app14.route("/api/phone", phone_default);
-app14.route("/api/tenant", tenant_default);
-app14.route("/api/webhooks", webhooks_default);
-app14.route("/api/rent", rent_default);
-app14.route("/api/stripe", stripe_default);
-app14.route("/api/stripe/webhooks", stripe_webhooks_default);
-app14.get("/health", (c) => c.json({
+app15.route("/api/ai", ai_default);
+app15.route("/api/build", build_default);
+app15.route("/api/builds", builds_default);
+app15.route("/api/analytics", analytics_default);
+app15.route("/api/customers", customers_default);
+app15.route("/api/keys", keys_default);
+app15.route("/api/payments", payments_default);
+app15.route("/api/phone", phone_default);
+app15.route("/api/tenant", tenant_default);
+app15.route("/api/webhooks", webhooks_default);
+app15.route("/api/rent", rent_default);
+app15.route("/api/stripe", stripe_default);
+app15.route("/api/stripe/webhooks", stripe_webhooks_default);
+app15.get("/health", (c) => c.json({
   status: "ok",
   environment: c.env.ENVIRONMENT,
   supabase_configured: !!c.env.SUPABASE_URL,
   anthropic_configured: !!c.env.ANTHROPIC_API_KEY,
   stripe_configured: !!c.env.STRIPE_SECRET_KEY
 }));
-var src_default = app14;
+var src_default = app15;
 
 // node_modules/wrangler/templates/middleware/middleware-ensure-req-body-drained.ts
 init_strip_cf_connecting_ip_header();
@@ -39084,7 +39833,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env2, _ctx, middlewareCtx
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// .wrangler/tmp/bundle-q2qssg/middleware-insertion-facade.js
+// .wrangler/tmp/bundle-MOPvAC/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -39121,7 +39870,7 @@ function __facade_invoke__(request, env2, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// .wrangler/tmp/bundle-q2qssg/middleware-loader.entry.ts
+// .wrangler/tmp/bundle-MOPvAC/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

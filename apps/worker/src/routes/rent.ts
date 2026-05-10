@@ -2,8 +2,12 @@ import { Hono } from 'hono'
 import type { Env } from '../index'
 import { getSupabase } from '../lib/supabase'
 import { MOCK_RENT_ITEMS } from './rent-mock-data'
+import bookings from './rent-bookings'
 
 const app = new Hono<{ Bindings: Env }>()
+
+// Mount booking routes
+app.route('/', bookings)
 
 // Check if Supabase is configured
 function isSupabaseConfigured(env: Env): boolean {
