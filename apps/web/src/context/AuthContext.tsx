@@ -7,20 +7,52 @@ import {
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "../lib/supabase";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
+import type { Company } from "../types/database";
 
+// Updated UserProfile to match v2 schema with phone auth
 export interface UserProfile {
   id: string;
   phone: string;
   email?: string;
   name?: string;
+  avatarUrl?: string;
   businessName?: string;
   businessPrompt?: string;
-  plan: "free" | "starter" | "growth" | "scale";
+
+  // Account status
+  status: "active" | "suspended" | "deleted";
+  phoneVerified: boolean;
+
+  // Subscription & billing
+  plan: "free" | "starter" | "growth" | "scale" | "enterprise";
+  stripeCustomerId?: string;
+  subscriptionStatus?: "active" | "trialing" | "past_due" | "canceled" | "paused";
+  subscriptionId?: string;
+  trialEndsAt?: string;
+  subscriptionEndsAt?: string;
+
+  // Usage & credits
+  creditsBalance: number;
+  monthlyCompanyLimit: number;
+  totalCompaniesCreated: number;
+
+  // Legacy fields
   customDomain?: string;
   subdomain?: string;
-  stripeCustomerId?: string;
+
+  // Preferences
+  timezone: string;
+  notificationPreferences: {
+    sms: boolean;
+    activity: boolean;
+    billing: boolean;
+  };
+
+  // Metadata
+  lastLoginAt?: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface AuthContextValue {
@@ -29,10 +61,24 @@ interface AuthContextValue {
   user: User | null;
   session: Session | null;
   profile: UserProfile | null;
+
+  // Companies
+  companies: Company[];
+  activeCompany: Company | null;
+  setActiveCompany: (companyId: string) => void;
+  refreshCompanies: () => Promise<void>;
+  canCreateCompany: () => boolean;
+
+  // Auth methods (phone)
   requestOtp: (phone: string) => Promise<{ error: string | null }>;
   verifyOtp: (phone: string, token: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
+
+  // Profile management
   updateProfile: (partial: Partial<UserProfile>) => Promise<void>;
+
+  // Credits management
+  deductCredits: (amount: number, description: string, usageType: string, companyId?: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
@@ -41,10 +87,16 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   session: null,
   profile: null,
+  companies: [],
+  activeCompany: null,
+  setActiveCompany: () => {},
+  refreshCompanies: async () => {},
+  canCreateCompany: () => false,
   requestOtp: async () => ({ error: null }),
   verifyOtp: async () => ({ error: null }),
   logout: async () => {},
   updateProfile: async () => {},
+  deductCredits: async () => false,
 });
 
 function phoneToSubdomain(phone: string): string {
@@ -55,7 +107,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const activeCompany = companies.find(c => c.id === activeCompanyId) || companies[0] || null;
 
   const loadProfile = useCallback(async (u: User) => {
     const { data } = await supabase
@@ -65,40 +121,164 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single();
 
     if (data) {
-      setProfile(data as UserProfile);
+      // Map database fields (snake_case) to UserProfile (camelCase)
+      const mappedProfile: UserProfile = {
+        id: data.id,
+        phone: data.phone,
+        email: data.email || undefined,
+        name: data.name || undefined,
+        avatarUrl: data.avatar_url || undefined,
+        businessName: data.business_name || undefined,
+        businessPrompt: data.business_prompt || undefined,
+        status: data.status || "active",
+        phoneVerified: data.phone_verified || false,
+        plan: data.plan || "free",
+        stripeCustomerId: data.stripe_customer_id || undefined,
+        subscriptionStatus: data.subscription_status || undefined,
+        subscriptionId: data.subscription_id || undefined,
+        trialEndsAt: data.trial_ends_at || undefined,
+        subscriptionEndsAt: data.subscription_ends_at || undefined,
+        creditsBalance: data.credits_balance || 0,
+        monthlyCompanyLimit: data.monthly_company_limit || 1,
+        totalCompaniesCreated: data.total_companies_created || 0,
+        customDomain: data.custom_domain || undefined,
+        subdomain: data.subdomain || undefined,
+        timezone: data.timezone || "UTC",
+        notificationPreferences: data.notification_preferences || {
+          sms: true,
+          activity: true,
+          billing: true,
+        },
+        lastLoginAt: data.last_login_at || undefined,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at || data.created_at,
+      };
+      setProfile(mappedProfile);
     } else {
-      const newProfile: UserProfile = {
+      // Create new profile
+      const newProfile = {
         id: u.id,
         phone: u.phone ?? "",
+        status: "active",
+        phone_verified: false,
         plan: "free",
+        credits_balance: 100, // Free signup bonus
+        monthly_company_limit: 1,
+        total_companies_created: 0,
         subdomain: phoneToSubdomain(u.phone ?? u.id),
-        createdAt: new Date().toISOString(),
+        timezone: "UTC",
+        notification_preferences: {
+          sms: true,
+          activity: true,
+          billing: true,
+        },
       };
-      await supabase.from("profiles").upsert(newProfile);
-      setProfile(newProfile);
+
+      await supabase.from("profiles").insert(newProfile);
+
+      const mappedProfile: UserProfile = {
+        id: newProfile.id,
+        phone: newProfile.phone,
+        status: newProfile.status as "active",
+        phoneVerified: newProfile.phone_verified,
+        plan: newProfile.plan as "free",
+        creditsBalance: newProfile.credits_balance,
+        monthlyCompanyLimit: newProfile.monthly_company_limit,
+        totalCompaniesCreated: newProfile.total_companies_created,
+        subdomain: newProfile.subdomain,
+        timezone: newProfile.timezone,
+        notificationPreferences: newProfile.notification_preferences,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      setProfile(mappedProfile);
+    }
+  }, []);
+
+  const loadCompanies = useCallback(async (userId: string) => {
+    // Get companies owned by user
+    const { data: ownedCompanies } = await supabase
+      .from("companies")
+      .select("*")
+      .eq("owner_id", userId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false });
+
+    // Get companies where user is a member (if company_members table exists)
+    const { data: memberCompanies } = await supabase
+      .from("company_members")
+      .select(`
+        company_id,
+        companies (*)
+      `)
+      .eq("user_id", userId)
+      .eq("invitation_status", "accepted");
+
+    const allCompanies = [
+      ...(ownedCompanies || []),
+      ...(memberCompanies?.map((m: any) => m.companies).flat().filter(Boolean) || []),
+    ] as Company[];
+
+    setCompanies(allCompanies);
+
+    // Set active company from localStorage or first company
+    const savedCompanyId = localStorage.getItem("activeCompanyId");
+    if (savedCompanyId && allCompanies.some(c => c.id === savedCompanyId)) {
+      setActiveCompanyId(savedCompanyId);
+    } else if (allCompanies.length > 0) {
+      setActiveCompanyId(allCompanies[0].id);
     }
   }, []);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
+    // If Supabase is not configured, skip auth entirely
+    if (!isSupabaseConfigured) {
+      console.warn("[AuthContext] Running in fallback mode - no authentication");
+      setIsLoading(false);
+      return;
+    }
+
+    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
       setSession(s);
       setUser(s?.user ?? null);
-      if (s?.user) loadProfile(s.user).finally(() => setIsLoading(false));
-      else setIsLoading(false);
+      if (s?.user) {
+        await loadProfile(s.user);
+        await loadCompanies(s.user.id).catch(() => {
+          // Companies table might not exist yet - that's okay
+        });
+        // Update last login
+        await supabase
+          .from("profiles")
+          .update({ last_login_at: new Date().toISOString() })
+          .eq("id", s.user.id)
+          .catch(() => {
+            // Column might not exist yet - that's okay
+          });
+      }
+      setIsLoading(false);
+    }).catch((err) => {
+      console.error("[AuthContext] Failed to get session:", err);
+      setIsLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, s) => {
         setSession(s);
         setUser(s?.user ?? null);
-        if (s?.user) await loadProfile(s.user);
-        else setProfile(null);
+        if (s?.user) {
+          await loadProfile(s.user);
+          await loadCompanies(s.user.id).catch(() => {});
+        } else {
+          setProfile(null);
+          setCompanies([]);
+          setActiveCompanyId(null);
+        }
         setIsLoading(false);
       }
     );
 
     return () => subscription.unsubscribe();
-  }, [loadProfile]);
+  }, [loadProfile, loadCompanies]);
 
   const requestOtp = useCallback(async (phone: string) => {
     const { error } = await supabase.auth.signInWithOtp({ phone });
@@ -117,13 +297,88 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     await supabase.auth.signOut();
     setProfile(null);
+    setCompanies([]);
+    setActiveCompanyId(null);
+    localStorage.removeItem("activeCompanyId");
   }, []);
 
   const updateProfile = useCallback(async (partial: Partial<UserProfile>) => {
     if (!user) return;
+
+    // Convert camelCase to snake_case for database
+    const dbUpdate: any = {};
+    if (partial.name !== undefined) dbUpdate.name = partial.name;
+    if (partial.email !== undefined) dbUpdate.email = partial.email;
+    if (partial.avatarUrl !== undefined) dbUpdate.avatar_url = partial.avatarUrl;
+    if (partial.businessName !== undefined) dbUpdate.business_name = partial.businessName;
+    if (partial.businessPrompt !== undefined) dbUpdate.business_prompt = partial.businessPrompt;
+    if (partial.timezone !== undefined) dbUpdate.timezone = partial.timezone;
+    if (partial.notificationPreferences !== undefined) {
+      dbUpdate.notification_preferences = partial.notificationPreferences;
+    }
+
+    await supabase.from("profiles").update(dbUpdate).eq("id", user.id);
+
     const updated = { ...profile, ...partial } as UserProfile;
     setProfile(updated);
-    await supabase.from("profiles").update(partial).eq("id", user.id);
+  }, [user, profile]);
+
+  const setActiveCompany = useCallback((companyId: string) => {
+    setActiveCompanyId(companyId);
+    localStorage.setItem("activeCompanyId", companyId);
+  }, []);
+
+  const refreshCompanies = useCallback(async () => {
+    if (!user) return;
+    await loadCompanies(user.id);
+  }, [user, loadCompanies]);
+
+  const canCreateCompany = useCallback(() => {
+    if (!profile) return false;
+    const activeCompaniesCount = companies.filter(
+      c => c.status !== "archived" && c.status !== "deleted"
+    ).length;
+    return activeCompaniesCount < profile.monthlyCompanyLimit;
+  }, [profile, companies]);
+
+  const deductCredits = useCallback(async (
+    amount: number,
+    description: string,
+    usageType: string,
+    companyId?: string
+  ): Promise<boolean> => {
+    if (!user || !profile) return false;
+
+    // Check if user has enough credits
+    if (profile.creditsBalance < amount) {
+      return false;
+    }
+
+    const newBalance = profile.creditsBalance - amount;
+
+    // Insert transaction (this will trigger auto-update of balance via DB function)
+    const { error } = await supabase.from("credits_transactions").insert({
+      user_id: user.id,
+      type: "usage",
+      amount: -amount,
+      balance_after: newBalance,
+      company_id: companyId || null,
+      description,
+      usage_type: usageType,
+    });
+
+    if (error) {
+      console.error("Failed to deduct credits:", error);
+      return false;
+    }
+
+    // Update local state
+    setProfile({
+      ...profile,
+      creditsBalance: newBalance,
+    });
+
+    return true;
   }, [user, profile]);
 
   return (
@@ -134,10 +389,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         session,
         profile,
+        companies,
+        activeCompany,
         requestOtp,
         verifyOtp,
         logout,
         updateProfile,
+        setActiveCompany,
+        refreshCompanies,
+        canCreateCompany,
+        deductCredits,
       }}
     >
       {children}

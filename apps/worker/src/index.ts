@@ -12,6 +12,8 @@ import phone from './routes/phone'
 import tenant from './routes/tenant'
 import webhooks from './routes/webhooks'
 import rent from './routes/rent'
+import stripe from './routes/stripe'
+import stripeWebhooks from './routes/stripe-webhooks'
 
 export type Env = {
   ENVIRONMENT: string
@@ -50,6 +52,8 @@ app.route('/api/phone', phone)
 app.route('/api/tenant', tenant)
 app.route('/api/webhooks', webhooks)
 app.route('/api/rent', rent)
+app.route('/api/stripe', stripe)
+app.route('/api/stripe/webhooks', stripeWebhooks)
 
 app.get('/health', (c) => c.json({
   status: 'ok',

@@ -1,8 +1,14 @@
 import { Hono } from 'hono'
 import type { Env } from '../index'
 import { getSupabase } from '../lib/supabase'
+import { MOCK_RENT_ITEMS } from './rent-mock-data'
 
 const app = new Hono<{ Bindings: Env }>()
+
+// Check if Supabase is configured
+function isSupabaseConfigured(env: Env): boolean {
+  return !!(env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY)
+}
 
 /**
  * Generate URL-safe slug from name
@@ -19,6 +25,38 @@ function generateSlug(name: string): string {
  * List all approved marketplace items with optional filtering
  */
 app.get('/', async (c) => {
+  // Fallback mode: return mock data
+  if (!isSupabaseConfigured(c.env)) {
+    const category = c.req.query('category')
+    const status = c.req.query('status')
+    const featured = c.req.query('featured')
+    const limit = Math.min(parseInt(c.req.query('limit') ?? '50'), 100)
+    const offset = parseInt(c.req.query('offset') ?? '0')
+
+    let filtered = MOCK_RENT_ITEMS.filter(item => item.approved)
+
+    if (category) {
+      filtered = filtered.filter(item => item.category === category)
+    }
+
+    if (status) {
+      filtered = filtered.filter(item => item.status === status)
+    }
+
+    if (featured === 'true') {
+      filtered = filtered.filter(item => item.featured)
+    }
+
+    const paginated = filtered.slice(offset, offset + limit)
+
+    return c.json({
+      data: paginated,
+      limit,
+      offset,
+      total: paginated.length
+    })
+  }
+
   const sb = getSupabase(c.env)
 
   const category = c.req.query('category')
@@ -304,8 +342,6 @@ app.delete('/:id', async (c) => {
  * Join the marketplace waitlist
  */
 app.post('/waitlist', async (c) => {
-  const sb = getSupabase(c.env)
-
   try {
     const body = await c.req.json<{
       email: string
@@ -317,6 +353,21 @@ app.post('/waitlist', async (c) => {
     if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
       return c.json({ error: 'Valid email is required' }, 400)
     }
+
+    // Fallback mode: just log and return success
+    if (!isSupabaseConfigured(c.env)) {
+      console.log('[MOCK] Waitlist signup:', body.email, 'for item:', body.item_id || 'general')
+      return c.json({
+        message: 'Successfully joined the waitlist! (Mock mode)',
+        data: {
+          id: crypto.randomUUID(),
+          email: body.email.toLowerCase().trim(),
+          created_at: new Date().toISOString()
+        }
+      }, 201)
+    }
+
+    const sb = getSupabase(c.env)
 
     // Optional: Check if item_id exists
     if (body.item_id) {
