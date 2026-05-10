@@ -1,414 +1,608 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-/* ── Feed data ─────────────────────────────────────────── */
+// ── Data ──────────────────────────────────────────────────────────────────────
 
-const FEED_EVENTS = [
-  { emoji: "🚀", name: "Jordan P.", action: "just launched", highlight: "Premium Dog Gear DTC", meta: "Legal + Brand + Site live" },
-  { emoji: "💰", name: "Sarah M.", action: "got their first customer", highlight: "$297 sale", meta: "Coaching for busy parents" },
-  { emoji: "⚡", name: "Marcus T.", action: "went live with", highlight: "SaaS for designers", meta: "$29/mo · 3 paying users today" },
-  { emoji: "🏪", name: "Priya K.", action: "is scaling", highlight: "Meal prep to City 2", meta: "212 subscribers migrated" },
-  { emoji: "📈", name: "Alex R.", action: "hit", highlight: "$4,800 MRR", meta: "Sustainable home goods · month 3" },
-  { emoji: "🤝", name: "Diana W.", action: "landed", highlight: "first retainer client", meta: "$5k/mo · B2B consultancy" },
-  { emoji: "🌐", name: "Tom S.", action: "deployed", highlight: "custom domain", meta: "fincraft.io is live" },
-  { emoji: "📬", name: "Keiko L.", action: "sent", highlight: "2,400 outreach emails", meta: "42% open rate this week" },
-  { emoji: "⚙️", name: "Ryan B.", action: "set up", highlight: "7 agent departments", meta: "All running in parallel" },
-  { emoji: "🎯", name: "Nina F.", action: "converted", highlight: "14 free → paid", meta: "Email tool · $49/mo tier" },
-  { emoji: "🏆", name: "Carlos V.", action: "crossed", highlight: "$10k revenue", meta: "Month 2 · Pet accessories brand" },
-  { emoji: "📊", name: "Jasmine H.", action: "shared", highlight: "live revenue dashboard", meta: "Investors can see it in real time" },
+const TYPING_EXAMPLES = [
+  "Premium leather goods DTC brand",
+  "B2B software for construction teams",
+  "Meal prep delivery service",
+  "Digital marketing agency",
+  "Online education platform",
+  "Fitness coaching business",
 ];
 
-/* ── Prompts ────────────────────────────────────────────── */
+// ── Real-time Metrics ─────────────────────────────────────────────────────────
 
-const EXAMPLES = [
-  "Premium dog gear DTC, $45 AOV, ship US — I want real revenue in 30 days.",
-  "Online coaching for busy parents. 3 tiers, $197–$997. Launch this month.",
-  "SaaS tool for freelance designers. $29/mo. I need the full company stack.",
-  "Local meal prep service, 200 subscribers. Ready to scale to a new city.",
-  "E-commerce brand for sustainable home goods. D2C, $60 AOV, launch Q2.",
-  "B2B software consultancy. Retainer model, $5k/mo clients. Build the engine.",
-];
+function useCounter(initial: number, increment: number, interval: number = 2000) {
+  const [value, setValue] = useState(initial);
+  const incrementRef = useRef(increment);
+  const intervalRef = useRef(interval);
 
-/* ── Live counter ───────────────────────────────────────── */
-
-function useLiveCount(init: number, intervalMs: number, step = 1) {
-  const [count, setCount] = useState(init);
   useEffect(() => {
-    const id = setInterval(() => setCount((n) => n + step), intervalMs);
-    return () => clearInterval(id);
-  }, [intervalMs, step]);
-  return count;
-}
-
-/* ── Activity feed item ─────────────────────────────────── */
-
-function FeedItem({
-  item,
-  delay,
-}: {
-  item: (typeof FEED_EVENTS)[0];
-  delay: number;
-}) {
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(t);
-  }, [delay]);
-
-  return (
-    <div
-      className={`flex gap-3 p-3 rounded-xl bg-surface-2 border border-white/5 transition-all duration-500 ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-      }`}
-    >
-      <span className="text-xl leading-none mt-0.5 flex-shrink-0">{item.emoji}</span>
-      <div className="min-w-0">
-        <p className="text-sm text-zinc-300 leading-snug">
-          <span className="font-semibold text-white">{item.name}</span>{" "}
-          {item.action}{" "}
-          <span className="font-semibold text-brand-400">{item.highlight}</span>
-        </p>
-        <p className="text-xs text-zinc-500 mt-0.5">{item.meta}</p>
-      </div>
-    </div>
-  );
-}
-
-/* ── Animated feed ──────────────────────────────────────── */
-
-function ActivityFeed() {
-  const [items, setItems] = useState(FEED_EVENTS.slice(0, 5));
-  const [key, setKey] = useState(0);
+    incrementRef.current = increment;
+    intervalRef.current = interval;
+  });
 
   useEffect(() => {
     const id = setInterval(() => {
-      setItems((prev) => {
-        const nextIdx = (FEED_EVENTS.indexOf(prev[0]) + prev.length) % FEED_EVENTS.length;
-        return [FEED_EVENTS[nextIdx], ...prev.slice(0, 4)];
-      });
-      setKey((k) => k + 1);
-    }, 4000);
+      setValue(v => v + Math.floor(Math.random() * incrementRef.current));
+    }, intervalRef.current);
     return () => clearInterval(id);
   }, []);
 
+  return value;
+}
+
+const MetricCard = memo(function MetricCard({
+  label,
+  value,
+  suffix = "",
+  prefix = "",
+}: {
+  label: string;
+  value: number;
+  suffix?: string;
+  prefix?: string;
+}) {
   return (
-    <div className="flex flex-col gap-2">
-      {items.map((item, i) => (
-        <FeedItem key={`${key}-${i}`} item={item} delay={i * 80} />
-      ))}
+    <div className="flex flex-col">
+      <div className="text-[10px] font-medium text-slate-400 uppercase tracking-[0.1em] mb-2.5">
+        {label}
+      </div>
+      <div className="text-[28px] font-semibold text-slate-900 tracking-[-0.02em] tabular-nums">
+        {prefix}{value.toLocaleString()}{suffix}
+      </div>
+    </div>
+  );
+});
+
+function MetricsDashboard() {
+  const agentsWorking = useCounter(47328, 12, 2000);
+  const cardsIssued = useCounter(34567, 8, 2200);
+  const emailsSent = useCounter(1847293, 95, 1800);
+  const revenue = useCounter(8234156, 6200, 2200);
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-12 gap-y-8 py-16 border-y border-slate-200">
+      <MetricCard label="Active Agents" value={agentsWorking} />
+      <MetricCard label="Cards Issued" value={cardsIssued} />
+      <MetricCard label="Emails Sent" value={emailsSent} />
+      <MetricCard label="Revenue" value={revenue} prefix="$" />
     </div>
   );
 }
 
-/* ── Prompt box ─────────────────────────────────────────── */
+// ── Prompt Input with Auto-typing ─────────────────────────────────────────────
 
-function PromptBox() {
+function PromptInput() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const [prompt, setPrompt] = useState("");
-  const [exIdx, setExIdx] = useState(0);
+  const [value, setValue] = useState("");
+  const [focused, setFocused] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [placeholder, setPlaceholder] = useState("");
+  const [exampleIndex, setExampleIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Auto-typing effect
   useEffect(() => {
-    const id = setInterval(() => setExIdx((i) => (i + 1) % EXAMPLES.length), 4500);
-    return () => clearInterval(id);
-  }, []);
+    if (focused || value) return;
 
-  function handleSubmit() {
-    const text = prompt.trim() || EXAMPLES[exIdx];
-    if (isAuthenticated) {
-      navigate(`/dashboard?p=${encodeURIComponent(text)}`);
-    } else {
-      navigate(`/login?redirect=/dashboard&p=${encodeURIComponent(text)}`);
+    const currentExample = TYPING_EXAMPLES[exampleIndex];
+
+    if (!isDeleting && charIndex < currentExample.length) {
+      const timeout = setTimeout(() => {
+        setPlaceholder(currentExample.slice(0, charIndex + 1));
+        setCharIndex(charIndex + 1);
+      }, 60);
+      return () => clearTimeout(timeout);
+    } else if (!isDeleting && charIndex === currentExample.length) {
+      const timeout = setTimeout(() => setIsDeleting(true), 2000);
+      return () => clearTimeout(timeout);
+    } else if (isDeleting && charIndex > 0) {
+      const timeout = setTimeout(() => {
+        setPlaceholder(currentExample.slice(0, charIndex - 1));
+        setCharIndex(charIndex - 1);
+      }, 30);
+      return () => clearTimeout(timeout);
+    } else if (isDeleting && charIndex === 0) {
+      setIsDeleting(false);
+      setExampleIndex((exampleIndex + 1) % TYPING_EXAMPLES.length);
     }
+  }, [charIndex, isDeleting, exampleIndex, focused, value]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
+  }, [value]);
+
+  function submit() {
+    const text = value.trim();
+    if (!text) return;
+    setLoading(true);
+    setTimeout(() => {
+      if (isAuthenticated) navigate(`/dashboard?p=${encodeURIComponent(text)}`);
+      else navigate(`/login?redirect=/dashboard&p=${encodeURIComponent(text)}`);
+    }, 200);
   }
 
-  return (
-    <div className="w-full">
-      <div className="relative rounded-2xl bg-surface-2 border border-white/10 focus-within:border-brand-500/60 transition-colors shadow-2xl">
-        <textarea
-          ref={textareaRef}
-          className="w-full bg-transparent text-zinc-100 placeholder-zinc-500 resize-none text-base leading-relaxed px-4 pt-4 pb-16 rounded-2xl outline-none"
-          placeholder={EXAMPLES[exIdx]}
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit();
-          }}
-          rows={3}
-          aria-label="Describe your business idea"
-        />
-        <div className="absolute bottom-3 left-4 right-3 flex items-center justify-between">
-          <span className="text-xs text-zinc-600">
-            Who pays · for what · what "done" looks like in 30 days
-          </span>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold transition-colors"
-          >
-            Build it
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      <p className="text-center text-xs text-zinc-600 mt-3">
-        Free preview · $99/mo to subscribe · You own the entity and upside
-      </p>
-    </div>
-  );
-}
-
-/* ── Stats strip ─────────────────────────────────────────── */
-
-function StatStrip() {
-  const agents = useLiveCount(47, 12000);
-  const emails = useLiveCount(31847, 4200);
-  const customers = useLiveCount(2463, 30000);
-
-  const stats = [
-    { label: "Agents running", value: agents.toLocaleString() },
-    { label: "Emails sent this month", value: emails.toLocaleString() },
-    { label: "Customers reached", value: customers.toLocaleString() },
-    { label: "Flat monthly price", value: "$99" },
+  const samplePrompts = [
+    "Premium leather goods DTC brand with Shopify store and email marketing",
+    "B2B software for construction teams with demo videos and sales automation",
+    "Meal prep delivery service with subscription model and local SEO",
+    "Digital marketing agency specializing in e-commerce brands"
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-white/5 border-y border-white/5">
-      {stats.map((s) => (
-        <div key={s.label} className="bg-surface-1 px-5 py-4 text-center">
-          <div className="text-2xl font-bold text-white tabular-nums">{s.value}</div>
-          <div className="text-xs text-zinc-500 mt-0.5">{s.label}</div>
+    <div className="w-full max-w-4xl mx-auto">
+      <div
+        className={`relative rounded-2xl border-2 transition-all shadow-lg ${
+          focused
+            ? "border-slate-900 shadow-xl"
+            : "border-slate-200"
+        }`}
+      >
+        <div className="relative min-h-[180px]">
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            onKeyDown={e => {
+              if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                submit();
+              }
+            }}
+            disabled={loading}
+            className="block w-full bg-white text-slate-900 text-[17px] leading-relaxed resize-none px-8 py-6 pr-20 outline-none rounded-2xl min-h-[180px]"
+            style={{ maxHeight: '400px', overflowY: 'auto' }}
+          />
+          {!value && !focused && (
+            <div className="absolute top-6 left-8 pointer-events-none text-[17px] text-slate-400 flex items-start">
+              {placeholder}
+              <span className="inline-block w-[2px] h-6 bg-slate-900 ml-1 animate-cursor-blink" />
+            </div>
+          )}
         </div>
-      ))}
+        <div className="absolute right-4 bottom-4">
+          <button
+            onClick={submit}
+            disabled={loading || !value.trim()}
+            className="w-12 h-12 bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed text-white rounded-xl transition-all flex items-center justify-center shadow-lg"
+          >
+            {loading ? (
+              <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Trust Indicators - Fintech Style */}
+      <div className="mt-10 flex items-center justify-center gap-8 text-[13px] text-slate-500">
+        <div className="flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Bank-grade security
+        </div>
+        <div className="w-px h-4 bg-slate-300" />
+        <div className="flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+          FDIC insured
+        </div>
+        <div className="w-px h-4 bg-slate-300" />
+        <div className="flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+          SOC 2 compliant
+        </div>
+      </div>
     </div>
   );
 }
 
-/* ── Departments ─────────────────────────────────────────── */
+// ── Infrastructure Cards ──────────────────────────────────────────────────────
 
-const DEPARTMENTS = [
-  { icon: "⚖️", label: "Legal", desc: "Entity formation, agreements, and compliance from day one." },
-  { icon: "🎨", label: "Brand", desc: "Name, voice, visuals, and narrative that converts." },
-  { icon: "🌐", label: "Web", desc: "Live site, checkout, and product flows." },
-  { icon: "📣", label: "Marketing", desc: "Launch campaigns, creative, and distribution." },
-  { icon: "💼", label: "Sales", desc: "Sequences, CRM, and daily pipeline motion." },
-  { icon: "💳", label: "Finance", desc: "Books, invoicing, and margin visibility." },
-  { icon: "⚙️", label: "Ops", desc: "Delivery, vendors, and 24/7 floor coverage." },
-];
+const InfrastructureCard = memo(function InfrastructureCard({
+  type,
+  title,
+  description,
+  visualComponent
+}: {
+  type: string;
+  title: string;
+  description: string;
+  visualComponent: React.ReactNode;
+}) {
+  return (
+    <div className="group relative">
+      <div className="border-2 border-slate-200 rounded-2xl p-8 bg-white hover:border-slate-900 transition-all">
+        {/* Visual Representation */}
+        <div className="mb-8">
+          {visualComponent}
+        </div>
 
-/* ── Nav ─────────────────────────────────────────────────── */
+        {/* Content */}
+        <div>
+          <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
+            {type}
+          </div>
+          <div className="text-[20px] font-semibold text-slate-900 mb-3 tracking-tight">
+            {title}
+          </div>
+          <div className="text-[14px] text-slate-600 leading-relaxed">
+            {description}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
 
-function Nav() {
+// Visual component for payment card
+const CardVisual = () => (
+  <div className="relative h-48 rounded-xl bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 p-6 flex flex-col justify-between overflow-hidden">
+    <div className="absolute inset-0 opacity-10">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-2xl" />
+    </div>
+    <div className="relative z-10">
+      <div className="flex items-center gap-2 mb-8">
+        <div className="w-10 h-8 rounded-md bg-gradient-to-br from-amber-300 to-amber-500" />
+        <div>
+          <div className="text-white text-xs font-bold">NANOWORK</div>
+          <div className="text-white/60 text-[10px]">AGENT CARD</div>
+        </div>
+      </div>
+      <div className="text-white text-lg font-bold tracking-[0.2em] font-mono mb-4">
+        •••• •••• •••• 4892
+      </div>
+      <div className="flex justify-between items-end">
+        <div>
+          <div className="text-white/50 text-[9px] mb-0.5">DEPT</div>
+          <div className="text-white text-xs font-bold">FINANCE</div>
+        </div>
+        <div className="flex -space-x-1.5">
+          <div className="w-6 h-6 rounded-full bg-red-500" />
+          <div className="w-6 h-6 rounded-full bg-amber-400" />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Visual component for email
+const EmailVisual = () => (
+  <div className="relative h-48 rounded-xl border-2 border-slate-200 bg-white p-6 flex flex-col overflow-hidden">
+    {/* Email header bar */}
+    <div className="flex items-center gap-2 pb-4 border-b border-slate-200">
+      <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+      </div>
+      <div className="flex-1">
+        <div className="text-[13px] font-semibold text-slate-900">finance@nanowork.ai</div>
+        <div className="text-[11px] text-slate-500">Department agent</div>
+      </div>
+    </div>
+
+    {/* Email preview */}
+    <div className="mt-4 space-y-3">
+      <div className="flex items-start gap-2">
+        <div className="w-1.5 h-1.5 rounded-full bg-slate-900 mt-1.5" />
+        <div className="flex-1">
+          <div className="text-[12px] font-semibold text-slate-900 mb-0.5">Vendor Payment Processed</div>
+          <div className="text-[11px] text-slate-500">Payment to Shopify confirmed...</div>
+        </div>
+      </div>
+      <div className="flex items-start gap-2">
+        <div className="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5" />
+        <div className="flex-1">
+          <div className="text-[12px] font-medium text-slate-700 mb-0.5">Customer Invoice #1847</div>
+          <div className="text-[11px] text-slate-500">Invoice sent to customer...</div>
+        </div>
+      </div>
+      <div className="flex items-start gap-2">
+        <div className="w-1.5 h-1.5 rounded-full bg-slate-400 mt-1.5" />
+        <div className="flex-1">
+          <div className="text-[12px] font-medium text-slate-700 mb-0.5">Monthly Report Ready</div>
+          <div className="text-[11px] text-slate-500">Financial summary prepared...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Visual component for bank account
+const BankAccountVisual = () => (
+  <div className="relative h-48 rounded-xl border-2 border-slate-900 bg-slate-50 p-6 flex flex-col justify-between">
+    {/* Bank header */}
+    <div className="flex items-center justify-between">
+      <div>
+        <div className="text-[11px] font-semibold text-slate-500 mb-1">NANOWORK FINANCE</div>
+        <div className="text-[13px] font-bold text-slate-900">Operating Account</div>
+      </div>
+      <div className="w-10 h-10 rounded-lg bg-slate-900 flex items-center justify-center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </div>
+    </div>
+
+    {/* Balance */}
+    <div>
+      <div className="text-[11px] font-semibold text-slate-500 mb-1">AVAILABLE BALANCE</div>
+      <div className="text-[32px] font-bold text-slate-900 tracking-tight tabular-nums mb-4">
+        $234,567
+      </div>
+    </div>
+
+    {/* Account details */}
+    <div className="flex gap-6">
+      <div>
+        <div className="text-[9px] font-semibold text-slate-500 mb-0.5">ROUTING</div>
+        <div className="text-[11px] font-mono font-semibold text-slate-900">021000021</div>
+      </div>
+      <div>
+        <div className="text-[9px] font-semibold text-slate-500 mb-0.5">ACCOUNT</div>
+        <div className="text-[11px] font-mono font-semibold text-slate-900">•••• 4892</div>
+      </div>
+    </div>
+  </div>
+);
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+
+export default function Home() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 bg-surface-0/80 backdrop-blur-md border-b border-white/5">
-      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 text-white font-bold text-lg tracking-tight">
-          <span className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-sm">N</span>
-          Nanowork
-        </Link>
-        <div className="flex items-center gap-3">
-          {isAuthenticated ? (
-            <Link
-              to="/dashboard"
-              className="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-colors"
-            >
-              Dashboard
-            </Link>
-          ) : (
-            <>
-              <Link
-                to="/login"
-                className="text-sm text-zinc-400 hover:text-white transition-colors"
-              >
-                Sign in
+    <div className="min-h-screen bg-white text-slate-900">
+
+      {/* Nav */}
+      <header className="border-b border-slate-200">
+        <div className="max-w-5xl mx-auto px-6 flex items-center justify-between h-14">
+          <Link to="/" className="flex items-center gap-2.5 text-[15px] font-semibold text-slate-900">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M2 10H22" stroke="currentColor" strokeWidth="1.5"/>
+              <rect x="5" y="14" width="4" height="2" rx="0.5" fill="currentColor"/>
+            </svg>
+            Nanowork
+          </Link>
+          <nav className="flex items-center gap-6">
+            {isAuthenticated ? (
+              <Link to="/dashboard" className="text-[14px] text-slate-900 font-medium">
+                Dashboard
               </Link>
-              <Link
-                to="/login"
-                className="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-colors"
-              >
-                Get started
-              </Link>
-            </>
-          )}
+            ) : (
+              <>
+                <Link to="/login" className="text-[14px] text-slate-600 hover:text-slate-900 font-medium transition-colors">
+                  Sign in
+                </Link>
+                <Link to="/login" className="px-4 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-[14px] font-medium rounded transition-colors">
+                  Start
+                </Link>
+              </>
+            )}
+          </nav>
         </div>
-      </div>
-    </header>
-  );
-}
-
-/* ── Page ─────────────────────────────────────────────────── */
-
-export default function Home() {
-  return (
-    <div className="min-h-screen bg-surface-0 text-zinc-100">
-      <Nav />
+      </header>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-4 pt-16 pb-12">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          {/* Left: headline + prompt */}
-          <div className="animate-slide-up">
-            {/* Live pill */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-2 border border-white/10 text-xs text-zinc-400 mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse-dot" />
-              <span>47 agents running for Nanowork right now</span>
-              <span className="text-green-500 font-semibold">LIVE</span>
-            </div>
+      <main className="max-w-5xl mx-auto px-6">
 
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tight mb-5 text-balance">
-              What will you
-              <br />
-              <span className="bg-gradient-to-r from-brand-400 to-purple-400 bg-clip-text text-transparent">
-                build today?
-              </span>
-            </h1>
+        {/* Hero Section */}
+        <section className="pt-32 pb-20 text-center">
+          <h1 className="text-[72px] leading-[1.05] font-bold text-slate-900 tracking-[-0.04em] mb-8">
+            Your AI company
+          </h1>
 
-            <p className="text-zinc-400 text-lg leading-relaxed mb-8 text-balance">
-              Type one prompt. Get a full AI-run company — legal, brand, web, marketing,
-              sales, finance, and ops — all spinning up in parallel toward real revenue.
-            </p>
-
-            <PromptBox />
-          </div>
-
-          {/* Right: live feed */}
-          <div className="animate-fade-in">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse-dot" />
-              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
-                Live activity
-              </span>
-            </div>
-            <ActivityFeed />
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <StatStrip />
-
-      {/* How it works */}
-      <section className="max-w-6xl mx-auto px-4 py-20">
-        <div className="text-center mb-12">
-          <p className="text-xs font-semibold uppercase tracking-widest text-brand-400 mb-3">
-            How it works
+          <p className="text-[19px] text-slate-600 leading-relaxed mb-16 max-w-xl mx-auto font-medium">
+            Not bots. Real agents with their own cards, emails, and bank accounts. Building your business 24/7.
           </p>
-          <h2 className="text-3xl font-bold text-white mb-4">
-            From one line of intent to an earning system
-          </h2>
-          <p className="text-zinc-400 max-w-xl mx-auto text-balance">
-            You are not configuring integrations. You are giving a clear commercial thesis
-            and letting agents race to make it real.
-          </p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            {
-              num: "01",
-              title: "Drop the prompt",
-              body: "One coherent ask: who pays, for what, by when. Text is enough for agents to parallelize all seven departments simultaneously.",
-            },
-            {
-              num: "02",
-              title: "Subscribe at $99/mo",
-              body: "We align scope in-thread; you subscribe when the shape of the business feels right. No equity taken, no tier maze.",
-            },
-            {
-              num: "03",
-              title: "Watch the floor run",
-              body: "Filings, brand, site, campaigns, pipeline, books, runbooks — shipping toward revenue you can read on a dashboard.",
-            },
-          ].map((step) => (
-            <div
-              key={step.num}
-              className="p-6 rounded-2xl bg-surface-1 border border-white/5 hover:border-white/10 transition-colors"
-            >
-              <span className="text-xs font-mono font-bold text-brand-400">{step.num}</span>
-              <h3 className="text-lg font-semibold text-white mt-2 mb-2">{step.title}</h3>
-              <p className="text-sm text-zinc-400 leading-relaxed">{step.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
 
-      {/* Departments */}
-      <section className="bg-surface-1 border-y border-white/5 py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-400 mb-3">
-              The full company
-            </p>
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Seven agent departments. One prompt. All in parallel.
+          <PromptInput />
+        </section>
+
+        {/* What Makes This Real */}
+        <section className="py-24 border-t border-slate-200">
+          <div className="mb-16 text-center">
+            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.15em] mb-3">
+              How it works
+            </div>
+            <h2 className="text-[42px] font-semibold text-slate-900 tracking-[-0.025em] leading-tight mb-6">
+              Real agents.<br />Real infrastructure.
             </h2>
+            <p className="text-[17px] text-slate-600 leading-relaxed max-w-2xl mx-auto">
+              Every agent gets the tools they need to operate independently. No API calls. No middleware. Just autonomous execution with real financial instruments.
+            </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {DEPARTMENTS.map((d) => (
-              <div
-                key={d.label}
-                className="p-5 rounded-xl bg-surface-2 border border-white/5 hover:border-brand-500/30 hover:bg-surface-3 transition-all group"
-              >
-                <span className="text-2xl mb-3 block">{d.icon}</span>
-                <h3 className="font-semibold text-white mb-1.5 group-hover:text-brand-400 transition-colors">
-                  {d.label}
-                </h3>
-                <p className="text-xs text-zinc-500 leading-relaxed">{d.desc}</p>
+
+          <div className="grid lg:grid-cols-3 gap-6">
+            <InfrastructureCard
+              type="Financial Infrastructure"
+              title="Virtual payment cards"
+              description="Each agent receives a dedicated card with spending controls, real-time monitoring, and full audit trail for vendor payments and subscriptions."
+              visualComponent={<CardVisual />}
+            />
+
+            <InfrastructureCard
+              type="Communication Layer"
+              title="Dedicated email addresses"
+              description="Agents communicate from professional email addresses with automated inbox management, priority routing, and complete conversation history."
+              visualComponent={<EmailVisual />}
+            />
+
+            <InfrastructureCard
+              type="Banking Operations"
+              title="Department bank accounts"
+              description="Separate accounts for each department with real money movement, automated bookkeeping, and real-time balance transparency."
+              visualComponent={<BankAccountVisual />}
+            />
+          </div>
+
+        </section>
+
+        {/* Journey: Idea → Revenue → Unicorn */}
+        <section className="py-24 border-t border-slate-200">
+          <div className="mb-16">
+            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-[0.15em] mb-3">
+              Your path
+            </div>
+            <h2 className="text-[42px] font-semibold text-slate-900 tracking-[-0.025em] leading-tight mb-6">
+              From idea to unicorn
+            </h2>
+            <p className="text-[17px] text-slate-600 leading-relaxed max-w-2xl">
+              We handle the entire journey. Not just the build. Not just the launch. Everything it takes to go from zero to billion-dollar valuation.
+            </p>
+          </div>
+
+          <div className="space-y-1 max-w-3xl">
+            {/* Phase 1: Idea → Revenue */}
+            <div className="group relative p-8 border-2 border-slate-900 rounded-lg hover:bg-slate-50 transition-all">
+              <div className="flex items-start gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center text-[18px] font-bold">
+                    1
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="text-[24px] font-semibold text-slate-900 mb-3 tracking-tight">
+                    Idea → Revenue
+                  </div>
+                  <div className="text-[15px] text-slate-600 leading-relaxed mb-4">
+                    The hardest part. Most founders spend 18+ months here. We do it in days. Legal entity, brand identity, production website, go-to-market strategy, first customers, and revenue flowing.
+                  </div>
+                  <div className="flex items-center gap-6 text-[13px] text-slate-500 font-medium">
+                    <span>Day 1: Entity formed</span>
+                    <span>•</span>
+                    <span>Day 3: Website live</span>
+                    <span>•</span>
+                    <span>Week 1: First revenue</span>
+                  </div>
+                </div>
               </div>
-            ))}
-            {/* 8th card: CTA */}
-            <div className="p-5 rounded-xl bg-brand-600/10 border border-brand-500/20 hover:bg-brand-600/20 transition-all flex flex-col justify-between">
-              <p className="text-sm text-zinc-300 leading-relaxed flex-1">
-                All seven running at once — not a waterfall, not a suite of disconnected tools.
-              </p>
-              <Link
-                to="/login"
-                className="mt-4 text-sm font-semibold text-brand-400 hover:text-brand-300 transition-colors"
-              >
-                Start building →
-              </Link>
+            </div>
+
+            {/* Phase 2: Revenue → Scale */}
+            <div className="group relative p-8 border-2 border-slate-200 rounded-lg hover:border-slate-900 hover:bg-slate-50 transition-all">
+              <div className="flex items-start gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full border-2 border-slate-900 text-slate-900 flex items-center justify-center text-[18px] font-bold">
+                    2
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="text-[24px] font-semibold text-slate-900 mb-3 tracking-tight">
+                    Revenue → Scale
+                  </div>
+                  <div className="text-[15px] text-slate-600 leading-relaxed mb-4">
+                    Agents optimize every channel. Email, paid acquisition, partnerships, sales outreach. They test, iterate, and scale what works. While you sleep, they're acquiring customers and generating revenue.
+                  </div>
+                  <div className="flex items-center gap-6 text-[13px] text-slate-500 font-medium">
+                    <span>Month 3: $50K MRR</span>
+                    <span>•</span>
+                    <span>Month 6: $200K MRR</span>
+                    <span>•</span>
+                    <span>Month 12: $1M+ MRR</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Phase 3: Scale → Unicorn */}
+            <div className="group relative p-8 border-2 border-slate-200 rounded-lg hover:border-slate-900 hover:bg-slate-50 transition-all">
+              <div className="flex items-start gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full border-2 border-slate-900 text-slate-900 flex items-center justify-center text-[18px] font-bold">
+                    3
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <div className="text-[24px] font-semibold text-slate-900 mb-3 tracking-tight">
+                    Scale → Unicorn
+                  </div>
+                  <div className="text-[15px] text-slate-600 leading-relaxed mb-4">
+                    Your agents manage fundraising materials, investor relations, financial modeling, and operational excellence. They handle the complexity of hypergrowth while you focus on vision and strategy.
+                  </div>
+                  <div className="flex items-center gap-6 text-[13px] text-slate-500 font-medium">
+                    <span>Year 2: Series A ready</span>
+                    <span>•</span>
+                    <span>Year 3: $50M ARR</span>
+                    <span>•</span>
+                    <span>Year 5: Unicorn trajectory</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Pricing */}
-      <section className="max-w-6xl mx-auto px-4 py-20 text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-brand-400 mb-3">
-          Pricing
-        </p>
-        <div className="inline-flex items-baseline gap-1 mb-4">
-          <span className="text-7xl font-bold text-white">$99</span>
-          <span className="text-2xl text-zinc-500">/mo</span>
-        </div>
-        <p className="text-zinc-400 max-w-md mx-auto mb-8 text-balance">
-          One membership for an AI-run company across all seven departments. Cancel anytime.
-          No equity. No tier maze.
-        </p>
-        <Link
-          to="/login"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold transition-colors text-base"
-        >
-          Start for free
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        </Link>
-      </section>
+          {/* Supporting text */}
+          <div className="mt-16 p-8 border border-slate-200 rounded-lg bg-slate-50">
+            <div className="text-[15px] text-slate-600 leading-relaxed max-w-2xl mx-auto text-center">
+              <span className="font-semibold text-slate-900">You own everything.</span> The entity, the brand, the customers, the revenue, the equity. Agents work for you, not the other way around. This is your company. They just run it better than humans could.
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="py-24 text-center border-t border-slate-200">
+          <h2 className="text-[48px] font-semibold text-slate-900 tracking-[-0.03em] mb-6">
+            Start your journey
+          </h2>
+          <p className="text-[17px] text-slate-600 mb-10">
+            From zero to revenue in days. From revenue to unicorn with agents that never stop working.
+          </p>
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-slate-900 hover:bg-slate-800 text-white text-[15px] font-medium rounded-lg transition-colors"
+          >
+            Get started
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </section>
+
+      </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-8">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-600">
-          <span className="font-semibold text-zinc-400">Nanowork</span>
-          <span>© {new Date().getFullYear()} Nanowork. All rights reserved.</span>
-          <div className="flex gap-4">
-            <a href="#" className="hover:text-zinc-400 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-zinc-400 transition-colors">Terms</a>
+      <footer className="border-t border-slate-200 py-12">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="flex items-center justify-between text-[13px]">
+            <div className="text-slate-500">
+              © {new Date().getFullYear()} Nanowork
+            </div>
+            <div className="flex gap-8 text-slate-600">
+              <a href="#" className="hover:text-slate-900 transition-colors">Privacy</a>
+              <a href="#" className="hover:text-slate-900 transition-colors">Terms</a>
+              <a href="#" className="hover:text-slate-900 transition-colors">Docs</a>
+            </div>
           </div>
         </div>
       </footer>
