@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Rent from "./pages/Rent";
+import Revenue from "./pages/Revenue";
 import DashboardLayout from "./dashboard/DashboardLayout";
 import Overview from "./dashboard/Overview";
 import Domains from "./dashboard/Domains";
@@ -26,6 +27,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/rent" element={<Rent />} />
+      <Route path="/revenue" element={<Revenue />} />
       <Route
         path="/dashboard"
         element={
