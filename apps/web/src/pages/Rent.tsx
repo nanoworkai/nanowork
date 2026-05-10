@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { TopNav, SiteFooter } from "../components/SiteChrome";
 import type { RentItem, RentCategory } from "../types/rent";
 
@@ -100,6 +101,12 @@ function Hero({ onJoinWaitlist }: { onJoinWaitlist: () => void }) {
             className="px-8 py-3 border-2 border-slate-200 hover:border-slate-900 text-slate-900 text-sm font-medium rounded-xl transition-colors"
           >
             Browse Preview
+          </a>
+          <a
+            href="/rent/submit"
+            className="px-8 py-3 border-2 border-blue-200 bg-blue-50 hover:border-blue-600 text-blue-900 text-sm font-medium rounded-xl transition-colors"
+          >
+            List Your Resource
           </a>
         </div>
 
@@ -263,6 +270,7 @@ function RentCard({
   onJoinWaitlist: () => void;
   delay: number;
 }) {
+  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -272,7 +280,8 @@ function RentCard({
 
   return (
     <div
-      className={`group border-2 border-slate-200 rounded-2xl p-6 bg-white hover:border-slate-900 hover:shadow-lg transition-all duration-300 ${
+      onClick={() => navigate(`/rent/${item.slug}`)}
+      className={`group border-2 border-slate-200 rounded-2xl p-6 bg-white hover:border-slate-900 hover:shadow-lg transition-all duration-300 cursor-pointer ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       }`}
     >
@@ -323,7 +332,10 @@ function RentCard({
           </span>
         )}
         <button
-          onClick={onJoinWaitlist}
+          onClick={(e) => {
+            e.stopPropagation();
+            onJoinWaitlist();
+          }}
           className="ml-auto px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg transition-colors"
         >
           Notify Me

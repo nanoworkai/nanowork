@@ -1,307 +1,436 @@
-import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { DollarSign, Sparkles, ArrowRight, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, Check } from "lucide-react";
 
 export default function Revenue() {
+  const navigate = useNavigate();
+  const [revenue, setRevenue] = useState(2400000);
+  const [clients, setClients] = useState(847);
+  const [responseRate, setResponseRate] = useState(94);
   const [companyUrl, setCompanyUrl] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [rotation, setRotation] = useState({ x: 0, y: 0 });
-  const cardRef = useRef<HTMLDivElement>(null);
-  const dragOffset = useRef({ x: 0, y: 0 });
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Animate counters on mount
+  useEffect(() => {
+    const revenueInterval = setInterval(() => {
+      setRevenue(prev => prev + Math.floor(Math.random() * 1000));
+    }, 3000);
+
+    const clientsInterval = setInterval(() => {
+      setClients(prev => prev + 1);
+    }, 5000);
+
+    return () => {
+      clearInterval(revenueInterval);
+      clearInterval(clientsInterval);
+    };
+  }, []);
+
+  const handleAnalyze = (e: React.FormEvent) => {
     e.preventDefault();
     if (!companyUrl.trim()) return;
 
-    setIsProcessing(true);
-    // TODO: Integrate with backend
+    setIsAnalyzing(true);
+
+    // Simulate analysis then redirect
     setTimeout(() => {
-      console.log("Processing:", companyUrl);
-      setIsProcessing(false);
-    }, 2000);
+      navigate(`/login?redirect=/dashboard&url=${encodeURIComponent(companyUrl)}`);
+    }, 1500);
   };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (cardRef.current) {
-      setIsDragging(true);
-      const rect = cardRef.current.getBoundingClientRect();
-      dragOffset.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      };
-    }
-  };
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging && cardRef.current) {
-      const container = cardRef.current.parentElement;
-      if (container) {
-        const containerRect = container.getBoundingClientRect();
-        const newX = e.clientX - containerRect.left - dragOffset.current.x;
-        const newY = e.clientY - containerRect.top - dragOffset.current.y;
-        setCardPosition({ x: newX, y: newY });
-      }
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleCardHover = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isDragging || !cardRef.current) return;
-
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const rotateX = ((y - centerY) / centerY) * -10;
-    const rotateY = ((x - centerX) / centerX) * 10;
-
-    setRotation({ x: rotateX, y: rotateY });
-  };
-
-  const handleCardLeave = () => {
-    if (!isDragging) {
-      setRotation({ x: 0, y: 0 });
-    }
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [isDragging]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-950 via-slate-950 to-slate-950 relative overflow-hidden">
-      {/* Money-inspired animated background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-40 right-20 w-40 h-40 bg-green-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-yellow-500/10 rounded-full blur-2xl animate-pulse delay-500" />
-
-        {/* Dollar sign watermarks */}
-        <div className="absolute top-1/4 right-1/4 text-emerald-500/5 text-[200px] font-bold select-none">$</div>
-        <div className="absolute bottom-1/3 left-1/4 text-green-500/5 text-[150px] font-bold select-none">$</div>
-      </div>
+    <div className="min-h-screen bg-black text-white">
 
       {/* Nav */}
-      <header className="relative border-b border-white/5 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 via-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:shadow-emerald-500/40 transition-all">
-              <DollarSign className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className="text-white font-bold text-[15px] tracking-tight">Revenue</div>
-              <div className="text-emerald-400 text-[11px] font-medium">by Nanowork</div>
-            </div>
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 backdrop-blur-xl bg-black/50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link to="/" className="text-white font-semibold hover:opacity-70 transition-opacity text-[15px]">
+            Revenue
           </Link>
           <Link
             to="/"
-            className="text-sm text-zinc-400 hover:text-white transition-colors"
+            className="text-sm text-zinc-500 hover:text-white transition-colors"
           >
             Back to Home
           </Link>
         </div>
       </header>
 
-      {/* Hero */}
-      <main className="relative max-w-7xl mx-auto px-6 pt-16 pb-24">
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
 
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        {/* Animated Data Stream Background */}
+        <div className="absolute inset-0 overflow-hidden opacity-20">
+          {/* Grid pattern */}
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)
+            `,
+            backgroundSize: '80px 80px'
+          }} />
 
-          {/* Left: Interactive Credit Card */}
-          <div className="relative h-[600px] flex items-center justify-center perspective-1000">
+          {/* Flowing data lines */}
+          {[...Array(8)].map((_, i) => (
             <div
-              ref={cardRef}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleCardHover}
-              onMouseLeave={handleCardLeave}
+              key={i}
+              className="absolute h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent"
               style={{
-                transform: `translate(${cardPosition.x}px, ${cardPosition.y}px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
-                transition: isDragging ? 'none' : 'transform 0.3s ease-out',
-                cursor: isDragging ? 'grabbing' : 'grab'
+                top: `${15 + i * 12}%`,
+                width: '200%',
+                animation: `flowRight ${8 + i * 2}s linear infinite`,
+                animationDelay: `${i * 0.5}s`,
+                opacity: 0.3,
               }}
-              className="relative w-[420px] h-[260px] rounded-2xl preserve-3d select-none"
-            >
-              {/* Glow effect */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-400 rounded-3xl opacity-40 blur-2xl" />
+            />
+          ))}
+        </div>
 
-              {/* Credit card */}
-              <div className="relative w-full h-full bg-gradient-to-br from-emerald-400 via-green-500 to-emerald-600 rounded-2xl shadow-2xl overflow-hidden">
+        {/* Content */}
+        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
 
-                {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-50" />
+          <h1 className="text-[96px] md:text-[120px] font-black tracking-[-0.04em] leading-[0.9] mb-8">
+            From link to revenue
+            <br />
+            <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
+              in 48 hours
+            </span>
+          </h1>
 
-                {/* Metallic chip */}
-                <div className="absolute top-16 left-8 w-14 h-11 rounded-lg bg-gradient-to-br from-yellow-200 via-yellow-300 to-yellow-400 shadow-lg overflow-hidden">
-                  <div className="grid grid-cols-3 grid-rows-3 h-full p-1 gap-0.5">
-                    {Array.from({ length: 9 }).map((_, i) => (
-                      <div key={i} className="bg-yellow-500/30 rounded-sm" />
-                    ))}
-                  </div>
-                </div>
+          <p className="text-[24px] text-zinc-400 max-w-3xl mx-auto mb-16 leading-relaxed font-light">
+            AI finds customers. AI researches. AI sends outreach.
+            <br />
+            You close deals.
+          </p>
 
-                {/* Logo */}
-                <div className="absolute top-8 right-8 flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-white font-bold text-sm">
-                    <div className="tracking-wider">REVENUE</div>
-                    <div className="text-[10px] opacity-80">NANOWORK</div>
-                  </div>
-                </div>
-
-                {/* Card number */}
-                <div className="absolute top-32 left-8 right-8">
-                  <div className="text-white text-2xl font-mono tracking-[0.25em] mb-6 drop-shadow-lg">
-                    •••• •••• •••• 7849
-                  </div>
-                </div>
-
-                {/* Card details */}
-                <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end">
-                  <div>
-                    <div className="text-white/70 text-[10px] font-semibold uppercase tracking-wider mb-1">
-                      Cardholder
-                    </div>
-                    <div className="text-white font-semibold tracking-wide text-sm">
-                      AI REVENUE AGENT
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-white/70 text-[10px] font-semibold uppercase tracking-wider mb-1">
-                      Expires
-                    </div>
-                    <div className="text-white font-semibold tracking-wide text-sm font-mono">
-                      12/29
-                    </div>
-                  </div>
-
-                  {/* Card network */}
-                  <div className="flex -space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-white/90" />
-                    <div className="w-8 h-8 rounded-full bg-white/70" />
-                  </div>
-                </div>
-
-                {/* Contactless symbol */}
-                <div className="absolute top-16 right-8">
-                  <div className="relative w-6 h-6">
-                    <div className="absolute inset-0 border-2 border-white/40 rounded-full" />
-                    <div className="absolute inset-0.5 border-2 border-white/30 rounded-full" />
-                    <div className="absolute inset-1 border-2 border-white/20 rounded-full" />
-                    <div className="absolute inset-1.5 border-2 border-white/10 rounded-full" />
-                  </div>
-                </div>
-
-                {/* Holographic pattern overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent opacity-50 pointer-events-none" />
-              </div>
-            </div>
-          </div>
-
-          {/* Right: Content */}
-          <div className="space-y-8">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-sm text-emerald-300">
-              <Sparkles className="w-4 h-4" />
-              AI-Powered Customer Acquisition
-            </div>
-
-            {/* Title */}
-            <div>
-              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight leading-[1.1]">
-                Turn your link into
-                <br />
-                <span className="bg-gradient-to-r from-emerald-400 via-green-400 to-emerald-500 bg-clip-text text-transparent">
-                  revenue
-                </span>
-              </h1>
-
-              {/* Subtitle */}
-              <p className="text-xl text-zinc-300 leading-relaxed">
-                Already have a company? Bring your link. Our AI finds your ideal customers,
-                researches their needs, and sends personalized outreach—automatically.
-              </p>
-            </div>
-
-            {/* Input form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="relative flex-1">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl opacity-20 blur transition-opacity" />
-                  <input
-                    type="url"
-                    value={companyUrl}
-                    onChange={(e) => setCompanyUrl(e.target.value)}
-                    placeholder="https://yourcompany.com"
-                    className="relative w-full bg-zinc-900/90 backdrop-blur-xl text-white placeholder:text-zinc-500 px-6 py-4 rounded-xl border border-emerald-500/20 focus:border-emerald-500/50 focus:outline-none text-lg transition-colors"
-                    required
-                  />
-                </div>
+          {/* Try It Now Input */}
+          <div className="max-w-3xl mx-auto mb-20">
+            <form onSubmit={handleAnalyze} className="relative">
+              <div className="flex items-center gap-4 p-3 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 focus-within:border-white/30 transition-all">
+                <input
+                  type="url"
+                  value={companyUrl}
+                  onChange={(e) => setCompanyUrl(e.target.value)}
+                  placeholder="Paste your company URL to get started"
+                  className="flex-1 bg-transparent text-white placeholder:text-zinc-600 text-lg px-6 py-3 outline-none"
+                  disabled={isAnalyzing}
+                />
                 <button
                   type="submit"
-                  disabled={isProcessing}
-                  className="px-8 py-4 bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-600 hover:from-emerald-600 hover:via-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 whitespace-nowrap"
+                  disabled={isAnalyzing || !companyUrl.trim()}
+                  className="group px-8 py-3 bg-white hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed text-black font-semibold rounded-full flex items-center gap-2 transition-all flex-shrink-0"
                 >
-                  {isProcessing ? (
+                  {isAnalyzing ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Processing
+                      <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                      Analyzing
                     </>
                   ) : (
                     <>
                       Start
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
                 </button>
               </div>
-              <p className="text-sm text-zinc-500">
-                💵 No credit card required • Free analysis • Results in minutes
+              <p className="text-center text-zinc-600 text-sm mt-4">
+                Free analysis • No credit card required
               </p>
             </form>
+          </div>
 
-            {/* Key features */}
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <div className="p-4 rounded-xl bg-white/5 border border-emerald-500/20">
-                <div className="text-emerald-400 font-bold text-2xl mb-1">24/7</div>
-                <div className="text-sm text-zinc-400">Always finding customers</div>
+          {/* Live Metrics Strip */}
+          <div className="flex items-center justify-center gap-16 pt-12 border-t border-white/5">
+            <div className="text-center">
+              <div className="text-[36px] font-bold mb-1 tabular-nums">
+                ${(revenue / 1000000).toFixed(1)}M
               </div>
-              <div className="p-4 rounded-xl bg-white/5 border border-emerald-500/20">
-                <div className="text-emerald-400 font-bold text-2xl mb-1">&lt; 48h</div>
-                <div className="text-sm text-zinc-400">To first customer</div>
+              <div className="text-[13px] text-zinc-600 uppercase tracking-wider">
+                Revenue Generated
               </div>
-              <div className="p-4 rounded-xl bg-white/5 border border-emerald-500/20">
-                <div className="flex items-center gap-2 mb-1">
-                  <Zap className="w-5 h-5 text-emerald-400" />
-                  <div className="text-emerald-400 font-bold text-xl">AI Agents</div>
-                </div>
-                <div className="text-sm text-zinc-400">Research & outreach</div>
+            </div>
+
+            <div className="w-px h-16 bg-white/10" />
+
+            <div className="text-center">
+              <div className="text-[36px] font-bold mb-1 tabular-nums">
+                {clients.toLocaleString()}
               </div>
-              <div className="p-4 rounded-xl bg-white/5 border border-emerald-500/20">
-                <div className="text-emerald-400 font-bold text-2xl mb-1">+143%</div>
-                <div className="text-sm text-zinc-400">Avg revenue increase</div>
+              <div className="text-[13px] text-zinc-600 uppercase tracking-wider">
+                Active Clients
+              </div>
+            </div>
+
+            <div className="w-px h-16 bg-white/10" />
+
+            <div className="text-center">
+              <div className="text-[36px] font-bold mb-1 tabular-nums">
+                {responseRate}%
+              </div>
+              <div className="text-[13px] text-zinc-600 uppercase tracking-wider">
+                Response Rate
+              </div>
+            </div>
+
+            <div className="w-px h-16 bg-white/10" />
+
+            <div className="text-center">
+              <div className="text-[36px] font-bold mb-1">
+                &lt; 12h
+              </div>
+              <div className="text-[13px] text-zinc-600 uppercase tracking-wider">
+                First Lead
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* How It Works - Horizontal Timeline */}
+      <section className="relative py-32 border-t border-white/5">
+        <div className="max-w-6xl mx-auto px-6">
+
+          <div className="text-center mb-24">
+            <h2 className="text-[64px] font-bold tracking-tight leading-[1.1] mb-6">
+              How it works
+            </h2>
+            <p className="text-[20px] text-zinc-500 max-w-3xl mx-auto leading-relaxed font-light">
+              Three steps. Fully automated. Results in days.
+            </p>
+          </div>
+
+          <div className="space-y-0">
+
+            {/* Step 1 */}
+            <div className="group relative flex items-start gap-12 py-16 border-b border-white/5 hover:border-emerald-500/20 transition-all">
+              <div className="text-[120px] font-black text-white/5 leading-none group-hover:text-white/10 transition-colors flex-shrink-0">
+                01
+              </div>
+              <div className="flex-1 pt-8">
+                <h3 className="text-[40px] font-bold tracking-tight mb-6">
+                  Paste your link
+                </h3>
+                <p className="text-zinc-400 text-[20px] leading-relaxed max-w-2xl">
+                  Drop in your company URL. Our AI analyzes your product, market, and ideal customer profile in minutes.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="group relative flex items-start gap-12 py-16 border-b border-white/5 hover:border-emerald-500/20 transition-all">
+              <div className="text-[120px] font-black text-white/5 leading-none group-hover:text-white/10 transition-colors flex-shrink-0">
+                02
+              </div>
+              <div className="flex-1 pt-8">
+                <h3 className="text-[40px] font-bold tracking-tight mb-6">
+                  AI research begins
+                </h3>
+                <p className="text-zinc-400 text-[20px] leading-relaxed max-w-2xl">
+                  Seven research agents scan millions of companies, filter for perfect fit, and deep-dive on needs and pain points.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="group relative flex items-start gap-12 py-16 hover:border-emerald-500/20 transition-all">
+              <div className="text-[120px] font-black text-white/5 leading-none group-hover:text-white/10 transition-colors flex-shrink-0">
+                03
+              </div>
+              <div className="flex-1 pt-8">
+                <h3 className="text-[40px] font-bold tracking-tight mb-6">
+                  Personalized outreach at scale
+                </h3>
+                <p className="text-zinc-400 text-[20px] leading-relaxed max-w-2xl">
+                  Custom emails written per prospect. Sent from your domain. Replies forwarded to you instantly.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Live Results Ticker */}
+      <section className="relative py-20 border-y border-white/5 bg-white/[0.01] overflow-hidden">
+        <div className="max-w-6xl mx-auto px-6">
+          <h3 className="text-center text-[32px] font-bold mb-8">
+            Companies are closing deals right now
+          </h3>
+
+          {/* Scrolling ticker */}
+          <div className="relative overflow-hidden">
+            <div className="flex gap-12 animate-scroll-left">
+              {[
+                "TechCorp closed $24k deal • 2m ago",
+                "StartupXYZ got 47 replies • 14m ago",
+                "SaaSCo booked 12 demos • 31m ago",
+                "DataFlow landed enterprise client • 1h ago",
+                "CloudSync hit $100k ARR • 3h ago",
+                "APIFirst got 89 qualified leads • 5h ago",
+                // Duplicate for seamless loop
+                "TechCorp closed $24k deal • 2m ago",
+                "StartupXYZ got 47 replies • 14m ago",
+                "SaaSCo booked 12 demos • 31m ago",
+              ].map((text, i) => (
+                <div key={i} className="flex-shrink-0 px-8 py-4 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-sm whitespace-nowrap">
+                  {text}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* The Problem - Bold Statement */}
+      <section className="relative py-32">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+
+          <h2 className="text-[64px] md:text-[80px] font-bold tracking-tight leading-[1.1] mb-12">
+            Most companies waste 6 months
+            <br />
+            finding their first 10 customers
+          </h2>
+
+          <h3 className="text-[64px] md:text-[80px] font-bold tracking-tight leading-[1.1] mb-20">
+            <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
+              We do it in 2 days.
+            </span>
+          </h3>
+
+          {/* Comparison */}
+          <div className="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto pt-12 border-t border-white/5">
+            <div className="text-left space-y-4">
+              <div className="text-zinc-600 text-sm uppercase tracking-wider mb-2">Traditional</div>
+              <div className="text-[48px] font-bold text-zinc-700">180 days</div>
+              <div className="text-zinc-500 text-lg">to 10 customers</div>
+            </div>
+            <div className="text-left space-y-4">
+              <div className="text-emerald-400 text-sm uppercase tracking-wider mb-2">Revenue</div>
+              <div className="text-[48px] font-bold">2 days</div>
+              <div className="text-zinc-400 text-lg">to 10 customers</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing - Transparent Single Tier */}
+      <section className="relative py-32 border-t border-white/5">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+
+          <div className="text-[96px] font-black mb-6">
+            $997<span className="text-zinc-700">/month</span>
+          </div>
+
+          <p className="text-[24px] text-zinc-400 mb-16 leading-relaxed">
+            Unlimited outreach. Unlimited leads. Cancel anytime.
+            <br />
+            <span className="text-white font-medium">Results guaranteed.</span>
+          </p>
+
+          {/* Value Props */}
+          <div className="space-y-4 max-w-2xl mx-auto mb-16 text-left">
+            {[
+              "Unlimited AI research agents",
+              "Unlimited emails sent",
+              "Your domain, your brand",
+              "CRM integration included",
+              "Dedicated success manager",
+              "White-glove onboarding",
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-4 text-[18px]">
+                <Check className="w-6 h-6 text-emerald-400 flex-shrink-0" />
+                <span className="text-zinc-300">{item}</span>
+              </div>
+            ))}
+          </div>
+
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-3 px-12 py-6 bg-white hover:bg-zinc-100 text-black font-semibold rounded-full transition-all text-[18px]"
+          >
+            Start free trial
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+
+          <p className="text-zinc-600 text-sm mt-6">
+            14 days free
+          </p>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative py-32 border-t border-white/5">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+
+          <h2 className="text-[72px] md:text-[96px] font-bold tracking-tight leading-[1.1] mb-16">
+            Ready to start?
+          </h2>
+
+          {/* Try It Now Input - Bottom */}
+          <div className="max-w-3xl mx-auto">
+            <form onSubmit={handleAnalyze} className="relative">
+              <div className="flex items-center gap-4 p-3 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 focus-within:border-white/30 transition-all">
+                <input
+                  type="url"
+                  value={companyUrl}
+                  onChange={(e) => setCompanyUrl(e.target.value)}
+                  placeholder="Enter your company URL"
+                  className="flex-1 bg-transparent text-white placeholder:text-zinc-600 text-lg px-6 py-3 outline-none"
+                  disabled={isAnalyzing}
+                />
+                <button
+                  type="submit"
+                  disabled={isAnalyzing || !companyUrl.trim()}
+                  className="group px-8 py-3 bg-white hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed text-black font-semibold rounded-full flex items-center gap-2 transition-all flex-shrink-0"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                      Analyzing
+                    </>
+                  ) : (
+                    <>
+                      Analyze
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </button>
+              </div>
+              <p className="text-center text-zinc-600 text-sm mt-4">
+                Free • No signup required
+              </p>
+            </form>
+          </div>
 
         </div>
-      </main>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/5 py-12">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between text-sm text-zinc-600">
+          <div>© 2026 Nanowork</div>
+          <div className="flex gap-8">
+            <a href="#" className="hover:text-white transition-colors">Terms</a>
+            <a href="#" className="hover:text-white transition-colors">Privacy</a>
+            <a href="#" className="hover:text-white transition-colors">Docs</a>
+          </div>
+        </div>
+      </footer>
+
+      {/* Animations */}
+      <style>{`
+        @keyframes flowRight {
+          from { transform: translateX(-100%); }
+          to { transform: translateX(100%); }
+        }
+        @keyframes scroll-left {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        .animate-scroll-left {
+          animation: scroll-left 40s linear infinite;
+        }
+      `}</style>
     </div>
   );
 }
