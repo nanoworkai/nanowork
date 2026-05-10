@@ -1,7 +1,6 @@
 import { Hono } from 'hono'
 import type { Env } from '../index'
 import { getSupabase } from '../lib/supabase'
-import { getPhone } from '../middleware/auth'
 
 const app = new Hono<{ Bindings: Env }>()
 
@@ -102,22 +101,16 @@ app.post('/', async (c) => {
   const sb = getSupabase(c.env)
 
   // Require authentication
-  let phone: string
-  try {
-    phone = await getPhone(c)
-  } catch (e) {
-    return c.json({ error: String(e) }, 401)
+  const authHeader = c.req.header('Authorization')
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ error: 'Missing authorization token' }, 401)
   }
 
-  // Get user ID from phone
-  const { data: user } = await sb
-    .from('profiles')
-    .select('id')
-    .eq('phone', phone)
-    .maybeSingle()
+  const token = authHeader.slice(7)
+  const { data: { user }, error: authError } = await sb.auth.getUser(token)
 
-  if (!user) {
-    return c.json({ error: 'User not found' }, 404)
+  if (authError || !user) {
+    return c.json({ error: 'Invalid token' }, 401)
   }
 
   try {
@@ -192,22 +185,16 @@ app.patch('/:id', async (c) => {
   const sb = getSupabase(c.env)
 
   // Require authentication
-  let phone: string
-  try {
-    phone = await getPhone(c)
-  } catch (e) {
-    return c.json({ error: String(e) }, 401)
+  const authHeader = c.req.header('Authorization')
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ error: 'Missing authorization token' }, 401)
   }
 
-  // Get user ID
-  const { data: user } = await sb
-    .from('profiles')
-    .select('id')
-    .eq('phone', phone)
-    .maybeSingle()
+  const token = authHeader.slice(7)
+  const { data: { user }, error: authError } = await sb.auth.getUser(token)
 
-  if (!user) {
-    return c.json({ error: 'User not found' }, 404)
+  if (authError || !user) {
+    return c.json({ error: 'Invalid token' }, 401)
   }
 
   const id = c.req.param('id')
@@ -271,22 +258,16 @@ app.delete('/:id', async (c) => {
   const sb = getSupabase(c.env)
 
   // Require authentication
-  let phone: string
-  try {
-    phone = await getPhone(c)
-  } catch (e) {
-    return c.json({ error: String(e) }, 401)
+  const authHeader = c.req.header('Authorization')
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ error: 'Missing authorization token' }, 401)
   }
 
-  // Get user ID
-  const { data: user } = await sb
-    .from('profiles')
-    .select('id')
-    .eq('phone', phone)
-    .maybeSingle()
+  const token = authHeader.slice(7)
+  const { data: { user }, error: authError } = await sb.auth.getUser(token)
 
-  if (!user) {
-    return c.json({ error: 'User not found' }, 404)
+  if (authError || !user) {
+    return c.json({ error: 'Invalid token' }, 401)
   }
 
   const id = c.req.param('id')

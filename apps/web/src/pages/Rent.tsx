@@ -157,16 +157,23 @@ function RentGrid({ onJoinWaitlist }: { onJoinWaitlist: (itemId?: string) => voi
   async function fetchItems() {
     setLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8787';
       const url = filter === "all"
-        ? `${apiUrl}/api/rent`
-        : `${apiUrl}/api/rent?category=${filter}`;
+        ? `/api/rent`
+        : `/api/rent?category=${filter}`;
 
       const res = await fetch(url);
+
+      if (!res.ok) {
+        console.error("API returned error:", res.status);
+        setItems([]);
+        return;
+      }
+
       const json = await res.json();
       setItems(json.data ?? []);
     } catch (err) {
       console.error("Failed to fetch rent items:", err);
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -411,8 +418,7 @@ function WaitlistModal({
     setError("");
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8787';
-      const res = await fetch(`${apiUrl}/api/rent/waitlist`, {
+      const res = await fetch(`/api/rent/waitlist`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
