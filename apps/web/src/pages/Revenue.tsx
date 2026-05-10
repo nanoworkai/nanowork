@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, DollarSign } from "lucide-react";
 
 export default function Revenue() {
   const navigate = useNavigate();
   const [revenue, setRevenue] = useState(2400000);
   const [clients, setClients] = useState(847);
-  const [responseRate, setResponseRate] = useState(94);
   const [companyUrl, setCompanyUrl] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -32,98 +31,388 @@ export default function Revenue() {
 
     setIsAnalyzing(true);
 
-    // Simulate analysis then redirect
     setTimeout(() => {
       navigate(`/login?redirect=/dashboard&url=${encodeURIComponent(companyUrl)}`);
     }, 1500);
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-[#0a1f0f] text-white relative overflow-hidden">
 
-      {/* Nav */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 backdrop-blur-xl bg-black/50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="text-white font-semibold hover:opacity-70 transition-opacity text-[15px]">
-            Revenue
-          </Link>
-          <Link
-            to="/"
-            className="text-sm text-zinc-500 hover:text-white transition-colors"
-          >
-            Back to Home
-          </Link>
+      {/* Dollar Bill Texture & Patterns */}
+      <div className="fixed inset-0 opacity-[0.03] pointer-events-none" style={{
+        backgroundImage: `
+          repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px),
+          repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)
+        `,
+        backgroundSize: '100px 100px'
+      }} />
+
+      {/* Guilloche Pattern Background */}
+      <div className="fixed inset-0 opacity-[0.02] pointer-events-none">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="guilloche" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+              <circle cx="100" cy="100" r="80" fill="none" stroke="#10b981" strokeWidth="0.5" opacity="0.3"/>
+              <circle cx="100" cy="100" r="60" fill="none" stroke="#10b981" strokeWidth="0.5" opacity="0.3"/>
+              <circle cx="100" cy="100" r="40" fill="none" stroke="#10b981" strokeWidth="0.5" opacity="0.3"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#guilloche)" />
+        </svg>
+      </div>
+
+      {/* Watermark - Large "REVENUE" */}
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[300px] font-serif font-bold text-emerald-950/20 select-none pointer-events-none tracking-wider">
+        REVENUE
+      </div>
+
+      {/* Nav with Serial Number Style */}
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-emerald-900/30 backdrop-blur-xl bg-[#0a1f0f]/90">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full border-2 border-emerald-500 flex items-center justify-center bg-emerald-950/50">
+                <DollarSign className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <div className="text-emerald-400 font-serif font-bold text-lg tracking-wider">REVENUE</div>
+                <div className="text-[10px] text-emerald-700 font-mono tracking-widest">SERIES 2026</div>
+              </div>
+            </div>
+            <Link
+              to="/"
+              className="text-sm text-emerald-600 hover:text-emerald-400 transition-colors font-mono tracking-wider"
+            >
+              RETURN
+            </Link>
+          </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      {/* Hero Section - Dollar Bill Style */}
+      <section className="relative min-h-screen flex items-center justify-center pt-20 px-6">
 
-        {/* Animated Data Stream Background */}
-        <div className="absolute inset-0 overflow-hidden opacity-20">
-          {/* Grid pattern */}
-          <div className="absolute inset-0" style={{
-            backgroundImage: `
-              linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)
-            `,
-            backgroundSize: '80px 80px'
-          }} />
+        {/* Ornate Corner Decorations */}
+        <div className="absolute top-32 left-8 w-24 h-24 border-t-2 border-l-2 border-emerald-800/40 rounded-tl-3xl" />
+        <div className="absolute top-32 right-8 w-24 h-24 border-t-2 border-r-2 border-emerald-800/40 rounded-tr-3xl" />
+        <div className="absolute bottom-32 left-8 w-24 h-24 border-b-2 border-l-2 border-emerald-800/40 rounded-bl-3xl" />
+        <div className="absolute bottom-32 right-8 w-24 h-24 border-b-2 border-r-2 border-emerald-800/40 rounded-br-3xl" />
 
-          {/* Flowing data lines */}
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent"
-              style={{
-                top: `${15 + i * 12}%`,
-                width: '200%',
-                animation: `flowRight ${8 + i * 2}s linear infinite`,
-                animationDelay: `${i * 0.5}s`,
-                opacity: 0.3,
-              }}
-            />
-          ))}
-        </div>
+        <div className="max-w-6xl mx-auto text-center relative z-10">
 
-        {/* Content */}
-        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
+          {/* Serial Number Top */}
+          <div className="font-mono text-emerald-600/50 text-sm tracking-[0.3em] mb-8">
+            NO. R2026847293
+          </div>
 
-          <h1 className="text-[96px] md:text-[120px] font-black tracking-[-0.04em] leading-[0.9] mb-8">
-            From link to revenue
+          {/* Official Seal Badge */}
+          <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full border-2 border-emerald-600/30 bg-emerald-950/30 text-emerald-400 text-sm font-serif mb-8 backdrop-blur-sm">
+            <div className="w-6 h-6 rounded-full border-2 border-emerald-500 flex items-center justify-center">
+              <Check className="w-3 h-3" />
+            </div>
+            CERTIFIED REVENUE SYSTEM
+          </div>
+
+          {/* Main Headline - Dollar Bill Style */}
+          <h1 className="text-[80px] md:text-[110px] font-serif font-bold tracking-tight leading-[0.9] mb-8 text-emerald-50">
+            IN REVENUE
             <br />
-            <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
-              in 48 hours
+            <span className="text-transparent bg-gradient-to-r from-emerald-300 via-emerald-400 to-emerald-500 bg-clip-text">
+              WE TRUST
             </span>
           </h1>
 
-          <p className="text-[24px] text-zinc-400 max-w-3xl mx-auto mb-16 leading-relaxed font-light">
-            AI finds customers. AI researches. AI sends outreach.
+          <p className="text-[20px] text-emerald-200/80 max-w-3xl mx-auto mb-12 leading-relaxed font-light">
+            Backed by artificial intelligence. Redeemable for real customers.
             <br />
-            You close deals.
+            Legal tender for building your business.
           </p>
 
-          {/* Try It Now Input */}
-          <div className="max-w-3xl mx-auto mb-20">
+          {/* Try It Input - Premium Currency Style */}
+          <div className="max-w-3xl mx-auto mb-16">
             <form onSubmit={handleAnalyze} className="relative">
-              <div className="flex items-center gap-4 p-3 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 focus-within:border-white/30 transition-all">
+              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-full blur opacity-20" />
+              <div className="relative flex items-center gap-3 p-2 bg-emerald-950/50 backdrop-blur-xl rounded-full border-2 border-emerald-600/30">
                 <input
                   type="url"
                   value={companyUrl}
                   onChange={(e) => setCompanyUrl(e.target.value)}
-                  placeholder="Paste your company URL to get started"
-                  className="flex-1 bg-transparent text-white placeholder:text-zinc-600 text-lg px-6 py-3 outline-none"
+                  placeholder="Deposit your company URL"
+                  className="flex-1 bg-transparent text-emerald-100 placeholder:text-emerald-700 text-lg px-6 py-4 outline-none font-light"
                   disabled={isAnalyzing}
                 />
                 <button
                   type="submit"
                   disabled={isAnalyzing || !companyUrl.trim()}
-                  className="group px-8 py-3 bg-white hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed text-black font-semibold rounded-full flex items-center gap-2 transition-all flex-shrink-0"
+                  className="group px-8 py-4 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-[#0a1f0f] font-semibold rounded-full flex items-center gap-2 transition-all flex-shrink-0 shadow-lg shadow-emerald-500/20"
                 >
                   {isAnalyzing ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-[#0a1f0f]/20 border-t-[#0a1f0f] rounded-full animate-spin" />
                       Analyzing
+                    </>
+                  ) : (
+                    <>
+                      Redeem
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+            <p className="text-center text-emerald-700 text-xs mt-4 font-mono tracking-wider uppercase">
+              Backed by AI • Full faith and credit
+            </p>
+          </div>
+
+          {/* Stats - Currency Note Style */}
+          <div className="grid grid-cols-4 gap-8 pt-12 border-t-2 border-emerald-900/30">
+            <div className="text-center">
+              <div className="font-serif text-[32px] font-bold text-emerald-400 mb-1 tabular-nums">
+                ${(revenue / 1000000).toFixed(1)}M
+              </div>
+              <div className="text-[11px] text-emerald-700 uppercase tracking-widest font-mono">
+                Issued
+              </div>
+            </div>
+
+            <div className="text-center">
+              <div className="font-serif text-[32px] font-bold text-emerald-400 mb-1 tabular-nums">
+                {clients.toLocaleString()}
+              </div>
+              <div className="text-[11px] text-emerald-700 uppercase tracking-widest font-mono">
+                Holders
+              </div>
+            </div>
+
+            <div className="text-center">
+              <div className="font-serif text-[32px] font-bold text-emerald-400 mb-1">
+                48H
+              </div>
+              <div className="text-[11px] text-emerald-700 uppercase tracking-widest font-mono">
+                Maturity
+              </div>
+            </div>
+
+            <div className="text-center">
+              <div className="font-serif text-[32px] font-bold text-emerald-400 mb-1">
+                AAA
+              </div>
+              <div className="text-[11px] text-emerald-700 uppercase tracking-widest font-mono">
+                Rating
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works - Official Certificate Style */}
+      <section className="relative py-32 border-t-2 border-emerald-900/30">
+        <div className="max-w-6xl mx-auto px-6">
+
+          <div className="text-center mb-24">
+            <div className="inline-block px-6 py-2 border-2 border-emerald-600/30 rounded-full mb-6 bg-emerald-950/30">
+              <span className="text-emerald-400 text-sm font-mono tracking-widest uppercase">Specification</span>
+            </div>
+            <h2 className="text-[56px] font-serif font-bold tracking-tight leading-[1.1] text-emerald-50">
+              Denomination Details
+            </h2>
+          </div>
+
+          <div className="space-y-0">
+
+            {/* Step 1 */}
+            <div className="group relative border-b-2 border-emerald-900/20 pb-12 mb-12">
+              <div className="flex items-start gap-12">
+                <div className="flex-shrink-0">
+                  <div className="w-20 h-20 rounded-full border-4 border-emerald-600/30 bg-emerald-950/50 flex items-center justify-center">
+                    <span className="text-[32px] font-serif font-bold text-emerald-400">1</span>
+                  </div>
+                </div>
+                <div className="flex-1 pt-4">
+                  <h3 className="text-[36px] font-serif font-bold text-emerald-100 mb-4 tracking-tight">
+                    Initial Deposit
+                  </h3>
+                  <p className="text-emerald-300/70 text-[18px] leading-relaxed max-w-2xl">
+                    Provide your company URL. Our AI treasury analyzes your market position, product value, and ideal customer portfolio.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="group relative border-b-2 border-emerald-900/20 pb-12 mb-12">
+              <div className="flex items-start gap-12">
+                <div className="flex-shrink-0">
+                  <div className="w-20 h-20 rounded-full border-4 border-emerald-600/30 bg-emerald-950/50 flex items-center justify-center">
+                    <span className="text-[32px] font-serif font-bold text-emerald-400">2</span>
+                  </div>
+                </div>
+                <div className="flex-1 pt-4">
+                  <h3 className="text-[36px] font-serif font-bold text-emerald-100 mb-4 tracking-tight">
+                    Asset Verification
+                  </h3>
+                  <p className="text-emerald-300/70 text-[18px] leading-relaxed max-w-2xl">
+                    Seven research agents audit millions of prospects, verify market fit, and authenticate needs against your offering.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="group relative pb-12">
+              <div className="flex items-start gap-12">
+                <div className="flex-shrink-0">
+                  <div className="w-20 h-20 rounded-full border-4 border-emerald-600/30 bg-emerald-950/50 flex items-center justify-center">
+                    <span className="text-[32px] font-serif font-bold text-emerald-400">3</span>
+                  </div>
+                </div>
+                <div className="flex-1 pt-4">
+                  <h3 className="text-[36px] font-serif font-bold text-emerald-100 mb-4 tracking-tight">
+                    Revenue Distribution
+                  </h3>
+                  <p className="text-emerald-300/70 text-[18px] leading-relaxed max-w-2xl">
+                    Personalized outreach issued at scale. Custom notes per prospect. Delivered from your domain. Replies forwarded instantly.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Value Proposition - Visual Chart */}
+      <section className="relative py-32 border-y-2 border-emerald-900/30 bg-emerald-950/20">
+        <div className="max-w-6xl mx-auto px-6">
+
+          <div className="text-center mb-16">
+            <h2 className="text-[56px] font-serif font-bold tracking-tight leading-[1.1] text-emerald-50 mb-4">
+              Time to 10 customers
+            </h2>
+          </div>
+
+          {/* Visual Bar Chart */}
+          <div className="max-w-5xl mx-auto space-y-12">
+
+            {/* Traditional - Long Bar */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-emerald-600 font-mono text-sm tracking-wider uppercase">Traditional</span>
+                <span className="text-emerald-900 text-[36px] font-serif font-bold">180 days</span>
+              </div>
+              <div className="h-16 bg-emerald-950/50 border-2 border-emerald-900/30 rounded-lg overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-emerald-900/50 to-emerald-800/30 w-full flex items-center justify-end px-6">
+                  <span className="text-emerald-700 font-mono text-xs tracking-wider">6 MONTHS</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Revenue - Short Bar */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-emerald-400 font-mono text-sm tracking-wider uppercase">Revenue</span>
+                <span className="text-emerald-400 text-[36px] font-serif font-bold">2 days</span>
+              </div>
+              <div className="h-16 bg-emerald-950/50 border-2 border-emerald-600/50 rounded-lg overflow-hidden shadow-lg shadow-emerald-500/10">
+                <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 flex items-center justify-end px-6" style={{ width: '1.1%' }}>
+                  <span className="text-[#0a1f0f] font-mono text-xs font-bold tracking-wider whitespace-nowrap">48H</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Stat */}
+            <div className="text-center pt-8 border-t-2 border-emerald-900/30">
+              <div className="text-[64px] font-serif font-bold text-emerald-400 mb-2">
+                90×
+              </div>
+              <div className="text-emerald-600 text-lg font-mono tracking-wider uppercase">
+                Faster customer acquisition
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing - Treasury Bond Style */}
+      <section className="relative py-32">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+
+          <div className="inline-block px-6 py-2 border-2 border-emerald-600/30 rounded-full mb-12 bg-emerald-950/30">
+            <span className="text-emerald-400 text-sm font-mono tracking-widest uppercase">Face Value</span>
+          </div>
+
+          <div className="text-[96px] font-serif font-black text-emerald-400 mb-4">
+            $997
+          </div>
+          <div className="text-[20px] text-emerald-600 mb-12 font-mono tracking-wider">
+            PER MONTH • UNLIMITED ISSUANCE
+          </div>
+
+          {/* Benefits */}
+          <div className="space-y-3 max-w-2xl mx-auto mb-16">
+            {[
+              "Unlimited AI research capacity",
+              "Unlimited outreach distribution",
+              "Your domain, your brand equity",
+              "Full CRM integration",
+              "Dedicated account manager",
+              "White-glove onboarding service",
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-4 text-[17px] p-4 border-l-2 border-emerald-600/30 bg-emerald-950/20">
+                <div className="w-5 h-5 rounded-full border-2 border-emerald-500 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-3 h-3 text-emerald-400" />
+                </div>
+                <span className="text-emerald-200">{item}</span>
+              </div>
+            ))}
+          </div>
+
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-3 px-12 py-5 bg-emerald-500 hover:bg-emerald-400 text-[#0a1f0f] font-bold rounded-full transition-all text-[18px] shadow-lg shadow-emerald-500/20"
+          >
+            Issue Your First Note
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+
+          <p className="text-emerald-700 text-sm mt-6 font-mono tracking-wider">
+            14 DAY TRIAL PERIOD
+          </p>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="relative py-32 border-t-2 border-emerald-900/30">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+
+          <h2 className="text-[72px] md:text-[96px] font-serif font-bold tracking-tight leading-[1.1] mb-16 text-emerald-50">
+            Redeem today
+          </h2>
+
+          <div className="max-w-3xl mx-auto">
+            <form onSubmit={handleAnalyze} className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-emerald-800 rounded-full blur opacity-20" />
+              <div className="relative flex items-center gap-3 p-2 bg-emerald-950/50 backdrop-blur-xl rounded-full border-2 border-emerald-600/30">
+                <input
+                  type="url"
+                  value={companyUrl}
+                  onChange={(e) => setCompanyUrl(e.target.value)}
+                  placeholder="Enter your company URL"
+                  className="flex-1 bg-transparent text-emerald-100 placeholder:text-emerald-700 text-lg px-6 py-4 outline-none"
+                  disabled={isAnalyzing}
+                />
+                <button
+                  type="submit"
+                  disabled={isAnalyzing || !companyUrl.trim()}
+                  className="group px-8 py-4 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-[#0a1f0f] font-semibold rounded-full flex items-center gap-2 transition-all flex-shrink-0 shadow-lg shadow-emerald-500/20"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-[#0a1f0f]/20 border-t-[#0a1f0f] rounded-full animate-spin" />
+                      Processing
                     </>
                   ) : (
                     <>
@@ -133,304 +422,35 @@ export default function Revenue() {
                   )}
                 </button>
               </div>
-              <p className="text-center text-zinc-600 text-sm mt-4">
-                Free analysis • No credit card required
-              </p>
             </form>
-          </div>
-
-          {/* Live Metrics Strip */}
-          <div className="flex items-center justify-center gap-16 pt-12 border-t border-white/5">
-            <div className="text-center">
-              <div className="text-[36px] font-bold mb-1 tabular-nums">
-                ${(revenue / 1000000).toFixed(1)}M
-              </div>
-              <div className="text-[13px] text-zinc-600 uppercase tracking-wider">
-                Revenue Generated
-              </div>
-            </div>
-
-            <div className="w-px h-16 bg-white/10" />
-
-            <div className="text-center">
-              <div className="text-[36px] font-bold mb-1 tabular-nums">
-                {clients.toLocaleString()}
-              </div>
-              <div className="text-[13px] text-zinc-600 uppercase tracking-wider">
-                Active Clients
-              </div>
-            </div>
-
-            <div className="w-px h-16 bg-white/10" />
-
-            <div className="text-center">
-              <div className="text-[36px] font-bold mb-1 tabular-nums">
-                {responseRate}%
-              </div>
-              <div className="text-[13px] text-zinc-600 uppercase tracking-wider">
-                Response Rate
-              </div>
-            </div>
-
-            <div className="w-px h-16 bg-white/10" />
-
-            <div className="text-center">
-              <div className="text-[36px] font-bold mb-1">
-                &lt; 12h
-              </div>
-              <div className="text-[13px] text-zinc-600 uppercase tracking-wider">
-                First Lead
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works - Horizontal Timeline */}
-      <section className="relative py-32 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6">
-
-          <div className="text-center mb-24">
-            <h2 className="text-[64px] font-bold tracking-tight leading-[1.1] mb-6">
-              How it works
-            </h2>
-            <p className="text-[20px] text-zinc-500 max-w-3xl mx-auto leading-relaxed font-light">
-              Three steps. Fully automated. Results in days.
+            <p className="text-center text-emerald-700 text-xs mt-4 font-mono tracking-wider uppercase">
+              No cost • Immediate settlement
             </p>
           </div>
 
-          <div className="space-y-0">
-
-            {/* Step 1 */}
-            <div className="group relative flex items-start gap-12 py-16 border-b border-white/5 hover:border-emerald-500/20 transition-all">
-              <div className="text-[120px] font-black text-white/5 leading-none group-hover:text-white/10 transition-colors flex-shrink-0">
-                01
-              </div>
-              <div className="flex-1 pt-8">
-                <h3 className="text-[40px] font-bold tracking-tight mb-6">
-                  Paste your link
-                </h3>
-                <p className="text-zinc-400 text-[20px] leading-relaxed max-w-2xl">
-                  Drop in your company URL. Our AI analyzes your product, market, and ideal customer profile in minutes.
-                </p>
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="group relative flex items-start gap-12 py-16 border-b border-white/5 hover:border-emerald-500/20 transition-all">
-              <div className="text-[120px] font-black text-white/5 leading-none group-hover:text-white/10 transition-colors flex-shrink-0">
-                02
-              </div>
-              <div className="flex-1 pt-8">
-                <h3 className="text-[40px] font-bold tracking-tight mb-6">
-                  AI research begins
-                </h3>
-                <p className="text-zinc-400 text-[20px] leading-relaxed max-w-2xl">
-                  Seven research agents scan millions of companies, filter for perfect fit, and deep-dive on needs and pain points.
-                </p>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="group relative flex items-start gap-12 py-16 hover:border-emerald-500/20 transition-all">
-              <div className="text-[120px] font-black text-white/5 leading-none group-hover:text-white/10 transition-colors flex-shrink-0">
-                03
-              </div>
-              <div className="flex-1 pt-8">
-                <h3 className="text-[40px] font-bold tracking-tight mb-6">
-                  Personalized outreach at scale
-                </h3>
-                <p className="text-zinc-400 text-[20px] leading-relaxed max-w-2xl">
-                  Custom emails written per prospect. Sent from your domain. Replies forwarded to you instantly.
-                </p>
-              </div>
-            </div>
-
+          {/* Serial Number Bottom */}
+          <div className="font-mono text-emerald-600/50 text-sm tracking-[0.3em] mt-16">
+            R2026847293 • SERIES 2026
           </div>
-        </div>
-      </section>
-
-      {/* Live Results Ticker */}
-      <section className="relative py-20 border-y border-white/5 bg-white/[0.01] overflow-hidden">
-        <div className="max-w-6xl mx-auto px-6">
-          <h3 className="text-center text-[32px] font-bold mb-8">
-            Companies are closing deals right now
-          </h3>
-
-          {/* Scrolling ticker */}
-          <div className="relative overflow-hidden">
-            <div className="flex gap-12 animate-scroll-left">
-              {[
-                "TechCorp closed $24k deal • 2m ago",
-                "StartupXYZ got 47 replies • 14m ago",
-                "SaaSCo booked 12 demos • 31m ago",
-                "DataFlow landed enterprise client • 1h ago",
-                "CloudSync hit $100k ARR • 3h ago",
-                "APIFirst got 89 qualified leads • 5h ago",
-                // Duplicate for seamless loop
-                "TechCorp closed $24k deal • 2m ago",
-                "StartupXYZ got 47 replies • 14m ago",
-                "SaaSCo booked 12 demos • 31m ago",
-              ].map((text, i) => (
-                <div key={i} className="flex-shrink-0 px-8 py-4 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-sm whitespace-nowrap">
-                  {text}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* The Problem - Bold Statement */}
-      <section className="relative py-32">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-
-          <h2 className="text-[64px] md:text-[80px] font-bold tracking-tight leading-[1.1] mb-12">
-            Most companies waste 6 months
-            <br />
-            finding their first 10 customers
-          </h2>
-
-          <h3 className="text-[64px] md:text-[80px] font-bold tracking-tight leading-[1.1] mb-20">
-            <span className="bg-gradient-to-r from-emerald-400 to-emerald-600 bg-clip-text text-transparent">
-              We do it in 2 days.
-            </span>
-          </h3>
-
-          {/* Comparison */}
-          <div className="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto pt-12 border-t border-white/5">
-            <div className="text-left space-y-4">
-              <div className="text-zinc-600 text-sm uppercase tracking-wider mb-2">Traditional</div>
-              <div className="text-[48px] font-bold text-zinc-700">180 days</div>
-              <div className="text-zinc-500 text-lg">to 10 customers</div>
-            </div>
-            <div className="text-left space-y-4">
-              <div className="text-emerald-400 text-sm uppercase tracking-wider mb-2">Revenue</div>
-              <div className="text-[48px] font-bold">2 days</div>
-              <div className="text-zinc-400 text-lg">to 10 customers</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing - Transparent Single Tier */}
-      <section className="relative py-32 border-t border-white/5">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-
-          <div className="text-[96px] font-black mb-6">
-            $997<span className="text-zinc-700">/month</span>
-          </div>
-
-          <p className="text-[24px] text-zinc-400 mb-16 leading-relaxed">
-            Unlimited outreach. Unlimited leads. Cancel anytime.
-            <br />
-            <span className="text-white font-medium">Results guaranteed.</span>
-          </p>
-
-          {/* Value Props */}
-          <div className="space-y-4 max-w-2xl mx-auto mb-16 text-left">
-            {[
-              "Unlimited AI research agents",
-              "Unlimited emails sent",
-              "Your domain, your brand",
-              "CRM integration included",
-              "Dedicated success manager",
-              "White-glove onboarding",
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-4 text-[18px]">
-                <Check className="w-6 h-6 text-emerald-400 flex-shrink-0" />
-                <span className="text-zinc-300">{item}</span>
-              </div>
-            ))}
-          </div>
-
-          <Link
-            to="/login"
-            className="inline-flex items-center gap-3 px-12 py-6 bg-white hover:bg-zinc-100 text-black font-semibold rounded-full transition-all text-[18px]"
-          >
-            Start free trial
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-
-          <p className="text-zinc-600 text-sm mt-6">
-            14 days free
-          </p>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="relative py-32 border-t border-white/5">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-
-          <h2 className="text-[72px] md:text-[96px] font-bold tracking-tight leading-[1.1] mb-16">
-            Ready to start?
-          </h2>
-
-          {/* Try It Now Input - Bottom */}
-          <div className="max-w-3xl mx-auto">
-            <form onSubmit={handleAnalyze} className="relative">
-              <div className="flex items-center gap-4 p-3 bg-white/5 backdrop-blur-xl rounded-full border border-white/10 focus-within:border-white/30 transition-all">
-                <input
-                  type="url"
-                  value={companyUrl}
-                  onChange={(e) => setCompanyUrl(e.target.value)}
-                  placeholder="Enter your company URL"
-                  className="flex-1 bg-transparent text-white placeholder:text-zinc-600 text-lg px-6 py-3 outline-none"
-                  disabled={isAnalyzing}
-                />
-                <button
-                  type="submit"
-                  disabled={isAnalyzing || !companyUrl.trim()}
-                  className="group px-8 py-3 bg-white hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed text-black font-semibold rounded-full flex items-center gap-2 transition-all flex-shrink-0"
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                      Analyzing
-                    </>
-                  ) : (
-                    <>
-                      Analyze
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </button>
-              </div>
-              <p className="text-center text-zinc-600 text-sm mt-4">
-                Free • No signup required
-              </p>
-            </form>
-          </div>
-
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-12">
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between text-sm text-zinc-600">
-          <div>© 2026 Nanowork</div>
-          <div className="flex gap-8">
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Docs</a>
+      <footer className="border-t-2 border-emerald-900/30 py-12 bg-emerald-950/20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-center justify-between text-sm">
+            <div className="text-emerald-700 font-mono tracking-wider">
+              © 2026 NANOWORK REVENUE SYSTEM
+            </div>
+            <div className="flex gap-8 font-mono tracking-wider">
+              <a href="#" className="text-emerald-700 hover:text-emerald-400 transition-colors">TERMS</a>
+              <a href="#" className="text-emerald-700 hover:text-emerald-400 transition-colors">PRIVACY</a>
+              <a href="#" className="text-emerald-700 hover:text-emerald-400 transition-colors">DOCS</a>
+            </div>
           </div>
         </div>
       </footer>
 
-      {/* Animations */}
-      <style>{`
-        @keyframes flowRight {
-          from { transform: translateX(-100%); }
-          to { transform: translateX(100%); }
-        }
-        @keyframes scroll-left {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-        .animate-scroll-left {
-          animation: scroll-left 40s linear infinite;
-        }
-      `}</style>
     </div>
   );
 }
