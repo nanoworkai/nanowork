@@ -2,22 +2,29 @@ import { Link } from "react-router-dom";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-surface-0 flex flex-col items-center justify-center px-4 text-center">
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-80 h-80 bg-brand-600/8 rounded-full blur-3xl" />
-      </div>
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 text-center">
+      {/* Logo */}
+      <Link to="/" className="flex items-center gap-2.5 text-slate-900 font-semibold text-[15px] mb-12 hover:opacity-70 transition-opacity">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+          <path d="M2 10H22" stroke="currentColor" strokeWidth="1.5"/>
+          <rect x="5" y="14" width="4" height="2" rx="0.5" fill="currentColor"/>
+        </svg>
+        Nanowork
+      </Link>
 
-      <p className="text-7xl font-bold text-surface-4 mb-4">404</p>
-      <h1 className="text-2xl font-bold text-white mb-3">Page not found</h1>
-      <p className="text-zinc-500 max-w-sm mb-8">
-        The link you followed is broken, or the page has moved.
+      <p className="text-[120px] leading-none font-bold text-slate-200 mb-6">404</p>
+      <h1 className="text-3xl font-bold text-slate-900 mb-3">Page not found</h1>
+      <p className="text-slate-600 max-w-sm mb-8 leading-relaxed">
+        The page you're looking for doesn't exist or has been moved.
       </p>
       <Link
         to="/"
-        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold transition-colors"
+        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold transition-colors text-sm"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M3 12l9-9 9 9" /><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
         </svg>
         Back to home
       </Link>

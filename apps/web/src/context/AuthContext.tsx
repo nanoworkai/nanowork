@@ -69,7 +69,9 @@ interface AuthContextValue {
   refreshCompanies: () => Promise<void>;
   canCreateCompany: () => boolean;
 
-  // Auth methods (phone)
+  // Auth methods
+  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  signUp: (email: string, password: string, name?: string) => Promise<{ error: string | null }>;
   requestOtp: (phone: string) => Promise<{ error: string | null }>;
   verifyOtp: (phone: string, token: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
@@ -92,6 +94,8 @@ const AuthContext = createContext<AuthContextValue>({
   setActiveCompany: () => {},
   refreshCompanies: async () => {},
   canCreateCompany: () => false,
+  signIn: async () => ({ error: null }),
+  signUp: async () => ({ error: null }),
   requestOtp: async () => ({ error: null }),
   verifyOtp: async () => ({ error: null }),
   logout: async () => {},
@@ -280,6 +284,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, [loadProfile, loadCompanies]);
 
+  const signIn = useCallback(async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error?.message ?? null };
+  }, []);
+
+  const signUp = useCallback(async (email: string, password: string, name?: string) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name },
+      },
+    });
+
+    if (error) return { error: error.message };
+
+    // Create profile entry if user was created
+    if (data.user) {
+      await supabase.from("profiles").insert({
+        id: data.user.id,
+        email: email,
+        name: name || null,
+        phone: null,
+        status: "active",
+        phone_verified: false,
+        plan: "free",
+        credits_balance: 100,
+        monthly_company_limit: 1,
+        total_companies_created: 0,
+        timezone: "UTC",
+        notification_preferences: { sms: false, activity: true, billing: true },
+      });
+    }
+
+    return { error: null };
+  }, []);
+
   const requestOtp = useCallback(async (phone: string) => {
     const { error } = await supabase.auth.signInWithOtp({ phone });
     return { error: error?.message ?? null };
@@ -391,6 +432,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         companies,
         activeCompany,
+        signIn,
+        signUp,
         requestOtp,
         verifyOtp,
         logout,

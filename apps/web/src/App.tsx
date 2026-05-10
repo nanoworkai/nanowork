@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Rent from "./pages/Rent";
 import Revenue from "./pages/Revenue";
+import Swipe from "./pages/Swipe";
 import DashboardLayout from "./dashboard/DashboardLayout";
 import Overview from "./dashboard/Overview";
 import Domains from "./dashboard/Domains";
@@ -28,6 +29,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/rent" element={<Rent />} />
       <Route path="/revenue" element={<Revenue />} />
+      <Route path="/swipe" element={<Swipe />} />
       <Route
         path="/dashboard"
         element={
