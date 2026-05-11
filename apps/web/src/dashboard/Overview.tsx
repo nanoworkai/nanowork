@@ -3,6 +3,16 @@ import { useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 
+/**
+ * DASHBOARD DESIGN PRINCIPLES:
+ *
+ * 1. DATA DENSITY: Show real information immediately - no empty states
+ * 2. GRID SYSTEM: Precise 8px grid for alignment
+ * 3. STATUS INDICATORS: Minimal dots and labels, no animations
+ * 4. MONOCHROME: Only white/gray shades, no color
+ * 5. CARD HIERARCHY: Subtle shadows and borders create depth
+ */
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface TaskEntry {
@@ -91,7 +101,7 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
     });
 
     es.onerror = () => {
-      setError("Connection lost — the build may still be running in the background.");
+      setError("Connection lost");
       es.close();
     };
 
@@ -101,82 +111,78 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
   return { meta, depts, feed, done, error };
 }
 
-// ── Department card ───────────────────────────────────────────────────────────
+// ── Department Card ───────────────────────────────────────────────────────────
 
 function DeptCard({ name, state }: { name: string; state: DeptState | undefined }) {
   if (!state) {
     return (
-      <div className="p-4 rounded-xl bg-surface-2 border border-white/5 opacity-40">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="text-lg">⋯</span>
-          <span className="text-sm font-semibold text-zinc-500">{name}</span>
+      <div className="card rounded-xl p-5 opacity-40">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="text-base">⋯</span>
+            <span className="text-sm font-semibold text-white/60">{name}</span>
+          </div>
+          <span className="text-xs font-mono text-white/30">QUEUED</span>
         </div>
-        <p className="text-xs text-zinc-600">Queued</p>
       </div>
     );
   }
 
   const { icon, tasks, output, status, taskCount } = state;
+  const progress = tasks.length / Math.max(taskCount, 1);
 
   return (
-    <div className={`p-4 rounded-xl border transition-all duration-500 ${
-      status === "done"
-        ? "bg-green-500/5 border-green-500/20"
-        : status === "running"
-        ? "bg-brand-600/5 border-brand-500/30"
-        : "bg-surface-2 border-white/5"
+    <div className={`card rounded-xl p-5 transition-all duration-150 ${
+      status === "done" ? "bg-surface-3" : ""
     }`}>
-      <div className="flex items-start justify-between mb-3">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-lg">{icon}</span>
+          <span className="text-base">{icon}</span>
           <span className="text-sm font-semibold text-white">{name}</span>
         </div>
-        <span className={`text-xs font-mono font-semibold ${
-          status === "done" ? "text-green-400" : "text-brand-400"
-        }`}>
-          {status === "done" ? "✓ Done" : status === "running" ? (
-            <span className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-400 animate-pulse inline-block" />
-              {tasks.length}/{taskCount}
-            </span>
-          ) : "Queued"}
-        </span>
+        <div className="flex items-center gap-2">
+          {status === "running" && (
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+          )}
+          <span className={`text-xs font-mono ${
+            status === "done" ? "text-white/60" : "text-white/40"
+          }`}>
+            {status === "done" ? "DONE" : `${tasks.length}/${taskCount}`}
+          </span>
+        </div>
       </div>
 
-      <div className="space-y-1 mb-3">
-        {DEPT_ORDER.slice(0, taskCount).map((_, i) => {
-          const task = tasks[i];
-          const isDone = !!task;
-          return (
-            <div key={i} className={`flex items-start gap-2 text-xs ${isDone ? "text-zinc-300" : "text-zinc-700"}`}>
-              <span className={`mt-0.5 flex-shrink-0 ${isDone ? "text-green-400" : "text-zinc-700"}`}>
-                {isDone ? "✓" : "◌"}
-              </span>
-              <span className={isDone ? "" : "italic"}>{task ?? "Pending…"}</span>
-            </div>
-          );
-        })}
+      {/* Tasks */}
+      <div className="space-y-1.5 mb-3">
+        {tasks.slice(-3).map((task, i) => (
+          <div key={i} className="text-xs text-white/50 leading-relaxed">
+            {task}
+          </div>
+        ))}
       </div>
 
-      {output && (
-        <p className="text-xs text-zinc-400 border-t border-white/5 pt-2 mt-2 leading-relaxed">
-          {output}
-        </p>
+      {/* Progress bar */}
+      {status === "running" && (
+        <div className="h-px bg-white/5 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-white/30 transition-all duration-300"
+            style={{ width: `${progress * 100}%` }}
+          />
+        </div>
       )}
 
-      {status === "running" && (
-        <div className="mt-2 h-1 rounded-full bg-surface-4 overflow-hidden">
-          <div
-            className="h-full bg-brand-500 rounded-full transition-all duration-500"
-            style={{ width: `${(tasks.length / Math.max(taskCount, 1)) * 100}%` }}
-          />
+      {/* Output */}
+      {output && status === "done" && (
+        <div className="mt-3 pt-3 text-xs text-white/40 leading-relaxed" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+          {output}
         </div>
       )}
     </div>
   );
 }
 
-// ── Live task feed ────────────────────────────────────────────────────────────
+// ── Live Feed ─────────────────────────────────────────────────────────────────
 
 function LiveFeed({ entries }: { entries: TaskEntry[] }) {
   const endRef = useRef<HTMLDivElement>(null);
@@ -185,16 +191,21 @@ function LiveFeed({ entries }: { entries: TaskEntry[] }) {
   if (!entries.length) return null;
 
   return (
-    <div className="rounded-xl bg-surface-1 border border-white/5 overflow-hidden">
-      <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5">
-        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Live agent output</span>
+    <div className="card-lg rounded-xl overflow-hidden">
+      {/* Header */}
+      <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+        <span className="text-xs font-bold text-white/60 uppercase tracking-wider">Live Output</span>
       </div>
-      <div className="max-h-56 overflow-y-auto p-2 flex flex-col gap-1 font-mono">
+
+      {/* Feed */}
+      <div className="max-h-64 overflow-y-auto">
         {entries.slice().reverse().map((e, i) => (
-          <div key={i} className="flex items-start gap-2 px-2 py-1 rounded-lg hover:bg-white/3 transition-colors">
-            <span className="text-zinc-600 text-xs mt-0.5 flex-shrink-0 w-20 truncate">[{e.dept}]</span>
-            <span className="text-xs text-zinc-300 leading-snug">{e.task}</span>
+          <div key={i} className="px-5 py-2.5 hover:bg-white/3 transition-colors" style={{ borderBottom: i < entries.length - 1 ? '1px solid rgba(255, 255, 255, 0.02)' : 'none' }}>
+            <div className="flex items-start gap-3">
+              <span className="text-xs text-white/30 font-mono w-20 flex-shrink-0">[{e.dept}]</span>
+              <span className="text-xs text-white/60 leading-relaxed">{e.task}</span>
+            </div>
           </div>
         ))}
         <div ref={endRef} />
@@ -203,19 +214,20 @@ function LiveFeed({ entries }: { entries: TaskEntry[] }) {
   );
 }
 
-// ── Prompt form ───────────────────────────────────────────────────────────────
+// ── Prompt Form ───────────────────────────────────────────────────────────────
 
 function PromptForm({ onStart, loading }: { onStart: (p: string) => void; loading: boolean }) {
   const [value, setValue] = useState("");
 
   return (
-    <div className="p-6 rounded-2xl bg-surface-1 border border-white/10 animate-slide-up">
-      <h2 className="text-lg font-semibold text-white mb-1">What are you building?</h2>
-      <p className="text-sm text-zinc-500 mb-4">
-        One prompt — all 7 agent departments launch in parallel.
+    <div className="card-lg rounded-2xl p-8">
+      <h2 className="text-xl font-bold text-white mb-2 tracking-tight">What are you building?</h2>
+      <p className="text-sm text-white/50 mb-6">
+        One prompt launches all seven departments in parallel.
       </p>
       <textarea
-        className="w-full bg-surface-2 border border-white/10 focus:border-brand-500/50 text-zinc-100 placeholder-zinc-600 rounded-xl px-4 py-3 text-sm leading-relaxed resize-none outline-none transition-colors mb-4"
+        className="w-full bg-surface-3 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 resize-none outline-none mb-4"
+        style={{ border: '1px solid rgba(255, 255, 255, 0.08)' }}
         rows={3}
         placeholder="Premium dog gear DTC, $45 AOV, ship US — I want real revenue in 30 days."
         value={value}
@@ -226,20 +238,15 @@ function PromptForm({ onStart, loading }: { onStart: (p: string) => void; loadin
       <button
         onClick={() => value.trim() && onStart(value.trim())}
         disabled={!value.trim() || loading}
-        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm transition-colors"
+        className="px-6 py-3 rounded-xl bg-white hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed text-black font-semibold text-sm transition-colors"
       >
         {loading ? (
-          <>
-            <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            Building…
-          </>
+          <span className="flex items-center gap-2">
+            <span className="w-3.5 h-3.5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+            Building...
+          </span>
         ) : (
-          <>
-            Launch all 7 agents
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </>
+          "Launch Build"
         )}
       </button>
     </div>
@@ -269,14 +276,14 @@ export default function Overview() {
     }
   }, [promptFromUrl, profile?.businessPrompt, updateProfile]);
 
-  // Save company name to profile once we get it
+  // Save company name to profile
   useEffect(() => {
     if (meta?.companyName && !profile?.businessName) {
       updateProfile({ businessName: meta.companyName });
     }
   }, [meta?.companyName, profile?.businessName, updateProfile]);
 
-  // Also save build to Supabase builds table if user is authenticated
+  // Save build to database
   useEffect(() => {
     if (!done || !user || !activePrompt) return;
     supabase.from("linq_jobs").insert({
@@ -294,57 +301,53 @@ export default function Overview() {
   }
 
   const totalDone = Object.values(depts).filter((d) => d.status === "done").length;
-  const totalStarted = Object.values(depts).filter((d) => d.status !== undefined).length;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-6 py-8">
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-white">
-              {meta?.companyName ?? profile?.businessName ?? "Your Build"}
-            </h1>
-            {meta?.tagline && (
-              <p className="text-zinc-400 text-sm mt-0.5 italic">"{meta.tagline}"</p>
-            )}
-          </div>
-
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-2xl font-bold text-white tracking-tight">
+            {meta?.companyName ?? profile?.businessName ?? "Your Build"}
+          </h1>
           {buildEnabled && (
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-sm text-zinc-400">
-                {done ? (
-                  <span className="text-green-400 font-semibold">✓ All 7 departments live</span>
-                ) : (
-                  <>
-                    <span className="w-2 h-2 rounded-full bg-brand-400 animate-pulse" />
-                    {totalDone} of 7 done · {totalStarted} running
-                  </>
-                )}
-              </div>
+            <div className="flex items-center gap-4">
+              {done ? (
+                <span className="text-sm text-white/50 font-semibold">All departments live</span>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                  <span className="text-sm text-white/50 font-semibold">{totalDone} of 7 complete</span>
+                </div>
+              )}
               {done && (
                 <button
                   onClick={() => { setBuildEnabled(false); setActivePrompt(null); }}
-                  className="text-xs text-zinc-600 hover:text-zinc-400 underline transition-colors"
+                  className="text-xs text-white/40 hover:text-white/60 underline transition-colors"
                 >
-                  Start new build
+                  New build
                 </button>
               )}
             </div>
           )}
         </div>
 
+        {meta?.tagline && (
+          <p className="text-sm text-white/40 italic">"{meta.tagline}"</p>
+        )}
+
         {activePrompt && (
-          <div className="mt-3 px-4 py-2.5 rounded-xl bg-surface-2 border border-white/5 text-sm text-zinc-500 italic">
-            "{activePrompt}"
+          <div className="mt-4 card rounded-xl px-4 py-3">
+            <div className="text-xs text-white/30 font-semibold uppercase tracking-wider mb-1">Prompt</div>
+            <div className="text-sm text-white/60">"{activePrompt}"</div>
           </div>
         )}
       </div>
 
       {/* Error */}
       {error && (
-        <div className="mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
-          {error}
+        <div className="mb-6 card rounded-xl px-5 py-4" style={{ border: '1px solid rgba(255, 100, 100, 0.2)', background: 'rgba(255, 100, 100, 0.05)' }}>
+          <div className="text-sm text-white/80">{error}</div>
         </div>
       )}
 
@@ -365,28 +368,35 @@ export default function Overview() {
           </div>
 
           {/* Live feed */}
-          <div className="mb-6">
+          <div className="mb-8">
             <LiveFeed entries={feed} />
           </div>
         </>
       )}
 
       {/* Quick links */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {[
-          { to: "/dashboard/domains", label: "Manage domains", icon: "🌐" },
-          { to: "/dashboard/plan", label: "Upgrade plan", icon: "⚡" },
-          { to: "/dashboard/settings", label: "Settings", icon: "⚙️" },
-        ].map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className="flex items-center gap-3 p-4 rounded-xl bg-surface-1 border border-white/5 hover:border-white/10 hover:bg-surface-2 transition-all text-sm text-zinc-400 hover:text-zinc-200"
-          >
-            <span>{item.icon}</span>
-            {item.label}
-          </Link>
-        ))}
+      <div className="grid grid-cols-3 gap-3">
+        <Link
+          to="/dashboard/domains"
+          className="card card-hover rounded-xl p-5 transition-all duration-150"
+        >
+          <div className="text-xs text-white/40 font-semibold uppercase tracking-wider mb-1">Domains</div>
+          <div className="text-sm text-white font-semibold">Manage domains</div>
+        </Link>
+        <Link
+          to="/dashboard/plan"
+          className="card card-hover rounded-xl p-5 transition-all duration-150"
+        >
+          <div className="text-xs text-white/40 font-semibold uppercase tracking-wider mb-1">Plan</div>
+          <div className="text-sm text-white font-semibold">Upgrade</div>
+        </Link>
+        <Link
+          to="/dashboard/settings"
+          className="card card-hover rounded-xl p-5 transition-all duration-150"
+        >
+          <div className="text-xs text-white/40 font-semibold uppercase tracking-wider mb-1">Settings</div>
+          <div className="text-sm text-white font-semibold">Configure</div>
+        </Link>
       </div>
     </div>
   );

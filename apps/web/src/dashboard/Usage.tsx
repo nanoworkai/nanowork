@@ -8,7 +8,7 @@ const BREAKDOWN = [
   { category: "Bandwidth", amount: 1.58, pct: 3 },
 ];
 
-const COLORS = ["bg-brand-500", "bg-purple-500", "bg-blue-500", "bg-emerald-500"];
+const COLORS = ["bg-white", "bg-purple-500", "bg-blue-500", "bg-emerald-500"];
 
 export default function Usage() {
   const { profile } = useAuth();
@@ -23,7 +23,7 @@ export default function Usage() {
         </div>
         <Link
           to="/dashboard/plan"
-          className="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold transition-colors"
+          className="px-3 py-1.5 rounded-lg bg-white hover:bg-white text-white text-xs font-semibold transition-colors"
         >
           Upgrade plan
         </Link>
@@ -67,7 +67,7 @@ export default function Usage() {
       {/* Info */}
       <div className="p-4 rounded-xl bg-surface-2 border border-white/5 text-sm text-zinc-500">
         Detailed usage logs and invoices are available in the{" "}
-        <Link to="/dashboard/plan" className="text-brand-400 hover:text-brand-300 transition-colors">
+        <Link to="/dashboard/plan" className="text-white hover:text-white/80 transition-colors">
           billing portal →
         </Link>
       </div>

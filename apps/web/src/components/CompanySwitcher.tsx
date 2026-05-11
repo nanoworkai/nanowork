@@ -53,7 +53,7 @@ export function CompanySwitcher() {
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-2 border border-white/10 hover:border-brand-500/60 transition-colors text-sm text-white"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-2 border border-white/10 hover:border-white/20/60 transition-colors text-sm text-white"
       >
         <div className="flex items-center gap-2">
           {/* Company Icon */}
@@ -64,7 +64,7 @@ export function CompanySwitcher() {
               className="w-5 h-5 rounded"
             />
           ) : (
-            <div className="w-5 h-5 rounded bg-brand-600 flex items-center justify-center text-xs font-bold">
+            <div className="w-5 h-5 rounded bg-white flex items-center justify-center text-xs font-bold">
               {activeCompany?.name?.charAt(0) || "C"}
             </div>
           )}
@@ -109,7 +109,7 @@ export function CompanySwitcher() {
                   key={company.id}
                   onClick={() => handleSelect(company.id)}
                   className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-white/5 transition-colors text-left ${
-                    activeCompany?.id === company.id ? "bg-brand-600/20" : ""
+                    activeCompany?.id === company.id ? "bg-white/20" : ""
                   }`}
                 >
                   {/* Company Icon */}
@@ -120,7 +120,7 @@ export function CompanySwitcher() {
                       className="w-8 h-8 rounded"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded bg-brand-600 flex items-center justify-center text-sm font-bold text-white">
+                    <div className="w-8 h-8 rounded bg-white flex items-center justify-center text-sm font-bold text-white">
                       {company.name.charAt(0)}
                     </div>
                   )}
@@ -138,7 +138,7 @@ export function CompanySwitcher() {
                   {/* Active Indicator */}
                   {activeCompany?.id === company.id && (
                     <svg
-                      className="w-5 h-5 text-brand-500"
+                      className="w-5 h-5 text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -163,9 +163,9 @@ export function CompanySwitcher() {
               onClick={handleCreateNew}
               className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-white/5 transition-colors text-left"
             >
-              <div className="w-8 h-8 rounded bg-brand-600/20 border-2 border-brand-600 border-dashed flex items-center justify-center">
+              <div className="w-8 h-8 rounded bg-white/20 border-2 border-white/20 border-dashed flex items-center justify-center">
                 <svg
-                  className="w-4 h-4 text-brand-500"
+                  className="w-4 h-4 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

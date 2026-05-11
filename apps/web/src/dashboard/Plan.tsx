@@ -92,14 +92,14 @@ export default function Plan() {
               key={plan.tier}
               className={`relative p-5 rounded-2xl border flex flex-col transition-all ${
                 isCurrent
-                  ? "border-brand-500/40 bg-brand-600/10"
+                  ? "border-white/20/40 bg-white/10"
                   : isRecommended
                   ? "border-white/15 bg-surface-1"
                   : "border-white/5 bg-surface-1"
               }`}
             >
               {isRecommended && !isCurrent && (
-                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-brand-600 text-white px-2.5 py-0.5 rounded-full">
+                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-white text-white px-2.5 py-0.5 rounded-full">
                   Popular
                 </span>
               )}
@@ -135,7 +135,7 @@ export default function Plan() {
                 <button
                   onClick={() => setConfirm(plan.tier)}
                   className={`w-full py-2 rounded-lg text-xs font-semibold transition-colors ${
-                    isRecommended ? "bg-brand-600 hover:bg-brand-500 text-white" : "bg-surface-2 hover:bg-surface-3 border border-white/10 text-zinc-300 hover:text-white"
+                    isRecommended ? "bg-white hover:bg-white text-white" : "bg-surface-2 hover:bg-surface-3 border border-white/10 text-zinc-300 hover:text-white"
                   }`}
                 >
                   Switch to {plan.name}
@@ -164,7 +164,7 @@ export default function Plan() {
               <button
                 onClick={() => handleSwitch(confirm)}
                 disabled={switching}
-                className="flex-1 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white text-sm font-semibold transition-colors"
+                className="flex-1 py-2 rounded-xl bg-white hover:bg-white disabled:opacity-50 text-white text-sm font-semibold transition-colors"
               >
                 {switching ? "Switching…" : "Confirm"}
               </button>

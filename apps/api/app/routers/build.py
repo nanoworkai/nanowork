@@ -3,15 +3,20 @@ Build endpoints.
 
 POST /api/build/run     → single JSON response (used by BuildPage demo)
 GET  /api/build/stream  → SSE stream of agent progress, one event per task
+POST /api/build/preview → create preview build (unauthenticated freemium flow)
+POST /api/builds/:id/unlock → unlock full build with credits
 """
 
 import asyncio
 import json
 from typing import AsyncIterator
+from uuid import UUID
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+
+from app.deps import get_supabase
 
 router = APIRouter(prefix="/build", tags=["build"])
 
@@ -224,4 +229,164 @@ async def stream_build(prompt: str):
             "Cache-Control": "no-cache",
             "X-Accel-Buffering": "no",
         },
+    )
+
+
+# ── Preview Build (Freemium Flow) ──────────────────────────────────────────────
+
+class PreviewBuildRequest(BaseModel):
+    prompt: str
+
+
+class PreviewBuildResponse(BaseModel):
+    build_id: str
+    preview_url: str
+    company_name: str
+    tagline: str
+    credits_cost: int
+
+
+@router.post("/preview", response_model=PreviewBuildResponse)
+async def create_preview_build(req: PreviewBuildRequest):
+    """
+    Create a preview build without authentication (freemium conversion flow).
+    Returns build_id and preview_url for the limited free version.
+    """
+    # Generate the build data
+    data = _call_claude(req.prompt)
+    if data is None:
+        data = _fallback(req.prompt)
+
+    # Store in database
+    supabase = get_supabase()
+
+    build_record = {
+        "prompt": req.prompt,
+        "company_name": data.get("company_name", "Your Company"),
+        "tagline": data.get("tagline", ""),
+        "status": "preview",
+        "build_data": data,
+        "credits_cost": 100,  # Cost to unlock full version
+        "metadata": {"preview_generated": True},
+    }
+
+    result = supabase.table("builds").insert(build_record).execute()
+
+    if not result.data:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create preview build"
+        )
+
+    build = result.data[0]
+    build_id = build["id"]
+
+    # Preview URL points to the preview page
+    preview_url = f"/preview/{build_id}"
+
+    return PreviewBuildResponse(
+        build_id=build_id,
+        preview_url=preview_url,
+        company_name=build["company_name"],
+        tagline=build["tagline"],
+        credits_cost=build["credits_cost"],
+    )
+
+
+@router.get("/{build_id}")
+async def get_build(build_id: UUID):
+    """
+    Get build details by ID (for preview page).
+    """
+    supabase = get_supabase()
+
+    result = supabase.table("builds").select("*").eq("id", str(build_id)).execute()
+
+    if not result.data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Build not found")
+
+    return result.data[0]
+
+
+class UnlockBuildRequest(BaseModel):
+    pass  # No body needed, user is authenticated
+
+
+class UnlockBuildResponse(BaseModel):
+    success: bool
+    full_url: str
+    credits_remaining: int
+
+
+@router.post("/{build_id}/unlock", response_model=UnlockBuildResponse)
+async def unlock_build(build_id: UUID):
+    """
+    Unlock full build with credits (authenticated users only).
+    Deducts credits and generates full website.
+    """
+    supabase = get_supabase()
+
+    # Get authenticated user
+    user = supabase.auth.get_user()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
+
+    user_id = user.user.id
+
+    # Get build
+    build_result = supabase.table("builds").select("*").eq("id", str(build_id)).execute()
+    if not build_result.data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Build not found")
+
+    build = build_result.data[0]
+
+    # Check if already unlocked
+    if build["status"] == "unlocked":
+        return UnlockBuildResponse(
+            success=True,
+            full_url=build.get("full_url", f"/dashboard/builds/{build_id}"),
+            credits_remaining=0,  # TODO: Get from profiles
+        )
+
+    # Get user credits
+    profile_result = supabase.table("profiles").select("credits_balance").eq("id", user_id).execute()
+    if not profile_result.data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
+
+    credits = profile_result.data[0]["credits_balance"]
+    cost = build["credits_cost"]
+
+    # Check sufficient credits
+    if credits < cost:
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail=f"Insufficient credits. Need {cost}, have {credits}"
+        )
+
+    # Deduct credits
+    new_balance = credits - cost
+    supabase.table("profiles").update({"credits_balance": new_balance}).eq("id", user_id).execute()
+
+    # Log credit transaction
+    supabase.table("credits_transactions").insert({
+        "user_id": user_id,
+        "amount": -cost,
+        "type": "debit",
+        "description": f"Unlocked build: {build['company_name']}",
+        "balance_after": new_balance,
+    }).execute()
+
+    # Update build to unlocked
+    full_url = f"/dashboard/builds/{build_id}"
+    supabase.table("builds").update({
+        "status": "unlocked",
+        "user_id": user_id,
+        "full_url": full_url,
+        "unlocked_at": "now()",
+    }).eq("id", str(build_id)).execute()
+
+    return UnlockBuildResponse(
+        success=True,
+        full_url=full_url,
+        credits_remaining=new_balance,
     )

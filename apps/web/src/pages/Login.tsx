@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Terminal, Lock } from "lucide-react";
 
 type Tab = "signin" | "signup";
 
@@ -44,7 +45,6 @@ export default function Login() {
       if (err) {
         setError(err);
       } else {
-        // Success - user is now authenticated
         const dest = pendingPrompt
           ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
           : nextPath;
@@ -56,7 +56,6 @@ export default function Login() {
       if (err) {
         setError(err);
       } else {
-        // Success - user is now authenticated
         const dest = pendingPrompt
           ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
           : nextPath;
@@ -66,126 +65,172 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-surface-0 flex flex-col items-center justify-center px-4">
       {/* Logo */}
-      <Link to="/" className="flex items-center gap-2.5 text-slate-900 font-semibold text-[15px] mb-8 hover:opacity-70 transition-opacity">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-          <path d="M2 10H22" stroke="currentColor" strokeWidth="1.5"/>
-          <rect x="5" y="14" width="4" height="2" rx="0.5" fill="currentColor"/>
-        </svg>
+      <Link
+        to="/"
+        className="flex items-center gap-2 text-white font-mono text-sm font-bold uppercase tracking-wider mb-12 hover:opacity-70 transition-opacity"
+      >
+        <Terminal className="w-5 h-5" />
         Nanowork
       </Link>
 
-      {/* Card */}
-      <div className="w-full max-w-sm bg-white border-2 border-slate-200 rounded-2xl p-8 shadow-lg">
-        {/* Tab Switcher */}
-        <div className="flex gap-2 mb-6 p-1 bg-slate-100 rounded-lg">
-          <button
-            type="button"
-            onClick={() => { setTab("signin"); setError(""); }}
-            className={`flex-1 py-2 text-sm font-semibold rounded-md transition-colors ${
-              tab === "signin"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            Sign in
-          </button>
-          <button
-            type="button"
-            onClick={() => { setTab("signup"); setError(""); }}
-            className={`flex-1 py-2 text-sm font-semibold rounded-md transition-colors ${
-              tab === "signup"
-                ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            Sign up
-          </button>
-        </div>
-
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">
-          {tab === "signup" ? "Create your account" : "Welcome back"}
-        </h1>
-        <p className="text-sm text-slate-600 mb-6">
-          {tab === "signup"
-            ? "Start building your AI-powered company"
-            : "Sign in to continue to your dashboard"}
-        </p>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {tab === "signup" && (
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1.5" htmlFor="login-name">
-                Name
-              </label>
-              <input
-                id="login-name"
-                className="w-full px-3 py-2.5 rounded-xl bg-white border-2 border-slate-200 focus:border-slate-900 text-slate-900 placeholder-slate-400 text-sm outline-none transition-colors"
-                type="text"
-                placeholder="Your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                autoComplete="name"
-              />
+      {/* Terminal Login Card */}
+      <div className="w-full max-w-md">
+        <div className="card-lg rounded-none border border-white/10">
+          {/* Header */}
+          <div className="border-b border-white/10 px-6 py-4 bg-surface-1">
+            <div className="flex items-center gap-3">
+              <Lock className="w-4 h-4 text-white/60" />
+              <span className="text-xs font-mono font-bold text-white/60 uppercase tracking-wider">
+                Authentication Required
+              </span>
+              <div className="flex-1" />
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-green-400" />
+                <span className="text-xs font-mono text-white/40">SECURE</span>
+              </div>
             </div>
-          )}
-
-          <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1.5" htmlFor="login-email">
-              Email
-            </label>
-            <input
-              id="login-email"
-              className="w-full px-3 py-2.5 rounded-xl bg-white border-2 border-slate-200 focus:border-slate-900 text-slate-900 placeholder-slate-400 text-sm outline-none transition-colors"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoFocus
-              autoComplete="email"
-              required
-            />
           </div>
 
-          <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1.5" htmlFor="login-password">
-              Password
-            </label>
-            <input
-              id="login-password"
-              className="w-full px-3 py-2.5 rounded-xl bg-white border-2 border-slate-200 focus:border-slate-900 text-slate-900 placeholder-slate-400 text-sm outline-none transition-colors"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete={tab === "signup" ? "new-password" : "current-password"}
-              required
-            />
+          <div className="p-6">
+            {/* Tab Switcher */}
+            <div className="flex gap-0 mb-6 border border-white/10">
+              <button
+                type="button"
+                onClick={() => {
+                  setTab("signin");
+                  setError("");
+                }}
+                className={`flex-1 py-3 text-xs font-mono font-bold uppercase tracking-wider transition-colors ${
+                  tab === "signin"
+                    ? "bg-white text-black"
+                    : "bg-transparent text-white/60 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setTab("signup");
+                  setError("");
+                }}
+                className={`flex-1 py-3 text-xs font-mono font-bold uppercase tracking-wider transition-colors border-l border-white/10 ${
+                  tab === "signup"
+                    ? "bg-white text-black"
+                    : "bg-transparent text-white/60 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              {tab === "signup" && (
+                <div>
+                  <label
+                    className="block text-xs font-mono text-white/40 uppercase tracking-wider mb-2"
+                    htmlFor="login-name"
+                  >
+                    Name
+                  </label>
+                  <input
+                    id="login-name"
+                    className="w-full px-4 py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-sm font-mono outline-none transition-colors"
+                    type="text"
+                    placeholder="FULL NAME"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    autoComplete="name"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label
+                  className="block text-xs font-mono text-white/40 uppercase tracking-wider mb-2"
+                  htmlFor="login-email"
+                >
+                  Email Address
+                </label>
+                <input
+                  id="login-email"
+                  className="w-full px-4 py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-sm font-mono outline-none transition-colors"
+                  type="email"
+                  placeholder="USER@DOMAIN.COM"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoFocus
+                  autoComplete="email"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-xs font-mono text-white/40 uppercase tracking-wider mb-2"
+                  htmlFor="login-password"
+                >
+                  Password
+                </label>
+                <input
+                  id="login-password"
+                  className="w-full px-4 py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-sm font-mono outline-none transition-colors"
+                  type="password"
+                  placeholder="••••••••••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete={tab === "signup" ? "new-password" : "current-password"}
+                  required
+                />
+              </div>
+
+              {error && (
+                <div className="px-4 py-3 border border-red-400/20 bg-red-400/5">
+                  <div className="flex items-start gap-2">
+                    <span className="text-xs font-mono text-red-400 mt-0.5">ERROR:</span>
+                    <p className="text-xs font-mono text-red-400 leading-relaxed flex-1">
+                      {error}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 rounded-none bg-white hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed text-black font-mono text-xs font-bold uppercase tracking-wider transition-colors mt-2"
+              >
+                {loading
+                  ? tab === "signup"
+                    ? "CREATING..."
+                    : "AUTHENTICATING..."
+                  : tab === "signup"
+                  ? "Create Account"
+                  : "Authenticate"}
+              </button>
+            </form>
           </div>
 
-          {error && (
-            <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-              {error}
+          {/* Footer */}
+          <div className="border-t border-white/10 px-6 py-4 bg-surface-1">
+            <p className="text-xs font-mono text-white/30 text-center">
+              ENCRYPTED CONNECTION · SOC 2 TYPE II CERTIFIED
             </p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm transition-colors mt-2"
-          >
-            {loading ? (tab === "signup" ? "Creating account…" : "Signing in…") : (tab === "signup" ? "Create account" : "Sign in")}
-          </button>
-        </form>
+          </div>
+        </div>
       </div>
 
-      <p className="text-xs text-slate-500 mt-6 text-center">
-        By continuing, you agree to our{" "}
-        <a href="#" className="text-slate-700 hover:text-slate-900 underline transition-colors">Terms</a>
-        {" "}and{" "}
-        <a href="#" className="text-slate-700 hover:text-slate-900 underline transition-colors">Privacy Policy</a>.
+      <p className="text-xs font-mono text-white/30 mt-8 text-center">
+        BY CONTINUING YOU AGREE TO{" "}
+        <a href="#" className="text-white/50 hover:text-white transition-colors underline">
+          TERMS
+        </a>{" "}
+        AND{" "}
+        <a href="#" className="text-white/50 hover:text-white transition-colors underline">
+          PRIVACY POLICY
+        </a>
       </p>
     </div>
   );

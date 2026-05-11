@@ -120,14 +120,14 @@ export function CreditsPurchaseModal({
                 key={pkg.id}
                 className={`relative rounded-xl border-2 p-6 transition-all ${
                   pkg.popular
-                    ? "border-brand-500 bg-brand-500/5"
+                    ? "border-white/20 bg-white/5"
                     : "border-white/10 hover:border-white/20"
                 }`}
               >
                 {/* Popular Badge */}
                 {pkg.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <div className="px-3 py-1 rounded-full bg-brand-600 text-white text-xs font-bold">
+                    <div className="px-3 py-1 rounded-full bg-white text-white text-xs font-bold">
                       MOST POPULAR
                     </div>
                   </div>
@@ -149,7 +149,7 @@ export function CreditsPurchaseModal({
                       ${pkg.price}
                     </div>
                     {'savings' in pkg && pkg.savings && (
-                      <div className="text-xs text-brand-400 font-medium mt-1">
+                      <div className="text-xs text-white font-medium mt-1">
                         Save {pkg.savings}
                       </div>
                     )}
@@ -161,7 +161,7 @@ export function CreditsPurchaseModal({
                     disabled={loading}
                     className={`w-full py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       pkg.popular
-                        ? "bg-brand-600 hover:bg-brand-500 text-white"
+                        ? "bg-white hover:bg-white text-white"
                         : "bg-white/10 hover:bg-white/20 text-white"
                     }`}
                   >

@@ -9,7 +9,7 @@ from fastapi.responses import FileResponse
 
 from app.config import cors_origin_list, get_settings
 from app.deps import supabase_or_none
-from app.routers import ai_route, build, phone
+from app.routers import ai_route, build, phone, agents
 from app.routers import analytics, builds, customers, keys, payments, tenant, webhooks
 
 
@@ -50,6 +50,7 @@ app.include_router(customers.router, prefix="/api")
 app.include_router(analytics.router, prefix="/api")
 app.include_router(payments.router, prefix="/api")
 app.include_router(webhooks.router, prefix="/api")
+app.include_router(agents.router, prefix="/api")
 
 
 @app.middleware("http")

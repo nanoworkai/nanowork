@@ -26,6 +26,12 @@ class Settings(BaseSettings):
         """Prefer STRIPE_SECRET_KEY; fall back to legacy LINQ_STRIPE_SECRET_KEY."""
         return (self.stripe_secret_key or self.linq_stripe_secret_key or "").strip() or None
 
+    # Agent Platform
+    internal_token: str | None = None
+    agent_email_domain: str | None = None
+    resend_api_key: str | None = None
+    frontend_url: str = "http://localhost:5173"
+
     cors_origins: str = (
         "https://nanowork.app,"
         "https://www.nanowork.app,"

@@ -33,9 +33,9 @@ export function CreditsDisplay({ onBuyClick, compact = false }: CreditsDisplayPr
   return (
     <div className={`flex items-center gap-3 ${compact ? "" : "px-4 py-2.5 rounded-lg bg-surface-2 border border-white/10"}`}>
       {/* Credits Icon */}
-      <div className={`flex-shrink-0 w-8 h-8 rounded-lg ${isCritical ? "bg-red-500/20" : isLow ? "bg-yellow-500/20" : "bg-brand-600/20"} flex items-center justify-center`}>
+      <div className={`flex-shrink-0 w-8 h-8 rounded-lg ${isCritical ? "bg-red-500/20" : isLow ? "bg-yellow-500/20" : "bg-white/20"} flex items-center justify-center`}>
         <svg
-          className={`w-4 h-4 ${isCritical ? "text-red-400" : isLow ? "text-yellow-400" : "text-brand-500"}`}
+          className={`w-4 h-4 ${isCritical ? "text-red-400" : isLow ? "text-yellow-400" : "text-white"}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -75,7 +75,7 @@ export function CreditsDisplay({ onBuyClick, compact = false }: CreditsDisplayPr
       {!compact && (
         <button
           onClick={onBuyClick}
-          className="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition-colors whitespace-nowrap"
+          className="px-3 py-1.5 rounded-lg bg-white hover:bg-white text-white text-sm font-medium transition-colors whitespace-nowrap"
         >
           Buy More
         </button>

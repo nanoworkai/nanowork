@@ -4,12 +4,14 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Revenue from "./pages/Revenue";
 import Swipe from "./pages/Swipe";
+import PreviewPage from "./pages/PreviewPage";
 import DashboardLayout from "./dashboard/DashboardLayout";
 import Overview from "./dashboard/Overview";
 import Bookings from "./dashboard/Bookings";
 import Domains from "./dashboard/Domains";
 import Plan from "./dashboard/Plan";
 import Settings from "./dashboard/Settings";
+import BuildView from "./dashboard/BuildView";
 import { useAuth } from "./context/AuthContext";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -29,6 +31,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/revenue" element={<Revenue />} />
       <Route path="/swipe" element={<Swipe />} />
+      <Route path="/preview/:buildId" element={<PreviewPage />} />
       <Route
         path="/dashboard"
         element={
@@ -42,6 +45,7 @@ export default function App() {
         <Route path="domains" element={<Domains />} />
         <Route path="plan" element={<Plan />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="builds/:buildId" element={<BuildView />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

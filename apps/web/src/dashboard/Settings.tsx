@@ -35,7 +35,7 @@ function SaveButton({ saved, loading, label }: { saved: boolean; loading?: boole
       className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
         saved
           ? "bg-green-500/15 text-green-400 border border-green-500/20"
-          : "bg-brand-600 hover:bg-brand-500 text-white"
+          : "bg-white hover:bg-white text-white"
       } disabled:opacity-50`}
     >
       {loading ? "Saving…" : saved ? "✓ Saved" : (label ?? "Save")}
@@ -66,7 +66,7 @@ function FieldInput({
         className={`w-full px-3 py-2 rounded-xl text-sm border outline-none transition-colors ${
           readOnly
             ? "bg-surface-3 border-white/5 text-zinc-500 cursor-default font-mono"
-            : "bg-surface-2 border-white/10 focus:border-brand-500/60 text-zinc-100 placeholder-zinc-600"
+            : "bg-surface-2 border-white/10 focus:border-white/20/60 text-zinc-100 placeholder-zinc-600"
         }`}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}

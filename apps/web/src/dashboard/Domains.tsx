@@ -51,7 +51,7 @@ export default function Domains() {
           Your business is served at <span className="font-mono text-zinc-400">*.{PLATFORM_HOST}</span>
         </p>
         <form onSubmit={handleSubdomainSave} className="flex flex-col gap-3">
-          <div className="flex items-center gap-1 px-3 py-2 rounded-xl bg-surface-2 border border-white/10 focus-within:border-brand-500/60 transition-colors">
+          <div className="flex items-center gap-1 px-3 py-2 rounded-xl bg-surface-2 border border-white/10 focus-within:border-white/20/60 transition-colors">
             <span className="text-xs text-zinc-600">https://</span>
             <input
               className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-600 outline-none min-w-0"
@@ -64,13 +64,13 @@ export default function Domains() {
           </div>
           {subError && <p className="text-xs text-red-400">{subError}</p>}
           <p className="text-xs text-zinc-600">
-            Live URL: <a href={fullUrl} className="text-brand-400 hover:text-brand-300 transition-colors" target="_blank" rel="noreferrer">{fullUrl}</a>
+            Live URL: <a href={fullUrl} className="text-white hover:text-white/80 transition-colors" target="_blank" rel="noreferrer">{fullUrl}</a>
           </p>
           <div className="flex justify-end">
             <button
               type="submit"
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                subSaved ? "bg-green-500/15 text-green-400 border border-green-500/20" : "bg-brand-600 hover:bg-brand-500 text-white"
+                subSaved ? "bg-green-500/15 text-green-400 border border-green-500/20" : "bg-white hover:bg-white text-white"
               }`}
             >
               {subSaved ? "✓ Saved" : "Save subdomain"}
@@ -88,7 +88,7 @@ export default function Domains() {
           </div>
           <button
             onClick={() => setShowAdd(!showAdd)}
-            className="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-white hover:bg-white text-white text-xs font-semibold transition-colors"
           >
             {showAdd ? "Cancel" : "+ Add domain"}
           </button>
@@ -98,7 +98,7 @@ export default function Domains() {
           <div className="mb-4 p-4 rounded-xl bg-surface-2 border border-white/5">
             <div className="flex gap-2 mb-3">
               <input
-                className="flex-1 px-3 py-2 rounded-lg bg-surface-3 border border-white/10 focus:border-brand-500/60 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors"
+                className="flex-1 px-3 py-2 rounded-lg bg-surface-3 border border-white/10 focus:border-white/20/60 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors"
                 type="text"
                 placeholder="yourbrand.com"
                 value={newDomain}
@@ -109,7 +109,7 @@ export default function Domains() {
               <button
                 onClick={handleAddDomain}
                 disabled={!newDomain.trim()}
-                className="px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 disabled:opacity-40 text-white text-sm font-semibold transition-colors"
+                className="px-4 py-2 rounded-lg bg-white hover:bg-white disabled:opacity-40 text-white text-sm font-semibold transition-colors"
               >
                 Add
               </button>

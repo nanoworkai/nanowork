@@ -146,7 +146,7 @@ export function PlanUpgradeModal({ isOpen, onClose }: PlanUpgradeModalProps) {
                 className="relative w-14 h-7 rounded-full bg-surface-2 border border-white/10"
               >
                 <div
-                  className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-brand-600 transition-transform ${
+                  className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white transition-transform ${
                     billingCycle === "yearly" ? "translate-x-7" : ""
                   }`}
                 />
@@ -155,7 +155,7 @@ export function PlanUpgradeModal({ isOpen, onClose }: PlanUpgradeModalProps) {
                 className={`text-sm ${billingCycle === "yearly" ? "text-white font-medium" : "text-zinc-500"}`}
               >
                 Yearly
-                <span className="ml-1 text-brand-400 text-xs">Save 17%</span>
+                <span className="ml-1 text-white text-xs">Save 17%</span>
               </span>
             </div>
           </div>
@@ -172,7 +172,7 @@ export function PlanUpgradeModal({ isOpen, onClose }: PlanUpgradeModalProps) {
                   key={plan.id}
                   className={`rounded-xl border-2 p-6 ${
                     plan.id === "growth"
-                      ? "border-brand-500 bg-brand-500/5"
+                      ? "border-white/20 bg-white/5"
                       : "border-white/10"
                   }`}
                 >
@@ -198,7 +198,7 @@ export function PlanUpgradeModal({ isOpen, onClose }: PlanUpgradeModalProps) {
                             per {billingCycle === "yearly" ? "year" : "month"}
                           </div>
                           {billingCycle === "yearly" && (
-                            <div className="text-xs text-brand-400 mt-1">
+                            <div className="text-xs text-white mt-1">
                               ${Math.round(price / 12)}/month billed yearly
                             </div>
                           )}
@@ -222,7 +222,7 @@ export function PlanUpgradeModal({ isOpen, onClose }: PlanUpgradeModalProps) {
                       disabled={loading}
                       className={`w-full py-3 rounded-lg font-semibold transition-all mb-6 disabled:opacity-50 ${
                         plan.id === "growth"
-                          ? "bg-brand-600 hover:bg-brand-500 text-white"
+                          ? "bg-white hover:bg-white text-white"
                           : "bg-white/10 hover:bg-white/20 text-white"
                       }`}
                     >
@@ -237,7 +237,7 @@ export function PlanUpgradeModal({ isOpen, onClose }: PlanUpgradeModalProps) {
                     {features.map((feature, i) => (
                       <div key={i} className="flex items-start gap-2">
                         <svg
-                          className="w-5 h-5 text-brand-500 flex-shrink-0 mt-0.5"
+                          className="w-5 h-5 text-white flex-shrink-0 mt-0.5"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"

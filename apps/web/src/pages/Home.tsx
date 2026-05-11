@@ -1,315 +1,198 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
-import {
-  Shield,
-  Building2,
-  FileText,
-  Clock,
-  CreditCard,
-  Mail,
-  Landmark,
-  TrendingUp,
-  ArrowRight,
-  Check,
-  ChevronLeft,
-  ChevronRight
-} from "lucide-react";
+import { ArrowRight, Terminal } from "lucide-react";
 
-// ── Types & Data ──────────────────────────────────────────────────────────────
+/**
+ * BLOOMBERG TERMINAL DESIGN PRINCIPLES:
+ *
+ * 1. DATA DENSITY: Multiple information streams visible simultaneously
+ * 2. MONOSPACE TYPOGRAPHY: Terminal aesthetic with fixed-width fonts
+ * 3. GRID SYSTEM: Rigid 4-column layout like terminal windows
+ * 4. STATUS INDICATORS: Live dots, ticker-style updates
+ * 5. DARK THEME: Pure black with amber/white accents only
+ * 6. NO DECORATION: All business, zero marketing fluff
+ */
 
 const TYPING_EXAMPLES = [
-  "Enterprise SaaS platform for logistics",
-  "Fintech infrastructure for payments",
-  "Healthcare AI diagnostic platform",
-  "Climate tech carbon marketplace",
-  "Web3 decentralized exchange",
-  "Biotech pharmaceutical research",
+  "FINTECH PAYMENT INFRA | $10M ARR TARGET",
+  "SAAS LOGISTICS PLATFORM | B2B ENTERPRISE",
+  "AI HEALTHCARE DIAGNOSTIC | FDA COMPLIANT",
 ];
 
-interface InfrastructureFeature {
-  icon: React.ReactNode;
-  category: string;
-  title: string;
-  description: string;
-  compliance: string[];
-  visual: React.ReactNode;
-}
+// Mock real-time stock data
+const STOCKS = [
+  { symbol: "MSFT", price: 412.38, change: 2.14, pct: 0.52 },
+  { symbol: "GOOGL", price: 178.92, change: -1.23, pct: -0.68 },
+  { symbol: "AAPL", price: 226.50, change: 3.42, pct: 1.53 },
+  { symbol: "NVDA", price: 138.75, change: 5.21, pct: 3.90 },
+  { symbol: "META", price: 563.28, change: -2.87, pct: -0.51 },
+  { symbol: "AMZN", price: 218.44, change: 1.92, pct: 0.89 },
+  { symbol: "TSLA", price: 345.67, change: -8.34, pct: -2.36 },
+  { symbol: "NFLX", price: 712.89, change: 4.56, pct: 0.64 },
+  { symbol: "CRM", price: 312.45, change: 6.78, pct: 2.22 },
+  { symbol: "ORCL", price: 167.23, change: 1.45, pct: 0.87 },
+  { symbol: "ADBE", price: 478.90, change: -3.21, pct: -0.67 },
+  { symbol: "CSCO", price: 57.82, change: 0.92, pct: 1.62 },
+];
 
-// ── Live Metrics Component ────────────────────────────────────────────────────
+// Tech news feed for valuations
+const NEWS_FEED = [
+  {
+    time: "09:42",
+    source: "BLOOMBERG",
+    headline: "AI Infrastructure Spending Hits $127B as Enterprise Adoption Accelerates",
+    impact: "BULLISH",
+  },
+  {
+    time: "09:38",
+    source: "WSJ",
+    headline: "SaaS Multiples Compress to 8.2x as Interest Rates Hold at 5.25%",
+    impact: "NEUTRAL",
+  },
+  {
+    time: "09:31",
+    source: "FT",
+    headline: "Payment Processing Volume Up 18% QoQ Driven by B2B Transactions",
+    impact: "BULLISH",
+  },
+  {
+    time: "09:24",
+    source: "CNBC",
+    headline: "Healthcare Tech M&A Activity Surges 34% YoY with $14B in Deals",
+    impact: "BULLISH",
+  },
+  {
+    time: "09:15",
+    source: "REUTERS",
+    headline: "Cloud Infrastructure ARR Growth Decelerates to 22% from 28% Previous Quarter",
+    impact: "BEARISH",
+  },
+  {
+    time: "09:08",
+    source: "BLOOMBERG",
+    headline: "Fintech Valuations Recover as Fed Signals Potential Rate Cuts in H2",
+    impact: "BULLISH",
+  },
+];
 
-function LiveMetrics() {
-  const [metrics] = useState({
-    companies: 2847,
-    revenue: 847000000,
-    transactions: 12847293,
-    countries: 67
-  });
+// ──────────────────────────────────────────────────────────────────────────────
+// STOCK TICKER - Scrolling market data
+// ──────────────────────────────────────────────────────────────────────────────
 
-  return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 py-16 border-y border-slate-200">
-      <div>
-        <div className="text-4xl font-bold text-slate-900 mb-2">
-          {metrics.companies.toLocaleString()}+
-        </div>
-        <div className="text-sm font-medium text-slate-600 uppercase tracking-wider">
-          Companies Built
-        </div>
-      </div>
-      <div>
-        <div className="text-4xl font-bold text-slate-900 mb-2">
-          ${(metrics.revenue / 1000000).toFixed(0)}M
-        </div>
-        <div className="text-sm font-medium text-slate-600 uppercase tracking-wider">
-          Revenue Generated
-        </div>
-      </div>
-      <div>
-        <div className="text-4xl font-bold text-slate-900 mb-2">
-          {(metrics.transactions / 1000000).toFixed(1)}M
-        </div>
-        <div className="text-sm font-medium text-slate-600 uppercase tracking-wider">
-          Transactions
-        </div>
-      </div>
-      <div>
-        <div className="text-4xl font-bold text-slate-900 mb-2">
-          {metrics.countries}
-        </div>
-        <div className="text-sm font-medium text-slate-600 uppercase tracking-wider">
-          Countries
-        </div>
-      </div>
-    </div>
-  );
-}
+function StockTicker() {
+  const [stocks, setStocks] = useState(STOCKS);
 
-// ── Infrastructure Carousel ───────────────────────────────────────────────────
-
-function InfrastructureCarousel() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const features: InfrastructureFeature[] = [
-    {
-      icon: <CreditCard className="w-6 h-6" />,
-      category: "Financial Infrastructure",
-      title: "Virtual Payment Cards",
-      description: "FDIC-insured virtual cards with granular spending controls, real-time transaction monitoring, and complete audit trails.",
-      compliance: ["PCI DSS Level 1", "FDIC Insured", "SOC 2 Type II"],
-      visual: (
-        <div className="relative w-full h-48 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg shadow-lg" />
-              <div>
-                <div className="text-xs font-bold text-white">NANOWORK</div>
-                <div className="text-[10px] text-slate-400">CORPORATE CARD</div>
-              </div>
-            </div>
-            <div className="text-lg font-mono text-white tracking-wider mb-6">
-              •••• •••• •••• 4892
-            </div>
-            <div className="flex justify-between items-end">
-              <div>
-                <div className="text-[10px] text-slate-500 mb-1">DEPARTMENT</div>
-                <div className="text-sm font-bold text-white">FINANCE</div>
-              </div>
-              <div className="flex gap-2">
-                <div className="w-8 h-8 rounded-full bg-red-500/20 border-2 border-red-500" />
-                <div className="w-8 h-8 rounded-full bg-amber-500/20 border-2 border-amber-500 -ml-4" />
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      icon: <Mail className="w-6 h-6" />,
-      category: "Communication Layer",
-      title: "Dedicated Email Infrastructure",
-      description: "Professional email addresses with enterprise-grade security, automated inbox management, and encrypted storage.",
-      compliance: ["GDPR Compliant", "HIPAA Ready", "ISO 27001"],
-      visual: (
-        <div className="w-full h-48 bg-white border border-slate-200 rounded-2xl p-6">
-          <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
-            <div className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white text-sm font-bold">
-              F
-            </div>
-            <div className="flex-1">
-              <div className="text-sm font-semibold text-slate-900">finance@company.ai</div>
-              <div className="text-xs text-slate-500">Department Agent</div>
-            </div>
-            <div className="w-2 h-2 rounded-full bg-green-500" />
-          </div>
-          <div className="space-y-3">
-            {[
-              { subject: "Invoice #2847 Processed", time: "2m ago", unread: true },
-              { subject: "Vendor Payment Confirmed", time: "1h ago", unread: false },
-              { subject: "Monthly Report Ready", time: "3h ago", unread: false },
-            ].map((email, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div className={`w-2 h-2 rounded-full mt-1.5 ${email.unread ? 'bg-blue-500' : 'bg-slate-300'}`} />
-                <div className="flex-1 min-w-0">
-                  <div className={`text-xs ${email.unread ? 'font-semibold text-slate-900' : 'font-medium text-slate-600'} truncate`}>
-                    {email.subject}
-                  </div>
-                  <div className="text-[10px] text-slate-400">{email.time}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-    },
-    {
-      icon: <Landmark className="w-6 h-6" />,
-      category: "Banking Operations",
-      title: "Department Bank Accounts",
-      description: "Separate FDIC-insured accounts with real-time balance tracking, automated reconciliation, and institutional-grade security.",
-      compliance: ["FDIC Insured $250K", "SOC 2 Type II", "AML/KYC"],
-      visual: (
-        <div className="relative w-full h-48 bg-slate-50 border-2 border-slate-900 rounded-2xl p-6 overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900" />
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Nanowork Finance
-              </div>
-              <div className="text-xs font-bold text-slate-900">Operating Account</div>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
-              <Landmark className="w-5 h-5 text-white" />
-            </div>
-          </div>
-          <div className="mb-6">
-            <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
-              Available Balance
-            </div>
-            <div className="text-3xl font-bold text-slate-900 tracking-tight">
-              $234,567
-            </div>
-          </div>
-          <div className="flex gap-6">
-            <div>
-              <div className="text-[9px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Routing
-              </div>
-              <div className="text-xs font-mono font-semibold text-slate-900">021000021</div>
-            </div>
-            <div>
-              <div className="text-[9px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Account
-              </div>
-              <div className="text-xs font-mono font-semibold text-slate-900">•••• 4892</div>
-            </div>
-          </div>
-        </div>
-      )
-    }
-  ];
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % features.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + features.length) % features.length);
-  };
-
+  // Simulate live updates
   useEffect(() => {
-    const interval = setInterval(nextSlide, 5000);
+    const interval = setInterval(() => {
+      setStocks((prev) =>
+        prev.map((stock) => {
+          const volatility = Math.random() * 0.5 - 0.25; // -0.25% to +0.25%
+          const priceChange = stock.price * (volatility / 100);
+          const newPrice = stock.price + priceChange;
+          const newChange = stock.change + priceChange;
+          const newPct = (newChange / (newPrice - newChange)) * 100;
+
+          return {
+            ...stock,
+            price: newPrice,
+            change: newChange,
+            pct: newPct,
+          };
+        })
+      );
+    }, 3000);
+
     return () => clearInterval(interval);
   }, []);
 
-  const current = features[currentIndex];
-
   return (
-    <div className="relative">
-      <div className="relative bg-white border border-slate-200 rounded-3xl p-8 lg:p-12 shadow-sm">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentIndex}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-            className="grid lg:grid-cols-2 gap-12 items-center"
+    <div className="bg-surface-1 border-b border-white/10 overflow-hidden">
+      <div className="flex animate-scroll">
+        {/* Duplicate stocks for seamless loop */}
+        {[...stocks, ...stocks].map((stock, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 px-6 py-2.5 border-r border-white/5 whitespace-nowrap flex-shrink-0"
           >
-            {/* Content */}
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white">
-                  {current.icon}
-                </div>
-                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  {current.category}
-                </div>
-              </div>
-
-              <h3 className="text-3xl font-bold text-slate-900 mb-4 leading-tight">
-                {current.title}
-              </h3>
-
-              <p className="text-lg text-slate-600 leading-relaxed mb-6">
-                {current.description}
-              </p>
-
-              <div className="flex flex-wrap gap-2">
-                {current.compliance.map((badge, i) => (
-                  <div key={i} className="flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-full">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-semibold text-green-900">{badge}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Visual */}
-            <div className="flex items-center justify-center">
-              {current.visual}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Navigation */}
-        <div className="flex items-center justify-between mt-8 pt-8 border-t border-slate-200">
-          <div className="flex gap-2">
-            {features.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentIndex(i)}
-                className={`h-2 rounded-full transition-all ${
-                  i === currentIndex ? 'w-8 bg-slate-900' : 'w-2 bg-slate-300 hover:bg-slate-400'
-                }`}
-              />
-            ))}
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              onClick={prevSlide}
-              className="w-10 h-10 rounded-full border-2 border-slate-900 flex items-center justify-center text-slate-900 hover:bg-slate-900 hover:text-white transition-colors"
+            <span className="text-xs font-mono font-bold text-white">{stock.symbol}</span>
+            <span className="text-xs font-mono text-white tabular-nums">
+              ${stock.price.toFixed(2)}
+            </span>
+            <span
+              className={`text-xs font-mono tabular-nums ${
+                stock.change >= 0 ? "text-green-400" : "text-red-400"
+              }`}
             >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={nextSlide}
-              className="w-10 h-10 rounded-full bg-slate-900 flex items-center justify-center text-white hover:bg-slate-800 transition-colors"
+              {stock.change >= 0 ? "+" : ""}
+              {stock.change.toFixed(2)}
+            </span>
+            <span
+              className={`text-xs font-mono tabular-nums ${
+                stock.pct >= 0 ? "text-green-400" : "text-red-400"
+              }`}
             >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+              {stock.pct >= 0 ? "+" : ""}
+              {stock.pct.toFixed(2)}%
+            </span>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
 }
 
-// ── Prompt Input ──────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────────
+// LIVE TICKER - Shows real-time metrics
+// ──────────────────────────────────────────────────────────────────────────────
 
-function PromptInput() {
+function LiveTicker() {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const metrics = [
+    { label: "COMPANIES", value: "2,847", change: "+12" },
+    { label: "REVENUE", value: "$847M", change: "+$2.4M" },
+    { label: "TXN/SEC", value: "148", change: "+3" },
+    { label: "UPTIME", value: "99.98%", change: "—" },
+  ];
+
+  return (
+    <div className="card rounded-none border-b border-white/10">
+      <div className="grid grid-cols-5 divide-x divide-white/10">
+        {/* Clock */}
+        <div className="px-6 py-4">
+          <div className="text-xs font-mono text-white/40 mb-1">UTC</div>
+          <div className="text-base font-mono font-bold text-white tabular-nums">
+            {time.toUTCString().slice(17, 25)}
+          </div>
+        </div>
+
+        {/* Metrics */}
+        {metrics.map((m, i) => (
+          <div key={i} className="px-6 py-4">
+            <div className="text-xs font-mono text-white/40 mb-1">{m.label}</div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-base font-mono font-bold text-white tabular-nums">{m.value}</span>
+              <span className="text-xs font-mono text-green-400">{m.change}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// TERMINAL PROMPT INPUT
+// ──────────────────────────────────────────────────────────────────────────────
+
+function TerminalPrompt() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const [value, setValue] = useState("");
@@ -319,8 +202,9 @@ function PromptInput() {
   const [exampleIndex, setExampleIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Typewriter
   useEffect(() => {
     if (focused || value) return;
     const currentExample = TYPING_EXAMPLES[exampleIndex];
@@ -329,7 +213,7 @@ function PromptInput() {
       const timeout = setTimeout(() => {
         setPlaceholder(currentExample.slice(0, charIndex + 1));
         setCharIndex(charIndex + 1);
-      }, 60);
+      }, 40);
       return () => clearTimeout(timeout);
     } else if (!isDeleting && charIndex === currentExample.length) {
       const timeout = setTimeout(() => setIsDeleting(true), 2000);
@@ -338,7 +222,7 @@ function PromptInput() {
       const timeout = setTimeout(() => {
         setPlaceholder(currentExample.slice(0, charIndex - 1));
         setCharIndex(charIndex - 1);
-      }, 30);
+      }, 20);
       return () => clearTimeout(timeout);
     } else if (isDeleting && charIndex === 0) {
       setIsDeleting(false);
@@ -346,136 +230,283 @@ function PromptInput() {
     }
   }, [charIndex, isDeleting, exampleIndex, focused, value]);
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
-    }
-  }, [value]);
-
-  function submit() {
+  async function submit() {
     const text = value.trim();
     if (!text) return;
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      // Call preview build endpoint (no auth required)
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/build/preview`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: text }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create preview');
+      }
+
+      const data = await response.json();
+
+      // Redirect to preview page
+      navigate(`/preview/${data.build_id}`);
+    } catch (error) {
+      console.error('Preview build failed:', error);
+      // Fallback to old flow
       if (isAuthenticated) navigate(`/dashboard?p=${encodeURIComponent(text)}`);
       else navigate(`/login?redirect=/dashboard&p=${encodeURIComponent(text)}`);
-    }, 200);
+    }
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className={`relative border-2 rounded-3xl bg-slate-900 transition-all duration-300 ${
-        focused ? 'border-slate-700 shadow-2xl' : 'border-slate-800 shadow-xl'
-      }`}>
-        <textarea
-          ref={textareaRef}
-          value={value}
-          onChange={e => setValue(e.target.value)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          onKeyDown={e => {
-            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-              e.preventDefault();
-              submit();
-            }
-          }}
-          disabled={loading}
-          className="w-full min-h-[160px] max-h-[400px] p-8 pr-24 text-lg text-white bg-transparent border-none outline-none resize-none placeholder-slate-500 font-medium"
-          style={{ fontFamily: 'inherit' }}
-        />
-        {!value && !focused && (
-          <div className="absolute top-8 left-8 text-lg text-slate-500 pointer-events-none flex items-center font-medium">
-            {placeholder}
-            <span className="inline-block w-0.5 h-6 bg-slate-400 ml-1 animate-pulse" />
+    <div className="card-lg rounded-none border border-white/10">
+      <div className="border-b border-white/10 px-6 py-3 bg-surface-1">
+        <div className="flex items-center gap-3">
+          <Terminal className="w-4 h-4 text-white/60" />
+          <span className="text-xs font-mono font-bold text-white/60 uppercase tracking-wider">
+            Build Command
+          </span>
+          <div className="flex-1" />
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-xs font-mono text-white/40">READY</span>
           </div>
-        )}
-        <button
-          onClick={submit}
-          disabled={loading || !value.trim()}
-          className="absolute right-6 bottom-6 w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg hover:scale-105"
-        >
-          {loading ? (
-            <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <ArrowRight className="w-6 h-6" />
-          )}
-        </button>
+        </div>
       </div>
 
-      <div className="flex items-center justify-center gap-8 mt-8 text-sm font-semibold text-slate-600">
-        <div className="flex items-center gap-2">
-          <Shield className="w-4 h-4" />
-          Bank-grade security
+      <div className="p-6">
+        <div className="relative mb-4">
+          <div className="flex items-start gap-3">
+            <span className="text-white/60 font-mono text-sm mt-1 select-none">$</span>
+            <div className="flex-1">
+              <textarea
+                ref={inputRef}
+                value={value}
+                onChange={e => setValue(e.target.value)}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                onKeyDown={e => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    submit();
+                  }
+                }}
+                disabled={loading}
+                className="w-full min-h-[80px] max-h-[200px] bg-transparent border-none outline-none resize-none text-white placeholder-transparent font-mono text-sm leading-relaxed"
+              />
+              {!value && (
+                <div className="absolute top-0 left-9 right-0 pointer-events-none">
+                  <div className="font-mono text-sm text-white/30 leading-relaxed flex">
+                    {placeholder}
+                    {!focused && <span className="inline-block w-2 h-5 bg-white/50 ml-1 animate-pulse" />}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="w-px h-4 bg-slate-300" />
-        <div className="flex items-center gap-2">
-          <Building2 className="w-4 h-4" />
-          FDIC insured
-        </div>
-        <div className="w-px h-4 bg-slate-300" />
-        <div className="flex items-center gap-2">
-          <FileText className="w-4 h-4" />
-          SOC 2 compliant
+
+        <div className="flex items-center justify-between pt-4 border-t border-white/5">
+          <div className="flex items-center gap-6 text-xs font-mono text-white/40">
+            <span>7 DEPARTMENTS</span>
+            <span>|</span>
+            <span>PARALLEL EXECUTION</span>
+            <span>|</span>
+            <span>FDIC INSURED</span>
+          </div>
+
+          <button
+            onClick={submit}
+            disabled={loading || !value.trim()}
+            className="px-6 py-2.5 rounded-none bg-white hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed text-black font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+          >
+            {loading ? "EXECUTING..." : "EXECUTE"}
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
-// ── Trust Badges ──────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────────
+// NEWS FEED - Tech news for valuations
+// ──────────────────────────────────────────────────────────────────────────────
 
-function TrustBadges() {
-  const badges = [
-    { icon: <Shield />, title: "Bank-Grade Security", description: "256-bit encryption, SOC 2 Type II certified" },
-    { icon: <Building2 />, title: "FDIC Insured", description: "All funds protected up to $250,000" },
-    { icon: <FileText />, title: "Full Compliance", description: "GDPR, PCI DSS, and SOX compliant" },
-    { icon: <Clock />, title: "24/7 Monitoring", description: "Real-time fraud detection and alerts" },
+function NewsFeed() {
+  return (
+    <div className="card-lg rounded-none border border-white/10">
+      <div className="border-b border-white/10 px-6 py-3 bg-surface-1">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          <span className="text-xs font-mono font-bold text-white/60 uppercase tracking-wider">
+            Market Intelligence Feed
+          </span>
+          <div className="flex-1" />
+          <span className="text-xs font-mono text-white/40">LIVE</span>
+        </div>
+      </div>
+
+      <div className="divide-y divide-white/5">
+        {NEWS_FEED.map((item, i) => (
+          <div
+            key={i}
+            className="px-6 py-4 hover:bg-surface-2 transition-colors cursor-pointer"
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex flex-col items-end gap-1 w-12 flex-shrink-0">
+                <span className="text-xs font-mono text-white/40 tabular-nums">{item.time}</span>
+                <span
+                  className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-none ${
+                    item.impact === "BULLISH"
+                      ? "bg-green-400/10 text-green-400 border border-green-400/20"
+                      : item.impact === "BEARISH"
+                      ? "bg-red-400/10 text-red-400 border border-red-400/20"
+                      : "bg-white/5 text-white/40 border border-white/10"
+                  }`}
+                >
+                  {item.impact}
+                </span>
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] font-mono text-white/40 mb-1 uppercase tracking-wider">
+                  {item.source}
+                </div>
+                <p className="text-xs font-mono text-white/80 leading-relaxed">
+                  {item.headline}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="border-t border-white/10 px-6 py-3 bg-surface-1">
+        <button className="text-xs font-mono text-white/40 hover:text-white transition-colors uppercase tracking-wider">
+          View All Intelligence →
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// DATA GRID - Infrastructure specs
+// ──────────────────────────────────────────────────────────────────────────────
+
+function InfrastructureGrid() {
+  const items = [
+    {
+      code: "PAYMENT",
+      title: "Virtual Payment Cards",
+      specs: ["PCI DSS LVL 1", "FDIC $250K", "SOC 2 TYPE II"],
+      status: "OPERATIONAL",
+    },
+    {
+      code: "BANKING",
+      title: "Department Accounts",
+      specs: ["FDIC INSURED", "ACH/WIRE", "REAL-TIME"],
+      status: "OPERATIONAL",
+    },
+    {
+      code: "COMMS",
+      title: "Email Infrastructure",
+      specs: ["GDPR", "HIPAA READY", "ISO 27001"],
+      status: "OPERATIONAL",
+    },
+    {
+      code: "ANALYTICS",
+      title: "Real-Time Dashboards",
+      specs: ["SUB-100MS", "99.99% SLA", "ENCRYPTED"],
+      status: "OPERATIONAL",
+    },
+    {
+      code: "COMPLIANCE",
+      title: "SOC 2 Framework",
+      specs: ["TYPE II", "ANNUAL AUDIT", "CONTINUOUS"],
+      status: "OPERATIONAL",
+    },
+    {
+      code: "AGENTS",
+      title: "Autonomous Operations",
+      specs: ["24/7/365", "MULTI-DEPT", "PARALLEL"],
+      status: "OPERATIONAL",
+    },
   ];
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-      {badges.map((badge, i) => (
-        <div key={i} className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-900 flex items-center justify-center text-white">
-            {badge.icon}
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10">
+      {items.map((item, i) => (
+        <div key={i} className="card rounded-none border-0 p-6 hover:bg-surface-3 transition-colors">
+          <div className="flex items-start justify-between mb-4">
+            <div className="text-xs font-mono font-bold text-white/40">{item.code}</div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+              <span className="text-[10px] font-mono text-green-400">{item.status}</span>
+            </div>
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">{badge.title}</h3>
-          <p className="text-sm text-slate-600 leading-relaxed">{badge.description}</p>
+
+          <h3 className="text-sm font-mono font-bold text-white mb-3 leading-tight">
+            {item.title}
+          </h3>
+
+          <div className="flex flex-wrap gap-1.5">
+            {item.specs.map((spec, j) => (
+              <span
+                key={j}
+                className="px-2 py-0.5 rounded-none bg-white/5 text-[10px] font-mono text-white/60 border border-white/10"
+              >
+                {spec}
+              </span>
+            ))}
+          </div>
         </div>
       ))}
     </div>
   );
 }
 
-// ── Main Component ────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────────
+// MAIN COMPONENT
+// ──────────────────────────────────────────────────────────────────────────────
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 text-slate-900 hover:opacity-70 transition-opacity">
-            <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-white" />
+    <div className="min-h-screen bg-surface-0">
+      {/* Header - Terminal style */}
+      <header className="sticky top-0 z-50 bg-surface-0 border-b border-white/10">
+        <div className="max-w-[1800px] mx-auto px-6 h-14 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 text-white hover:opacity-70 transition-opacity">
+            <div className="w-6 h-6 rounded-none bg-white flex items-center justify-center">
+              <Terminal className="w-3.5 h-3.5 text-black" />
             </div>
-            <span className="text-xl font-bold tracking-tight">Nanowork</span>
+            <span className="text-sm font-mono font-bold uppercase tracking-wider">Nanowork</span>
           </Link>
-          <nav className="flex items-center gap-6">
+
+          <nav className="flex items-center gap-1">
             {isAuthenticated ? (
-              <Link to="/dashboard" className="px-6 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors">
+              <Link
+                to="/dashboard"
+                className="px-5 py-2 rounded-none bg-white text-black text-xs font-mono font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
+              >
                 Dashboard
               </Link>
             ) : (
               <>
-                <Link to="/login" className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors">
-                  Sign in
+                <Link
+                  to="/login"
+                  className="px-5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-white/60 hover:text-white transition-colors"
+                >
+                  Login
                 </Link>
-                <Link to="/login" className="px-6 py-2.5 bg-slate-900 text-white text-sm font-semibold rounded-xl hover:bg-slate-800 transition-colors">
-                  Get Started
+                <Link
+                  to="/login"
+                  className="px-5 py-2 rounded-none bg-white text-black text-xs font-mono font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
+                >
+                  Start
                 </Link>
               </>
             )}
@@ -483,113 +514,147 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Stock Ticker */}
+      <StockTicker />
+
+      {/* Live Metrics Ticker */}
+      <LiveTicker />
+
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Hero */}
-        <section className="py-24 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full text-sm font-semibold text-slate-900 mb-8">
-            <TrendingUp className="w-4 h-4" />
-            IPO-ready infrastructure from day one
-          </div>
-
-          <h1 className="text-6xl lg:text-7xl font-bold text-slate-900 mb-8 leading-[1.1] tracking-tight">
-            Enterprise AI <br/>Company Builder
-          </h1>
-
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-12 leading-relaxed font-medium">
-            Not bots. Real autonomous agents with their own cards, emails, and bank accounts.
-            Building venture-scale companies with institutional-grade infrastructure.
-          </p>
-
-          <PromptInput />
-        </section>
-
-        {/* Live Metrics */}
-        <LiveMetrics />
-
-        {/* Infrastructure Carousel */}
-        <section className="py-24">
-          <div className="text-center mb-16">
-            <div className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">
-              Enterprise Infrastructure
+      <main className="max-w-[1800px] mx-auto px-6">
+        {/* Hero Section - Dense, terminal-style */}
+        <section className="py-16">
+          <div className="mb-8">
+            <div className="flex items-baseline gap-3 mb-2">
+              <span className="text-xs font-mono text-white/40">PRODUCT:</span>
+              <h1 className="text-4xl font-mono font-bold text-white uppercase tracking-tight">
+                Enterprise Agent Infrastructure
+              </h1>
             </div>
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6 leading-tight">
-              Real agents. Real infrastructure.
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              Bank-grade security meets autonomous execution. Every agent operates with dedicated financial
-              instruments, complete audit trails, and institutional compliance.
-            </p>
+            <div className="flex items-baseline gap-3">
+              <span className="text-xs font-mono text-white/40">STATUS:</span>
+              <p className="text-sm font-mono text-white/70 max-w-3xl leading-relaxed">
+                Autonomous agents with real bank accounts, payment cards, and institutional-grade infrastructure.
+                One command launches seven departments working in parallel. IPO-ready from day one.
+              </p>
+            </div>
           </div>
 
-          <InfrastructureCarousel />
+          <TerminalPrompt />
         </section>
 
-        {/* Trust Section */}
-        <section className="py-24 bg-slate-50 -mx-6 lg:-mx-8 px-6 lg:px-8 rounded-3xl">
-          <TrustBadges />
+        {/* Two Column Layout: News Feed + Infrastructure */}
+        <section className="py-12">
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Left: News Feed */}
+            <div className="lg:col-span-1">
+              <NewsFeed />
+            </div>
+
+            {/* Right: Infrastructure Grid */}
+            <div className="lg:col-span-2">
+              <div className="mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-mono font-bold text-white/40 uppercase tracking-wider">
+                    Infrastructure Matrix
+                  </span>
+                  <div className="flex-1 h-px bg-white/10" />
+                  <span className="text-xs font-mono text-green-400">6 SYSTEMS OPERATIONAL</span>
+                </div>
+              </div>
+
+              <InfrastructureGrid />
+            </div>
+          </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-24 text-center">
-          <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">
-            Start building today
-          </h2>
-          <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
-            From zero to revenue in days. From revenue to IPO with agents that never stop working.
-          </p>
-          <Link
-            to="/login"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-slate-900 text-white text-lg font-semibold rounded-2xl hover:bg-slate-800 transition-all shadow-xl hover:scale-105"
-          >
-            Get Started
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+        {/* Stats Bar - Bloomberg style */}
+        <section className="py-12">
+          <div className="card-lg rounded-none border border-white/10 p-8">
+            <div className="grid grid-cols-4 gap-8">
+              {[
+                { metric: "COMPANIES BUILT", value: "2,847", delta: "+127 THIS MONTH" },
+                { metric: "TOTAL REVENUE", value: "$847M", delta: "+$2.4M TODAY" },
+                { metric: "TRANSACTIONS", value: "12.8M", delta: "+148/SEC" },
+                { metric: "GLOBAL REACH", value: "67 COUNTRIES", delta: "+3 THIS QUARTER" },
+              ].map((stat, i) => (
+                <div key={i}>
+                  <div className="text-xs font-mono text-white/40 mb-2 uppercase tracking-wider">
+                    {stat.metric}
+                  </div>
+                  <div className="text-3xl font-mono font-bold text-white mb-1 tabular-nums">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs font-mono text-green-400">
+                    {stat.delta}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA - Terminal command style */}
+        <section className="py-16">
+          <div className="card-lg rounded-none border border-white/10 p-12 text-center">
+            <div className="text-xs font-mono text-white/40 uppercase tracking-wider mb-4">
+              Begin Execution
+            </div>
+            <h2 className="text-3xl font-mono font-bold text-white uppercase mb-4 tracking-tight">
+              Start Building Today
+            </h2>
+            <p className="text-sm font-mono text-white/60 mb-8 max-w-2xl mx-auto leading-relaxed">
+              From zero to revenue in days. From revenue to scale with agents that never stop working.
+              Enterprise infrastructure from the first command.
+            </p>
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-3 px-8 py-4 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
+            >
+              Initialize System
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-slate-50 mt-24">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
-          <div className="grid md:grid-cols-4 gap-12">
+      {/* Footer - Minimal terminal footer */}
+      <footer className="border-t border-white/10 mt-16">
+        <div className="max-w-[1800px] mx-auto px-6 py-12">
+          <div className="grid grid-cols-4 gap-12">
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-white" />
-                </div>
-                <span className="text-xl font-bold">Nanowork</span>
+              <div className="flex items-center gap-2 mb-4">
+                <Terminal className="w-4 h-4 text-white/60" />
+                <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">Nanowork</span>
               </div>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                AI agents that build and run your entire business. Enterprise infrastructure from day one.
+              <p className="text-xs font-mono text-white/40 leading-relaxed">
+                Enterprise agent infrastructure
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Product</h3>
-              <ul className="space-y-3 text-sm text-slate-600">
-                <li><Link to="/revenue" className="hover:text-slate-900">Revenue</Link></li>
-                <li><Link to="/swipe" className="hover:text-slate-900">Swipe</Link></li>
-                <li><Link to="/dashboard" className="hover:text-slate-900">Dashboard</Link></li>
+              <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Product</h3>
+              <ul className="space-y-2 text-xs font-mono text-white/40">
+                <li><Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
+                <li><Link to="/revenue" className="hover:text-white transition-colors">Revenue</Link></li>
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Company</h3>
-              <ul className="space-y-3 text-sm text-slate-600">
-                <li><a href="#about" className="hover:text-slate-900">About</a></li>
-                <li><a href="#blog" className="hover:text-slate-900">Blog</a></li>
-                <li><a href="#careers" className="hover:text-slate-900">Careers</a></li>
+              <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Company</h3>
+              <ul className="space-y-2 text-xs font-mono text-white/40">
+                <li><a href="#about" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="#blog" className="hover:text-white transition-colors">Blog</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Legal</h3>
-              <ul className="space-y-3 text-sm text-slate-600">
-                <li><a href="#privacy" className="hover:text-slate-900">Privacy</a></li>
-                <li><a href="#terms" className="hover:text-slate-900">Terms</a></li>
-                <li><a href="#security" className="hover:text-slate-900">Security</a></li>
+              <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Legal</h3>
+              <ul className="space-y-2 text-xs font-mono text-white/40">
+                <li><a href="#privacy" className="hover:text-white transition-colors">Privacy</a></li>
+                <li><a href="#terms" className="hover:text-white transition-colors">Terms</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-slate-200 mt-12 pt-8 text-center text-sm text-slate-600">
-            © {new Date().getFullYear()} Nanowork, Inc. All rights reserved.
+          <div className="mt-12 pt-6 border-t border-white/5 text-center text-xs font-mono text-white/30">
+            © {new Date().getFullYear()} NANOWORK INC · ALL RIGHTS RESERVED
           </div>
         </div>
       </footer>
