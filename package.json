@@ -12,7 +12,7 @@
     "build": "npm run build:web && npm run build:copy",
     "build:web": "npm run build -w web",
     "build:copy": "rm -rf apps/api/static && cp -r apps/web/dist apps/api/static",
-    "start": "bash -lc 'cd apps/api && PYTHONPATH=. .venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000'",
+    "start": "cd apps/api && python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}",
     "preview": "npm run build && npm run start",
     "deploy:worker": "cd apps/worker && npx wrangler deploy",
     "test:api": "cd apps/api && PYTHONPATH=. .venv/bin/pytest",
