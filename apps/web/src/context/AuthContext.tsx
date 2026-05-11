@@ -251,14 +251,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Companies table might not exist yet - that's okay
         });
         // Update last login
-        supabase
+        void supabase
           .from("profiles")
           .update({ last_login_at: new Date().toISOString() })
-          .eq("id", s.user.id)
-          .then(() => {})
-          .catch(() => {
-            // Column might not exist yet - that's okay
-          });
+          .eq("id", s.user.id);
       }
       setIsLoading(false);
     }).catch((err) => {

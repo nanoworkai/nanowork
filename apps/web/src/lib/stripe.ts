@@ -45,6 +45,7 @@ export const CREDITS_PACKAGES = [
     price: 10,
     priceId: PRICE_IDS.credits_1k,
     popular: false,
+    savings: undefined,
   },
   {
     id: 'pro',
