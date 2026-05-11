@@ -525,19 +525,13 @@ export default function Home() {
         {/* Hero Section - Dense, terminal-style */}
         <section className="py-16">
           <div className="mb-8">
-            <div className="flex items-baseline gap-3 mb-2">
-              <span className="text-xs font-mono text-white/40">PRODUCT:</span>
-              <h1 className="text-4xl font-mono font-bold text-white uppercase tracking-tight">
-                Enterprise Agent Infrastructure
-              </h1>
-            </div>
-            <div className="flex items-baseline gap-3">
-              <span className="text-xs font-mono text-white/40">STATUS:</span>
-              <p className="text-sm font-mono text-white/70 max-w-3xl leading-relaxed">
-                Autonomous agents with real bank accounts, payment cards, and institutional-grade infrastructure.
-                One command launches seven departments working in parallel. IPO-ready from day one.
-              </p>
-            </div>
+            <h1 className="text-4xl font-mono font-bold text-white uppercase tracking-tight mb-4">
+              Enterprise Agent Infrastructure
+            </h1>
+            <p className="text-sm font-mono text-white/70 max-w-3xl leading-relaxed">
+              Autonomous agents with real bank accounts, payment cards, and institutional-grade infrastructure.
+              One command launches seven departments working in parallel. IPO-ready from day one.
+            </p>
           </div>
 
           <TerminalPrompt />
