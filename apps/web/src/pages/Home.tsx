@@ -297,9 +297,9 @@ function TerminalPrompt() {
               />
               {!value && (
                 <div className="absolute top-0 left-9 right-0 pointer-events-none">
-                  <div className="font-mono text-sm text-white/30 leading-relaxed flex">
+                  <div className="font-mono text-sm text-white/70 leading-relaxed flex">
                     {placeholder}
-                    {!focused && <span className="inline-block w-2 h-5 bg-white/50 ml-1 animate-pulse" />}
+                    {!focused && <span className="inline-block w-2 h-5 bg-white/80 ml-1 animate-pulse" />}
                   </div>
                 </div>
               )}
