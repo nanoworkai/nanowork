@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: nanowork-mvp
+    runtime: python
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: |
+      # Install Node.js dependencies and build frontend
+      npm install
+      npm run build
+      # Install Python dependencies
+      cd apps/api
+      pip install -r requirements.txt
+    startCommand: |
+      cd apps/api
+      python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHONPATH
+        value: /opt/render/project/src/apps/api
+      - key: ENVIRONMENT
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: LINQ_STRIPE_SECRET_KEY
+        sync: false
+      - key: LINQ_STRIPE_PUBLISHABLE_KEY
+        sync: false
