@@ -2,9 +2,6 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import Rent from "./pages/Rent";
-import RentDetail from "./pages/RentDetail";
-import SubmitResource from "./pages/SubmitResource";
 import Revenue from "./pages/Revenue";
 import Swipe from "./pages/Swipe";
 import DashboardLayout from "./dashboard/DashboardLayout";
@@ -30,9 +27,6 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/rent" element={<Rent />} />
-      <Route path="/rent/submit" element={<SubmitResource />} />
-      <Route path="/rent/:slug" element={<RentDetail />} />
       <Route path="/revenue" element={<Revenue />} />
       <Route path="/swipe" element={<Swipe />} />
       <Route

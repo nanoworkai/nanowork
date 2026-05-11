@@ -250,15 +250,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await loadCompanies(s.user.id).catch(() => {
           // Companies table might not exist yet - that's okay
         });
-        // Update last login
-        supabase
-          .from("profiles")
-          .update({ last_login_at: new Date().toISOString() })
-          .eq("id", s.user.id)
-          .then(() => {})
-          .catch(() => {
-            // Column might not exist yet - that's okay
-          });
+        // Update last login (fire and forget)
+        void (async () => {
+          try {
+            await supabase
+              .from("profiles")
+              .update({ last_login_at: new Date().toISOString() })
+              .eq("id", s.user.id);
+          } catch {
+            // Ignore errors - column may not exist
+          }
+        })();
       }
       setIsLoading(false);
     }).catch((err) => {

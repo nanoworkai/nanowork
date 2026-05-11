@@ -5,11 +5,21 @@
     "apps/web"
   ],
   "scripts": {
-    "dev": "npm run dev -w web",
-    "build": "npm run build -w web",
-    "preview": "npm run preview -w web",
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
+    "dev:web": "npm run dev -w web",
     "dev:api": "bash -lc 'cd apps/api && PYTHONPATH=. .venv/bin/python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000'",
     "dev:worker": "cd apps/worker && npx wrangler dev",
-    "deploy:worker": "cd apps/worker && npx wrangler deploy"
+    "build": "npm run build:web && npm run build:copy",
+    "build:web": "npm run build -w web",
+    "build:copy": "rm -rf apps/api/static && cp -r apps/web/dist apps/api/static",
+    "start": "bash -lc 'cd apps/api && PYTHONPATH=. .venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000'",
+    "preview": "npm run build && npm run start",
+    "deploy:worker": "cd apps/worker && npx wrangler deploy",
+    "test:api": "cd apps/api && PYTHONPATH=. .venv/bin/pytest",
+    "lint:api": "cd apps/api && .venv/bin/ruff check app",
+    "format:api": "cd apps/api && .venv/bin/ruff format app"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }

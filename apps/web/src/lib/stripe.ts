@@ -45,6 +45,7 @@ export const CREDITS_PACKAGES = [
     price: 10,
     priceId: PRICE_IDS.credits_1k,
     popular: false,
+    savings: undefined,
   },
   {
     id: 'pro',
@@ -65,6 +66,8 @@ export const CREDITS_PACKAGES = [
     popular: false,
   },
 ] as const;
+
+export type CreditsPackage = typeof CREDITS_PACKAGES[number];
 
 // Create Stripe checkout session for subscription
 export async function createSubscriptionCheckout(
