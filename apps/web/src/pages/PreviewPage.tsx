@@ -22,7 +22,7 @@ interface BuildData {
 export default function PreviewPage() {
   const { buildId } = useParams<{ buildId: string }>();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   const [build, setBuild] = useState<BuildData | null>(null);
   const [loading, setLoading] = useState(true);
