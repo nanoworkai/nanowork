@@ -94,7 +94,9 @@ def health() -> dict:
 
 
 # Static files - React app (must be last!)
+# Always use apps/api/static (relative to this file's parent directory)
 STATIC_DIR = Path(__file__).parent.parent / "static"
+
 if STATIC_DIR.exists():
     # Serve static assets (JS, CSS, images)
     app.mount("/assets", StaticFiles(directory=STATIC_DIR / "assets"), name="assets")
@@ -120,5 +122,5 @@ else:
             "message": "Nanowork API",
             "docs": "/api/docs",
             "health": "/health",
-            "note": "Frontend not built. Run: npm run build:web"
+            "note": f"Frontend not built. Run: npm run build:web (looked in {STATIC_DIR})"
         }
