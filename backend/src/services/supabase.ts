@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import ws from 'ws';
 import {
   Agent,
   NewAgent,
@@ -48,6 +49,12 @@ export function getSupabase(): SupabaseClient {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
+    },
+    global: {
+      fetch: (...args) => fetch(...args),
+    },
+    realtime: {
+      transport: ws as any,
     },
   });
 
