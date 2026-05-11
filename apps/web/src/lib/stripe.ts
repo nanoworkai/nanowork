@@ -67,6 +67,8 @@ export const CREDITS_PACKAGES = [
   },
 ] as const;
 
+export type CreditsPackage = typeof CREDITS_PACKAGES[number];
+
 // Create Stripe checkout session for subscription
 export async function createSubscriptionCheckout(
   priceId: string,

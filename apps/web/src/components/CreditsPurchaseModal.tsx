@@ -148,7 +148,7 @@ export function CreditsPurchaseModal({
                     <div className="text-2xl font-bold text-white">
                       ${pkg.price}
                     </div>
-                    {pkg.savings && (
+                    {'savings' in pkg && pkg.savings && (
                       <div className="text-xs text-brand-400 font-medium mt-1">
                         Save {pkg.savings}
                       </div>
