@@ -68,14 +68,14 @@ function StockTicker() {
         {[...stocks, ...stocks].map((stock, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 px-6 py-2.5 border-r border-white/5 whitespace-nowrap flex-shrink-0"
+            className="flex items-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 border-r border-white/5 whitespace-nowrap flex-shrink-0"
           >
-            <span className="text-xs font-mono font-bold text-white">{stock.symbol}</span>
-            <span className="text-xs font-mono text-white tabular-nums">
+            <span className="text-[10px] sm:text-xs font-mono font-bold text-white">{stock.symbol}</span>
+            <span className="text-[10px] sm:text-xs font-mono text-white tabular-nums">
               ${stock.price.toFixed(2)}
             </span>
             <span
-              className={`text-xs font-mono tabular-nums ${
+              className={`text-[10px] sm:text-xs font-mono tabular-nums ${
                 stock.change >= 0 ? "text-green-400" : "text-red-400"
               }`}
             >
@@ -83,7 +83,7 @@ function StockTicker() {
               {stock.change.toFixed(2)}
             </span>
             <span
-              className={`text-xs font-mono tabular-nums ${
+              className={`text-[10px] sm:text-xs font-mono tabular-nums ${
                 stock.pct >= 0 ? "text-green-400" : "text-red-400"
               }`}
             >
@@ -170,23 +170,23 @@ function TerminalPrompt() {
 
   return (
     <div className="card-lg rounded-none border border-white/10">
-      <div className="border-b border-white/10 px-6 py-3 bg-surface-1">
-        <div className="flex items-center gap-3">
-          <Terminal className="w-4 h-4 text-white/60" />
-          <span className="text-xs font-mono font-bold text-white/60 uppercase tracking-wider">
+      <div className="border-b border-white/10 px-4 sm:px-6 py-3 bg-surface-1">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/60" />
+          <span className="text-[10px] sm:text-xs font-mono font-bold text-white/60 uppercase tracking-wider">
             Build Command
           </span>
           <div className="flex-1" />
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs font-mono text-white/40">READY</span>
+            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-[10px] sm:text-xs font-mono text-white/40">READY</span>
           </div>
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <div className="relative mb-4">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-2 sm:gap-3">
             <span className="text-white/60 font-mono text-sm mt-1 select-none">$</span>
             <div className="flex-1">
               <textarea
@@ -202,11 +202,11 @@ function TerminalPrompt() {
                   }
                 }}
                 disabled={loading}
-                className="w-full min-h-[80px] max-h-[200px] bg-transparent border-none outline-none resize-none text-white placeholder-transparent font-mono text-sm leading-relaxed"
+                className="w-full min-h-[80px] max-h-[200px] bg-transparent border-none outline-none resize-none text-white placeholder-transparent font-mono text-xs sm:text-sm leading-relaxed"
               />
               {!value && (
-                <div className="absolute top-0 left-9 right-0 pointer-events-none">
-                  <div className="font-mono text-sm text-white/70 leading-relaxed flex">
+                <div className="absolute top-0 left-7 sm:left-9 right-0 pointer-events-none">
+                  <div className="font-mono text-xs sm:text-sm text-white/70 leading-relaxed flex">
                     {placeholder}
                     {!focused && <span className="inline-block w-2 h-5 bg-white/80 ml-1 animate-pulse" />}
                   </div>
@@ -216,19 +216,19 @@ function TerminalPrompt() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-4 border-t border-white/5">
-          <div className="flex items-center gap-6 text-xs font-mono text-white/40">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 pt-4 border-t border-white/5">
+          <div className="flex items-center gap-2 sm:gap-6 text-[10px] sm:text-xs font-mono text-white/40 flex-wrap">
             <span>7 DEPARTMENTS</span>
-            <span>|</span>
+            <span className="hidden sm:inline">|</span>
             <span>PARALLEL EXECUTION</span>
-            <span>|</span>
-            <span>FDIC INSURED</span>
+            <span className="hidden sm:inline">|</span>
+            <span className="hidden md:inline">FDIC INSURED</span>
           </div>
 
           <button
             onClick={submit}
             disabled={loading || !value.trim()}
-            className="px-6 py-2.5 rounded-none bg-white hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed text-black font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2.5 rounded-none bg-white hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed text-black font-mono text-xs font-bold uppercase tracking-wider transition-colors"
           >
             {loading ? "EXECUTING..." : "EXECUTE"}
           </button>
@@ -275,14 +275,14 @@ function DepartmentGrid() {
   ];
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
       {departments.map((dept, i) => (
-        <div key={i} className="card rounded-none border border-white/10 p-6 hover:bg-surface-3 transition-colors">
-          <div className="flex items-start justify-between mb-4">
-            <h3 className="text-base font-mono font-bold text-white">
+        <div key={i} className="card rounded-none border border-white/10 p-4 sm:p-6 hover:bg-surface-3 transition-colors">
+          <div className="flex items-start justify-between mb-3 sm:mb-4">
+            <h3 className="text-sm sm:text-base font-mono font-bold text-white">
               {dept.name}
             </h3>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
               <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
               <span className="text-[10px] font-mono text-green-400">ACTIVE</span>
             </div>
@@ -308,19 +308,19 @@ export default function Home() {
     <div className="min-h-screen bg-surface-0">
       {/* Header - Terminal style */}
       <header className="sticky top-0 z-50 bg-surface-0 border-b border-white/10">
-        <div className="max-w-[1800px] mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-white hover:opacity-70 transition-opacity">
-            <div className="w-6 h-6 rounded-none bg-white flex items-center justify-center">
-              <Terminal className="w-3.5 h-3.5 text-black" />
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-none bg-white flex items-center justify-center">
+              <Terminal className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-black" />
             </div>
-            <span className="text-sm font-mono font-bold uppercase tracking-wider">Nanowork</span>
+            <span className="text-xs sm:text-sm font-mono font-bold uppercase tracking-wider">Nanowork</span>
           </Link>
 
           <nav className="flex items-center gap-1">
             {isAuthenticated ? (
               <Link
                 to="/dashboard"
-                className="px-5 py-2 rounded-none bg-white text-black text-xs font-mono font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
+                className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-none bg-white text-black text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
               >
                 Dashboard
               </Link>
@@ -328,13 +328,13 @@ export default function Home() {
               <>
                 <Link
                   to="/login"
-                  className="px-5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-white/60 hover:text-white transition-colors"
+                  className="hidden sm:block px-5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-white/60 hover:text-white transition-colors"
                 >
                   Login
                 </Link>
                 <Link
                   to="/login"
-                  className="px-5 py-2 rounded-none bg-white text-black text-xs font-mono font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
+                  className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-none bg-white text-black text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
                 >
                   Start
                 </Link>
@@ -348,14 +348,14 @@ export default function Home() {
       <StockTicker />
 
       {/* Main Content */}
-      <main className="max-w-[1800px] mx-auto px-6">
+      <main className="max-w-[1800px] mx-auto px-4 sm:px-6">
         {/* Hero Section - Dense, terminal-style */}
-        <section className="py-16">
-          <div className="mb-8">
-            <h1 className="text-4xl font-mono font-bold text-white uppercase tracking-tight mb-4">
+        <section className="py-8 sm:py-12 lg:py-16">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-mono font-bold text-white uppercase tracking-tight mb-3 sm:mb-4">
               Turn Your Idea Into a Company
             </h1>
-            <p className="text-sm font-mono text-white/70 max-w-3xl leading-relaxed">
+            <p className="text-xs sm:text-sm font-mono text-white/70 max-w-3xl leading-relaxed">
               Seven AI departments work 24/7 to build your business. Legal, brand, web, marketing, sales, finance, and ops—all autonomous, all running in parallel. One prompt starts everything.
             </p>
           </div>
@@ -364,14 +364,14 @@ export default function Home() {
         </section>
 
         {/* Department Grid */}
-        <section className="py-12">
-          <div className="mb-6">
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-mono font-bold text-white/40 uppercase tracking-wider">
+        <section className="py-8 sm:py-12">
+          <div className="mb-4 sm:mb-6">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-[10px] sm:text-xs font-mono font-bold text-white/40 uppercase tracking-wider">
                 Your Autonomous Team
               </span>
               <div className="flex-1 h-px bg-white/10" />
-              <span className="text-xs font-mono text-green-400">7 DEPARTMENTS ACTIVE</span>
+              <span className="text-[10px] sm:text-xs font-mono text-green-400 whitespace-nowrap">7 DEPARTMENTS</span>
             </div>
           </div>
 
@@ -379,36 +379,36 @@ export default function Home() {
         </section>
 
         {/* CTA - Terminal command style */}
-        <section className="py-16">
-          <div className="card-lg rounded-none border border-white/10 p-12 text-center">
-            <div className="text-xs font-mono text-white/40 uppercase tracking-wider mb-4">
+        <section className="py-8 sm:py-12 lg:py-16">
+          <div className="card-lg rounded-none border border-white/10 p-6 sm:p-8 lg:p-12 text-center">
+            <div className="text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-3 sm:mb-4">
               Ready to Build
             </div>
-            <h2 className="text-3xl font-mono font-bold text-white uppercase mb-4 tracking-tight">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-mono font-bold text-white uppercase mb-3 sm:mb-4 tracking-tight">
               Start Building Today
             </h2>
-            <p className="text-sm font-mono text-white/60 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm font-mono text-white/60 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
               From zero to revenue in days. From revenue to scale with agents that never stop working.
               Real infrastructure from day one.
             </p>
             <Link
               to="/login"
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
+              className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
             >
               Get Started
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Link>
           </div>
         </section>
       </main>
 
       {/* Footer - Minimal terminal footer */}
-      <footer className="border-t border-white/10 mt-16">
-        <div className="max-w-[1800px] mx-auto px-6 py-12">
-          <div className="grid grid-cols-4 gap-12">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Terminal className="w-4 h-4 text-white/60" />
+      <footer className="border-t border-white/10 mt-8 sm:mt-12 lg:mt-16">
+        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
+            <div className="col-span-2 sm:col-span-1">
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/60" />
                 <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">Nanowork</span>
               </div>
               <p className="text-xs font-mono text-white/40 leading-relaxed">
@@ -437,7 +437,7 @@ export default function Home() {
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-6 border-t border-white/5 text-center text-xs font-mono text-white/30">
+          <div className="mt-8 sm:mt-12 pt-4 sm:pt-6 border-t border-white/5 text-center text-[10px] sm:text-xs font-mono text-white/30">
             © {new Date().getFullYear()} NANOWORK INC · ALL RIGHTS RESERVED
           </div>
         </div>
