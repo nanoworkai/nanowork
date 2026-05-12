@@ -28,7 +28,7 @@
 - ✅ SUPABASE_SETUP.md - Step-by-step database setup
 - ✅ DATABASE_SCHEMA.md - Visual schema reference
 - ✅ COMPLETION_CHECKLIST.md - Verification of requirements
-- ✅ verify-schema.sql - Database verification script
+- ✅ db/verify-schema.sql - Database verification script
 - ✅ test-simple.sh - API testing script
 
 ## 📦 File Inventory
@@ -57,8 +57,9 @@ backend/
 ├── render.yaml                           # Deploy config
 ├── .env.example                          # Environment template
 ├── .env                                  # Local config
-├── supabase-schema.sql                   # Database schema (700+ lines)
-├── verify-schema.sql                     # Verification script
+├── db/                                   # Database files
+│   ├── schema.sql                       # Database schema (700+ lines)
+│   └── verify-schema.sql                # Verification script
 ├── test-simple.sh                        # API test script
 ├── README.md                             # Main documentation
 ├── SUPABASE_SETUP.md                     # Database setup guide
@@ -76,9 +77,9 @@ backend/
 # 1. Create new project (or use existing)
 # 2. Enable "vector" extension in Database → Extensions
 # 3. Open SQL Editor
-# 4. Copy entire supabase-schema.sql
+# 4. Copy entire db/schema.sql
 # 5. Paste and run (takes ~5 seconds)
-# 6. Verify with verify-schema.sql
+# 6. Verify with db/verify-schema.sql
 ```
 
 ### 2. Configure Environment

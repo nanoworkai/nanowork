@@ -9,7 +9,7 @@
 # 1. Create project (or use existing)
 # 2. Database → Extensions → Enable "vector"
 # 3. SQL Editor → New query
-# 4. Copy/paste backend/supabase-schema.sql
+# 4. Copy/paste backend/db/schema.sql
 # 5. Click "Run" (takes ~5 seconds)
 # 6. Settings → API → Copy URL + Keys
 ```
@@ -95,4 +95,4 @@ Backend is running and connected to Supabase.
 
 - Issues: GitHub Issues
 - Docs: /backend/README.md
-- Schema verification: Run verify-schema.sql in Supabase
+- Schema verification: Run db/verify-schema.sql in Supabase

@@ -26,7 +26,7 @@ Go to **Database → Extensions** in your Supabase dashboard and enable:
 
 1. Open **SQL Editor** in Supabase dashboard
 2. Create a new query
-3. Copy the entire contents of `supabase-schema.sql`
+3. Copy the entire contents of `db/schema.sql`
 4. Paste into the SQL editor
 5. Click **Run** (or press Cmd/Ctrl + Enter)
 
