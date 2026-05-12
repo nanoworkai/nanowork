@@ -15,9 +15,9 @@ import { ArrowRight, Terminal } from "lucide-react";
  */
 
 const TYPING_EXAMPLES = [
-  "NEXT-GEN SOCIAL NETWORK FOR CREATORS",
-  "AI-POWERED FITNESS REVOLUTION",
-  "SUSTAINABLE FASHION MARKETPLACE",
+  "Build a social network where creators own their content and earn directly from fans. Think Patreon meets Instagram with web3 payments and zero platform fees.",
+  "Launch an AI fitness coach that creates personalized workout plans, tracks progress with computer vision, and adapts in real-time. Target busy professionals, $29/month.",
+  "Create a sustainable fashion marketplace connecting eco-conscious brands with millennial shoppers. Verified supply chains, carbon-neutral shipping, curated collections.",
 ];
 
 // Mock stock data for NYSE crawl
@@ -245,46 +245,32 @@ function TerminalPrompt() {
 function DepartmentGrid() {
   const departments = [
     {
-      code: "LEGAL",
       name: "Legal",
-      description: "Entity formation, operating agreements, terms of service, privacy policies, and contractor agreements. Handles all compliance and regulatory requirements.",
-      status: "ACTIVE",
+      description: "Entity formation, operating agreements, terms of service, privacy policies, contractor agreements. Handles compliance and regulatory requirements.",
     },
     {
-      code: "BRAND",
       name: "Brand",
-      description: "Logo design, brand guidelines, voice and tone, color systems, and visual identity. Creates cohesive brand assets across all channels.",
-      status: "ACTIVE",
+      description: "Logo design, brand guidelines, voice and tone, color systems, visual identity. Creates cohesive assets across all channels.",
     },
     {
-      code: "WEB",
       name: "Web",
-      description: "Landing pages, web apps, e-commerce, checkout flows, and hosting. Builds and deploys production-ready digital experiences.",
-      status: "ACTIVE",
+      description: "Landing pages, web apps, e-commerce, checkout flows, hosting. Builds and deploys production-ready digital experiences.",
     },
     {
-      code: "MARKETING",
       name: "Marketing",
-      description: "Content strategy, SEO, email campaigns, social media, and analytics. Drives awareness and growth across channels.",
-      status: "ACTIVE",
+      description: "Content strategy, SEO, email campaigns, social media, analytics. Drives awareness and growth across all channels.",
     },
     {
-      code: "SALES",
       name: "Sales",
-      description: "Outreach sequences, pipeline management, CRM, lead qualification, and deal tracking. Converts prospects into customers.",
-      status: "ACTIVE",
+      description: "Outreach sequences, pipeline management, CRM, lead qualification, deal tracking. Converts prospects into customers.",
     },
     {
-      code: "FINANCE",
       name: "Finance",
-      description: "Revenue tracking, expense management, invoicing, payment processing, and financial reporting. Keeps books accurate and current.",
-      status: "ACTIVE",
+      description: "Revenue tracking, expense management, invoicing, payment processing, financial reporting. Keeps books accurate and current.",
     },
     {
-      code: "OPS",
       name: "Operations",
-      description: "Process automation, deployment pipelines, monitoring, vendor management, and system reliability. Keeps everything running smoothly.",
-      status: "ACTIVE",
+      description: "Process automation, deployment pipelines, monitoring, vendor management, system reliability. Keeps everything running smoothly.",
     },
   ];
 
@@ -292,17 +278,15 @@ function DepartmentGrid() {
     <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
       {departments.map((dept, i) => (
         <div key={i} className="card rounded-none border border-white/10 p-6 hover:bg-surface-3 transition-colors">
-          <div className="flex items-start justify-between mb-3">
-            <div className="text-xs font-mono font-bold text-white/40">{dept.code}</div>
+          <div className="flex items-start justify-between mb-4">
+            <h3 className="text-base font-mono font-bold text-white">
+              {dept.name}
+            </h3>
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-[10px] font-mono text-green-400">{dept.status}</span>
+              <span className="text-[10px] font-mono text-green-400">ACTIVE</span>
             </div>
           </div>
-
-          <h3 className="text-sm font-mono font-bold text-white mb-3">
-            {dept.name}
-          </h3>
 
           <p className="text-xs text-white/60 leading-relaxed">
             {dept.description}
