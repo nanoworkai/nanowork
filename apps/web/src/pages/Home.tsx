@@ -15,10 +15,87 @@ import { ArrowRight, Terminal } from "lucide-react";
  */
 
 const TYPING_EXAMPLES = [
-  "FINTECH PAYMENT INFRA | $10M ARR TARGET",
-  "SAAS LOGISTICS PLATFORM | B2B ENTERPRISE",
-  "AI HEALTHCARE DIAGNOSTIC | FDA COMPLIANT",
+  "NEXT-GEN SOCIAL NETWORK FOR CREATORS",
+  "AI-POWERED FITNESS REVOLUTION",
+  "SUSTAINABLE FASHION MARKETPLACE",
 ];
+
+// Mock stock data for NYSE crawl
+const STOCKS = [
+  { symbol: "MSFT", price: 412.38, change: 2.14, pct: 0.52 },
+  { symbol: "GOOGL", price: 178.92, change: -1.23, pct: -0.68 },
+  { symbol: "AAPL", price: 226.50, change: 3.42, pct: 1.53 },
+  { symbol: "NVDA", price: 138.75, change: 5.21, pct: 3.90 },
+  { symbol: "META", price: 563.28, change: -2.87, pct: -0.51 },
+  { symbol: "AMZN", price: 218.44, change: 1.92, pct: 0.89 },
+  { symbol: "TSLA", price: 345.67, change: -8.34, pct: -2.36 },
+  { symbol: "NFLX", price: 712.89, change: 4.56, pct: 0.64 },
+];
+
+// ──────────────────────────────────────────────────────────────────────────────
+// STOCK TICKER - NYSE-style crawl
+// ──────────────────────────────────────────────────────────────────────────────
+
+function StockTicker() {
+  const [stocks, setStocks] = useState(STOCKS);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStocks((prev) =>
+        prev.map((stock) => {
+          const volatility = Math.random() * 0.5 - 0.25;
+          const priceChange = stock.price * (volatility / 100);
+          const newPrice = stock.price + priceChange;
+          const newChange = stock.change + priceChange;
+          const newPct = (newChange / (newPrice - newChange)) * 100;
+
+          return {
+            ...stock,
+            price: newPrice,
+            change: newChange,
+            pct: newPct,
+          };
+        })
+      );
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="bg-surface-1 border-b border-white/10 overflow-hidden">
+      <div className="flex animate-scroll">
+        {[...stocks, ...stocks].map((stock, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 px-6 py-2.5 border-r border-white/5 whitespace-nowrap flex-shrink-0"
+          >
+            <span className="text-xs font-mono font-bold text-white">{stock.symbol}</span>
+            <span className="text-xs font-mono text-white tabular-nums">
+              ${stock.price.toFixed(2)}
+            </span>
+            <span
+              className={`text-xs font-mono tabular-nums ${
+                stock.change >= 0 ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              {stock.change >= 0 ? "+" : ""}
+              {stock.change.toFixed(2)}
+            </span>
+            <span
+              className={`text-xs font-mono tabular-nums ${
+                stock.pct >= 0 ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              {stock.pct >= 0 ? "+" : ""}
+              {stock.pct.toFixed(2)}%
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 // ──────────────────────────────────────────────────────────────────────────────
 // TERMINAL PROMPT INPUT
@@ -165,69 +242,79 @@ function TerminalPrompt() {
 // DATA GRID - Infrastructure specs
 // ──────────────────────────────────────────────────────────────────────────────
 
-function InfrastructureGrid() {
-  const items = [
+function DepartmentGrid() {
+  const departments = [
     {
-      code: "PAYMENT",
-      title: "Virtual Payment Cards",
-      specs: ["PCI DSS LVL 1", "FDIC $250K", "SOC 2 TYPE II"],
-      status: "OPERATIONAL",
+      icon: "⚖️",
+      name: "Legal",
+      description: "Contracts, compliance, and entity formation",
+      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
     },
     {
-      code: "BANKING",
-      title: "Department Accounts",
-      specs: ["FDIC INSURED", "ACH/WIRE", "REAL-TIME"],
-      status: "OPERATIONAL",
+      icon: "🎨",
+      name: "Brand",
+      description: "Identity, voice, and creative direction",
+      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
     },
     {
-      code: "COMMS",
-      title: "Email Infrastructure",
-      specs: ["GDPR", "HIPAA READY", "ISO 27001"],
-      status: "OPERATIONAL",
+      icon: "💻",
+      name: "Web",
+      description: "Sites, apps, and digital experiences",
+      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
     },
     {
-      code: "ANALYTICS",
-      title: "Real-Time Dashboards",
-      specs: ["SUB-100MS", "99.99% SLA", "ENCRYPTED"],
-      status: "OPERATIONAL",
+      icon: "📢",
+      name: "Marketing",
+      description: "Growth, content, and audience building",
+      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
     },
     {
-      code: "COMPLIANCE",
-      title: "SOC 2 Framework",
-      specs: ["TYPE II", "ANNUAL AUDIT", "CONTINUOUS"],
-      status: "OPERATIONAL",
+      icon: "💼",
+      name: "Sales",
+      description: "Pipeline, outreach, and deal closing",
+      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
     },
     {
-      code: "AGENTS",
-      title: "Autonomous Operations",
-      specs: ["24/7/365", "MULTI-DEPT", "PARALLEL"],
-      status: "OPERATIONAL",
+      icon: "💰",
+      name: "Finance",
+      description: "Revenue, expenses, and financial ops",
+      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
+    },
+    {
+      icon: "⚙️",
+      name: "Operations",
+      description: "Systems, processes, and execution",
+      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
     },
   ];
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-white/10">
-      {items.map((item, i) => (
-        <div key={i} className="card rounded-none border-0 p-6 hover:bg-surface-3 transition-colors">
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      {departments.map((dept, i) => (
+        <div key={i} className="card rounded-none border border-white/10 p-6 hover:bg-surface-3 transition-colors">
           <div className="flex items-start justify-between mb-4">
-            <div className="text-xs font-mono font-bold text-white/40">{item.code}</div>
+            <span className="text-2xl">{dept.icon}</span>
             <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-              <span className="text-[10px] font-mono text-green-400">{item.status}</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-[10px] font-mono text-green-400">ACTIVE</span>
             </div>
           </div>
 
-          <h3 className="text-sm font-mono font-bold text-white mb-3 leading-tight">
-            {item.title}
+          <h3 className="text-base font-mono font-bold text-white mb-2">
+            {dept.name}
           </h3>
 
+          <p className="text-xs text-white/60 mb-4 leading-relaxed">
+            {dept.description}
+          </p>
+
           <div className="flex flex-wrap gap-1.5">
-            {item.specs.map((spec, j) => (
+            {dept.capabilities.map((cap, j) => (
               <span
                 key={j}
                 className="px-2 py-0.5 rounded-none bg-white/5 text-[10px] font-mono text-white/60 border border-white/10"
               >
-                {spec}
+                {cap}
               </span>
             ))}
           </div>
@@ -284,36 +371,38 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Stock Ticker */}
+      <StockTicker />
+
       {/* Main Content */}
       <main className="max-w-[1800px] mx-auto px-6">
         {/* Hero Section - Dense, terminal-style */}
         <section className="py-16">
           <div className="mb-8">
             <h1 className="text-4xl font-mono font-bold text-white uppercase tracking-tight mb-4">
-              Enterprise Agent Infrastructure
+              Turn Your Idea Into a Company
             </h1>
             <p className="text-sm font-mono text-white/70 max-w-3xl leading-relaxed">
-              Autonomous agents with real bank accounts, payment cards, and institutional-grade infrastructure.
-              One command launches seven departments working in parallel. IPO-ready from day one.
+              Seven AI departments work 24/7 to build your business. Legal, brand, web, marketing, sales, finance, and ops—all autonomous, all running in parallel. One prompt starts everything.
             </p>
           </div>
 
           <TerminalPrompt />
         </section>
 
-        {/* Infrastructure Grid */}
+        {/* Department Grid */}
         <section className="py-12">
           <div className="mb-6">
             <div className="flex items-center gap-3">
               <span className="text-xs font-mono font-bold text-white/40 uppercase tracking-wider">
-                Infrastructure Matrix
+                Your Autonomous Team
               </span>
               <div className="flex-1 h-px bg-white/10" />
-              <span className="text-xs font-mono text-green-400">6 SYSTEMS OPERATIONAL</span>
+              <span className="text-xs font-mono text-green-400">7 DEPARTMENTS ACTIVE</span>
             </div>
           </div>
 
-          <InfrastructureGrid />
+          <DepartmentGrid />
         </section>
 
         {/* CTA - Terminal command style */}
