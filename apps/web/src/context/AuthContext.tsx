@@ -103,9 +103,11 @@ const AuthContext = createContext<AuthContextValue>({
   deductCredits: async () => false,
 });
 
-function phoneToSubdomain(phone: string): string {
-  return "app-" + phone.replace(/\D/g, "").slice(-6);
-}
+// Legacy phone-based subdomain generator (unused with email auth)
+// Commented out to fix TypeScript build error
+// function phoneToSubdomain(phone: string): string {
+//   return "app-" + phone.replace(/\D/g, "").slice(-6);
+// }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
