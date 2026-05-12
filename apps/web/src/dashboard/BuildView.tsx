@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Download, ExternalLink, Github } from "lucide-react";
+import { ArrowLeft, Download, ExternalLink, Code } from "lucide-react";
 import { fetchAppBySlug, type UserApp } from "../lib/apps";
 
 interface BuildData {
@@ -108,7 +108,7 @@ export default function BuildView() {
                 rel="noopener noreferrer"
                 className="px-4 py-2 border border-white/10 bg-surface-1 hover:bg-surface-2 text-white font-mono text-xs rounded-none flex items-center gap-2"
               >
-                <Github className="w-4 h-4" />
+                <Code className="w-4 h-4" />
                 VIEW CODE
               </a>
             )}

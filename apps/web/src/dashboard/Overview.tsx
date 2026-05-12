@@ -3,7 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { fetchUserApps, type UserApp } from "../lib/apps";
-import { ExternalLink, Github, Crown } from "lucide-react";
+import { ExternalLink, Code, Crown } from "lucide-react";
 
 /**
  * DASHBOARD DESIGN PRINCIPLES:
@@ -425,7 +425,7 @@ export default function Overview() {
                       rel="noopener noreferrer"
                       className="px-3 py-2 bg-surface-3 hover:bg-white/5 border border-white/10 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-2"
                     >
-                      <Github className="w-3.5 h-3.5" />
+                      <Code className="w-3.5 h-3.5" />
                     </a>
                   )}
                 </div>
