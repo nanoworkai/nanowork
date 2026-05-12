@@ -9,6 +9,7 @@
     "dev:web": "npm run dev -w web",
     "dev:worker": "cd apps/worker && npx wrangler dev",
     "build": "npm run build -w web",
+    "start": "echo 'ERROR: This is the root package. Backend should be deployed from /backend directory. Check Render rootDir setting.' && exit 1",
     "deploy": "npm run build && npm run deploy:worker && npm run deploy:web",
     "deploy:worker": "cd apps/worker && npx wrangler deploy",
     "deploy:web": "cd apps/web && npx wrangler pages deploy dist"

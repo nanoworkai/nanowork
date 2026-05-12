@@ -7,7 +7,8 @@ services:
     branch: main
     rootDir: backend
     buildCommand: npm ci && npm run build
-    startCommand: node dist/index.js
+    startCommand: npm start
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
