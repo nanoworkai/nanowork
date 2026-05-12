@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
+import { fetchUserApps, type UserApp } from "../lib/apps";
+import { ExternalLink, Github, Crown } from "lucide-react";
 
 /**
  * DASHBOARD DESIGN PRINCIPLES:
@@ -266,8 +268,18 @@ export default function Overview() {
   const [buildEnabled, setBuildEnabled] = useState(
     !!(promptFromUrl || profile?.businessPrompt)
   );
+  const [userApps, setUserApps] = useState<UserApp[]>([]);
+  const [appsLoading, setAppsLoading] = useState(true);
 
   const { meta, depts, feed, done, error } = useAgentStream(activePrompt, buildEnabled);
+
+  // Load user's apps
+  useEffect(() => {
+    fetchUserApps()
+      .then(setUserApps)
+      .catch(err => console.error("Failed to load apps:", err))
+      .finally(() => setAppsLoading(false));
+  }, []);
 
   // Persist prompt to profile
   useEffect(() => {
@@ -372,6 +384,63 @@ export default function Overview() {
             <LiveFeed entries={feed} />
           </div>
         </>
+      )}
+
+      {/* User Apps */}
+      {!appsLoading && userApps.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-lg font-bold text-white mb-4">Your Apps</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {userApps.map((app) => (
+              <div key={app.slug} className="card rounded-xl p-5 hover:bg-surface-3 transition-all duration-150">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="text-sm font-bold text-white mb-1">
+                      {app.app_name || app.slug}
+                    </h3>
+                    {app.is_paid && (
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <Crown className="w-3 h-3 text-amber-400" />
+                        <span className="text-xs text-amber-400 font-semibold">Pro</span>
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-xs text-white/40 font-mono">v{app.iterations}</span>
+                </div>
+
+                <div className="flex items-center gap-2 mt-4">
+                  <a
+                    href={`https://${app.slug}.nanowork.app`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 px-3 py-2 bg-white hover:bg-white/90 text-black text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    Open
+                  </a>
+                  {app.github_repo_url && (
+                    <a
+                      href={app.github_repo_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-2 bg-surface-3 hover:bg-white/5 border border-white/10 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      <Github className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
+
+                {app.deployed_at && (
+                  <div className="mt-3 pt-3 border-t border-white/5">
+                    <span className="text-xs text-white/30">
+                      Deployed {new Date(app.deployed_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Quick links */}

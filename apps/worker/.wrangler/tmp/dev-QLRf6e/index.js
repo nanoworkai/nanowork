@@ -5123,14 +5123,14 @@ var Hono = /* @__PURE__ */ __name(class _Hono {
    * app.route("/api", app2) // GET /api/user
    * ```
    */
-  route(path2, app16) {
+  route(path2, app17) {
     const subApp = this.basePath(path2);
-    app16.routes.map((r) => {
+    app17.routes.map((r) => {
       let handler;
-      if (app16.errorHandler === errorHandler) {
+      if (app17.errorHandler === errorHandler) {
         handler = r.handler;
       } else {
-        handler = /* @__PURE__ */ __name(async (c, next) => (await compose([], app16.errorHandler)(c, () => r.handler(c, next))).res, "handler");
+        handler = /* @__PURE__ */ __name(async (c, next) => (await compose([], app17.errorHandler)(c, () => r.handler(c, next))).res, "handler");
         handler[COMPOSED_HANDLER] = r.handler;
       }
       subApp.#addRoute(r.method, r.path, handler);
@@ -39745,10 +39745,74 @@ app14.post("/", async (c) => {
 });
 var stripe_webhooks_default = app14;
 
-// src/index.ts
+// src/routes/scraper.ts
+init_strip_cf_connecting_ip_header();
+init_modules_watch_stub();
+init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_process();
+init_virtual_unenv_global_polyfill_cloudflare_unenv_preset_node_console();
+init_performance2();
 var app15 = new Hono2();
-app15.use("*", timing());
-app15.use("*", cors({
+app15.post("/scrape", async (c) => {
+  const { url } = await c.req.json();
+  if (!url) {
+    return c.json({ error: "URL is required" }, 400);
+  }
+  try {
+    const result = {
+      url,
+      title: "Site Title",
+      description: "Site description extracted from meta tags",
+      headings: ["Main Heading", "Sub Heading"],
+      copy: "Body text extracted from the page",
+      color_palette: ["#000000", "#FFFFFF", "#FF0000"],
+      tech_stack: ["React", "Next.js"],
+      scraped_at: (/* @__PURE__ */ new Date()).toISOString()
+    };
+    const supabase = createClient(
+      c.env.SUPABASE_URL,
+      c.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+    await supabase.from("linq_url_cache").upsert({
+      url,
+      scraped_data: result,
+      scraped_at: result.scraped_at
+    });
+    return c.json(result);
+  } catch (error3) {
+    console.error("Scrape failed:", error3);
+    return c.json({ error: error3.message }, 500);
+  }
+});
+app15.post("/competitors", async (c) => {
+  const { industry } = await c.req.json();
+  if (!industry) {
+    return c.json({ error: "Industry is required" }, 400);
+  }
+  try {
+    const supabase = createClient(
+      c.env.SUPABASE_URL,
+      c.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+    const { data, error: error3 } = await supabase.from("linq_url_cache").select("url, scraped_data, scraped_at").ilike("scraped_data->>title", `%${industry}%`).limit(5);
+    if (error3)
+      throw error3;
+    const results = data?.map((row) => ({
+      ...row.scraped_data,
+      url: row.url,
+      scraped_at: row.scraped_at
+    })) || [];
+    return c.json(results);
+  } catch (error3) {
+    console.error("Competitor scrape failed:", error3);
+    return c.json({ error: error3.message }, 500);
+  }
+});
+var scraper_default = app15;
+
+// src/index.ts
+var app16 = new Hono2();
+app16.use("*", timing());
+app16.use("*", cors({
   origin: [
     "https://nanowork.ai",
     "https://www.nanowork.ai",
@@ -39760,27 +39824,28 @@ app15.use("*", cors({
   allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
   credentials: true
 }));
-app15.route("/api/ai", ai_default);
-app15.route("/api/build", build_default);
-app15.route("/api/builds", builds_default);
-app15.route("/api/analytics", analytics_default);
-app15.route("/api/customers", customers_default);
-app15.route("/api/keys", keys_default);
-app15.route("/api/payments", payments_default);
-app15.route("/api/phone", phone_default);
-app15.route("/api/tenant", tenant_default);
-app15.route("/api/webhooks", webhooks_default);
-app15.route("/api/rent", rent_default);
-app15.route("/api/stripe", stripe_default);
-app15.route("/api/stripe/webhooks", stripe_webhooks_default);
-app15.get("/health", (c) => c.json({
+app16.route("/api/ai", ai_default);
+app16.route("/api/build", build_default);
+app16.route("/api/builds", builds_default);
+app16.route("/api/analytics", analytics_default);
+app16.route("/api/customers", customers_default);
+app16.route("/api/keys", keys_default);
+app16.route("/api/payments", payments_default);
+app16.route("/api/phone", phone_default);
+app16.route("/api/tenant", tenant_default);
+app16.route("/api/webhooks", webhooks_default);
+app16.route("/api/rent", rent_default);
+app16.route("/api/stripe", stripe_default);
+app16.route("/api/stripe/webhooks", stripe_webhooks_default);
+app16.route("/api/scraper", scraper_default);
+app16.get("/health", (c) => c.json({
   status: "ok",
   environment: c.env.ENVIRONMENT,
   supabase_configured: !!c.env.SUPABASE_URL,
   anthropic_configured: !!c.env.ANTHROPIC_API_KEY,
   stripe_configured: !!c.env.STRIPE_SECRET_KEY
 }));
-var src_default = app15;
+var src_default = app16;
 
 // node_modules/wrangler/templates/middleware/middleware-ensure-req-body-drained.ts
 init_strip_cf_connecting_ip_header();
