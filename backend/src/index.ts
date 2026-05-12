@@ -11,7 +11,6 @@ import appsRouter from './routes/apps';
 import landingPagesRouter from './routes/landing-pages';
 import deploymentsRouter from './routes/deployments';
 import conversationsRouter from './routes/conversations';
-import emailsRouter from './routes/emails';
 import tasksRouter from './routes/tasks';
 import contactsRouter from './routes/contacts';
 import paymentsRouter from './routes/payments';
@@ -60,7 +59,6 @@ app.use('/apps', appsRouter);
 app.use('/landing-pages', landingPagesRouter);
 app.use('/deployments', deploymentsRouter);
 app.use('/conversations', conversationsRouter);
-app.use('/emails', emailsRouter);
 app.use('/tasks', tasksRouter);
 app.use('/contacts', contactsRouter);
 app.use('/payments', paymentsRouter);
@@ -89,7 +87,6 @@ app.listen(PORT, () => {
   // Log warnings for missing optional env vars
   const optionalEnvVars = [
     'ANTHROPIC_API_KEY',
-    'RESEND_API_KEY',
     'STRIPE_SECRET_KEY',
     'INTERNAL_TOKEN',
   ];

@@ -36,9 +36,5 @@ services:
         sync: false
       - key: INTERNAL_TOKEN
         sync: false
-      - key: AGENT_EMAIL_DOMAIN
-        sync: false
-      - key: RESEND_API_KEY
-        sync: false
       - key: FRONTEND_URL
         value: https://nanowork.app

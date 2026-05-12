@@ -28,8 +28,6 @@ class Settings(BaseSettings):
 
     # Agent Platform
     internal_token: str | None = None
-    agent_email_domain: str | None = None
-    resend_api_key: str | None = None
     frontend_url: str = "http://localhost:5173"
 
     cors_origins: str = (

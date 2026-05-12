@@ -129,7 +129,7 @@ export const BUSINESSES: Business[] = [
     price: 9800,
     mrr: "$1,450 MRR",
     status: "available",
-    stack: ["Remix", "Postgres", "Redis", "Resend"],
+    stack: ["Remix", "Postgres", "Redis"],
     includes: [
       "Shopify app listing + review assets",
       "Multi-carrier API integrations",
