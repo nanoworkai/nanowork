@@ -1,40 +1,35 @@
 services:
   - type: web
-    name: nanowork-mvp
-    runtime: python
+    name: nanowork-backend
+    runtime: node
     region: oregon
     plan: free
     branch: main
-    buildCommand: |
-      # Install Node.js dependencies and build frontend
-      npm install
-      npm run build
-      # Install Python dependencies
-      cd apps/api
-      pip install --upgrade pip
-      pip install -r requirements.txt
-      # Verify uvicorn is installed
-      python -m pip show uvicorn
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-    rootDir: apps/api
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
-      - key: PYTHONPATH
-        value: .
-      - key: ENVIRONMENT
+      - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 3000
       - key: SUPABASE_URL
         sync: false
-      - key: SUPABASE_SERVICE_ROLE_KEY
+      - key: SUPABASE_SERVICE_KEY
         sync: false
       - key: SUPABASE_ANON_KEY
         sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
-      - key: LINQ_STRIPE_SECRET_KEY
+      - key: STRIPE_SECRET_KEY
         sync: false
-      - key: LINQ_STRIPE_PUBLISHABLE_KEY
+      - key: STRIPE_WEBHOOK_SECRET
         sync: false
       - key: INTERNAL_TOKEN
         sync: false
       - key: FRONTEND_URL
         value: https://nanowork.app
+      - key: CF_ACCOUNT_ID
+        sync: false
+      - key: CLOUDFLARE_API_TOKEN
+        sync: false
