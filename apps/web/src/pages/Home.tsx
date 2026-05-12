@@ -245,46 +245,46 @@ function TerminalPrompt() {
 function DepartmentGrid() {
   const departments = [
     {
-      icon: "⚖️",
+      code: "LEGAL",
       name: "Legal",
-      description: "Contracts, compliance, and entity formation",
-      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
+      description: "Entity formation, operating agreements, terms of service, privacy policies, and contractor agreements. Handles all compliance and regulatory requirements.",
+      status: "ACTIVE",
     },
     {
-      icon: "🎨",
+      code: "BRAND",
       name: "Brand",
-      description: "Identity, voice, and creative direction",
-      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
+      description: "Logo design, brand guidelines, voice and tone, color systems, and visual identity. Creates cohesive brand assets across all channels.",
+      status: "ACTIVE",
     },
     {
-      icon: "💻",
+      code: "WEB",
       name: "Web",
-      description: "Sites, apps, and digital experiences",
-      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
+      description: "Landing pages, web apps, e-commerce, checkout flows, and hosting. Builds and deploys production-ready digital experiences.",
+      status: "ACTIVE",
     },
     {
-      icon: "📢",
+      code: "MARKETING",
       name: "Marketing",
-      description: "Growth, content, and audience building",
-      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
+      description: "Content strategy, SEO, email campaigns, social media, and analytics. Drives awareness and growth across channels.",
+      status: "ACTIVE",
     },
     {
-      icon: "💼",
+      code: "SALES",
       name: "Sales",
-      description: "Pipeline, outreach, and deal closing",
-      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
+      description: "Outreach sequences, pipeline management, CRM, lead qualification, and deal tracking. Converts prospects into customers.",
+      status: "ACTIVE",
     },
     {
-      icon: "💰",
+      code: "FINANCE",
       name: "Finance",
-      description: "Revenue, expenses, and financial ops",
-      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
+      description: "Revenue tracking, expense management, invoicing, payment processing, and financial reporting. Keeps books accurate and current.",
+      status: "ACTIVE",
     },
     {
-      icon: "⚙️",
+      code: "OPS",
       name: "Operations",
-      description: "Systems, processes, and execution",
-      capabilities: ["24/7", "AUTONOMOUS", "ALWAYS ON"],
+      description: "Process automation, deployment pipelines, monitoring, vendor management, and system reliability. Keeps everything running smoothly.",
+      status: "ACTIVE",
     },
   ];
 
@@ -292,32 +292,21 @@ function DepartmentGrid() {
     <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
       {departments.map((dept, i) => (
         <div key={i} className="card rounded-none border border-white/10 p-6 hover:bg-surface-3 transition-colors">
-          <div className="flex items-start justify-between mb-4">
-            <span className="text-2xl">{dept.icon}</span>
+          <div className="flex items-start justify-between mb-3">
+            <div className="text-xs font-mono font-bold text-white/40">{dept.code}</div>
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-[10px] font-mono text-green-400">ACTIVE</span>
+              <span className="text-[10px] font-mono text-green-400">{dept.status}</span>
             </div>
           </div>
 
-          <h3 className="text-base font-mono font-bold text-white mb-2">
+          <h3 className="text-sm font-mono font-bold text-white mb-3">
             {dept.name}
           </h3>
 
-          <p className="text-xs text-white/60 mb-4 leading-relaxed">
+          <p className="text-xs text-white/60 leading-relaxed">
             {dept.description}
           </p>
-
-          <div className="flex flex-wrap gap-1.5">
-            {dept.capabilities.map((cap, j) => (
-              <span
-                key={j}
-                className="px-2 py-0.5 rounded-none bg-white/5 text-[10px] font-mono text-white/60 border border-white/10"
-              >
-                {cap}
-              </span>
-            ))}
-          </div>
         </div>
       ))}
     </div>
