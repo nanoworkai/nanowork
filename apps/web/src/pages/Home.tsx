@@ -246,31 +246,31 @@ function DepartmentGrid() {
   const departments = [
     {
       name: "Legal",
-      description: "Entity formation, operating agreements, terms of service, privacy policies, contractor agreements. Handles compliance and regulatory requirements.",
+      description: "Sets up your company, writes terms and privacy policies, drafts contractor agreements, and keeps you compliant with regulations.",
     },
     {
       name: "Brand",
-      description: "Logo design, brand guidelines, voice and tone, color systems, visual identity. Creates cohesive assets across all channels.",
+      description: "Designs your logo, builds brand guidelines, defines your voice and colors, and creates a visual identity people remember.",
     },
     {
       name: "Web",
-      description: "Landing pages, web apps, e-commerce, checkout flows, hosting. Builds and deploys production-ready digital experiences.",
+      description: "Builds your website, sets up e-commerce and checkout, hosts everything, and ships updates that actually work in production.",
     },
     {
       name: "Marketing",
-      description: "Content strategy, SEO, email campaigns, social media, analytics. Drives awareness and growth across all channels.",
+      description: "Plans content, writes for SEO, runs email campaigns, manages social media, and tracks what's actually driving growth.",
     },
     {
       name: "Sales",
-      description: "Outreach sequences, pipeline management, CRM, lead qualification, deal tracking. Converts prospects into customers.",
+      description: "Reaches out to prospects, manages your pipeline, qualifies leads, tracks deals, and turns conversations into customers.",
     },
     {
       name: "Finance",
-      description: "Revenue tracking, expense management, invoicing, payment processing, financial reporting. Keeps books accurate and current.",
+      description: "Tracks revenue, manages expenses, sends invoices, processes payments, and keeps your books accurate and up to date.",
     },
     {
       name: "Operations",
-      description: "Process automation, deployment pipelines, monitoring, vendor management, system reliability. Keeps everything running smoothly.",
+      description: "Automates workflows, manages deployments, monitors uptime, coordinates vendors, and makes sure everything runs smoothly.",
     },
   ];
 
@@ -382,20 +382,20 @@ export default function Home() {
         <section className="py-16">
           <div className="card-lg rounded-none border border-white/10 p-12 text-center">
             <div className="text-xs font-mono text-white/40 uppercase tracking-wider mb-4">
-              Begin Execution
+              Ready to Build
             </div>
             <h2 className="text-3xl font-mono font-bold text-white uppercase mb-4 tracking-tight">
               Start Building Today
             </h2>
             <p className="text-sm font-mono text-white/60 mb-8 max-w-2xl mx-auto leading-relaxed">
               From zero to revenue in days. From revenue to scale with agents that never stop working.
-              Enterprise infrastructure from the first command.
+              Real infrastructure from day one.
             </p>
             <Link
               to="/login"
               className="inline-flex items-center gap-3 px-8 py-4 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
             >
-              Initialize System
+              Get Started
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -412,7 +412,7 @@ export default function Home() {
                 <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">Nanowork</span>
               </div>
               <p className="text-xs font-mono text-white/40 leading-relaxed">
-                Enterprise agent infrastructure
+                AI agents that build companies
               </p>
             </div>
             <div>

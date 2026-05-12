@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "start": "serve -s dist -l 3000",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-og": "node generate-og-image.js"
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.4.0",
