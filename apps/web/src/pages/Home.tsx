@@ -20,174 +20,6 @@ const TYPING_EXAMPLES = [
   "AI HEALTHCARE DIAGNOSTIC | FDA COMPLIANT",
 ];
 
-// Mock real-time stock data
-const STOCKS = [
-  { symbol: "MSFT", price: 412.38, change: 2.14, pct: 0.52 },
-  { symbol: "GOOGL", price: 178.92, change: -1.23, pct: -0.68 },
-  { symbol: "AAPL", price: 226.50, change: 3.42, pct: 1.53 },
-  { symbol: "NVDA", price: 138.75, change: 5.21, pct: 3.90 },
-  { symbol: "META", price: 563.28, change: -2.87, pct: -0.51 },
-  { symbol: "AMZN", price: 218.44, change: 1.92, pct: 0.89 },
-  { symbol: "TSLA", price: 345.67, change: -8.34, pct: -2.36 },
-  { symbol: "NFLX", price: 712.89, change: 4.56, pct: 0.64 },
-  { symbol: "CRM", price: 312.45, change: 6.78, pct: 2.22 },
-  { symbol: "ORCL", price: 167.23, change: 1.45, pct: 0.87 },
-  { symbol: "ADBE", price: 478.90, change: -3.21, pct: -0.67 },
-  { symbol: "CSCO", price: 57.82, change: 0.92, pct: 1.62 },
-];
-
-// Tech news feed for valuations
-const NEWS_FEED = [
-  {
-    time: "09:42",
-    source: "BLOOMBERG",
-    headline: "AI Infrastructure Spending Hits $127B as Enterprise Adoption Accelerates",
-    impact: "BULLISH",
-  },
-  {
-    time: "09:38",
-    source: "WSJ",
-    headline: "SaaS Multiples Compress to 8.2x as Interest Rates Hold at 5.25%",
-    impact: "NEUTRAL",
-  },
-  {
-    time: "09:31",
-    source: "FT",
-    headline: "Payment Processing Volume Up 18% QoQ Driven by B2B Transactions",
-    impact: "BULLISH",
-  },
-  {
-    time: "09:24",
-    source: "CNBC",
-    headline: "Healthcare Tech M&A Activity Surges 34% YoY with $14B in Deals",
-    impact: "BULLISH",
-  },
-  {
-    time: "09:15",
-    source: "REUTERS",
-    headline: "Cloud Infrastructure ARR Growth Decelerates to 22% from 28% Previous Quarter",
-    impact: "BEARISH",
-  },
-  {
-    time: "09:08",
-    source: "BLOOMBERG",
-    headline: "Fintech Valuations Recover as Fed Signals Potential Rate Cuts in H2",
-    impact: "BULLISH",
-  },
-];
-
-// ──────────────────────────────────────────────────────────────────────────────
-// STOCK TICKER - Scrolling market data
-// ──────────────────────────────────────────────────────────────────────────────
-
-function StockTicker() {
-  const [stocks, setStocks] = useState(STOCKS);
-
-  // Simulate live updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStocks((prev) =>
-        prev.map((stock) => {
-          const volatility = Math.random() * 0.5 - 0.25; // -0.25% to +0.25%
-          const priceChange = stock.price * (volatility / 100);
-          const newPrice = stock.price + priceChange;
-          const newChange = stock.change + priceChange;
-          const newPct = (newChange / (newPrice - newChange)) * 100;
-
-          return {
-            ...stock,
-            price: newPrice,
-            change: newChange,
-            pct: newPct,
-          };
-        })
-      );
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div className="bg-surface-1 border-b border-white/10 overflow-hidden">
-      <div className="flex animate-scroll">
-        {/* Duplicate stocks for seamless loop */}
-        {[...stocks, ...stocks].map((stock, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-3 px-6 py-2.5 border-r border-white/5 whitespace-nowrap flex-shrink-0"
-          >
-            <span className="text-xs font-mono font-bold text-white">{stock.symbol}</span>
-            <span className="text-xs font-mono text-white tabular-nums">
-              ${stock.price.toFixed(2)}
-            </span>
-            <span
-              className={`text-xs font-mono tabular-nums ${
-                stock.change >= 0 ? "text-green-400" : "text-red-400"
-              }`}
-            >
-              {stock.change >= 0 ? "+" : ""}
-              {stock.change.toFixed(2)}
-            </span>
-            <span
-              className={`text-xs font-mono tabular-nums ${
-                stock.pct >= 0 ? "text-green-400" : "text-red-400"
-              }`}
-            >
-              {stock.pct >= 0 ? "+" : ""}
-              {stock.pct.toFixed(2)}%
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
-// LIVE TICKER - Shows real-time metrics
-// ──────────────────────────────────────────────────────────────────────────────
-
-function LiveTicker() {
-  const [time, setTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const metrics = [
-    { label: "COMPANIES", value: "2,847", change: "+12" },
-    { label: "REVENUE", value: "$847M", change: "+$2.4M" },
-    { label: "TXN/SEC", value: "148", change: "+3" },
-    { label: "UPTIME", value: "99.98%", change: "—" },
-  ];
-
-  return (
-    <div className="card rounded-none border-b border-white/10">
-      <div className="grid grid-cols-5 divide-x divide-white/10">
-        {/* Clock */}
-        <div className="px-6 py-4">
-          <div className="text-xs font-mono text-white/40 mb-1">UTC</div>
-          <div className="text-base font-mono font-bold text-white tabular-nums">
-            {time.toUTCString().slice(17, 25)}
-          </div>
-        </div>
-
-        {/* Metrics */}
-        {metrics.map((m, i) => (
-          <div key={i} className="px-6 py-4">
-            <div className="text-xs font-mono text-white/40 mb-1">{m.label}</div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-base font-mono font-bold text-white tabular-nums">{m.value}</span>
-              <span className="text-xs font-mono text-green-400">{m.change}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 // ──────────────────────────────────────────────────────────────────────────────
 // TERMINAL PROMPT INPUT
 // ──────────────────────────────────────────────────────────────────────────────
@@ -330,68 +162,6 @@ function TerminalPrompt() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// NEWS FEED - Tech news for valuations
-// ──────────────────────────────────────────────────────────────────────────────
-
-function NewsFeed() {
-  return (
-    <div className="card-lg rounded-none border border-white/10">
-      <div className="border-b border-white/10 px-6 py-3 bg-surface-1">
-        <div className="flex items-center gap-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-          <span className="text-xs font-mono font-bold text-white/60 uppercase tracking-wider">
-            Market Intelligence Feed
-          </span>
-          <div className="flex-1" />
-          <span className="text-xs font-mono text-white/40">LIVE</span>
-        </div>
-      </div>
-
-      <div className="divide-y divide-white/5">
-        {NEWS_FEED.map((item, i) => (
-          <div
-            key={i}
-            className="px-6 py-4 hover:bg-surface-2 transition-colors cursor-pointer"
-          >
-            <div className="flex items-start gap-4">
-              <div className="flex flex-col items-end gap-1 w-12 flex-shrink-0">
-                <span className="text-xs font-mono text-white/40 tabular-nums">{item.time}</span>
-                <span
-                  className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-none ${
-                    item.impact === "BULLISH"
-                      ? "bg-green-400/10 text-green-400 border border-green-400/20"
-                      : item.impact === "BEARISH"
-                      ? "bg-red-400/10 text-red-400 border border-red-400/20"
-                      : "bg-white/5 text-white/40 border border-white/10"
-                  }`}
-                >
-                  {item.impact}
-                </span>
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="text-[10px] font-mono text-white/40 mb-1 uppercase tracking-wider">
-                  {item.source}
-                </div>
-                <p className="text-xs font-mono text-white/80 leading-relaxed">
-                  {item.headline}
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="border-t border-white/10 px-6 py-3 bg-surface-1">
-        <button className="text-xs font-mono text-white/40 hover:text-white transition-colors uppercase tracking-wider">
-          View All Intelligence →
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
 // DATA GRID - Infrastructure specs
 // ──────────────────────────────────────────────────────────────────────────────
 
@@ -514,12 +284,6 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Stock Ticker */}
-      <StockTicker />
-
-      {/* Live Metrics Ticker */}
-      <LiveTicker />
-
       {/* Main Content */}
       <main className="max-w-[1800px] mx-auto px-6">
         {/* Hero Section - Dense, terminal-style */}
@@ -537,55 +301,19 @@ export default function Home() {
           <TerminalPrompt />
         </section>
 
-        {/* Two Column Layout: News Feed + Infrastructure */}
+        {/* Infrastructure Grid */}
         <section className="py-12">
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Left: News Feed */}
-            <div className="lg:col-span-1">
-              <NewsFeed />
-            </div>
-
-            {/* Right: Infrastructure Grid */}
-            <div className="lg:col-span-2">
-              <div className="mb-6">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono font-bold text-white/40 uppercase tracking-wider">
-                    Infrastructure Matrix
-                  </span>
-                  <div className="flex-1 h-px bg-white/10" />
-                  <span className="text-xs font-mono text-green-400">6 SYSTEMS OPERATIONAL</span>
-                </div>
-              </div>
-
-              <InfrastructureGrid />
+          <div className="mb-6">
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono font-bold text-white/40 uppercase tracking-wider">
+                Infrastructure Matrix
+              </span>
+              <div className="flex-1 h-px bg-white/10" />
+              <span className="text-xs font-mono text-green-400">6 SYSTEMS OPERATIONAL</span>
             </div>
           </div>
-        </section>
 
-        {/* Stats Bar - Bloomberg style */}
-        <section className="py-12">
-          <div className="card-lg rounded-none border border-white/10 p-8">
-            <div className="grid grid-cols-4 gap-8">
-              {[
-                { metric: "COMPANIES BUILT", value: "2,847", delta: "+127 THIS MONTH" },
-                { metric: "TOTAL REVENUE", value: "$847M", delta: "+$2.4M TODAY" },
-                { metric: "TRANSACTIONS", value: "12.8M", delta: "+148/SEC" },
-                { metric: "GLOBAL REACH", value: "67 COUNTRIES", delta: "+3 THIS QUARTER" },
-              ].map((stat, i) => (
-                <div key={i}>
-                  <div className="text-xs font-mono text-white/40 mb-2 uppercase tracking-wider">
-                    {stat.metric}
-                  </div>
-                  <div className="text-3xl font-mono font-bold text-white mb-1 tabular-nums">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs font-mono text-green-400">
-                    {stat.delta}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <InfrastructureGrid />
         </section>
 
         {/* CTA - Terminal command style */}
