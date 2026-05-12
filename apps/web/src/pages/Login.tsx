@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Terminal, Lock } from "lucide-react";
@@ -26,13 +26,14 @@ export default function Login() {
   const [error, setError] = useState("");
 
   // Redirect if already authenticated
-  if (isAuthenticated) {
-    const dest = pendingPrompt
-      ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
-      : nextPath;
-    navigate(dest, { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      const dest = pendingPrompt
+        ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
+        : nextPath;
+      navigate(dest, { replace: true });
+    }
+  }, [isAuthenticated, navigate, nextPath, pendingPrompt]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

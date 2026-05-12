@@ -3,6 +3,10 @@ import { createClient } from '@supabase/supabase-js'
 const url     = import.meta.env.VITE_SUPABASE_URL     as string
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
+// Debug: verify env vars are loading
+console.log('[supabase] VITE_SUPABASE_URL:', url)
+console.log('[supabase] Key configured:', !!anonKey)
+
 export const isSupabaseConfigured = !!(url && anonKey)
 
 export const supabase = createClient(

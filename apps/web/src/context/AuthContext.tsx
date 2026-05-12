@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .from("profiles")
       .select("*")
       .eq("id", u.id)
-      .single();
+      .maybeSingle();
 
     if (data) {
       // Map database fields (snake_case) to UserProfile (camelCase)
