@@ -2,10 +2,19 @@ import { Router, Request, Response } from 'express';
 import { nanoid } from 'nanoid';
 import { requireInternalToken } from '../../middleware/auth';
 import { getAgentByUserId, createAgent } from '../../services/supabase';
-import { agentEmailAddress } from '../../services/email';
 import { createConnectAccount } from '../../services/stripe';
 
 const router = Router();
+
+function agentEmailAddress(slug: string): string {
+  const domain = process.env.AGENT_EMAIL_DOMAIN;
+
+  if (!domain) {
+    throw new Error('AGENT_EMAIL_DOMAIN must be configured');
+  }
+
+  return `a-${slug}@${domain}`;
+}
 
 /**
  * POST /internal/provision-agent
