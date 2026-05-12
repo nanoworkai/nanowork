@@ -162,36 +162,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Create new profile
       const newProfile = {
         id: u.id,
-        phone: u.phone ?? "",
-        status: "active",
-        phone_verified: false,
+        email: u.email ?? null,
+        name: null,
+        phone: u.phone ?? null,
         plan: "free",
-        credits_balance: 100, // Free signup bonus
-        monthly_company_limit: 1,
-        total_companies_created: 0,
-        subdomain: phoneToSubdomain(u.phone ?? u.id),
+        credits: 100, // Free signup bonus
         timezone: "UTC",
-        notification_preferences: {
-          sms: true,
-          activity: true,
-          billing: true,
-        },
       };
 
       await supabase.from("profiles").insert(newProfile);
 
       const mappedProfile: UserProfile = {
         id: newProfile.id,
-        phone: newProfile.phone,
-        status: newProfile.status as "active",
-        phoneVerified: newProfile.phone_verified,
+        phone: newProfile.phone || "",
+        email: newProfile.email || undefined,
+        name: newProfile.name || undefined,
+        status: "active",
+        phoneVerified: false,
         plan: newProfile.plan as "free",
-        creditsBalance: newProfile.credits_balance,
-        monthlyCompanyLimit: newProfile.monthly_company_limit,
-        totalCompaniesCreated: newProfile.total_companies_created,
-        subdomain: newProfile.subdomain,
+        creditsBalance: newProfile.credits,
+        monthlyCompanyLimit: 1,
+        totalCompaniesCreated: 0,
         timezone: newProfile.timezone,
-        notificationPreferences: newProfile.notification_preferences,
+        notificationPreferences: {
+          sms: true,
+          activity: true,
+          billing: true,
+        },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -204,7 +201,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: ownedCompanies } = await supabase
       .from("companies")
       .select("*")
-      .eq("owner_id", userId)
+      .eq("user_id", userId)
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
 
@@ -215,8 +212,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         company_id,
         companies (*)
       `)
-      .eq("user_id", userId)
-      .eq("invitation_status", "accepted");
+      .eq("user_id", userId);
 
     const allCompanies = [
       ...(ownedCompanies || []),
@@ -255,7 +251,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           try {
             await supabase
               .from("profiles")
-              .update({ last_login_at: new Date().toISOString() })
+              .update({ updated_at: new Date().toISOString() })
               .eq("id", s.user.id);
           } catch {
             // Ignore errors - column may not exist
@@ -310,14 +306,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: email,
         name: name || null,
         phone: null,
-        status: "active",
-        phone_verified: false,
         plan: "free",
-        credits_balance: 100,
-        monthly_company_limit: 1,
-        total_companies_created: 0,
+        credits: 100,
         timezone: "UTC",
-        notification_preferences: { sms: false, activity: true, billing: true },
       });
     }
 

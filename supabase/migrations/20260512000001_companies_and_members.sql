@@ -1,7 +1,7 @@
 -- Create companies table
 create table if not exists companies (
   id         uuid primary key default gen_random_uuid(),
-  owner_id   uuid references auth.users(id) on delete cascade,
+  user_id   uuid references auth.users(id) on delete cascade,
   name       text not null,
   slug       text unique,
   plan       text default 'free',
@@ -17,7 +17,6 @@ create table if not exists company_members (
   company_id         uuid references companies(id) on delete cascade,
   user_id            uuid references auth.users(id) on delete cascade,
   role               text default 'member',
-  invitation_status  text default 'accepted',
   created_at         timestamptz default now(),
   updated_at         timestamptz default now(),
   unique (company_id, user_id)
@@ -29,7 +28,7 @@ alter table company_members enable row level security;
 
 -- Policies for companies
 create policy "users manage own companies"
-  on companies for all using (owner_id = auth.uid());
+  on companies for all using (user_id = auth.uid());
 
 -- Policies for company_members
 create policy "members read own memberships"
@@ -40,12 +39,12 @@ create policy "owners manage company members"
     exists (
       select 1 from companies
       where companies.id = company_members.company_id
-      and companies.owner_id = auth.uid()
+      and companies.user_id = auth.uid()
     )
   );
 
 -- Create indexes
-create index if not exists companies_owner_id_idx on companies(owner_id);
+create index if not exists companies_user_id_idx on companies(user_id);
 create index if not exists companies_slug_idx on companies(slug);
 create index if not exists company_members_company_id_idx on company_members(company_id);
 create index if not exists company_members_user_id_idx on company_members(user_id);
