@@ -40,7 +40,7 @@ export default function PreviewPage() {
   async function loadBuild() {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/build/${buildId}`
+        `${import.meta.env.VITE_API_URL || ""}/api/build/${buildId}`
       );
 
       if (!response.ok) {
@@ -77,7 +77,7 @@ export default function PreviewPage() {
     setUnlocking(true);
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/api/build/${buildId}/unlock`,
+        `${import.meta.env.VITE_API_URL || ""}/api/build/${buildId}/unlock`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

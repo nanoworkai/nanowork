@@ -5,22 +5,13 @@
     "apps/web"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
+    "dev": "concurrently \"npm run dev:web\" \"npm run dev:worker\"",
     "dev:web": "npm run dev -w web",
-    "dev:api": "bash -lc 'cd apps/api && PYTHONPATH=. .venv/bin/python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000'",
-    "dev:backend": "cd backend && npm run dev",
     "dev:worker": "cd apps/worker && npx wrangler dev",
-    "build": "npm run build:web && npm run build:copy",
-    "build:web": "npm run build -w web",
-    "build:copy": "rm -rf apps/api/static && cp -r apps/web/dist apps/api/static",
-    "build:backend": "cd backend && npm install && npm run build",
-    "start": "bash -lc \"cd apps/api && PYTHONPATH=. .venv/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}\"",
-    "start:backend": "cd backend && npm start",
-    "preview": "npm run build && npm run start",
+    "build": "npm run build -w web",
+    "deploy": "npm run build && npm run deploy:worker && npm run deploy:web",
     "deploy:worker": "cd apps/worker && npx wrangler deploy",
-    "test:api": "cd apps/api && PYTHONPATH=. .venv/bin/pytest",
-    "lint:api": "cd apps/api && .venv/bin/ruff check app",
-    "format:api": "cd apps/api && .venv/bin/ruff format app"
+    "deploy:web": "cd apps/web && npx wrangler pages deploy dist"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

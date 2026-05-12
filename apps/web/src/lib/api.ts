@@ -1,8 +1,8 @@
 /**
  * API Client for Nanowork
  *
- * In development: proxied through Vite to http://127.0.0.1:8000
- * In production: served from same origin (FastAPI serves frontend)
+ * In development: proxied through Vite to Cloudflare Worker (port 8787)
+ * In production: api.nanowork.app (Cloudflare Worker)
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';

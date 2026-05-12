@@ -237,7 +237,7 @@ function TerminalPrompt() {
 
     try {
       // Call preview build endpoint (no auth required)
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/build/preview`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/build/preview`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: text }),
