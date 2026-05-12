@@ -12,32 +12,25 @@
     body {
       width: 1200px;
       height: 630px;
-      background: #0c0d10;
-      font-family: 'Monaco', 'Courier New', monospace;
+      background: #000000;
+      font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
       color: white;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
     }
 
-    .header {
-      background: #14151a;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 20px 40px;
+    .container {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      gap: 40px;
     }
 
     .logo-box {
-      width: 32px;
-      height: 32px;
+      width: 120px;
+      height: 120px;
       background: white;
       display: flex;
       align-items: center;
@@ -45,146 +38,27 @@
     }
 
     .logo-icon {
-      width: 18px;
-      height: 18px;
-      background: black;
-      clip-path: polygon(0 100%, 20% 0, 100% 0, 100% 100%);
+      width: 60px;
+      height: 60px;
     }
 
-    .logo-text {
-      font-size: 16px;
+    .company-name {
+      font-size: 72px;
       font-weight: bold;
       text-transform: uppercase;
-      letter-spacing: 2px;
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.4);
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background: #4ade80;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    .content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 60px 80px;
-    }
-
-    .tagline {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.4);
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      margin-bottom: 24px;
-    }
-
-    .headline {
-      font-size: 64px;
-      font-weight: bold;
-      line-height: 1.1;
-      margin-bottom: 32px;
-      text-transform: uppercase;
-      letter-spacing: -1px;
-    }
-
-    .description {
-      font-size: 18px;
-      color: rgba(255, 255, 255, 0.7);
-      line-height: 1.6;
-      max-width: 900px;
-      margin-bottom: 40px;
-    }
-
-    .departments {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .dept {
-      background: #14151a;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 12px 20px;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .dept-dot {
-      width: 6px;
-      height: 6px;
-      background: #4ade80;
-      border-radius: 50%;
-    }
-
-    .footer {
-      background: #14151a;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 16px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.4);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 8px;
+      color: white;
     }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="logo">
-      <div class="logo-box">
-        <div class="logo-icon"></div>
-      </div>
-      <div class="logo-text">Nanowork</div>
+  <div class="container">
+    <div class="logo-box">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 20L20 4M20 4H8M20 4V16" stroke="black" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/>
+      </svg>
     </div>
-    <div class="status">
-      <div class="status-dot"></div>
-      <span>7 Departments Active</span>
-    </div>
-  </div>
-
-  <div class="content">
-    <div class="tagline">Build Command Interface</div>
-    <div class="headline">Turn Your Idea<br>Into a Company</div>
-    <div class="description">
-      Seven AI departments work 24/7 to build your business. Legal, brand, web, marketing, sales, finance, and ops—all autonomous, all running in parallel.
-    </div>
-    <div class="departments">
-      <div class="dept"><div class="dept-dot"></div>Legal</div>
-      <div class="dept"><div class="dept-dot"></div>Brand</div>
-      <div class="dept"><div class="dept-dot"></div>Web</div>
-      <div class="dept"><div class="dept-dot"></div>Marketing</div>
-      <div class="dept"><div class="dept-dot"></div>Sales</div>
-      <div class="dept"><div class="dept-dot"></div>Finance</div>
-      <div class="dept"><div class="dept-dot"></div>Operations</div>
-    </div>
-  </div>
-
-  <div class="footer">
-    <span>From Idea to Revenue</span>
-    <span>nanowork.app</span>
+    <div class="company-name">NANOWORK</div>
   </div>
 </body>
 </html>

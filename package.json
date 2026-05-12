@@ -12,7 +12,8 @@
     "start": "npm run start -w web",
     "deploy": "npm run build && npm run deploy:worker && npm run deploy:web",
     "deploy:worker": "cd apps/worker && npx wrangler deploy",
-    "deploy:web": "cd apps/web && npx wrangler pages deploy dist"
+    "deploy:web": "cd apps/web && npx wrangler pages deploy dist",
+    "generate:og": "node scripts/generate-og-image.js"
   },
   "dependencies": {
     "serve": "^14.2.4"
