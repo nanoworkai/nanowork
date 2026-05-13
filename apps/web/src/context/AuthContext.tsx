@@ -130,34 +130,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Map database fields (snake_case) to UserProfile (camelCase)
       const mappedProfile: UserProfile = {
         id: data.id,
-        phone: data.phone,
+        phone: data.phone || "",
         email: data.email || undefined,
         name: data.name || undefined,
-        avatarUrl: data.avatar_url || undefined,
-        businessName: data.business_name || undefined,
-        businessPrompt: data.business_prompt || undefined,
-        status: data.status || "active",
-        phoneVerified: data.phone_verified || false,
+        status: "active",
+        phoneVerified: false,
         plan: data.plan || "free",
-        stripeCustomerId: data.stripe_customer_id || undefined,
-        subscriptionStatus: data.subscription_status || undefined,
-        subscriptionId: data.subscription_id || undefined,
-        trialEndsAt: data.trial_ends_at || undefined,
-        subscriptionEndsAt: data.subscription_ends_at || undefined,
-        creditsBalance: data.credits_balance || 0,
-        monthlyCompanyLimit: data.monthly_company_limit || 1,
-        totalCompaniesCreated: data.total_companies_created || 0,
-        customDomain: data.custom_domain || undefined,
-        subdomain: data.subdomain || undefined,
+        creditsBalance: data.credits || 0,
+        monthlyCompanyLimit: 1,
+        totalCompaniesCreated: 0,
         timezone: data.timezone || "UTC",
-        notificationPreferences: data.notification_preferences || {
+        notificationPreferences: {
           sms: true,
           activity: true,
           billing: true,
         },
-        lastLoginAt: data.last_login_at || undefined,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at || data.created_at,
+        createdAt: data.created_at || new Date().toISOString(),
+        updatedAt: data.updated_at || new Date().toISOString(),
       };
       setProfile(mappedProfile);
     } else {
