@@ -150,45 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
       setProfile(mappedProfile);
     } else {
-      // Create new profile
-      const newProfile = {
-        id: u.id,
-        email: u.email ?? null,
-        name: null,
-        phone: u.phone ?? null,
-        plan: "free",
-        credits_balance: 100, // Free signup bonus
-        timezone: "UTC",
-      };
-
-      const { error: insertError } = await supabase.from("profiles").insert(newProfile);
-
-      if (insertError) {
-        console.error("Database error saving new user:", insertError);
-        throw insertError;
-      }
-
-      const mappedProfile: UserProfile = {
-        id: newProfile.id,
-        phone: newProfile.phone || "",
-        email: newProfile.email || undefined,
-        name: newProfile.name || undefined,
-        status: "active",
-        phoneVerified: false,
-        plan: newProfile.plan as "free",
-        creditsBalance: newProfile.credits_balance,
-        monthlyCompanyLimit: 1,
-        totalCompaniesCreated: 0,
-        timezone: newProfile.timezone,
-        notificationPreferences: {
-          sms: true,
-          activity: true,
-          billing: true,
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setProfile(mappedProfile);
+      console.warn("[AuthContext] Profile not found for user - trigger should have created it");
     }
   }, []);
 
@@ -285,7 +247,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, name?: string) => {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -296,24 +258,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (error) return { error: error.message };
 
-    // Create profile entry if user was created
-    if (data.user) {
-      const { error: profileError } = await supabase.from("profiles").insert({
-        id: data.user.id,
-        email: email,
-        name: name || null,
-        phone: null,
-        plan: "free",
-        credits_balance: 100,
-        timezone: "UTC",
-      });
-
-      if (profileError) {
-        console.error("Database error saving new user:", profileError);
-        return { error: "Failed to create user profile: " + profileError.message };
-      }
-    }
-
+    // Profile is automatically created by database trigger
     return { error: null };
   }, []);
 
