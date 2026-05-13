@@ -217,7 +217,7 @@ export default function Login() {
           {/* Footer */}
           <div className="border-t border-white/10 px-4 sm:px-6 py-3 sm:py-4 bg-surface-1">
             <p className="text-[10px] sm:text-xs font-mono text-white/30 text-center leading-relaxed">
-              ENCRYPTED CONNECTION · SOC 2 TYPE II CERTIFIED
+              ENCRYPTED CONNECTION · ENTERPRISE SECURITY
             </p>
           </div>
         </div>

@@ -229,7 +229,7 @@ function PromptInput() {
             <path d="M2 17l10 5 10-5"/>
             <path d="M2 12l10 5 10-5"/>
           </svg>
-          SOC 2 compliant
+          Enterprise security
         </div>
       </div>
     </div>
@@ -460,7 +460,7 @@ export default function Home() {
             <InfrastructureCard
               type="Banking Operations"
               title="Department bank accounts"
-              description="Separate FDIC-insured accounts with real-time balance tracking, automated reconciliation, and SOC 2 Type II certified security."
+              description="Separate FDIC-insured accounts with real-time balance tracking, automated reconciliation, and enterprise-grade security."
               visualComponent={<BankAccountVisual />}
             />
           </div>
@@ -479,7 +479,7 @@ export default function Home() {
               </div>
               <h3 className={styles.trustTitle}>Bank-Grade Security</h3>
               <p className={styles.trustDescription}>
-                256-bit encryption, SOC 2 Type II certified, and continuous security monitoring protect your business 24/7.
+                256-bit encryption, enterprise-grade security, and continuous security monitoring protect your business 24/7.
               </p>
             </div>
 
