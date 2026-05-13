@@ -222,7 +222,7 @@ function TerminalPrompt() {
             <span className="hidden sm:inline">|</span>
             <span>PARALLEL EXECUTION</span>
             <span className="hidden sm:inline">|</span>
-            <span className="hidden md:inline">FDIC INSURED</span>
+            <span className="hidden md:inline">AUTONOMOUS AGENTS</span>
           </div>
 
           <button
@@ -389,7 +389,6 @@ export default function Home() {
             </h2>
             <p className="text-xs sm:text-sm font-mono text-white/60 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
               From zero to revenue in days. From revenue to scale with agents that never stop working.
-              Real infrastructure from day one.
             </p>
             <Link
               to="/login"
@@ -402,43 +401,126 @@ export default function Home() {
         </section>
       </main>
 
-      {/* Footer - Minimal terminal footer */}
+      {/* Footer - Professional with competitors section */}
       <footer className="border-t border-white/10 mt-8 sm:mt-12 lg:mt-16">
         <div className="max-w-[1800px] mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
-            <div className="col-span-2 sm:col-span-1">
-              <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/60" />
-                <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">Nanowork</span>
+          {/* Competitors Section */}
+          <div className="mb-8 sm:mb-12 pb-8 sm:pb-12 border-b border-white/10">
+            <div className="text-center mb-6 sm:mb-8">
+              <div className="text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-2">
+                Compare
               </div>
-              <p className="text-xs font-mono text-white/40 leading-relaxed">
-                AI agents that build companies
-              </p>
+              <h3 className="text-lg sm:text-xl font-mono font-bold text-white uppercase tracking-tight">
+                Why Nanowork
+              </h3>
             </div>
-            <div>
-              <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Product</h3>
-              <ul className="space-y-2 text-xs font-mono text-white/40">
-                <li><Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
-                <li><Link to="/revenue" className="hover:text-white transition-colors">Revenue</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Company</h3>
-              <ul className="space-y-2 text-xs font-mono text-white/40">
-                <li><a href="#about" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#blog" className="hover:text-white transition-colors">Blog</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Legal</h3>
-              <ul className="space-y-2 text-xs font-mono text-white/40">
-                <li><a href="#privacy" className="hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="#terms" className="hover:text-white transition-colors">Terms</a></li>
-              </ul>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-5xl mx-auto mb-6 sm:mb-8">
+              {/* Polis */}
+              <div className="card rounded-none border border-white/10 p-4 sm:p-6 hover:bg-surface-1 transition-colors">
+                <h4 className="text-sm font-mono font-bold text-white mb-2">Nano vs Polis</h4>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  Polis focuses on community governance and coordination. Nanowork handles the full company stack—legal, finance, sales, and operations—not just collaboration tools.
+                </p>
+              </div>
+
+              {/* Nanocorp */}
+              <div className="card rounded-none border border-white/10 p-4 sm:p-6 hover:bg-surface-1 transition-colors">
+                <h4 className="text-sm font-mono font-bold text-white mb-2">Nano vs Nanocorp</h4>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  Nanocorp offers agent templates for specific tasks. Nanowork provides seven full departments that coordinate autonomously and scale with your business from day one.
+                </p>
+              </div>
+
+              {/* Nanoagents */}
+              <div className="card rounded-none border border-white/10 p-4 sm:p-6 hover:bg-surface-1 transition-colors">
+                <h4 className="text-sm font-mono font-bold text-white mb-2">Nano vs Nanoagents</h4>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  Nanoagents specializes in single-function automation. Nanowork orchestrates cross-functional teams that execute complex, multi-step business operations in parallel.
+                </p>
+              </div>
+
+              {/* Openclaw */}
+              <div className="card rounded-none border border-white/10 p-4 sm:p-6 hover:bg-surface-1 transition-colors">
+                <h4 className="text-sm font-mono font-bold text-white mb-2">Nano vs Openclaw</h4>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  Openclaw is an open-source framework for building agents. Nanowork is a production platform with managed infrastructure, compliance, and departments ready to work.
+                </p>
+              </div>
             </div>
           </div>
-          <div className="mt-8 sm:mt-12 pt-4 sm:pt-6 border-t border-white/5 text-center text-[10px] sm:text-xs font-mono text-white/30">
-            © {new Date().getFullYear()} NANOWORK INC · ALL RIGHTS RESERVED
+
+          {/* Main Footer Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr,2fr,1fr] gap-8 sm:gap-12 items-start">
+            {/* Logo Section - Left */}
+            <div>
+              <Link to="/" className="inline-flex items-center gap-2 mb-3 sm:mb-4 hover:opacity-70 transition-opacity">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-none bg-white flex items-center justify-center">
+                  <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black" />
+                </div>
+                <span className="text-sm sm:text-base font-mono font-bold text-white uppercase tracking-wider">
+                  Nanowork
+                </span>
+              </Link>
+              <p className="text-xs font-mono text-white/40 leading-relaxed max-w-xs">
+                AI agents that build companies. Seven departments, one prompt.
+              </p>
+            </div>
+
+            {/* Links Section - Center */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8">
+              <div>
+                <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Product</h3>
+                <ul className="space-y-2 text-xs font-mono text-white/40">
+                  <li><Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
+                  <li><Link to="/revenue" className="hover:text-white transition-colors">Revenue</Link></li>
+                  <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                  <li><a href="#docs" className="hover:text-white transition-colors">Docs</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Company</h3>
+                <ul className="space-y-2 text-xs font-mono text-white/40">
+                  <li><a href="#about" className="hover:text-white transition-colors">About</a></li>
+                  <li><a href="#blog" className="hover:text-white transition-colors">Blog</a></li>
+                  <li><a href="#careers" className="hover:text-white transition-colors">Careers</a></li>
+                  <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Legal</h3>
+                <ul className="space-y-2 text-xs font-mono text-white/40">
+                  <li><a href="#privacy" className="hover:text-white transition-colors">Privacy</a></li>
+                  <li><a href="#terms" className="hover:text-white transition-colors">Terms</a></li>
+                  <li><a href="#security" className="hover:text-white transition-colors">Security</a></li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Social/Status - Right */}
+            <div className="flex flex-col items-start lg:items-end">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-xs font-mono text-green-400 uppercase tracking-wider">
+                  All Systems Operational
+                </span>
+              </div>
+              <p className="text-xs font-mono text-white/40 lg:text-right">
+                Built on Cloudflare
+              </p>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="mt-8 sm:mt-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-[10px] sm:text-xs font-mono text-white/30">
+              © {new Date().getFullYear()} NANOWORK INC · ALL RIGHTS RESERVED
+            </div>
+            <div className="flex items-center gap-4 text-[10px] sm:text-xs font-mono text-white/30">
+              <span>MADE IN SAN FRANCISCO</span>
+              <span>·</span>
+              <span>EST. 2026</span>
+            </div>
           </div>
         </div>
       </footer>
