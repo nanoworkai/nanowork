@@ -3,7 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { fetchUserApps, type UserApp } from "../lib/apps";
-import { ExternalLink, Code, Crown } from "lucide-react";
+import { ExternalLink, Code, Crown, Globe, CreditCard, Settings as SettingsIcon, TrendingUp } from "lucide-react";
 
 /**
  * DASHBOARD DESIGN PRINCIPLES:
@@ -318,30 +318,49 @@ export default function Overview() {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
-          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            {meta?.companyName ?? profile?.businessName ?? "Your Build"}
-          </h1>
-          {buildEnabled && (
-            <div className="flex items-center gap-3 sm:gap-4">
-              {done ? (
-                <span className="text-xs sm:text-sm text-white/50 font-semibold">All departments live</span>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                  <span className="text-xs sm:text-sm text-white/50 font-semibold">{totalDone} of 7 complete</span>
-                </div>
-              )}
-              {done && (
-                <button
-                  onClick={() => { setBuildEnabled(false); setActivePrompt(null); }}
-                  className="text-xs text-white/40 hover:text-white/60 underline transition-colors"
-                >
-                  New build
-                </button>
-              )}
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2">
+          <div className="flex-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              {meta?.companyName ?? profile?.businessName ?? "Your Build"}
+            </h1>
+            {buildEnabled && (
+              <div className="flex items-center gap-3 mt-2">
+                {done ? (
+                  <span className="text-xs sm:text-sm text-white/50 font-semibold">All departments live</span>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    <span className="text-xs sm:text-sm text-white/50 font-semibold">{totalDone} of 7 complete</span>
+                  </div>
+                )}
+                {done && (
+                  <button
+                    onClick={() => { setBuildEnabled(false); setActivePrompt(null); }}
+                    className="text-xs text-white/40 hover:text-white/60 underline transition-colors"
+                  >
+                    New build
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Credits Display */}
+          <div className="card rounded-xl p-4 flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col">
+                <span className="text-xs text-white/40 font-semibold uppercase tracking-wider">Credits</span>
+                <span className="text-2xl font-bold text-white tabular-nums">{profile?.creditsBalance ?? 0}</span>
+              </div>
+              <div className="h-10 w-px bg-white/10" />
+              <div className="flex flex-col">
+                <span className="text-xs text-white/40 font-semibold uppercase tracking-wider">Builds</span>
+                <span className="text-lg font-bold text-white/60 tabular-nums">
+                  {profile?.totalCompaniesCreated ?? 0} / {profile?.monthlyCompanyLimit ?? 1}
+                </span>
+              </div>
             </div>
-          )}
+          </div>
         </div>
 
         {meta?.tagline && (
@@ -366,6 +385,34 @@ export default function Overview() {
       {/* Prompt entry */}
       {!buildEnabled && (
         <div className="mb-8">
+          {/* Welcome message for new users */}
+          {!profile?.businessPrompt && userApps.length === 0 && (
+            <div className="mb-6 card rounded-2xl p-6 border-white/10">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl">👋</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-base font-bold text-white mb-1">Welcome to Nanowork</h3>
+                  <p className="text-sm text-white/60 leading-relaxed mb-4">
+                    Build a complete AI-powered business in minutes. Enter your idea below, and our 7 departments
+                    (Legal, Brand, Web, Marketing, Sales, Finance, Ops) will work in parallel to launch your company.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <div className="text-xs bg-surface-3 px-3 py-1.5 rounded-lg text-white/50 border border-white/5">
+                      ✓ No coding required
+                    </div>
+                    <div className="text-xs bg-surface-3 px-3 py-1.5 rounded-lg text-white/50 border border-white/5">
+                      ✓ Live in 30 days
+                    </div>
+                    <div className="text-xs bg-surface-3 px-3 py-1.5 rounded-lg text-white/50 border border-white/5">
+                      ✓ Real revenue
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           <PromptForm onStart={handleStart} loading={false} />
         </div>
       )}
@@ -443,29 +490,60 @@ export default function Overview() {
         </div>
       )}
 
-      {/* Quick links */}
-      <div className="grid grid-cols-3 gap-3">
-        <Link
-          to="/dashboard/domains"
-          className="card card-hover rounded-xl p-5 transition-all duration-150"
-        >
-          <div className="text-xs text-white/40 font-semibold uppercase tracking-wider mb-1">Domains</div>
-          <div className="text-sm text-white font-semibold">Manage domains</div>
-        </Link>
-        <Link
-          to="/dashboard/plan"
-          className="card card-hover rounded-xl p-5 transition-all duration-150"
-        >
-          <div className="text-xs text-white/40 font-semibold uppercase tracking-wider mb-1">Plan</div>
-          <div className="text-sm text-white font-semibold">Upgrade</div>
-        </Link>
-        <Link
-          to="/dashboard/settings"
-          className="card card-hover rounded-xl p-5 transition-all duration-150"
-        >
-          <div className="text-xs text-white/40 font-semibold uppercase tracking-wider mb-1">Settings</div>
-          <div className="text-sm text-white font-semibold">Configure</div>
-        </Link>
+      {/* Quick actions */}
+      <div>
+        <h2 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-3">Quick Actions</h2>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <Link
+            to="/dashboard/domains"
+            className="card card-hover rounded-xl p-5 transition-all duration-150 group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                <Globe className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
+              </div>
+              <div className="text-xs text-white/40 font-semibold uppercase tracking-wider">Domains</div>
+            </div>
+            <div className="text-sm text-white font-medium">Connect your domain</div>
+            <div className="text-xs text-white/40 mt-1">Set up custom URLs</div>
+          </Link>
+          <Link
+            to="/dashboard/plan"
+            className="card card-hover rounded-xl p-5 transition-all duration-150 group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                <CreditCard className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
+              </div>
+              <div className="text-xs text-white/40 font-semibold uppercase tracking-wider">Plan</div>
+            </div>
+            <div className="text-sm text-white font-medium">Upgrade your plan</div>
+            <div className="text-xs text-white/40 mt-1">Currently on {profile?.plan ?? "free"}</div>
+          </Link>
+          <Link
+            to="/dashboard/settings"
+            className="card card-hover rounded-xl p-5 transition-all duration-150 group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                <SettingsIcon className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
+              </div>
+              <div className="text-xs text-white/40 font-semibold uppercase tracking-wider">Settings</div>
+            </div>
+            <div className="text-sm text-white font-medium">Account settings</div>
+            <div className="text-xs text-white/40 mt-1">Manage preferences</div>
+          </Link>
+          <div className="card rounded-xl p-5 border-dashed opacity-60">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-white/60" />
+              </div>
+              <div className="text-xs text-white/40 font-semibold uppercase tracking-wider">Analytics</div>
+            </div>
+            <div className="text-sm text-white/60 font-medium">Coming soon</div>
+            <div className="text-xs text-white/30 mt-1">Track performance</div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ import rent from './routes/rent'
 import stripe from './routes/stripe'
 import stripeWebhooks from './routes/stripe-webhooks'
 import scraper from './routes/scraper'
+import user from './routes/user'
 
 export type Env = {
   ENVIRONMENT: string
@@ -51,6 +52,7 @@ app.route('/api/keys', keys)
 app.route('/api/payments', payments)
 app.route('/api/phone', phone)
 app.route('/api/tenant', tenant)
+app.route('/api/user', user)
 app.route('/api/webhooks', webhooks)
 app.route('/api/rent', rent)
 app.route('/api/stripe', stripe)

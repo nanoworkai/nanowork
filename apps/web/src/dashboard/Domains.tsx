@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
+import { Check, Copy, ExternalLink, AlertCircle, Globe } from "lucide-react";
 
 const PLATFORM_HOST = "nanowork.app";
 
@@ -14,8 +15,15 @@ export default function Domains() {
   const [subError, setSubError] = useState("");
   const [newDomain, setNewDomain] = useState("");
   const [showAdd, setShowAdd] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const fullUrl = `https://${subdomain || "your-app"}.${PLATFORM_HOST}`;
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleSubdomainSave = async (e: FormEvent) => {
     e.preventDefault();
@@ -63,9 +71,17 @@ export default function Domains() {
             <span className="text-xs text-zinc-600 whitespace-nowrap">.{PLATFORM_HOST}</span>
           </div>
           {subError && <p className="text-xs text-red-400">{subError}</p>}
-          <p className="text-xs text-zinc-600">
-            Live URL: <a href={fullUrl} className="text-white hover:text-white/80 transition-colors" target="_blank" rel="noreferrer">{fullUrl}</a>
-          </p>
+          <div className="flex items-center gap-2">
+            <a
+              href={fullUrl}
+              className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span>{fullUrl}</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
           <div className="flex justify-end">
             <button
               type="submit"
@@ -95,10 +111,11 @@ export default function Domains() {
         </div>
 
         {showAdd && (
-          <div className="mb-4 p-4 rounded-xl bg-surface-2 border border-white/5">
-            <div className="flex gap-2 mb-3">
+          <div className="mb-4 p-5 rounded-xl bg-surface-2 border border-white/5">
+            <label className="block text-xs font-medium text-zinc-400 mb-2">Domain name</label>
+            <div className="flex gap-2 mb-4">
               <input
-                className="flex-1 px-3 py-2 rounded-lg bg-surface-3 border border-white/10 focus:border-white/20/60 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors"
+                className="flex-1 px-3 py-2 rounded-lg bg-surface-3 border border-white/10 focus:border-white/20 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors"
                 type="text"
                 placeholder="yourbrand.com"
                 value={newDomain}
@@ -109,36 +126,94 @@ export default function Domains() {
               <button
                 onClick={handleAddDomain}
                 disabled={!newDomain.trim()}
-                className="px-4 py-2 rounded-lg bg-white hover:bg-white disabled:opacity-40 text-white text-sm font-semibold transition-colors"
+                className="px-4 py-2 rounded-lg bg-white hover:bg-white/90 disabled:opacity-40 text-black text-sm font-semibold transition-colors"
               >
-                Add
+                Add domain
               </button>
             </div>
             {newDomain && (
-              <div className="text-xs text-zinc-500 space-y-1">
-                <p className="font-medium text-zinc-400">DNS configuration</p>
-                <p>Add a CNAME record:</p>
-                <p className="font-mono text-zinc-300 bg-surface-3 px-2 py-1 rounded">
-                  {newDomain} → nanowork.app
-                </p>
+              <div className="rounded-lg bg-surface-3 border border-white/5 p-4">
+                <div className="flex items-start gap-2 mb-3">
+                  <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-amber-400 mb-1">DNS Configuration Required</p>
+                    <p className="text-xs text-zinc-500">Add this CNAME record at your DNS provider:</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface-0/50 border border-white/5">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-zinc-500 mb-0.5">Type</p>
+                      <p className="text-sm font-mono text-zinc-200">CNAME</p>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-zinc-500 mb-0.5">Name</p>
+                      <p className="text-sm font-mono text-zinc-200 truncate">{newDomain}</p>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-zinc-500 mb-0.5">Value</p>
+                      <p className="text-sm font-mono text-zinc-200">nanowork.app</p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(`${newDomain} CNAME nanowork.app`)}
+                      className="p-2 hover:bg-white/5 rounded transition-colors"
+                      title="Copy DNS record"
+                    >
+                      {copied ? (
+                        <Check className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-zinc-400" />
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
         )}
 
         {profile?.customDomain ? (
-          <div className="flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-white/5">
-            <div>
-              <p className="text-sm text-zinc-200 font-medium">{profile.customDomain}</p>
-              <p className="text-xs text-zinc-600 mt-0.5">Custom domain</p>
+          <div className="rounded-xl bg-surface-2 border border-white/5 p-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="text-sm text-zinc-200 font-medium">{profile.customDomain}</p>
+                  <span className="text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Check className="w-3 h-3" />
+                    Active
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-600 mt-0.5">Your custom domain is connected and live</p>
+                <a
+                  href={`https://${profile.customDomain}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors mt-2"
+                >
+                  <span>Visit site</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+              <button
+                onClick={() => {
+                  if (confirm("Remove this custom domain?")) {
+                    updateProfile({ customDomain: undefined });
+                  }
+                }}
+                className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-colors"
+                title="Remove domain"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <span className="text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full">
-              Connected
-            </span>
           </div>
         ) : (
-          <div className="text-center py-8 text-zinc-600 text-sm">
-            No custom domain connected yet.
+          <div className="text-center py-12 text-zinc-600">
+            <Globe className="w-8 h-8 mx-auto mb-3 opacity-40" />
+            <p className="text-sm">No custom domain connected yet.</p>
+            <p className="text-xs text-zinc-700 mt-1">Click "Add domain" above to get started.</p>
           </div>
         )}
       </div>

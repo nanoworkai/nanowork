@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { supabase } from "../lib/supabase";
+import { LogOut, CreditCard, Globe, User } from "lucide-react";
 
 /* ── Section wrapper ─────────────────────────────────────── */
 
@@ -162,12 +162,47 @@ function DomainSection() {
           placeholder="yourbrand.com"
         />
         {domain && (
-          <div className="rounded-xl bg-surface-2 border border-white/5 p-4 text-xs text-zinc-500 space-y-1">
-            <p className="font-semibold text-zinc-400 mb-2">DNS setup</p>
-            <p>Add a CNAME record pointing:</p>
-            <p className="font-mono text-zinc-300 bg-surface-3 px-2 py-1 rounded mt-1">
-              {domain} → nanowork.app
-            </p>
+          <div className="rounded-xl bg-surface-2 border border-white/5 p-4 text-xs space-y-3">
+            <div className="flex items-start gap-2">
+              <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-white/60 text-xs">1</span>
+              </div>
+              <div>
+                <p className="font-semibold text-zinc-400 mb-1">Add DNS record at your provider</p>
+                <p className="text-zinc-500">Go to your domain registrar (Namecheap, GoDaddy, etc.)</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-white/60 text-xs">2</span>
+              </div>
+              <div>
+                <p className="font-semibold text-zinc-400 mb-1">Create CNAME record</p>
+                <div className="font-mono text-zinc-300 bg-surface-3 px-3 py-2 rounded mt-1 border border-white/5">
+                  <div className="flex justify-between items-center gap-4 mb-1">
+                    <span className="text-zinc-500">Type:</span>
+                    <span>CNAME</span>
+                  </div>
+                  <div className="flex justify-between items-center gap-4 mb-1">
+                    <span className="text-zinc-500">Name:</span>
+                    <span className="truncate">{domain}</span>
+                  </div>
+                  <div className="flex justify-between items-center gap-4">
+                    <span className="text-zinc-500">Value:</span>
+                    <span>nanowork.app</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-white/60 text-xs">3</span>
+              </div>
+              <div>
+                <p className="font-semibold text-zinc-400 mb-1">Save and wait</p>
+                <p className="text-zinc-500">DNS changes can take up to 24 hours to propagate</p>
+              </div>
+            </div>
           </div>
         )}
         <div className="flex justify-end">
@@ -214,20 +249,44 @@ function ProfileSection() {
 /* ── Delete account ──────────────────────────────────────── */
 
 function DeleteSection() {
-  const { user, logout } = useAuth();
+  const { user, logout, session } = useAuth();
   const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const [confirm, setConfirm] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const phrase = "delete my account";
 
   const handleDelete = async () => {
-    if (confirm !== phrase || !user) return;
+    if (confirm !== phrase || !user || !session) return;
+
     setDeleting(true);
-    await supabase.from("profiles").delete().eq("id", user.id);
-    await supabase.auth.admin?.deleteUser(user.id).catch(() => {});
-    await logout();
-    navigate("/", { replace: true });
+    setError(null);
+
+    try {
+      // Call backend API to delete user and all related data
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${apiUrl}/api/user`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to delete account');
+      }
+
+      // Sign out and redirect
+      await logout();
+      navigate("/", { replace: true });
+    } catch (err) {
+      console.error("Delete account error:", err);
+      setError(err instanceof Error ? err.message : "Failed to delete account. Please try again.");
+      setDeleting(false);
+    }
   };
 
   return (
@@ -245,6 +304,11 @@ function DeleteSection() {
         </button>
       ) : (
         <div className="flex flex-col gap-3">
+          {error && (
+            <div className="px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
           <p className="text-sm text-zinc-400">
             Type <span className="font-mono text-red-400">"{phrase}"</span> to confirm:
           </p>
@@ -255,18 +319,23 @@ function DeleteSection() {
             onChange={(e) => setConfirm(e.target.value)}
             placeholder={phrase}
             autoFocus
+            disabled={deleting}
           />
           <div className="flex gap-2">
             <button
               onClick={handleDelete}
               disabled={confirm !== phrase || deleting}
-              className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
             >
+              {deleting && (
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              )}
               {deleting ? "Deleting…" : "Confirm delete"}
             </button>
             <button
-              onClick={() => { setShow(false); setConfirm(""); }}
-              className="px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-zinc-400 hover:text-zinc-200 text-sm font-medium transition-colors"
+              onClick={() => { setShow(false); setConfirm(""); setError(null); }}
+              disabled={deleting}
+              className="px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-zinc-400 hover:text-zinc-200 text-sm font-medium transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
@@ -277,21 +346,101 @@ function DeleteSection() {
   );
 }
 
+/* ── Logout section ──────────────────────────────────────── */
+
+function LogoutSection() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleLogout = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      await logout();
+      navigate("/", { replace: true });
+    } catch (err) {
+      console.error("Logout failed:", err);
+      setError("Failed to sign out. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Section
+      title="Sign out"
+      desc="End your current session and return to the homepage."
+    >
+      <div className="space-y-3">
+        {error && (
+          <div className="px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
+        <button
+          onClick={handleLogout}
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm font-medium text-zinc-300 hover:text-white transition-all disabled:opacity-50"
+        >
+          <LogOut className="w-4 h-4" />
+          {loading ? "Signing out…" : "Sign out"}
+        </button>
+      </div>
+    </Section>
+  );
+}
+
 /* ── Page ─────────────────────────────────────────────────── */
 
 export default function Settings() {
+  const [activeTab, setActiveTab] = useState<"account" | "billing" | "domain">("account");
+
+  const tabs = [
+    { id: "account" as const, label: "Account", icon: User },
+    { id: "billing" as const, label: "Billing", icon: CreditCard },
+    { id: "domain" as const, label: "Domain", icon: Globe },
+  ];
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-zinc-500 text-sm mt-1">Manage your account, billing, and domain.</p>
+        <p className="text-zinc-500 text-sm mt-1">Manage your account, billing, and domain configuration.</p>
       </div>
 
+      {/* Tab Navigation */}
+      <div className="flex gap-2 mb-6 border-b border-white/5 overflow-x-auto">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? "text-white border-white"
+                  : "text-zinc-500 border-transparent hover:text-zinc-300"
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tab Content */}
       <div className="flex flex-col gap-4">
-        <ProfileSection />
-        <BillingSection />
-        <DomainSection />
-        <DeleteSection />
+        {activeTab === "account" && (
+          <>
+            <ProfileSection />
+            <LogoutSection />
+            <DeleteSection />
+          </>
+        )}
+        {activeTab === "billing" && <BillingSection />}
+        {activeTab === "domain" && <DomainSection />}
       </div>
     </div>
   );
