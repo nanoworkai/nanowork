@@ -133,14 +133,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         phone: data.phone || "",
         email: data.email || undefined,
         name: data.name || undefined,
-        status: "active",
-        phoneVerified: false,
+        status: data.status || "active",
+        phoneVerified: data.phone_verified || false,
         plan: data.plan || "free",
-        creditsBalance: data.credits || 0,
-        monthlyCompanyLimit: 1,
-        totalCompaniesCreated: 0,
+        creditsBalance: data.credits_balance || 0,
+        monthlyCompanyLimit: data.monthly_company_limit || 1,
+        totalCompaniesCreated: data.total_companies_created || 0,
         timezone: data.timezone || "UTC",
-        notificationPreferences: {
+        notificationPreferences: data.notification_preferences || {
           sms: true,
           activity: true,
           billing: true,
@@ -157,11 +157,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name: null,
         phone: u.phone ?? null,
         plan: "free",
-        credits: 100, // Free signup bonus
+        credits_balance: 100, // Free signup bonus
         timezone: "UTC",
       };
 
-      await supabase.from("profiles").insert(newProfile);
+      const { error: insertError } = await supabase.from("profiles").insert(newProfile);
+
+      if (insertError) {
+        console.error("Database error saving new user:", insertError);
+        throw insertError;
+      }
 
       const mappedProfile: UserProfile = {
         id: newProfile.id,
@@ -171,7 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         status: "active",
         phoneVerified: false,
         plan: newProfile.plan as "free",
-        creditsBalance: newProfile.credits,
+        creditsBalance: newProfile.credits_balance,
         monthlyCompanyLimit: 1,
         totalCompaniesCreated: 0,
         timezone: newProfile.timezone,
@@ -292,15 +297,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Create profile entry if user was created
     if (data.user) {
-      await supabase.from("profiles").insert({
+      const { error: profileError } = await supabase.from("profiles").insert({
         id: data.user.id,
         email: email,
         name: name || null,
         phone: null,
         plan: "free",
-        credits: 100,
+        credits_balance: 100,
         timezone: "UTC",
       });
+
+      if (profileError) {
+        console.error("Database error saving new user:", profileError);
+        return { error: "Failed to create user profile: " + profileError.message };
+      }
     }
 
     return { error: null };
