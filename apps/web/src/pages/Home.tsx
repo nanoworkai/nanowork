@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { ArrowRight, Terminal } from "lucide-react";
+import { ArrowRight, Terminal, Building2, Shield } from "lucide-react";
 
 /**
  * BLOOMBERG TERMINAL DESIGN PRINCIPLES:
@@ -378,6 +378,104 @@ export default function Home() {
           <DepartmentGrid />
         </section>
 
+        {/* Enterprise Section */}
+        <section className="py-8 sm:py-12 lg:py-16">
+          <div className="card-lg rounded-none border border-white/10 overflow-hidden">
+            {/* Header */}
+            <div className="border-b border-white/10 px-6 sm:px-8 py-4 bg-surface-1">
+              <div className="flex items-center gap-3">
+                <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-white/60" />
+                <span className="text-xs sm:text-sm font-mono font-bold text-white uppercase tracking-wider">
+                  Enterprise Solution
+                </span>
+                <div className="flex-1" />
+                <div className="flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-white/60" />
+                  <span className="text-[10px] sm:text-xs font-mono text-white/40">SOC 2 CERTIFIED</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 sm:p-8 lg:p-12">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                {/* Left: Description */}
+                <div>
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-mono font-bold text-white uppercase tracking-tight mb-4">
+                    Deploy AI Departments<br />Across Your Organization
+                  </h2>
+                  <p className="text-sm sm:text-base font-mono text-white/70 mb-6 leading-relaxed">
+                    VCs, holding companies, and large enterprises use Nanowork to scale AI departments across portfolio companies and business units. White-label deployment, centralized billing, and enterprise-grade security.
+                  </p>
+
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-2 flex-shrink-0" />
+                      <div>
+                        <h3 className="text-xs sm:text-sm font-mono font-bold text-white mb-1">Portfolio Management</h3>
+                        <p className="text-xs font-mono text-white/60 leading-relaxed">
+                          Deploy across unlimited companies with unified dashboard and cross-portfolio analytics
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-2 flex-shrink-0" />
+                      <div>
+                        <h3 className="text-xs sm:text-sm font-mono font-bold text-white mb-1">White-Label & Custom Training</h3>
+                        <p className="text-xs font-mono text-white/60 leading-relaxed">
+                          Your brand, your processes. Train AI departments on your specific business rules and workflows
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-2 flex-shrink-0" />
+                      <div>
+                        <h3 className="text-xs sm:text-sm font-mono font-bold text-white mb-1">Enterprise Security & Compliance</h3>
+                        <p className="text-xs font-mono text-white/60 leading-relaxed">
+                          SSO, SAML, audit trails, data residency controls, and dedicated infrastructure options
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Link
+                    to="/pricing"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
+                  >
+                    View Enterprise Pricing
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+
+                {/* Right: Stats Grid */}
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <div className="card rounded-none border border-white/10 p-4 sm:p-6 bg-surface-2">
+                    <div className="text-2xl sm:text-3xl font-mono font-bold text-white mb-2">Unlimited</div>
+                    <div className="text-xs font-mono text-white/60 uppercase tracking-wider">Companies</div>
+                  </div>
+
+                  <div className="card rounded-none border border-white/10 p-4 sm:p-6 bg-surface-2">
+                    <div className="text-2xl sm:text-3xl font-mono font-bold text-white mb-2">99.9%</div>
+                    <div className="text-xs font-mono text-white/60 uppercase tracking-wider">Uptime SLA</div>
+                  </div>
+
+                  <div className="card rounded-none border border-white/10 p-4 sm:p-6 bg-surface-2">
+                    <div className="text-2xl sm:text-3xl font-mono font-bold text-white mb-2">24/7</div>
+                    <div className="text-xs font-mono text-white/60 uppercase tracking-wider">Dedicated Support</div>
+                  </div>
+
+                  <div className="card rounded-none border border-white/10 p-4 sm:p-6 bg-surface-2">
+                    <div className="text-2xl sm:text-3xl font-mono font-bold text-white mb-2">Custom</div>
+                    <div className="text-xs font-mono text-white/60 uppercase tracking-wider">AI Training</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* CTA - Terminal command style */}
         <section className="py-8 sm:py-12 lg:py-16">
           <div className="card-lg rounded-none border border-white/10 p-6 sm:p-8 lg:p-12 text-center">
@@ -474,7 +572,7 @@ export default function Home() {
                 <ul className="space-y-2 text-xs font-mono text-white/40">
                   <li><Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
                   <li><Link to="/revenue" className="hover:text-white transition-colors">Revenue</Link></li>
-                  <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                  <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                   <li><a href="#docs" className="hover:text-white transition-colors">Docs</a></li>
                 </ul>
               </div>

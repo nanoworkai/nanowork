@@ -5,6 +5,7 @@ import NotFound from "./pages/NotFound";
 import Revenue from "./pages/Revenue";
 import Swipe from "./pages/Swipe";
 import PreviewPage from "./pages/PreviewPage";
+import Pricing from "./pages/Pricing";
 import DashboardLayout from "./dashboard/DashboardLayout";
 import Overview from "./dashboard/Overview";
 import Bookings from "./dashboard/Bookings";
@@ -36,6 +37,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/pricing" element={<Pricing />} />
       <Route path="/revenue" element={<Revenue />} />
       <Route path="/swipe" element={<Swipe />} />
       <Route path="/preview/:buildId" element={<PreviewPage />} />
