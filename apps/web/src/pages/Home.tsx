@@ -391,7 +391,7 @@ export default function Home() {
                 <div className="flex-1" />
                 <div className="flex items-center gap-1.5">
                   <Shield className="w-3.5 h-3.5 text-white/60" />
-                  <span className="text-[10px] sm:text-xs font-mono text-white/40">SOC 2 CERTIFIED</span>
+                  <span className="text-[10px] sm:text-xs font-mono text-white/40">ENTERPRISE READY</span>
                 </div>
               </div>
             </div>
@@ -405,7 +405,7 @@ export default function Home() {
                     Deploy AI Departments<br />Across Your Organization
                   </h2>
                   <p className="text-sm sm:text-base font-mono text-white/70 mb-6 leading-relaxed">
-                    VCs, holding companies, and large enterprises use Nanowork to scale AI departments across portfolio companies and business units. White-label deployment, centralized billing, and enterprise-grade security.
+                    VCs, holding companies, and large enterprises use Nanowork to scale AI departments across portfolio companies and business units. White-label deployment, centralized billing, and dedicated support.
                   </p>
 
                   <div className="space-y-3 mb-6">
@@ -432,9 +432,9 @@ export default function Home() {
                     <div className="flex items-start gap-3">
                       <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-2 flex-shrink-0" />
                       <div>
-                        <h3 className="text-xs sm:text-sm font-mono font-bold text-white mb-1">Enterprise Security & Compliance</h3>
+                        <h3 className="text-xs sm:text-sm font-mono font-bold text-white mb-1">Enterprise Security & Controls</h3>
                         <p className="text-xs font-mono text-white/60 leading-relaxed">
-                          SSO, SAML, audit trails, data residency controls, and dedicated infrastructure options
+                          SSO, SAML, audit logs, role-based access controls, and dedicated infrastructure options
                         </p>
                       </div>
                     </div>

@@ -67,11 +67,10 @@ const tiers: PricingTier[] = [
       "White-label deployments",
       "SSO & SAML authentication",
       "Role-based access control",
-      "Compliance & audit trails",
-      "SOC 2 Type II certified",
+      "Advanced security features",
+      "Audit logs & activity tracking",
       "Custom SLAs & uptime guarantees",
       "Dedicated infrastructure",
-      "On-premise deployment options",
       "Custom AI department training",
       "Dedicated support team",
       "Quarterly business reviews",
@@ -192,11 +191,11 @@ export default function Pricing() {
               <div className="inline-flex items-center gap-2 mb-4">
                 <Shield className="w-5 h-5 text-white/60" />
                 <h2 className="text-xl sm:text-2xl font-mono font-bold text-white uppercase tracking-tight">
-                  Enterprise-Grade Platform
+                  Built for Enterprise Scale
                 </h2>
               </div>
               <p className="text-sm font-mono text-white/60 max-w-2xl mx-auto">
-                Deploy AI departments across your entire organization with enterprise security, compliance, and control.
+                Deploy AI departments across your entire organization with enterprise security features and centralized control.
               </p>
             </div>
 
@@ -216,9 +215,9 @@ export default function Pricing() {
               </div>
 
               <div className="card rounded-none border border-white/10 p-6">
-                <h3 className="text-sm font-mono font-bold text-white mb-2 uppercase">Compliance & Security</h3>
+                <h3 className="text-sm font-mono font-bold text-white mb-2 uppercase">Security & Controls</h3>
                 <p className="text-xs font-mono text-white/60 leading-relaxed">
-                  SOC 2 Type II, GDPR compliant, HIPAA ready. Full audit trails, data residency controls, and role-based access for regulated industries.
+                  Enterprise-grade security with audit logs, data residency controls, role-based access, and encryption at rest and in transit.
                 </p>
               </div>
 
