@@ -9,7 +9,7 @@ import Swipe from "./pages/Swipe";
 import PreviewPage from "./pages/PreviewPage";
 import Pricing from "./pages/Pricing";
 import DashboardLayout from "./dashboard/DashboardLayout";
-import Overview from "./dashboard/Overview";
+import Overview from "./dashboard/OverviewNew";
 import Bookings from "./dashboard/Bookings";
 import Settings from "./dashboard/Settings";
 import BuildView from "./dashboard/BuildView";
@@ -56,11 +56,12 @@ export default function App() {
         }
       >
         <Route index element={<Overview />} />
+        <Route path="builds/:buildId" element={<Overview />} />
         <Route path="bookings" element={<Bookings />} />
         <Route path="inbox" element={<Inbox />} />
         <Route path="wallet" element={<Wallet />} />
         <Route path="settings" element={<Settings />} />
-        <Route path="builds/:buildId" element={<BuildView />} />
+        <Route path="build-view/:buildId" element={<BuildView />} />
       </Route>
 
       {/* User app routes - for built apps */}

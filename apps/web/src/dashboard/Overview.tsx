@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { fetchUserApps, type UserApp } from "../lib/apps";
-import { ExternalLink, Code, Crown, Globe, CreditCard, Settings as SettingsIcon, TrendingUp } from "lucide-react";
+import { ExternalLink, Code, Crown } from "lucide-react";
 
 /**
  * DASHBOARD DESIGN PRINCIPLES:
@@ -46,14 +46,30 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
   const [feed, setFeed] = useState<TaskEntry[]>([]);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [connecting, setConnecting] = useState(false);
   const esRef = useRef<EventSource | null>(null);
+  const retryCountRef = useRef(0);
+  const reconnectTimeoutRef = useRef<number | null>(null);
+  const maxRetries = 3;
 
-  useEffect(() => {
-    if (!enabled || !prompt) return;
-    if (esRef.current) esRef.current.close();
+  const connect = (promptToUse: string) => {
+    // Close existing connection
+    if (esRef.current) {
+      esRef.current.close();
+      esRef.current = null;
+    }
+
+    // Clear any pending reconnection
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
+    }
+
+    setConnecting(true);
+    setError(null);
 
     const apiBase = import.meta.env.VITE_API_BASE_URL ?? "";
-    const url = `${apiBase}/api/build/stream?prompt=${encodeURIComponent(prompt)}`;
+    const url = `${apiBase}/api/build/stream?prompt=${encodeURIComponent(promptToUse)}`;
     const es = new EventSource(url);
     esRef.current = es;
 
@@ -61,6 +77,11 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
       es.addEventListener(type, (e: MessageEvent) => {
         try { handler(JSON.parse(e.data)); } catch { /* ignore */ }
       });
+    };
+
+    es.onopen = () => {
+      setConnecting(false);
+      retryCountRef.current = 0; // Reset retry count on successful connection
     };
 
     on("meta", (d: unknown) => {
@@ -99,18 +120,53 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
 
     on("done", () => {
       setDone(true);
+      setConnecting(false);
       es.close();
     });
 
     es.onerror = () => {
-      setError("Connection lost");
+      setConnecting(false);
       es.close();
-    };
 
-    return () => es.close();
+      if (retryCountRef.current < maxRetries) {
+        retryCountRef.current++;
+        setError(`Connection lost — retrying (${retryCountRef.current}/${maxRetries})...`);
+
+        // Auto-reconnect after 2 seconds
+        reconnectTimeoutRef.current = window.setTimeout(() => {
+          connect(promptToUse);
+        }, 2000);
+      } else {
+        setError("Unable to connect to the server. Please check your connection and refresh.");
+      }
+    };
+  };
+
+  useEffect(() => {
+    if (!enabled || !prompt) return;
+
+    connect(prompt);
+
+    return () => {
+      if (esRef.current) {
+        esRef.current.close();
+        esRef.current = null;
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+    };
   }, [prompt, enabled]);
 
-  return { meta, depts, feed, done, error };
+  const retry = () => {
+    if (prompt) {
+      retryCountRef.current = 0; // Reset retry count for manual retry
+      connect(prompt);
+    }
+  };
+
+  return { meta, depts, feed, done, error, connecting, retry };
 }
 
 // ── Department Card ───────────────────────────────────────────────────────────
@@ -221,6 +277,13 @@ function LiveFeed({ entries }: { entries: TaskEntry[] }) {
 function PromptForm({ onStart, loading }: { onStart: (p: string) => void; loading: boolean }) {
   const [value, setValue] = useState("");
 
+  const handleSubmit = () => {
+    if (value.trim()) {
+      onStart(value.trim());
+      setValue(""); // Clear input after submit
+    }
+  };
+
   return (
     <div className="card-lg rounded-2xl p-5 sm:p-8">
       <h2 className="text-lg sm:text-xl font-bold text-white mb-2 tracking-tight">What are you building?</h2>
@@ -234,18 +297,17 @@ function PromptForm({ onStart, loading }: { onStart: (p: string) => void; loadin
         placeholder="Premium dog gear DTC, $45 AOV, ship US — I want real revenue in 30 days."
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && value.trim()) onStart(value.trim()); }}
-        disabled={loading}
+        onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && value.trim()) handleSubmit(); }}
       />
       <button
-        onClick={() => value.trim() && onStart(value.trim())}
+        onClick={handleSubmit}
         disabled={!value.trim() || loading}
         className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-white hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed text-black font-semibold text-xs sm:text-sm transition-colors"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
             <span className="w-3.5 h-3.5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-            Building...
+            Connecting...
           </span>
         ) : (
           "Launch Build"
@@ -271,7 +333,7 @@ export default function Overview() {
   const [userApps, setUserApps] = useState<UserApp[]>([]);
   const [appsLoading, setAppsLoading] = useState(true);
 
-  const { meta, depts, feed, done, error } = useAgentStream(activePrompt, buildEnabled);
+  const { meta, depts, feed, done, error, connecting, retry } = useAgentStream(activePrompt, buildEnabled);
 
   // Load user's apps
   useEffect(() => {
@@ -413,7 +475,7 @@ export default function Overview() {
               </div>
             </div>
           )}
-          <PromptForm onStart={handleStart} loading={false} />
+          <PromptForm onStart={handleStart} loading={connecting} />
         </div>
       )}
 
@@ -490,61 +552,6 @@ export default function Overview() {
         </div>
       )}
 
-      {/* Quick actions */}
-      <div>
-        <h2 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-3">Quick Actions</h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <Link
-            to="/dashboard/domains"
-            className="card card-hover rounded-xl p-5 transition-all duration-150 group"
-          >
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                <Globe className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
-              </div>
-              <div className="text-xs text-white/40 font-semibold uppercase tracking-wider">Domains</div>
-            </div>
-            <div className="text-sm text-white font-medium">Connect your domain</div>
-            <div className="text-xs text-white/40 mt-1">Set up custom URLs</div>
-          </Link>
-          <Link
-            to="/dashboard/plan"
-            className="card card-hover rounded-xl p-5 transition-all duration-150 group"
-          >
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                <CreditCard className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
-              </div>
-              <div className="text-xs text-white/40 font-semibold uppercase tracking-wider">Plan</div>
-            </div>
-            <div className="text-sm text-white font-medium">Upgrade your plan</div>
-            <div className="text-xs text-white/40 mt-1">Currently on {profile?.plan ?? "free"}</div>
-          </Link>
-          <Link
-            to="/dashboard/settings"
-            className="card card-hover rounded-xl p-5 transition-all duration-150 group"
-          >
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                <SettingsIcon className="w-4 h-4 text-white/60 group-hover:text-white transition-colors" />
-              </div>
-              <div className="text-xs text-white/40 font-semibold uppercase tracking-wider">Settings</div>
-            </div>
-            <div className="text-sm text-white font-medium">Account settings</div>
-            <div className="text-xs text-white/40 mt-1">Manage preferences</div>
-          </Link>
-          <div className="card rounded-xl p-5 border-dashed opacity-60">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-white/60" />
-              </div>
-              <div className="text-xs text-white/40 font-semibold uppercase tracking-wider">Analytics</div>
-            </div>
-            <div className="text-sm text-white/60 font-medium">Coming soon</div>
-            <div className="text-xs text-white/30 mt-1">Track performance</div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
