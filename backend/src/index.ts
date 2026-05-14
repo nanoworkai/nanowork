@@ -5,6 +5,7 @@ import cors from 'cors';
 // Import routes
 import provisionRouter from './routes/internal/provision';
 import emailWebhookRouter from './routes/webhooks/email';
+import stripeWebhookRouter from './routes/webhooks/stripe';
 import agentsRouter from './routes/agents';
 import businessesRouter from './routes/businesses';
 import appsRouter from './routes/apps';
@@ -15,6 +16,7 @@ import tasksRouter from './routes/tasks';
 import contactsRouter from './routes/contacts';
 import paymentsRouter from './routes/payments';
 import documentsRouter from './routes/documents';
+import domainsRouter from './routes/domains';
 
 // Validate required environment variables
 const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY'];
@@ -31,6 +33,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
+// Stripe webhook needs raw body, so register it before express.json()
+app.use('/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhookRouter);
+
 app.use(express.json());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:5173',
