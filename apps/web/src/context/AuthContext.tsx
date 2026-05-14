@@ -19,6 +19,7 @@ export interface UserProfile {
   avatarUrl?: string;
   businessName?: string;
   businessPrompt?: string;
+  aiEmail?: string; // AI agent email like nova@nanowork.ai
 
   // Account status
   status: "active" | "suspended" | "deleted";
@@ -133,6 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         phone: data.phone || "",
         email: data.email || undefined,
         name: data.name || undefined,
+        aiEmail: data.ai_email || undefined,
         status: data.status || "active",
         phoneVerified: data.phone_verified || false,
         plan: data.plan || "free",

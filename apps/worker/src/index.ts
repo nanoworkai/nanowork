@@ -16,6 +16,7 @@ import stripe from './routes/stripe'
 import stripeWebhooks from './routes/stripe-webhooks'
 import scraper from './routes/scraper'
 import user from './routes/user'
+import email from './routes/email'
 
 export type Env = {
   ENVIRONMENT: string
@@ -24,6 +25,7 @@ export type Env = {
   SUPABASE_SERVICE_ROLE_KEY: string
   STRIPE_SECRET_KEY: string
   STRIPE_WEBHOOK_SECRET: string
+  RESEND_API_KEY: string
 }
 
 const app = new Hono<{ Bindings: Env }>()
@@ -48,6 +50,7 @@ app.route('/api/build', build)
 app.route('/api/builds', builds)
 app.route('/api/analytics', analytics)
 app.route('/api/customers', customers)
+app.route('/api/email', email)
 app.route('/api/keys', keys)
 app.route('/api/payments', payments)
 app.route('/api/phone', phone)
