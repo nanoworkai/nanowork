@@ -40,8 +40,36 @@ const PORT = process.env.PORT || 3000;
 app.use('/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhookRouter);
 
 app.use(express.json());
+
+// CORS configuration - allow all production and development URLs
+const allowedOrigins = [
+  'https://nanowork.ai',
+  'https://www.nanowork.ai',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5174',
+];
+
+// Add FRONTEND_URL from environment if set
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) {
+      callback(null, true);
+      return;
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   credentials: true,
 }));
 
