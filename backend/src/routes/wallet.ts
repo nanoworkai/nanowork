@@ -86,7 +86,7 @@ router.post('/topup', requireUserAuth, async (req: AuthenticatedRequest, res: Re
     }
 
     const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2026-04-22.dahlia',
     });
 
     const selectedBundle = CREDIT_BUNDLES[bundle as keyof typeof CREDIT_BUNDLES];

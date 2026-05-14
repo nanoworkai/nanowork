@@ -1,8 +1,10 @@
 import Stripe from 'stripe';
 
-let stripe: Stripe | null = null;
+type StripeInstance = ReturnType<typeof Stripe>;
 
-function getStripe(): Stripe | null {
+let stripe: StripeInstance | null = null;
+
+function getStripe(): StripeInstance | null {
   if (stripe) return stripe;
 
   const apiKey = process.env.STRIPE_SECRET_KEY;
@@ -13,7 +15,7 @@ function getStripe(): Stripe | null {
   }
 
   stripe = new Stripe(apiKey, {
-    apiVersion: '2023-10-16',
+    apiVersion: '2026-04-22.dahlia',
   });
 
   return stripe;
@@ -158,7 +160,7 @@ export async function createStripeSubscription(
   customerId: string,
   priceId: string,
   metadata?: Record<string, string>
-): Promise<Stripe.Subscription | null> {
+): Promise<any> {
   const client = getStripe();
 
   if (!client) {
@@ -208,6 +210,6 @@ export async function cancelStripeSubscription(subscriptionId: string): Promise<
 /**
  * Get Stripe instance for webhook handling
  */
-export function getStripeInstance(): Stripe | null {
+export function getStripeInstance(): StripeInstance | null {
   return getStripe();
 }

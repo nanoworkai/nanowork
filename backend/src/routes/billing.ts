@@ -131,7 +131,7 @@ router.get('/info', requireUserAuth, async (req: AuthenticatedRequest, res: Resp
         });
 
         if (subscriptions.data.length > 0) {
-          const sub = subscriptions.data[0];
+          const sub = subscriptions.data[0] as any;
           subscriptionInfo = {
             status: sub.status,
             currentPeriodEnd: sub.current_period_end,
