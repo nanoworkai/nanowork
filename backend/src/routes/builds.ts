@@ -60,19 +60,19 @@ Examples: "Dog Walking App", "Restaurant Booking System", "Fitness Tracker"`,
 
 /**
  * GET /builds
- * Get all builds for the authenticated user
+ * Get all builds for the authenticated user's agent
  */
 router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
+    if (!req.agent) {
+      res.status(403).json({ error: 'No agent found for user' });
       return;
     }
 
     const { data, error } = await getSupabase()
       .from('generated_apps')
       .select('*')
-      .eq('user_id', req.user.id)
+      .eq('agent_id', req.agent.id)
       .order('last_activity_at', { ascending: false });
 
     if (error) {
@@ -91,12 +91,12 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
 
 /**
  * POST /builds
- * Create a new build
+ * Create a new build for the authenticated user's agent
  */
 router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
+    if (!req.agent) {
+      res.status(403).json({ error: 'No agent found for user' });
       return;
     }
 
@@ -105,7 +105,7 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
     const { data, error } = await getSupabase()
       .from('generated_apps')
       .insert({
-        user_id: req.user.id,
+        agent_id: req.agent.id,
         name,
         prompt,
         status: 'generating',
@@ -136,8 +136,8 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
  */
 router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
+    if (!req.agent) {
+      res.status(403).json({ error: 'No agent found for user' });
       return;
     }
 
@@ -152,7 +152,7 @@ router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Res
       .from('generated_apps')
       .update(updateData)
       .eq('id', id)
-      .eq('user_id', req.user.id)
+      .eq('agent_id', req.agent.id)
       .select()
       .single();
 
@@ -176,8 +176,8 @@ router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Res
  */
 router.delete('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
+    if (!req.agent) {
+      res.status(403).json({ error: 'No agent found for user' });
       return;
     }
 
@@ -187,7 +187,7 @@ router.delete('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Re
       .from('generated_apps')
       .delete()
       .eq('id', id)
-      .eq('user_id', req.user.id);
+      .eq('agent_id', req.agent.id);
 
     if (error) {
       throw new Error(`Failed to delete build: ${error.message}`);
@@ -209,8 +209,8 @@ router.delete('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Re
  */
 router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
+    if (!req.agent) {
+      res.status(403).json({ error: 'No agent found for user' });
       return;
     }
 
@@ -220,7 +220,7 @@ router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Respo
       .from('generated_apps')
       .select('*')
       .eq('id', id)
-      .eq('user_id', req.user.id)
+      .eq('agent_id', req.agent.id)
       .single();
 
     if (error || !data) {

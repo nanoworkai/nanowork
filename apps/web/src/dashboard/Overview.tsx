@@ -440,7 +440,18 @@ export default function Overview() {
       {/* Error */}
       {error && (
         <div className="mb-6 card rounded-xl px-5 py-4" style={{ border: '1px solid rgba(255, 100, 100, 0.2)', background: 'rgba(255, 100, 100, 0.05)' }}>
-          <div className="text-sm text-white/80">{error}</div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="text-sm text-white/80">{error}</div>
+            {!error.includes("refresh") && (
+              <button
+                onClick={retry}
+                disabled={connecting}
+                className="px-4 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+              >
+                {connecting ? "Connecting..." : "Try again"}
+              </button>
+            )}
+          </div>
         </div>
       )}
 
