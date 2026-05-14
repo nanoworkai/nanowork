@@ -11,8 +11,6 @@ import Pricing from "./pages/Pricing";
 import DashboardLayout from "./dashboard/DashboardLayout";
 import Overview from "./dashboard/Overview";
 import Bookings from "./dashboard/Bookings";
-import Domains from "./dashboard/Domains";
-import Plan from "./dashboard/Plan";
 import Settings from "./dashboard/Settings";
 import BuildView from "./dashboard/BuildView";
 import Inbox from "./dashboard/Inbox";
@@ -59,8 +57,6 @@ export default function App() {
       >
         <Route index element={<Overview />} />
         <Route path="bookings" element={<Bookings />} />
-        <Route path="domains" element={<Domains />} />
-        <Route path="plan" element={<Plan />} />
         <Route path="inbox" element={<Inbox />} />
         <Route path="wallet" element={<Wallet />} />
         <Route path="settings" element={<Settings />} />

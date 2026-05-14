@@ -2,7 +2,8 @@ import { useState, useEffect, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
-import { LogOut, CreditCard, Globe, User, Mail, Copy, Check, Inbox } from "lucide-react";
+import { LogOut, CreditCard, Globe, User, Mail, Copy, Check, Inbox, ExternalLink, AlertCircle } from "lucide-react";
+import type { UserProfile } from "../context/AuthContext";
 
 /* ── Section wrapper ─────────────────────────────────────── */
 
@@ -194,87 +195,6 @@ function BillingSection() {
           </div>
         </div>
       </div>
-    </Section>
-  );
-}
-
-/* ── Domain section ──────────────────────────────────────── */
-
-function DomainSection() {
-  const { profile, updateProfile } = useAuth();
-  const [domain, setDomain] = useState(profile?.customDomain ?? "");
-  const [saved, setSaved] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleSave = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    await updateProfile({ customDomain: domain.trim() });
-    setLoading(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
-  };
-
-  return (
-    <Section
-      title="Custom domain"
-      desc="Connect your own domain to your Nanowork business site."
-    >
-      <form onSubmit={handleSave} className="flex flex-col gap-4">
-        <FieldInput
-          label="Domain"
-          value={domain}
-          onChange={setDomain}
-          placeholder="yourbrand.com"
-        />
-        {domain && (
-          <div className="rounded-xl bg-surface-2 border border-white/5 p-4 text-xs space-y-3">
-            <div className="flex items-start gap-2">
-              <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-white/60 text-xs">1</span>
-              </div>
-              <div>
-                <p className="font-semibold text-zinc-400 mb-1">Add DNS record at your provider</p>
-                <p className="text-zinc-500">Go to your domain registrar (Namecheap, GoDaddy, etc.)</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-white/60 text-xs">2</span>
-              </div>
-              <div>
-                <p className="font-semibold text-zinc-400 mb-1">Create CNAME record</p>
-                <div className="font-mono text-zinc-300 bg-surface-3 px-3 py-2 rounded mt-1 border border-white/5">
-                  <div className="flex justify-between items-center gap-4 mb-1">
-                    <span className="text-zinc-500">Type:</span>
-                    <span>CNAME</span>
-                  </div>
-                  <div className="flex justify-between items-center gap-4 mb-1">
-                    <span className="text-zinc-500">Name:</span>
-                    <span className="truncate">{domain}</span>
-                  </div>
-                  <div className="flex justify-between items-center gap-4">
-                    <span className="text-zinc-500">Value:</span>
-                    <span>nanowork.app</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-start gap-2">
-              <div className="w-4 h-4 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-white/60 text-xs">3</span>
-              </div>
-              <div>
-                <p className="font-semibold text-zinc-400 mb-1">Save and wait</p>
-                <p className="text-zinc-500">DNS changes can take up to 24 hours to propagate</p>
-              </div>
-            </div>
-          </div>
-        )}
-        <div className="flex justify-end">
-          <SaveButton saved={saved} loading={loading} label="Save domain" />
-        </div>
-      </form>
     </Section>
   );
 }
@@ -592,6 +512,355 @@ function AIEmailSection() {
   );
 }
 
+/* ── Plan section ────────────────────────────────────────── */
+
+type PlanTier = UserProfile["plan"];
+
+const PLANS: { tier: PlanTier; name: string; price: number; desc: string; features: string[] }[] = [
+  {
+    tier: "free",
+    name: "Free",
+    price: 0,
+    desc: "Preview mode — see what's possible",
+    features: ["1 business build", "All 7 agent departments", "Dashboard access", "Community support"],
+  },
+  {
+    tier: "starter",
+    name: "Starter",
+    price: 99,
+    desc: "Full company built and running",
+    features: ["Everything in Free", "Live agents 24/7", "1 custom domain", "Priority support", "Revenue dashboard"],
+  },
+  {
+    tier: "growth",
+    name: "Growth",
+    price: 249,
+    desc: "Scaling with more power",
+    features: ["Everything in Starter", "3 business builds", "5 custom domains", "Advanced analytics", "Webhook integrations", "Custom branding"],
+  },
+  {
+    tier: "scale",
+    name: "Scale",
+    price: 499,
+    desc: "Enterprise-grade, unlimited",
+    features: ["Everything in Growth", "Unlimited builds", "Unlimited domains", "Dedicated support", "SLA guarantees", "White-label options"],
+  },
+];
+
+function PlanSection() {
+  const { profile, updateProfile } = useAuth();
+  const [confirm, setConfirm] = useState<PlanTier | null>(null);
+  const [switching, setSwitching] = useState(false);
+
+  const handleSwitch = async (tier: PlanTier) => {
+    setSwitching(true);
+    await updateProfile({ plan: tier });
+    setSwitching(false);
+    setConfirm(null);
+  };
+
+  return (
+    <>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {PLANS.map((plan) => {
+          const isCurrent = profile?.plan === plan.tier;
+          const isRecommended = plan.tier === "starter";
+          return (
+            <div
+              key={plan.tier}
+              className={`relative p-5 rounded-2xl border flex flex-col transition-all ${
+                isCurrent
+                  ? "border-white/20 bg-white/10"
+                  : isRecommended
+                  ? "border-white/15 bg-surface-1"
+                  : "border-white/5 bg-surface-1"
+              }`}
+            >
+              {isRecommended && !isCurrent && (
+                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-white text-black px-2.5 py-0.5 rounded-full">
+                  Popular
+                </span>
+              )}
+              {isCurrent && (
+                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-green-500 text-white px-2.5 py-0.5 rounded-full">
+                  Current
+                </span>
+              )}
+
+              <h3 className="text-base font-bold text-white">{plan.name}</h3>
+              <div className="flex items-baseline gap-1 mt-1 mb-2">
+                <span className="text-2xl font-bold text-white">${plan.price}</span>
+                <span className="text-xs text-zinc-500">/mo</span>
+              </div>
+              <p className="text-xs text-zinc-500 mb-4">{plan.desc}</p>
+
+              <ul className="flex-1 flex flex-col gap-1.5 mb-5">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-1.5 text-xs text-zinc-400">
+                    <svg className="flex-shrink-0 mt-0.5 text-green-400" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              {isCurrent ? (
+                <button disabled className="w-full py-2 rounded-lg text-xs font-semibold bg-surface-3 text-zinc-600 cursor-default">
+                  Current plan
+                </button>
+              ) : (
+                <button
+                  onClick={() => setConfirm(plan.tier)}
+                  className={`w-full py-2 rounded-lg text-xs font-semibold transition-colors ${
+                    isRecommended ? "bg-white hover:bg-zinc-100 text-black" : "bg-surface-2 hover:bg-surface-3 border border-white/10 text-zinc-300 hover:text-white"
+                  }`}
+                >
+                  Switch to {plan.name}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Confirm modal */}
+      {confirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4" onClick={() => setConfirm(null)}>
+          <div className="w-full max-w-sm bg-surface-1 border border-white/10 rounded-2xl p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-white mb-2">Switch plan</h3>
+            <p className="text-sm text-zinc-400 mb-6">
+              Switch to the <span className="text-white font-semibold">{PLANS.find((p) => p.tier === confirm)?.name}</span> plan? Changes take effect immediately.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setConfirm(null)}
+                className="flex-1 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleSwitch(confirm)}
+                disabled={switching}
+                className="flex-1 py-2 rounded-xl bg-white hover:bg-zinc-100 disabled:opacity-50 text-black text-sm font-semibold transition-colors"
+              >
+                {switching ? "Switching…" : "Confirm"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ── Domains section ──────────────────────────────────────── */
+
+const PLATFORM_HOST = "nanowork.app";
+
+function normalizeSubdomain(raw: string): string {
+  return raw.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/, "").slice(0, 40);
+}
+
+function DomainsSection() {
+  const { profile, updateProfile } = useAuth();
+  const [subdomain, setSubdomain] = useState(profile?.subdomain ?? "");
+  const [subSaved, setSubSaved] = useState(false);
+  const [subError, setSubError] = useState("");
+  const [newDomain, setNewDomain] = useState("");
+  const [showAdd, setShowAdd] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const fullUrl = `https://${subdomain || "your-app"}.${PLATFORM_HOST}`;
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSubdomainSave = async (e: FormEvent) => {
+    e.preventDefault();
+    const next = normalizeSubdomain(subdomain);
+    if (next.length < 2) { setSubError("At least 2 characters required."); return; }
+    setSubError("");
+    await updateProfile({ subdomain: next });
+    setSubdomain(next);
+    setSubSaved(true);
+    setTimeout(() => setSubSaved(false), 2500);
+  };
+
+  const handleAddDomain = async () => {
+    if (!newDomain.trim()) return;
+    await updateProfile({ customDomain: newDomain.trim() });
+    setNewDomain("");
+    setShowAdd(false);
+  };
+
+  return (
+    <>
+      {/* Subdomain */}
+      <Section
+        title="Platform subdomain"
+        desc={`Your business is served at *.${PLATFORM_HOST}`}
+      >
+        <form onSubmit={handleSubdomainSave} className="flex flex-col gap-3">
+          <div className="flex items-center gap-1 px-3 py-2 rounded-xl bg-surface-2 border border-white/10 focus-within:border-white/20 transition-colors">
+            <span className="text-xs text-zinc-600">https://</span>
+            <input
+              className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-600 outline-none min-w-0"
+              type="text"
+              value={subdomain}
+              onChange={(e) => setSubdomain(normalizeSubdomain(e.target.value))}
+              placeholder="your-app"
+            />
+            <span className="text-xs text-zinc-600 whitespace-nowrap">.{PLATFORM_HOST}</span>
+          </div>
+          {subError && <p className="text-xs text-red-400">{subError}</p>}
+          <div className="flex items-center gap-2">
+            <a
+              href={fullUrl}
+              className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span>{fullUrl}</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+          <div className="flex justify-end">
+            <SaveButton saved={subSaved} label="Save subdomain" />
+          </div>
+        </form>
+      </Section>
+
+      {/* Custom domain */}
+      <Section
+        title="Custom domain"
+        desc="Connect your own domain."
+      >
+        <div className="space-y-4">
+          <div className="flex justify-end">
+            <button
+              onClick={() => setShowAdd(!showAdd)}
+              className="px-3 py-1.5 rounded-lg bg-white hover:bg-zinc-100 text-black text-xs font-semibold transition-colors"
+            >
+              {showAdd ? "Cancel" : "+ Add domain"}
+            </button>
+          </div>
+
+          {showAdd && (
+            <div className="p-5 rounded-xl bg-surface-2 border border-white/5">
+              <label className="block text-xs font-medium text-zinc-400 mb-2">Domain name</label>
+              <div className="flex gap-2 mb-4">
+                <input
+                  className="flex-1 px-3 py-2 rounded-lg bg-surface-3 border border-white/10 focus:border-white/20 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors"
+                  type="text"
+                  placeholder="yourbrand.com"
+                  value={newDomain}
+                  onChange={(e) => setNewDomain(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddDomain()}
+                  autoFocus
+                />
+                <button
+                  onClick={handleAddDomain}
+                  disabled={!newDomain.trim()}
+                  className="px-4 py-2 rounded-lg bg-white hover:bg-zinc-100 disabled:opacity-40 text-black text-sm font-semibold transition-colors"
+                >
+                  Add domain
+                </button>
+              </div>
+              {newDomain && (
+                <div className="rounded-lg bg-surface-3 border border-white/5 p-4">
+                  <div className="flex items-start gap-2 mb-3">
+                    <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-amber-400 mb-1">DNS Configuration Required</p>
+                      <p className="text-xs text-zinc-500">Add this CNAME record at your DNS provider:</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface-0/50 border border-white/5">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-zinc-500 mb-0.5">Type</p>
+                        <p className="text-sm font-mono text-zinc-200">CNAME</p>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-zinc-500 mb-0.5">Name</p>
+                        <p className="text-sm font-mono text-zinc-200 truncate">{newDomain}</p>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-zinc-500 mb-0.5">Value</p>
+                        <p className="text-sm font-mono text-zinc-200">nanowork.app</p>
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard(`${newDomain} CNAME nanowork.app`)}
+                        className="p-2 hover:bg-white/5 rounded transition-colors"
+                        title="Copy DNS record"
+                      >
+                        {copied ? (
+                          <Check className="w-4 h-4 text-green-400" />
+                        ) : (
+                          <Copy className="w-4 h-4 text-zinc-400" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {profile?.customDomain ? (
+            <div className="rounded-xl bg-surface-2 border border-white/5 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm text-zinc-200 font-medium">{profile.customDomain}</p>
+                    <span className="text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      Active
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-600 mt-0.5">Your custom domain is connected and live</p>
+                  <a
+                    href={`https://${profile.customDomain}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors mt-2"
+                  >
+                    <span>Visit site</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                <button
+                  onClick={() => {
+                    if (confirm("Remove this custom domain?")) {
+                      updateProfile({ customDomain: undefined });
+                    }
+                  }}
+                  className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-colors"
+                  title="Remove domain"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-zinc-600">
+              <Globe className="w-8 h-8 mx-auto mb-3 opacity-40" />
+              <p className="text-sm">No custom domain connected yet.</p>
+              <p className="text-xs text-zinc-700 mt-1">Click "Add domain" above to get started.</p>
+            </div>
+          )}
+        </div>
+      </Section>
+    </>
+  );
+}
+
 /* ── Logout section ──────────────────────────────────────── */
 
 function LogoutSection() {
@@ -640,12 +909,12 @@ function LogoutSection() {
 /* ── Page ─────────────────────────────────────────────────── */
 
 export default function Settings() {
-  const [activeTab, setActiveTab] = useState<"account" | "billing" | "domain">("account");
+  const [activeTab, setActiveTab] = useState<"account" | "plan" | "domains">("account");
 
   const tabs = [
     { id: "account" as const, label: "Account", icon: User },
-    { id: "billing" as const, label: "Billing", icon: CreditCard },
-    { id: "domain" as const, label: "Domain", icon: Globe },
+    { id: "plan" as const, label: "Plan", icon: CreditCard },
+    { id: "domains" as const, label: "Domains", icon: Globe },
   ];
 
   return (
@@ -682,12 +951,13 @@ export default function Settings() {
           <>
             <ProfileSection />
             <AIEmailSection />
+            <BillingSection />
             <LogoutSection />
             <DeleteSection />
           </>
         )}
-        {activeTab === "billing" && <BillingSection />}
-        {activeTab === "domain" && <DomainSection />}
+        {activeTab === "plan" && <PlanSection />}
+        {activeTab === "domains" && <DomainsSection />}
       </div>
     </div>
   );
