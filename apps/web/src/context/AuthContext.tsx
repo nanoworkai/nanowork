@@ -20,6 +20,7 @@ export interface UserProfile {
   businessName?: string;
   businessPrompt?: string;
   aiEmail?: string; // AI agent email like nova@nanowork.ai
+  agentId?: string; // User's primary agent ID for linking builds/businesses
 
   // Account status
   status: "active" | "suspended" | "deleted";
