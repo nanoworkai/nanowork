@@ -150,3 +150,64 @@ export async function createPaymentLink(
     );
   }
 }
+
+/**
+ * Create a subscription for a customer
+ */
+export async function createStripeSubscription(
+  customerId: string,
+  priceId: string,
+  metadata?: Record<string, string>
+): Promise<Stripe.Subscription | null> {
+  const client = getStripe();
+
+  if (!client) {
+    console.warn('Stripe not configured - cannot create subscription');
+    return null;
+  }
+
+  try {
+    const subscription = await client.subscriptions.create({
+      customer: customerId,
+      items: [{ price: priceId }],
+      payment_behavior: 'default_incomplete',
+      payment_settings: { save_default_payment_method: 'on_subscription' },
+      expand: ['latest_invoice.payment_intent'],
+      metadata: metadata || {},
+    });
+
+    return subscription;
+  } catch (error) {
+    console.error('Failed to create subscription:', error);
+    throw new Error(
+      `Subscription creation failed: ${error instanceof Error ? error.message : 'unknown error'}`
+    );
+  }
+}
+
+/**
+ * Cancel a subscription
+ */
+export async function cancelStripeSubscription(subscriptionId: string): Promise<boolean> {
+  const client = getStripe();
+
+  if (!client) {
+    console.warn('Stripe not configured - cannot cancel subscription');
+    return false;
+  }
+
+  try {
+    await client.subscriptions.cancel(subscriptionId);
+    return true;
+  } catch (error) {
+    console.error('Failed to cancel subscription:', error);
+    return false;
+  }
+}
+
+/**
+ * Get Stripe instance for webhook handling
+ */
+export function getStripeInstance(): Stripe | null {
+  return getStripe();
+}
