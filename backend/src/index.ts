@@ -54,7 +54,7 @@ app.get('/health', (req, res) => {
 // Internal routes (protected by internal token)
 app.use('/internal', provisionRouter);
 
-// Webhook routes (protected by internal token)
+// Webhook routes (protected by signatures)
 app.use('/webhooks/email', emailWebhookRouter);
 
 // API routes (protected by user auth)
@@ -68,6 +68,7 @@ app.use('/tasks', tasksRouter);
 app.use('/contacts', contactsRouter);
 app.use('/payments', paymentsRouter);
 app.use('/documents', documentsRouter);
+app.use('/domains', domainsRouter);
 
 // 404 handler
 app.use((req, res) => {

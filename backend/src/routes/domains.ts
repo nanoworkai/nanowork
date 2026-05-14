@@ -99,10 +99,19 @@ router.post('/subscribe', requireUserAuth, async (req: AuthenticatedRequest, res
       // Don't fail the request - subscription was created
     }
 
+    // Extract client secret from latest invoice
+    let clientSecret: string | undefined;
+    if (subscription.latest_invoice && typeof subscription.latest_invoice !== 'string') {
+      const invoice = subscription.latest_invoice;
+      if (invoice.payment_intent && typeof invoice.payment_intent !== 'string') {
+        clientSecret = invoice.payment_intent.client_secret || undefined;
+      }
+    }
+
     res.json({
       success: true,
       subscriptionId: subscription.id,
-      clientSecret: subscription.latest_invoice?.payment_intent?.client_secret,
+      clientSecret,
     });
   } catch (error) {
     console.error('Domain subscription error:', error);

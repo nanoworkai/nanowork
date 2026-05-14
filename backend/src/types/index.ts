@@ -86,6 +86,11 @@ export interface Deployment {
   metadata: Record<string, any>;
   created_at: string;
   deployed_at: string | null;
+  custom_domain?: string | null;
+  domain_status?: 'pending_payment' | 'pending_configuration' | 'pending_dns' | 'active' | 'payment_failed' | null;
+  domain_verified?: boolean;
+  domain_subscription_id?: string | null;
+  cloudflare_project_name?: string | null;
 }
 
 export type NewDeployment = Omit<Deployment, 'id' | 'created_at'>;
