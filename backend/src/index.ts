@@ -45,6 +45,7 @@ app.use(express.json());
 const allowedOrigins = [
   'https://nanowork.ai',
   'https://www.nanowork.ai',
+  'https://nanowork-5k9.pages.dev', // Cloudflare Pages production URL
   'http://localhost:5173',
   'http://localhost:3000',
   'http://localhost:5174',
