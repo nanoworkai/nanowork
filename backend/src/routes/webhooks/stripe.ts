@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { getStripeInstance } from '../../services/stripe';
 import { getSupabase } from '../../services/supabase';
 import { removeCustomDomain } from '../../services/cloudflare';
+import { addCredits } from '../../services/creditService';
 
 const router = Router();
 
@@ -37,6 +38,10 @@ router.post('/', async (req: Request, res: Response) => {
   // Handle the event
   try {
     switch (event.type) {
+      case 'payment_intent.succeeded':
+        await handlePaymentIntentSucceeded(event.data.object);
+        break;
+
       case 'customer.subscription.deleted':
         await handleSubscriptionDeleted(event.data.object);
         break;
@@ -60,18 +65,72 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 /**
+ * Handle payment_intent.succeeded event
+ * - Add credits to user's balance for credit top-ups
+ */
+async function handlePaymentIntentSucceeded(paymentIntent: any) {
+  const metadata = paymentIntent.metadata;
+  const userId = metadata?.userId;
+  const creditAmount = metadata?.creditAmount;
+
+  if (!userId || !creditAmount) {
+    console.log('Payment intent without credit metadata (not a credit top-up)');
+    return;
+  }
+
+  console.log('Credit top-up payment succeeded:', paymentIntent.id, 'user:', userId, 'credits:', creditAmount);
+
+  try {
+    const newBalance = await addCredits(
+      userId,
+      parseInt(creditAmount, 10),
+      paymentIntent.id
+    );
+
+    console.log('Added credits to user:', userId, 'new balance:', newBalance);
+  } catch (error) {
+    console.error('Failed to add credits:', error);
+    throw error;
+  }
+}
+
+/**
  * Handle subscription.deleted event
- * Remove custom domain from Cloudflare and reset deployment
+ * - Remove custom domain from Cloudflare and reset deployment
+ * - Reset user plan to free
  */
 async function handleSubscriptionDeleted(subscription: any) {
   const subscriptionId = subscription.id;
+  const customerId = subscription.customer;
   const metadata = subscription.metadata;
 
-  console.log('Subscription deleted:', subscriptionId, metadata);
+  console.log('Subscription deleted:', subscriptionId, 'customer:', customerId, metadata);
 
   const supabase = getSupabase();
 
-  // Find deployment by subscription ID
+  // Find and reset user profile plan
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id, email')
+    .eq('stripe_customer_id', customerId)
+    .single();
+
+  if (profile && !profileError) {
+    await supabase
+      .from('profiles')
+      .update({
+        plan: 'free',
+        subscription_status: null,
+        subscription_id: null,
+        subscription_ends_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', profile.id);
+
+    console.log('Reset user plan to free:', profile.email);
+  }
+
+  // Find deployment by subscription ID (domain subscription)
   const { data: deployment, error: findError } = await supabase
     .from('deployments')
     .select('id, custom_domain, cloudflare_project_name')
@@ -79,7 +138,7 @@ async function handleSubscriptionDeleted(subscription: any) {
     .single();
 
   if (findError || !deployment) {
-    console.warn('No deployment found for subscription:', subscriptionId);
+    console.log('No deployment found for subscription (may be user subscription)');
     return;
   }
 
@@ -117,17 +176,56 @@ async function handleSubscriptionDeleted(subscription: any) {
 
 /**
  * Handle subscription.updated event
- * Update deployment status based on subscription status
+ * - Update deployment status based on subscription status
+ * - Sync user plan and subscription status
  */
 async function handleSubscriptionUpdated(subscription: any) {
   const subscriptionId = subscription.id;
+  const customerId = subscription.customer;
   const status = subscription.status;
+  const items = subscription.items?.data || [];
 
   console.log('Subscription updated:', subscriptionId, 'status:', status);
 
   const supabase = getSupabase();
 
-  // Find deployment
+  // Update user profile subscription status
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id, plan')
+    .eq('stripe_customer_id', customerId)
+    .single();
+
+  if (profile && !profileError) {
+    // Determine plan from subscription items (first price ID)
+    let newPlan = profile.plan;
+    if (items.length > 0) {
+      const priceId = items[0].price.id;
+      // Map Stripe price IDs to plan names
+      const planMapping: Record<string, string> = {
+        [process.env.STRIPE_PRICE_STARTER || '']: 'starter',
+        [process.env.STRIPE_PRICE_GROWTH || '']: 'growth',
+        [process.env.STRIPE_PRICE_SCALE || '']: 'scale',
+        [process.env.STRIPE_PRICE_ENTERPRISE || '']: 'enterprise',
+      };
+      newPlan = planMapping[priceId] || profile.plan;
+    }
+
+    // Update profile with subscription info
+    await supabase
+      .from('profiles')
+      .update({
+        plan: status === 'active' || status === 'trialing' ? newPlan : 'free',
+        subscription_status: status,
+        subscription_id: subscriptionId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', profile.id);
+
+    console.log('Updated user subscription:', profile.id, 'plan:', newPlan, 'status:', status);
+  }
+
+  // Find deployment (for domain subscriptions)
   const { data: deployment, error: findError } = await supabase
     .from('deployments')
     .select('id, domain_status')
@@ -135,7 +233,7 @@ async function handleSubscriptionUpdated(subscription: any) {
     .single();
 
   if (findError || !deployment) {
-    console.warn('No deployment found for subscription:', subscriptionId);
+    console.log('No deployment found for subscription (may be user subscription)');
     return;
   }
 

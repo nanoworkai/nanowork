@@ -17,6 +17,8 @@ import contactsRouter from './routes/contacts';
 import paymentsRouter from './routes/payments';
 import documentsRouter from './routes/documents';
 import domainsRouter from './routes/domains';
+import billingRouter from './routes/billing';
+import walletRouter from './routes/wallet';
 
 // Validate required environment variables
 const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY'];
@@ -69,6 +71,8 @@ app.use('/contacts', contactsRouter);
 app.use('/payments', paymentsRouter);
 app.use('/documents', documentsRouter);
 app.use('/domains', domainsRouter);
+app.use('/billing', billingRouter);
+app.use('/wallet', walletRouter);
 
 // 404 handler
 app.use((req, res) => {

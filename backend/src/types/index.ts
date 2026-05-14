@@ -228,6 +228,20 @@ export interface Document {
 
 export type NewDocument = Omit<Document, 'id' | 'created_at' | 'updated_at'>;
 
+export interface CreditTransaction {
+  id: string;
+  user_id: string;
+  amount: number;
+  balance_after: number;
+  type: 'topup' | 'spend' | 'refund';
+  description: string | null;
+  task_id: string | null;
+  stripe_payment_intent_id: string | null;
+  created_at: string;
+}
+
+export type NewCreditTransaction = Omit<CreditTransaction, 'id' | 'created_at'>;
+
 // Request/Response types
 import { Request } from 'express';
 

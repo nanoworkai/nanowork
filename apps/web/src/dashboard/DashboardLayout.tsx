@@ -6,9 +6,10 @@ import { Terminal, LogOut, Menu, Settings, CreditCard, HelpCircle, ChevronDown }
 const NAV_ITEMS = [
   { to: "/dashboard", label: "OVERVIEW", end: true, code: "00" },
   { to: "/dashboard/bookings", label: "BOOKINGS", end: false, code: "01" },
-  { to: "/dashboard/domains", label: "DOMAINS", end: false, code: "02" },
-  { to: "/dashboard/plan", label: "PLAN", end: false, code: "03" },
-  { to: "/dashboard/settings", label: "SETTINGS", end: false, code: "04" },
+  { to: "/dashboard/inbox", label: "INBOX", end: false, code: "02" },
+  { to: "/dashboard/domains", label: "DOMAINS", end: false, code: "03" },
+  { to: "/dashboard/plan", label: "PLAN", end: false, code: "04" },
+  { to: "/dashboard/settings", label: "SETTINGS", end: false, code: "05" },
 ];
 
 export default function DashboardLayout() {

@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Terminal, Lock } from "lucide-react";
 
@@ -14,6 +14,7 @@ function safeNextPath(raw: string | null): string {
 export default function Login() {
   const { signIn, signUp, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const nextPath = safeNextPath(searchParams.get("redirect") ?? searchParams.get("next"));
   const pendingPrompt = searchParams.get("p");
@@ -24,6 +25,20 @@ export default function Login() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState<string>("");
+
+  // Handle success/error messages from location state
+  useEffect(() => {
+    const state = location.state as { success?: string; error?: string } | null;
+    if (state?.success) {
+      setSuccess(state.success);
+      setError("");
+    }
+    if (state?.error) {
+      setError(state.error);
+      setSuccess("");
+    }
+  }, [location.state]);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -169,12 +184,22 @@ export default function Login() {
               </div>
 
               <div>
-                <label
-                  className="block text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-2"
-                  htmlFor="login-password"
-                >
-                  Password
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label
+                    className="block text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider"
+                    htmlFor="login-password"
+                  >
+                    Password
+                  </label>
+                  {tab === "signin" && (
+                    <Link
+                      to="/forgot-password"
+                      className="text-[10px] sm:text-xs font-mono text-white/50 hover:text-white transition-colors uppercase tracking-wider"
+                    >
+                      Forgot?
+                    </Link>
+                  )}
+                </div>
                 <input
                   id="login-password"
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-xs sm:text-sm font-mono outline-none transition-colors"
@@ -186,6 +211,17 @@ export default function Login() {
                   required
                 />
               </div>
+
+              {success && (
+                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-green-400/20 bg-green-400/5">
+                  <div className="flex items-start gap-2">
+                    <span className="text-[10px] sm:text-xs font-mono text-green-400 mt-0.5">SUCCESS:</span>
+                    <p className="text-[10px] sm:text-xs font-mono text-green-400 leading-relaxed flex-1">
+                      {success}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {error && (
                 <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-red-400/20 bg-red-400/5">
