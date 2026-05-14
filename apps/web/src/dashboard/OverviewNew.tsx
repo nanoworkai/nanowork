@@ -252,7 +252,6 @@ function TerminalPrompt({
   onBuildMenuClick,
 }: TerminalPromptProps) {
   const [value, setValue] = useState("");
-  const [focused, setFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -309,8 +308,6 @@ function TerminalPrompt({
                 ref={textareaRef}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
