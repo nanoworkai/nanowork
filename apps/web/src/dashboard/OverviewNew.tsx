@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Plus, MoreVertical, Trash2, Edit2 } from "lucide-react";
+import { Terminal, ChevronDown, Edit2, Trash2 } from "lucide-react";
 
 /**
- * Multi-build dashboard with sidebar (Claude/ChatGPT style)
+ * Terminal-style dashboard matching homepage aesthetic
  */
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -119,13 +119,13 @@ function useAgentStream(buildId: string | null, prompt: string | null, enabled: 
 function DeptCard({ name, state }: { name: string; state: DeptState | undefined }) {
   if (!state) {
     return (
-      <div className="card rounded-xl p-5 opacity-40">
+      <div className="card rounded-none border border-white/10 p-4 opacity-40">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className="text-base">⋯</span>
-            <span className="text-sm font-semibold text-white/60">{name}</span>
+            <span className="text-sm font-mono font-bold text-white/60">{name}</span>
           </div>
-          <span className="text-xs font-mono text-white/30">QUEUED</span>
+          <span className="text-[10px] font-mono text-white/30 uppercase tracking-wider">Queued</span>
         </div>
       </div>
     );
@@ -135,36 +135,43 @@ function DeptCard({ name, state }: { name: string; state: DeptState | undefined 
   const progress = tasks.length / Math.max(taskCount, 1);
 
   return (
-    <div className={`card rounded-xl p-5 transition-all duration-150 ${
-      status === "done" ? "bg-surface-3" : ""
-    }`}>
+    <div
+      className={`card rounded-none border transition-all duration-150 p-4 ${
+        status === "done"
+          ? "border-green-400/30 bg-surface-1"
+          : status === "running"
+          ? "border-white/20 bg-surface-1"
+          : "border-white/10 bg-surface-1"
+      }`}
+    >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-base">{icon}</span>
-          <span className="text-sm font-semibold text-white">{name}</span>
+          <span className="text-sm font-mono font-bold text-white">{name}</span>
         </div>
         <div className="flex items-center gap-2">
-          {status === "running" && (
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-          )}
-          <span className={`text-xs font-mono ${
-            status === "done" ? "text-white/60" : "text-white/40"
-          }`}>
-            {status === "done" ? "DONE" : `${tasks.length}/${taskCount}`}
+          {status === "running" && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />}
+          {status === "done" && <span className="w-1.5 h-1.5 rounded-full bg-green-400" />}
+          <span
+            className={`text-[10px] font-mono uppercase tracking-wider ${
+              status === "done" ? "text-green-400" : status === "running" ? "text-white/60" : "text-white/40"
+            }`}
+          >
+            {status === "done" ? "Done" : `${tasks.length}/${taskCount}`}
           </span>
         </div>
       </div>
 
       <div className="space-y-1.5 mb-3">
         {tasks.slice(-3).map((task, i) => (
-          <div key={i} className="text-xs text-white/50 leading-relaxed">
+          <div key={i} className="text-xs font-mono text-white/50 leading-relaxed">
             {task}
           </div>
         ))}
       </div>
 
       {status === "running" && (
-        <div className="h-px bg-white/5 rounded-full overflow-hidden">
+        <div className="h-px bg-white/10 overflow-hidden">
           <div
             className="h-full bg-white/30 transition-all duration-300"
             style={{ width: `${progress * 100}%` }}
@@ -173,7 +180,7 @@ function DeptCard({ name, state }: { name: string; state: DeptState | undefined 
       )}
 
       {output && status === "done" && (
-        <div className="mt-3 pt-3 text-xs text-white/40 leading-relaxed border-t border-white/5">
+        <div className="mt-3 pt-3 text-xs font-mono text-white/40 leading-relaxed border-t border-white/10">
           {output}
         </div>
       )}
@@ -185,100 +192,189 @@ function DeptCard({ name, state }: { name: string; state: DeptState | undefined 
 
 function LiveFeed({ entries }: { entries: TaskEntry[] }) {
   const endRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [entries]);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [entries]);
 
   if (!entries.length) return null;
 
   return (
-    <div className="card-lg rounded-xl overflow-hidden">
-      <div className="px-5 py-3 flex items-center gap-2 border-b border-white/5">
-        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-        <span className="text-xs font-bold text-white/60 uppercase tracking-wider">Live Output</span>
+    <div className="card-lg rounded-none border border-white/10 overflow-hidden">
+      <div className="px-4 sm:px-6 py-3 flex items-center gap-2 border-b border-white/10 bg-surface-1">
+        <Terminal className="w-3.5 h-3.5 text-white/60" />
+        <span className="text-[10px] sm:text-xs font-mono font-bold text-white/60 uppercase tracking-wider">
+          Live Output
+        </span>
+        <div className="flex-1" />
+        <div className="flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          <span className="text-[10px] font-mono text-white/40 uppercase">Streaming</span>
+        </div>
       </div>
 
-      <div className="max-h-64 overflow-y-auto">
-        {entries.slice().reverse().map((e, i) => (
-          <div key={i} className="px-5 py-2.5 hover:bg-white/3 transition-colors border-b border-white/2">
-            <div className="flex items-start gap-3">
-              <span className="text-xs text-white/30 font-mono w-20 flex-shrink-0">[{e.dept}]</span>
-              <span className="text-xs text-white/60 leading-relaxed">{e.task}</span>
+      <div className="max-h-80 overflow-y-auto bg-surface-2">
+        {entries
+          .slice()
+          .reverse()
+          .map((e, i) => (
+            <div key={i} className="px-4 sm:px-6 py-2.5 hover:bg-white/3 transition-colors border-b border-white/5">
+              <div className="flex items-start gap-3">
+                <span className="text-[10px] sm:text-xs text-white/30 font-mono w-16 sm:w-20 flex-shrink-0 uppercase">
+                  [{e.dept}]
+                </span>
+                <span className="text-[10px] sm:text-xs font-mono text-white/60 leading-relaxed">{e.task}</span>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
         <div ref={endRef} />
       </div>
     </div>
   );
 }
 
-// ── Prompt Form ───────────────────────────────────────────────────────────────
+// ── Terminal Prompt ───────────────────────────────────────────────────────────
 
-function PromptForm({ onStart, loading }: { onStart: (p: string) => void; loading: boolean }) {
+interface TerminalPromptProps {
+  buildName: string;
+  onStart: (p: string) => void;
+  loading: boolean;
+  status: "ready" | "building" | "complete" | "error";
+  hasPrompt: boolean;
+  onBuildMenuClick: () => void;
+}
+
+function TerminalPrompt({
+  buildName,
+  onStart,
+  loading,
+  status,
+  hasPrompt,
+  onBuildMenuClick,
+}: TerminalPromptProps) {
   const [value, setValue] = useState("");
+  const [focused, setFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    // Auto-focus when form appears
-    textareaRef.current?.focus();
-  }, []);
+    if (!hasPrompt) {
+      textareaRef.current?.focus();
+    }
+  }, [hasPrompt]);
+
+  const statusConfig = {
+    ready: { dot: "bg-green-400", text: "READY", pulse: true },
+    building: { dot: "bg-amber-400", text: "BUILDING", pulse: true },
+    complete: { dot: "bg-green-400", text: "COMPLETE", pulse: false },
+    error: { dot: "bg-red-400", text: "ERROR", pulse: false },
+  };
+
+  const { dot, text, pulse } = statusConfig[status];
+
+  const handleSubmit = () => {
+    const text = value.trim();
+    if (!text) return;
+    onStart(text);
+    setValue("");
+  };
 
   return (
-    <div className="card-lg rounded-2xl p-8">
-      <h2 className="text-xl font-bold text-white mb-2 tracking-tight">What are you building?</h2>
-      <p className="text-sm text-white/50 mb-6">
-        One prompt launches all seven departments in parallel.
-      </p>
-      <textarea
-        ref={textareaRef}
-        className="w-full bg-surface-3 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 resize-none outline-none mb-4 border border-white/8"
-        rows={3}
-        placeholder="Premium dog gear DTC, $45 AOV, ship US — I want real revenue in 30 days."
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && value.trim()) onStart(value.trim()); }}
-        disabled={loading}
-      />
-      <button
-        onClick={() => value.trim() && onStart(value.trim())}
-        disabled={!value.trim() || loading}
-        className="w-full sm:w-auto px-6 py-3 rounded-xl bg-white hover:bg-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed text-black font-semibold text-sm transition-colors"
-      >
-        {loading ? (
-          <span className="flex items-center justify-center gap-2">
-            <span className="w-3.5 h-3.5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-            Building...
-          </span>
-        ) : (
-          "Launch Build"
-        )}
-      </button>
+    <div className="card-lg rounded-none border border-white/10">
+      {/* Header Bar */}
+      <div className="border-b border-white/10 px-4 sm:px-6 py-3 bg-surface-1">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/60" />
+          <button
+            onClick={onBuildMenuClick}
+            className="flex items-center gap-1.5 text-[10px] sm:text-xs font-mono font-bold text-white/60 uppercase tracking-wider hover:text-white transition-colors"
+          >
+            <span>&gt;_</span>
+            <span>{buildName}</span>
+            <ChevronDown className="w-3 h-3" />
+          </button>
+          <div className="flex-1" />
+          <div className="flex items-center gap-1.5">
+            <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${dot} ${pulse ? "animate-pulse" : ""}`} />
+            <span className="text-[10px] sm:text-xs font-mono text-white/40">{text}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Input Area */}
+      <div className="p-4 sm:p-6">
+        <div className="relative mb-4">
+          <div className="flex items-start gap-2 sm:gap-3">
+            <span className="text-white/60 font-mono text-sm mt-1 select-none">$</span>
+            <div className="flex-1">
+              <textarea
+                ref={textareaRef}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit();
+                  }
+                }}
+                disabled={loading}
+                placeholder="Build a social network where creators own their content..."
+                className="w-full min-h-[80px] max-h-[200px] bg-transparent border-none outline-none resize-none text-white placeholder-white/30 font-mono text-xs sm:text-sm leading-relaxed"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Bar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 pt-4 border-t border-white/5">
+          <div className="flex items-center gap-2 sm:gap-6 text-[10px] sm:text-xs font-mono text-white/40 flex-wrap">
+            <span>7 DEPARTMENTS</span>
+            <span className="hidden sm:inline">|</span>
+            <span>PARALLEL EXECUTION</span>
+            <span className="hidden sm:inline">|</span>
+            <span className="hidden md:inline">AUTONOMOUS AGENTS</span>
+          </div>
+
+          <button
+            onClick={handleSubmit}
+            disabled={loading || !value.trim()}
+            className="w-full sm:w-auto px-4 sm:px-6 py-2.5 rounded-none bg-white hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed text-black font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+          >
+            {loading ? "EXECUTING..." : "EXECUTE"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
 
-// ── Builds Sidebar ────────────────────────────────────────────────────────────
+// ── Builds Dropdown Menu ──────────────────────────────────────────────────────
 
-interface BuildsSidebarProps {
+interface BuildsDropdownProps {
   builds: Build[];
   activeBuildId: string | null;
+  isOpen: boolean;
+  onClose: () => void;
   onSelectBuild: (id: string) => void;
   onNewBuild: () => void;
   onRenameBuild: (id: string, name: string) => void;
   onDeleteBuild: (id: string) => void;
 }
 
-function BuildsSidebar({
+function BuildsDropdown({
   builds,
   activeBuildId,
+  isOpen,
+  onClose,
   onSelectBuild,
   onNewBuild,
   onRenameBuild,
   onDeleteBuild,
-}: BuildsSidebarProps) {
+}: BuildsDropdownProps) {
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
-  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const formatRelativeTime = (date: string) => {
     const now = new Date();
@@ -296,10 +392,24 @@ function BuildsSidebar({
     return then.toLocaleDateString();
   };
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
   const startRename = (build: Build) => {
     setRenamingId(build.id);
     setRenameValue(build.name);
-    setMenuOpenId(null);
   };
 
   const saveRename = () => {
@@ -315,122 +425,120 @@ function BuildsSidebar({
   };
 
   return (
-    <div className="w-64 bg-surface-1 border-r border-white/10 flex flex-col h-full">
-      {/* Header */}
-      <div className="p-3 border-b border-white/10">
-        <button
-          onClick={onNewBuild}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-white hover:bg-zinc-100 text-black font-semibold text-sm transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          New Build
-        </button>
-      </div>
-
-      {/* Builds List */}
-      <div className="flex-1 overflow-y-auto p-2">
-        {builds.length === 0 ? (
-          <div className="p-4 text-center">
-            <p className="text-sm text-white/40 mb-2">No builds yet</p>
-            <p className="text-xs text-white/30">Start your first one</p>
-          </div>
-        ) : (
-          <div className="space-y-1">
-            {builds.map((build) => (
-              <div
-                key={build.id}
-                className={`group relative rounded-lg transition-colors ${
-                  activeBuildId === build.id
-                    ? "bg-white/10"
-                    : "hover:bg-white/5"
-                }`}
-              >
-                {renamingId === build.id ? (
-                  <div className="p-2">
-                    <input
-                      type="text"
-                      value={renameValue}
-                      onChange={(e) => setRenameValue(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") saveRename();
-                        if (e.key === "Escape") cancelRename();
-                      }}
-                      onBlur={saveRename}
-                      autoFocus
-                      className="w-full px-2 py-1 text-sm bg-surface-3 border border-white/20 rounded text-white outline-none"
-                    />
-                  </div>
-                ) : (
-                  <div
-                    onClick={() => onSelectBuild(build.id)}
-                    className="flex items-start gap-2 p-2 cursor-pointer"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white font-medium truncate">
-                        {build.name}
-                      </p>
-                      <p className="text-xs text-white/40 mt-0.5">
-                        {formatRelativeTime(build.last_activity_at)}
-                      </p>
-                    </div>
-
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setMenuOpenId(menuOpenId === build.id ? null : build.id);
+    <>
+      {/* Dropdown */}
+      <div
+        ref={dropdownRef}
+        className="absolute top-full left-0 mt-2 w-80 max-h-96 overflow-y-auto bg-surface-1 border border-white/10 rounded-none shadow-xl z-50"
+      >
+        {/* Builds List */}
+        <div className="p-2">
+          {builds.length === 0 ? (
+            <div className="p-4 text-center">
+              <p className="text-xs font-mono text-white/40 mb-2">No builds yet</p>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {builds.map((build) => (
+                <div
+                  key={build.id}
+                  className={`group relative rounded-none transition-colors ${
+                    activeBuildId === build.id ? "bg-white/10" : "hover:bg-white/5"
+                  }`}
+                >
+                  {renamingId === build.id ? (
+                    <div className="p-2">
+                      <input
+                        type="text"
+                        value={renameValue}
+                        onChange={(e) => setRenameValue(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") saveRename();
+                          if (e.key === "Escape") cancelRename();
                         }}
-                        className="p-1 rounded hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-
-                      {menuOpenId === build.id && (
-                        <div className="absolute right-2 top-8 w-40 bg-surface-2 border border-white/10 rounded-lg shadow-xl z-10 overflow-hidden">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              startRename(build);
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white hover:bg-white/5 transition-colors"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                            Rename
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeleteConfirmId(build.id);
-                              setMenuOpenId(null);
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            Delete
-                          </button>
-                        </div>
-                      )}
+                        onBlur={saveRename}
+                        autoFocus
+                        className="w-full px-2 py-1 text-xs font-mono bg-surface-3 border border-white/20 rounded-none text-white outline-none"
+                      />
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+                  ) : (
+                    <div
+                      onClick={() => {
+                        onSelectBuild(build.id);
+                        onClose();
+                      }}
+                      className="flex items-start gap-2 p-2 cursor-pointer"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-mono text-white font-medium truncate">
+                          {build.name}
+                        </p>
+                        <p className="text-[10px] font-mono text-white/40 mt-0.5">
+                          {formatRelativeTime(build.last_activity_at)}
+                        </p>
+                      </div>
+
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            startRename(build);
+                          }}
+                          className="p-1 rounded-none hover:bg-white/10 text-white/60 hover:text-white transition-colors"
+                          title="Rename"
+                        >
+                          <Edit2 className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteConfirmId(build.id);
+                          }}
+                          className="p-1 rounded-none hover:bg-red-500/10 text-white/60 hover:text-red-400 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* New Build Button */}
+        <div className="border-t border-white/10 p-2">
+          <button
+            onClick={() => {
+              onNewBuild();
+              onClose();
+            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-none bg-white hover:bg-white/90 text-black font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+          >
+            <span>+</span>
+            <span>New Build</span>
+          </button>
+        </div>
       </div>
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4" onClick={() => setDeleteConfirmId(null)}>
-          <div className="w-full max-w-sm bg-surface-1 border border-white/10 rounded-2xl p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-white mb-2">Delete build?</h3>
-            <p className="text-sm text-zinc-400 mb-6">
-              This cannot be undone.
-            </p>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4"
+          onClick={() => setDeleteConfirmId(null)}
+        >
+          <div
+            className="w-full max-w-sm bg-surface-1 border border-white/10 rounded-none p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-mono font-bold text-white mb-2">Delete build?</h3>
+            <p className="text-sm font-mono text-white/60 mb-6">This cannot be undone.</p>
             <div className="flex gap-2">
               <button
                 onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors"
+                className="flex-1 py-2 rounded-none bg-surface-2 hover:bg-surface-3 border border-white/10 text-xs font-mono text-white/60 hover:text-white font-medium transition-colors"
               >
                 Cancel
               </button>
@@ -438,8 +546,9 @@ function BuildsSidebar({
                 onClick={() => {
                   onDeleteBuild(deleteConfirmId);
                   setDeleteConfirmId(null);
+                  onClose();
                 }}
-                className="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors"
+                className="flex-1 py-2 rounded-none bg-red-500 hover:bg-red-600 text-white text-xs font-mono font-bold transition-colors"
               >
                 Delete
               </button>
@@ -447,7 +556,7 @@ function BuildsSidebar({
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
@@ -462,6 +571,7 @@ export default function Overview() {
   const [activeBuild, setActiveBuild] = useState<Build | null>(null);
   const [buildEnabled, setBuildEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const { meta, depts, feed, done, error } = useAgentStream(
     activeBuild?.id || null,
@@ -638,105 +748,121 @@ export default function Overview() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="w-8 h-8 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
+      <div className="flex h-screen items-center justify-center bg-surface-0">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm font-mono text-white/60">LOADING...</p>
+        </div>
       </div>
     );
   }
 
   const totalDone = Object.values(depts).filter((d) => d.status === "done").length;
 
+  // Determine terminal status
+  let terminalStatus: "ready" | "building" | "complete" | "error" = "ready";
+  if (error) terminalStatus = "error";
+  else if (done) terminalStatus = "complete";
+  else if (buildEnabled) terminalStatus = "building";
+
   return (
-    <div className="flex h-screen bg-surface-0">
-      {/* Sidebar */}
-      <BuildsSidebar
-        builds={builds}
-        activeBuildId={activeBuild?.id || null}
-        onSelectBuild={handleSelectBuild}
-        onNewBuild={handleNewBuild}
-        onRenameBuild={handleRenameBuild}
-        onDeleteBuild={handleDeleteBuild}
-      />
+    <div className="min-h-screen bg-surface-0">
+      {/* Main Content - Full width, no sidebar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {activeBuild ? (
+          <>
+            {/* Terminal Prompt - with dropdown */}
+            <div className="mb-8 relative">
+              <TerminalPrompt
+                buildName={activeBuild.name}
+                onStart={handleStartBuild}
+                loading={buildEnabled && !done}
+                status={terminalStatus}
+                hasPrompt={!!activeBuild.prompt}
+                onBuildMenuClick={() => setDropdownOpen(!dropdownOpen)}
+              />
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          {activeBuild ? (
-            <>
-              {/* Header */}
-              <div className="mb-8">
-                <h1 className="text-2xl font-bold text-white tracking-tight">
-                  {meta?.companyName || activeBuild.name}
-                </h1>
-                {buildEnabled && (
-                  <div className="flex items-center gap-3 mt-2">
-                    {done ? (
-                      <span className="text-sm text-white/50 font-semibold">All departments live</span>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                        <span className="text-sm text-white/50 font-semibold">{totalDone} of 7 complete</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {meta?.tagline && (
-                  <p className="text-sm text-white/40 italic mt-2">"{meta.tagline}"</p>
-                )}
-
-                {activeBuild.prompt && (
-                  <div className="mt-4 card rounded-xl px-4 py-3">
-                    <div className="text-xs text-white/30 font-semibold uppercase tracking-wider mb-1">Prompt</div>
-                    <div className="text-sm text-white/60">"{activeBuild.prompt}"</div>
-                  </div>
-                )}
-              </div>
-
-              {/* Error */}
-              {error && (
-                <div className="mb-6 card rounded-xl px-5 py-4 border border-red-500/20 bg-red-500/5">
-                  <div className="text-sm text-white/80">{error}</div>
-                </div>
-              )}
-
-              {/* Prompt entry */}
-              {!buildEnabled && !activeBuild.prompt && (
-                <div className="mb-8">
-                  <PromptForm onStart={handleStartBuild} loading={false} />
-                </div>
-              )}
-
-              {/* Department grid */}
-              {buildEnabled && (
-                <>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-6">
-                    {DEPT_ORDER.map((name) => (
-                      <DeptCard key={name} name={name} state={depts[name]} />
-                    ))}
-                  </div>
-
-                  {/* Live feed */}
-                  <div className="mb-8">
-                    <LiveFeed entries={feed} />
-                  </div>
-                </>
-              )}
-            </>
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <p className="text-lg text-white/60 mb-4">No build selected</p>
-                <button
-                  onClick={handleNewBuild}
-                  className="px-6 py-3 rounded-xl bg-white hover:bg-zinc-100 text-black font-semibold text-sm transition-colors"
-                >
-                  Create your first build
-                </button>
-              </div>
+              {/* Builds Dropdown */}
+              <BuildsDropdown
+                builds={builds}
+                activeBuildId={activeBuild.id}
+                isOpen={dropdownOpen}
+                onClose={() => setDropdownOpen(false)}
+                onSelectBuild={handleSelectBuild}
+                onNewBuild={handleNewBuild}
+                onRenameBuild={handleRenameBuild}
+                onDeleteBuild={handleDeleteBuild}
+              />
             </div>
-          )}
-        </div>
+
+            {/* Build metadata */}
+            {buildEnabled && (
+              <div className="mb-8">
+                {meta?.companyName && meta.companyName !== activeBuild.name && (
+                  <h2 className="text-xl sm:text-2xl font-mono font-bold text-white mb-2">
+                    {meta.companyName}
+                  </h2>
+                )}
+                {meta?.tagline && (
+                  <p className="text-sm font-mono text-white/60 mb-3">"{meta.tagline}"</p>
+                )}
+
+                <div className="flex items-center gap-3">
+                  {done ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-green-400" />
+                      <span className="text-xs font-mono text-green-400 uppercase">All departments complete</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                      <span className="text-xs font-mono text-white/60 uppercase">
+                        {totalDone} of 7 departments complete
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Error */}
+            {error && (
+              <div className="mb-8 border border-red-500/30 bg-red-500/5 rounded-none p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 rounded-full bg-red-400" />
+                  <span className="text-xs font-mono text-red-400 uppercase">Error</span>
+                </div>
+                <p className="text-sm font-mono text-white/80">{error}</p>
+              </div>
+            )}
+
+            {/* Department grid */}
+            {buildEnabled && (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+                  {DEPT_ORDER.map((name) => (
+                    <DeptCard key={name} name={name} state={depts[name]} />
+                  ))}
+                </div>
+
+                {/* Live feed */}
+                <LiveFeed entries={feed} />
+              </>
+            )}
+          </>
+        ) : (
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <p className="text-sm font-mono text-white/60 mb-4">No build selected</p>
+              <button
+                onClick={handleNewBuild}
+                className="px-6 py-3 rounded-none bg-white hover:bg-white/90 text-black font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+              >
+                Create your first build
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
