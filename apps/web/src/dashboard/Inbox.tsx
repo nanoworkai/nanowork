@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
-import { Mail, Inbox as InboxIcon, Send, Search, Filter, RefreshCw } from "lucide-react";
+import { Mail, Inbox as InboxIcon, Send, Search, RefreshCw } from "lucide-react";
 
 interface EmailMessage {
   id: string;

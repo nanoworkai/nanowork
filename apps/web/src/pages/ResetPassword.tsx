@@ -1,11 +1,10 @@
 import { useState, useEffect, type FormEvent } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { Terminal, Eye, EyeOff, Lock, Check } from "lucide-react";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);

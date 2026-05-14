@@ -16,6 +16,7 @@ import Plan from "./dashboard/Plan";
 import Settings from "./dashboard/Settings";
 import BuildView from "./dashboard/BuildView";
 import Inbox from "./dashboard/Inbox";
+import Wallet from "./dashboard/Wallet";
 import UserAppEntry from "./pages/user-app/UserAppEntry";
 import UserAppLayout from "./pages/user-app/UserAppLayout";
 import UserAppHome from "./pages/user-app/UserAppHome";
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="domains" element={<Domains />} />
         <Route path="plan" element={<Plan />} />
         <Route path="inbox" element={<Inbox />} />
+        <Route path="wallet" element={<Wallet />} />
         <Route path="settings" element={<Settings />} />
         <Route path="builds/:buildId" element={<BuildView />} />
       </Route>

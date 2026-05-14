@@ -8,8 +8,9 @@ const NAV_ITEMS = [
   { to: "/dashboard/bookings", label: "BOOKINGS", end: false, code: "01" },
   { to: "/dashboard/inbox", label: "INBOX", end: false, code: "02" },
   { to: "/dashboard/domains", label: "DOMAINS", end: false, code: "03" },
-  { to: "/dashboard/plan", label: "PLAN", end: false, code: "04" },
-  { to: "/dashboard/settings", label: "SETTINGS", end: false, code: "05" },
+  { to: "/dashboard/wallet", label: "WALLET", end: false, code: "04" },
+  { to: "/dashboard/plan", label: "PLAN", end: false, code: "05" },
+  { to: "/dashboard/settings", label: "SETTINGS", end: false, code: "06" },
 ];
 
 export default function DashboardLayout() {
