@@ -6,24 +6,26 @@ AI-powered company builder with autonomous agents. One prompt to launch your bus
 
 ```
 ┌─────────────────────────────────────────────┐
-│          Cloudflare Workers                 │
+│              Render.com                     │
 │  ┌───────────────────────────────────────┐  │
-│  │   API (Hono) - api.nanowork.app       │  │
+│  │   Backend API (Express/Node)          │  │
+│  │   nanowork-backend.onrender.com       │  │
 │  └───────────────────────────────────────┘  │
 └─────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────┐
-│         Cloudflare Pages                    │
+│              Render.com                     │
 │  ┌───────────────────────────────────────┐  │
-│  │   React SPA - nanowork.ai             │  │
+│  │   Frontend (React/Vite)               │  │
+│  │   nanowork-frontend.onrender.com      │  │
 │  └───────────────────────────────────────┘  │
 └─────────────────────────────────────────────┘
 ```
 
 **Key Features:**
-- Full TypeScript monorepo
-- Hono API on Cloudflare Workers
-- React (Vite) on Cloudflare Pages
+- Separate frontend and backend deployments on Render
+- Backend: Express/Node API
+- Frontend: React (Vite) SPA
 - Supabase for authentication & database
 - Stripe for payments
 - Anthropic Claude for AI features
@@ -34,87 +36,94 @@ AI-powered company builder with autonomous agents. One prompt to launch your bus
 
 - **Node.js 18+**
 - **npm**
-- **Wrangler CLI** (`npm install -g wrangler`)
 
 ### Installation
 
 ```bash
 # 1. Clone and navigate
-cd nanowork-mvp
+cd nanowork-web
 
 # 2. Install dependencies
 npm install
 
-# 3. Configure environment
-cp apps/web/.env.example apps/web/.env
-cp apps/worker/.dev.vars.example apps/worker/.dev.vars
+# 3. Configure backend environment
+cp backend/.env.example backend/.env
 # Edit with your credentials
 
-# 4. Run development
-npm run dev
+# 4. Configure frontend environment
+cp apps/web/.env.example apps/web/.env
+# Edit with your credentials
+
+# 5. Run development
+# Terminal 1 - Backend
+cd backend && npm run dev
+
+# Terminal 2 - Frontend
+cd apps/web && npm run dev
 ```
 
 This starts:
+- **Backend API:** http://localhost:3000
 - **Frontend:** http://localhost:5173 (Vite with HMR)
-- **Worker API:** http://localhost:8787 (proxied through Vite)
 
 Visit http://localhost:5173 to see the app.
 
 ## Development Workflow
 
 ```bash
-# Start both frontend and worker
-npm run dev
+# Backend development
+cd backend
+npm run dev          # Start backend API (port 3000)
+npm run build        # Build backend
+npm start            # Start production backend
 
-# Start individually
-npm run dev:web     # Frontend only (port 5173)
-npm run dev:worker  # Worker only (port 8787)
-
-# Build
-npm run build       # Build web app
-
-# Deploy
-npm run deploy      # Deploy both worker and web
+# Frontend development
+cd apps/web
+npm run dev          # Start frontend dev server (port 5173)
+npm run build        # Build frontend for production
+npm start            # Serve production build
 ```
 
 ## Project Structure
 
 ```
-nanowork-mvp/
+nanowork-web/
 ├── apps/
-│   ├── web/                 # React frontend
-│   │   ├── src/
-│   │   │   ├── lib/
-│   │   │   │   ├── api.ts   # API client
-│   │   │   │   └── supabase.ts
-│   │   │   ├── pages/       # Route pages
-│   │   │   ├── components/  # Reusable components
-│   │   │   └── App.tsx
-│   │   ├── vite.config.ts   # Proxy to :8787 in dev
-│   │   └── package.json
-│   │
-│   └── worker/              # Cloudflare Worker (Hono API)
+│   └── web/                 # React frontend
 │       ├── src/
-│       │   ├── index.ts     # Entry point
-│       │   ├── routes/      # API routes
-│       │   ├── lib/         # Utilities
-│       │   └── middleware/  # Middleware
-│       ├── wrangler.toml
+│       │   ├── lib/
+│       │   │   ├── api.ts   # API client
+│       │   │   └── supabase.ts
+│       │   ├── pages/       # Route pages
+│       │   ├── components/  # Reusable components
+│       │   └── App.tsx
+│       ├── vite.config.ts
+│       ├── render.yaml      # Frontend deployment config
 │       └── package.json
+│
+├── backend/                 # Express/Node API
+│   ├── src/
+│   │   ├── index.ts         # Entry point
+│   │   ├── routes/          # API routes
+│   │   └── lib/             # Utilities
+│   ├── render.yaml          # Backend deployment config
+│   └── package.json
 │
 └── package.json             # Root workspace
 ```
 
 ## Environment Variables
 
-### Worker (`apps/worker/.dev.vars` for local, Cloudflare dashboard for production)
+### Backend (`backend/.env`)
 
 ```bash
-ENVIRONMENT=development
+NODE_ENV=development
+PORT=3000
 
 # Database & Auth
 SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=xxx
+SUPABASE_SERVICE_KEY=xxx
+SUPABASE_ANON_KEY=xxx
 
 # AI
 ANTHROPIC_API_KEY=sk-ant-xxx
@@ -122,80 +131,101 @@ ANTHROPIC_API_KEY=sk-ant-xxx
 # Payments
 STRIPE_SECRET_KEY=sk_test_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
+
+# Other
+INTERNAL_TOKEN=xxx
+FRONTEND_URL=http://localhost:5173
 ```
 
 ### Frontend (`apps/web/.env`)
 
 ```bash
-# API URL (empty in dev = uses Vite proxy)
-VITE_API_URL=
+# API URL (backend URL)
+VITE_API_URL=http://localhost:3000
 
 # Supabase
 VITE_SUPABASE_URL=https://xxx.supabase.co
 VITE_SUPABASE_ANON_KEY=xxx
 
-# Stripe
-VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+# Site
+VITE_SITE_URL=http://localhost:5173
 ```
 
 ## API Documentation
 
 Once running:
-- **Application:** http://localhost:5173
-- **Worker API:** http://localhost:8787
-- **Health Check:** http://localhost:8787/health
+- **Frontend:** http://localhost:5173
+- **Backend API:** http://localhost:3000
+- **Health Check:** http://localhost:3000/health
 
 ## Deployment
 
-### Production Setup
+### Render.com Deployment
 
-1. **Deploy Worker (API):**
-   ```bash
-   cd apps/worker
-   npx wrangler deploy
-   ```
-   - Configure secrets: `wrangler secret put ANTHROPIC_API_KEY`
-   - Set environment variables in Cloudflare dashboard
+This project deploys frontend and backend as separate services on Render.
 
-2. **Deploy Web (Frontend):**
-   ```bash
-   cd apps/web
-   npm run build
-   npx wrangler pages deploy dist
-   ```
+#### 1. Deploy Backend
 
-3. **Configure DNS:**
-   - Worker: `api.nanowork.app`
-   - Pages: `nanowork.ai`
+1. Create a new **Web Service** on Render
+2. Connect your repository
+3. Use these settings:
+   - **Name:** `nanowork-backend`
+   - **Root Directory:** `backend`
+   - **Build Command:** `npm ci && npm run build`
+   - **Start Command:** `npm start`
+   - **Branch:** `main`
+4. Set environment variables in Render dashboard (see backend/.env.example)
+5. Deploy!
 
-Or use the root command:
-```bash
-npm run deploy
-```
+Alternatively, Render can auto-detect `backend/render.yaml` if you point to that directory.
+
+#### 2. Deploy Frontend
+
+1. Create a new **Web Service** on Render
+2. Connect your repository
+3. Use these settings:
+   - **Name:** `nanowork-frontend`
+   - **Root Directory:** `apps/web`
+   - **Build Command:** `npm ci && npm run build`
+   - **Start Command:** `npm start`
+   - **Branch:** `main`
+4. Set environment variables:
+   - `VITE_API_URL` = Your backend URL (e.g., `https://nanowork-backend.onrender.com`)
+   - Other env vars from apps/web/.env.example
+5. Deploy!
+
+Alternatively, Render can auto-detect `apps/web/render.yaml` if you point to that directory.
 
 ## Development vs Production
 
 ### Development
-- Frontend: `localhost:5173` (Vite with HMR)
-- Worker: `localhost:8787` (Wrangler dev)
-- Vite proxies `/api` and `/health` to worker
+- Frontend: `localhost:5173` (Vite dev server)
+- Backend: `localhost:3000` (Express)
+- Frontend configured to call `http://localhost:3000`
 
 ### Production
-- Frontend: Cloudflare Pages (nanowork.ai)
-- Worker: Cloudflare Workers (api.nanowork.app)
-- Set `VITE_API_URL=https://api.nanowork.app` in production
+- Frontend: Render (nanowork-frontend.onrender.com)
+- Backend: Render (nanowork-backend.onrender.com)
+- Frontend configured with `VITE_API_URL=https://nanowork-backend.onrender.com`
 
 ## Troubleshooting
 
 ### Frontend can't reach API
-- Ensure worker is running on port 8787
-- Check Vite proxy config in `apps/web/vite.config.ts`
-- Verify CORS settings in `apps/worker/src/index.ts`
+- Ensure backend is running on port 3000
+- Check `VITE_API_URL` is set correctly in apps/web/.env
+- Verify CORS settings in `backend/src/index.ts`
+- Check that frontend URL is in backend's allowed origins
 
-### Worker errors
-- Check `.dev.vars` file exists and has correct values
+### Backend errors
+- Check `backend/.env` file exists and has correct values
 - Ensure all required environment variables are set
-- Check `wrangler dev` logs for detailed errors
+- Check backend logs for detailed errors
+- Verify Supabase credentials are correct
+
+### CORS issues in production
+- Backend's `FRONTEND_URL` env var must match your frontend URL
+- Frontend's `VITE_API_URL` must match your backend URL
+- Check Render environment variables are set correctly
 
 ## Contributing
 

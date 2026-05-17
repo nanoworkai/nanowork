@@ -1,9 +1,14 @@
 services:
   - type: web
-    name: agent-platform-backend
+    name: nanowork-backend
     runtime: node
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: backend
     buildCommand: npm ci && npm run build
-    startCommand: node dist/index.js
+    startCommand: npm start
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
@@ -24,8 +29,10 @@ services:
       - key: INTERNAL_TOKEN
         sync: false
       - key: FRONTEND_URL
-        sync: false
-      - key: CLOUDFLARE_ACCOUNT_ID
+        value: https://nanowork-frontend.onrender.com
+      - key: CORS_ORIGIN
+        value: https://nanowork-frontend.onrender.com,https://nanowork.app
+      - key: CF_ACCOUNT_ID
         sync: false
       - key: CLOUDFLARE_API_TOKEN
         sync: false
