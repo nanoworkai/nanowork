@@ -44,8 +44,6 @@ The backend must be deployed first so you have the URL for the frontend configur
    STRIPE_WEBHOOK_SECRET=<your-stripe-webhook-secret>
    INTERNAL_TOKEN=<generate-a-random-token>
    FRONTEND_URL=https://nanowork-frontend.onrender.com
-   CF_ACCOUNT_ID=<optional-cloudflare-id>
-   CLOUDFLARE_API_TOKEN=<optional-cloudflare-token>
    ```
 
 5. Click "Create Web Service"

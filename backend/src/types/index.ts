@@ -79,7 +79,7 @@ export interface Deployment {
   business_id: string;
   artifact_type: 'landing_page' | 'generated_app';
   artifact_id: string;
-  platform: 'cloudflare_pages' | 'vercel' | 'netlify';
+  platform: 'render' | 'vercel' | 'netlify';
   deploy_url: string | null;
   status: 'pending' | 'deploying' | 'success' | 'failed';
   error_message: string | null;
@@ -90,7 +90,6 @@ export interface Deployment {
   domain_status?: 'pending_payment' | 'pending_configuration' | 'pending_dns' | 'active' | 'payment_failed' | null;
   domain_verified?: boolean;
   domain_subscription_id?: string | null;
-  cloudflare_project_name?: string | null;
 }
 
 export type NewDeployment = Omit<Deployment, 'id' | 'created_at'>;

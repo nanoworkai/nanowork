@@ -9,7 +9,7 @@ import {
   createDeployment,
 } from '../services/supabase';
 import { generateLandingPage } from '../services/anthropic';
-import { deployToCloudflarePages } from '../services/deploy';
+import { deployLandingPage } from '../services/deploy';
 
 const router = Router();
 
@@ -105,7 +105,7 @@ router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Respo
 
 /**
  * POST /landing-pages/:id/deploy
- * Deploy a landing page to Cloudflare Pages
+ * Deploy a landing page
  */
 router.post('/:id/deploy', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -123,15 +123,15 @@ router.post('/:id/deploy', requireUserAuth, async (req: AuthenticatedRequest, re
       return;
     }
 
-    // Deploy to Cloudflare Pages
-    const deployUrl = await deployToCloudflarePages(landingPage, business);
+    // Deploy landing page
+    const deployUrl = await deployLandingPage(landingPage, business);
 
     // Create deployment record
     const deployment = await createDeployment({
       business_id: business.id,
       artifact_type: 'landing_page',
       artifact_id: landingPage.id,
-      platform: 'cloudflare_pages',
+      platform: 'render',
       deploy_url: deployUrl,
       status: 'success',
       error_message: null,

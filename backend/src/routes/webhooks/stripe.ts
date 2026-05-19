@@ -1,7 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { getStripeInstance } from '../../services/stripe';
 import { getSupabase } from '../../services/supabase';
-import { removeCustomDomain } from '../../services/cloudflare';
 import { addCredits } from '../../services/creditService';
 
 const router = Router();
@@ -96,7 +95,7 @@ async function handlePaymentIntentSucceeded(paymentIntent: any) {
 
 /**
  * Handle subscription.deleted event
- * - Remove custom domain from Cloudflare and reset deployment
+ * - Reset deployment domain fields if custom domain subscription
  * - Reset user plan to free
  */
 async function handleSubscriptionDeleted(subscription: any) {
@@ -133,26 +132,13 @@ async function handleSubscriptionDeleted(subscription: any) {
   // Find deployment by subscription ID (domain subscription)
   const { data: deployment, error: findError } = await supabase
     .from('deployments')
-    .select('id, custom_domain, cloudflare_project_name')
+    .select('id, custom_domain')
     .eq('domain_subscription_id', subscriptionId)
     .single();
 
   if (findError || !deployment) {
     console.log('No deployment found for subscription (may be user subscription)');
     return;
-  }
-
-  const customDomain = deployment.custom_domain;
-  const projectName = deployment.cloudflare_project_name || 'nanowork-app';
-
-  // Remove domain from Cloudflare
-  if (customDomain) {
-    const removeResult = await removeCustomDomain(projectName, customDomain);
-    if (!removeResult.success) {
-      console.error('Failed to remove domain from Cloudflare:', removeResult.error);
-    } else {
-      console.log('Removed domain from Cloudflare:', customDomain);
-    }
   }
 
   // Reset deployment domain fields
