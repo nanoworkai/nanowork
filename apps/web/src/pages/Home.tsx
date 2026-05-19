@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { ArrowRight, Terminal, Building2, Shield } from "lucide-react";
+import { ArrowRight, Terminal, Building2, Shield, Crown, Users } from "lucide-react";
 
 /**
  * BLOOMBERG TERMINAL DESIGN PRINCIPLES:
@@ -230,7 +230,7 @@ function TerminalPrompt() {
             disabled={loading || !value.trim()}
             className="w-full sm:w-auto px-4 sm:px-6 py-2.5 rounded-none bg-white hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed text-black font-mono text-xs font-bold uppercase tracking-wider transition-colors"
           >
-            {loading ? "EXECUTING..." : "EXECUTE"}
+            {loading ? "BUILDING..." : "BUILD MY COMPANY"}
           </button>
         </div>
       </div>
@@ -351,16 +351,49 @@ export default function Home() {
       <main className="max-w-[1800px] mx-auto px-4 sm:px-6">
         {/* Hero Section - Dense, terminal-style */}
         <section className="py-8 sm:py-12 lg:py-16">
+          {/* Exclusive Badge */}
+          <div className="mb-6 flex items-center justify-center sm:justify-start">
+            <div className="inline-flex items-center gap-2 px-4 py-2 border border-amber-400/20 bg-amber-400/5 rounded-none">
+              <Crown className="w-4 h-4 text-amber-400" />
+              <span className="text-xs font-mono text-amber-400 font-bold uppercase tracking-wider">
+                Limited Availability • 10 Spots Per Week
+              </span>
+            </div>
+          </div>
+
           <div className="mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-mono font-bold text-white uppercase tracking-tight mb-3 sm:mb-4">
               Turn Your Idea Into a Company
             </h1>
-            <p className="text-xs sm:text-sm font-mono text-white/70 max-w-3xl leading-relaxed">
+            <p className="text-xs sm:text-sm font-mono text-white/70 max-w-3xl leading-relaxed mb-4">
               Seven AI departments work 24/7 to build your business. Legal, brand, web, marketing, sales, finance, and ops—all autonomous, all running in parallel. One prompt starts everything.
+            </p>
+            <p className="text-xs sm:text-sm font-mono text-amber-400/90 max-w-3xl leading-relaxed font-medium">
+              We onboard founders one at a time with white-glove service. Build something below to see what we can create for you—then schedule your{" "}
+              <a
+                href="https://calendly.com/jordan_plows"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-amber-300 transition-colors"
+              >
+                personal onboarding
+              </a>.
             </p>
           </div>
 
           <TerminalPrompt />
+
+          {/* Social Proof / Urgency */}
+          <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 text-xs font-mono text-white/50">
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              <span>3 spots left this week</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              <span>Next available onboarding: May 20th</span>
+            </div>
+          </div>
         </section>
 
         {/* Department Grid */}
@@ -476,25 +509,31 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CTA - Terminal command style */}
+        {/* CTA - White Glove */}
         <section className="py-8 sm:py-12 lg:py-16">
-          <div className="card-lg rounded-none border border-white/10 p-6 sm:p-8 lg:p-12 text-center">
-            <div className="text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-3 sm:mb-4">
-              Ready to Build
+          <div className="card-lg rounded-none border border-amber-400/20 bg-gradient-to-br from-amber-400/5 to-orange-500/5 p-6 sm:p-8 lg:p-12 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-400/10 border border-amber-400/20 mb-4 sm:mb-6">
+              <Crown className="w-4 h-4 text-amber-400" />
+              <span className="text-xs font-mono text-amber-400 font-bold uppercase tracking-wider">
+                White Glove Onboarding
+              </span>
             </div>
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-mono font-bold text-white uppercase mb-3 sm:mb-4 tracking-tight">
-              Start Building Today
+              Launch With Personal Support
             </h2>
-            <p className="text-xs sm:text-sm font-mono text-white/60 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
-              From zero to revenue in days. From revenue to scale with agents that never stop working.
+            <p className="text-xs sm:text-sm font-mono text-white/70 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
+              $497 one-time setup includes your complete company infrastructure, 1-on-1 kickoff call, and 30 days of priority support. Limited to 10 new companies per week to ensure you get our full attention.
             </p>
             <Link
               to="/login"
               className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
             >
-              Get Started
+              Reserve Your Spot
               <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </Link>
+            <p className="text-xs font-mono text-amber-400/80 mt-4 font-medium">
+              Next available: May 20, 2026 • 3 spots remaining
+            </p>
           </div>
         </section>
       </main>

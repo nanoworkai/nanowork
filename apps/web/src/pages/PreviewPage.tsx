@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Lock, Sparkles, CreditCard, ArrowRight } from "lucide-react";
+import { Lock, Sparkles, Crown, ArrowRight, Terminal } from "lucide-react";
+import WhiteGlovePayment from "../components/WhiteGlovePayment";
 
 interface BuildData {
   id: string;
@@ -23,19 +24,19 @@ export default function PreviewPage() {
   const { buildId } = useParams<{ buildId: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const [searchParams] = useSearchParams();
 
   const [build, setBuild] = useState<BuildData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [unlocking, setUnlocking] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [userCredits, setUserCredits] = useState<number>(0);
+
+  // Check if user just unlocked via Stripe
+  const justUnlocked = searchParams.get("unlocked") === "true";
 
   useEffect(() => {
     loadBuild();
-    if (isAuthenticated) {
-      loadCredits();
-    }
-  }, [buildId, isAuthenticated]);
+  }, [buildId]);
 
   async function loadBuild() {
     try {
@@ -56,49 +57,15 @@ export default function PreviewPage() {
     }
   }
 
-  async function loadCredits() {
-    // TODO: Implement credits fetching from API
-    setUserCredits(250); // Mock for now
-  }
-
-  async function handleUnlock() {
+  function handleUnlock() {
     if (!isAuthenticated) {
       // Redirect to signup with return URL
       navigate(`/login?redirect=/preview/${buildId}`);
       return;
     }
 
-    if (userCredits < (build?.credits_cost || 0)) {
-      // Redirect to buy credits
-      navigate(`/dashboard/plan?from=preview&buildId=${buildId}`);
-      return;
-    }
-
-    setUnlocking(true);
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL || ""}/api/build/${buildId}/unlock`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.detail || "Failed to unlock build");
-      }
-
-      const data = await response.json();
-
-      // Redirect to full build
-      navigate(data.full_url);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to unlock");
-    } finally {
-      setUnlocking(false);
-    }
+    // Show payment modal
+    setShowPayment(true);
   }
 
   if (loading) {
@@ -128,44 +95,66 @@ export default function PreviewPage() {
     );
   }
 
-  const isUnlocked = build.status === "unlocked";
+  const isUnlocked = build.status === "unlocked" || justUnlocked;
   const depts = build.build_data?.departments || {};
   const deptNames = Object.keys(depts);
+
+  // Show payment modal
+  if (showPayment) {
+    return (
+      <WhiteGlovePayment
+        buildId={buildId!}
+        companyName={build.company_name}
+        onSuccess={() => {
+          setShowPayment(false);
+          navigate(`/preview/${buildId}?unlocked=true`);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
       <div className="border-b border-white/10 bg-surface-1">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-mono font-bold">{build.company_name}</h1>
-              <p className="text-sm font-mono text-white/60 mt-1">{build.tagline}</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-none bg-white flex items-center justify-center flex-shrink-0">
+                <Terminal className="w-5 h-5 text-black" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-mono font-bold">{build.company_name}</h1>
+                <p className="text-xs sm:text-sm font-mono text-white/60 mt-1">{build.tagline}</p>
+              </div>
             </div>
 
             {!isUnlocked && (
-              <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <div className="text-xs font-mono text-white/40 uppercase">Preview Mode</div>
-                  <div className="text-lg font-mono font-bold text-amber-400">
-                    {build.credits_cost} Credits to Unlock
+              <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                <div className="text-left sm:text-right flex-1 sm:flex-initial">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Crown className="w-4 h-4 text-amber-400" />
+                    <span className="text-xs font-mono text-amber-400 uppercase font-bold">White Glove</span>
+                  </div>
+                  <div className="text-lg font-mono font-bold text-white">
+                    $497 One-Time
                   </div>
                 </div>
 
                 <button
                   onClick={handleUnlock}
-                  disabled={unlocking}
-                  className="px-6 py-3 bg-white text-black font-mono text-sm font-bold rounded-none hover:bg-white/90 disabled:opacity-50 flex items-center gap-2"
+                  className="px-4 sm:px-6 py-3 bg-white text-black font-mono text-xs sm:text-sm font-bold rounded-none hover:bg-white/90 transition-colors flex items-center gap-2 whitespace-nowrap"
                 >
-                  {unlocking ? (
-                    "UNLOCKING..."
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4" />
-                      UNLOCK FULL BUILD
-                    </>
-                  )}
+                  <Lock className="w-4 h-4" />
+                  GET STARTED
                 </button>
+              </div>
+            )}
+
+            {isUnlocked && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-400/10 border border-green-400/20 rounded-none">
+                <Sparkles className="w-4 h-4 text-green-400" />
+                <span className="text-xs font-mono text-green-400 font-bold uppercase">Unlocked</span>
               </div>
             )}
           </div>
@@ -173,65 +162,100 @@ export default function PreviewPage() {
       </div>
 
       {/* Preview Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {!isUnlocked && (
-          <div className="mb-8 p-6 border border-amber-400/20 bg-amber-400/5 rounded-none">
-            <div className="flex items-start gap-4">
-              <Sparkles className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="mb-8 p-6 sm:p-8 border border-amber-400/20 bg-gradient-to-br from-amber-400/10 to-orange-500/10 rounded-none">
+            <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
+                <Crown className="w-6 h-6 text-black" />
+              </div>
               <div className="flex-1">
-                <h3 className="font-mono font-bold text-amber-400 mb-2">
-                  🎉 YOUR COMPANY IS READY
+                <h3 className="text-lg sm:text-xl font-mono font-bold text-white mb-2">
+                  Your Company Is Ready to Launch
                 </h3>
-                <p className="text-sm font-mono text-white/80 mb-4">
-                  You're viewing a limited preview. Unlock the full build to get:
+                <p className="text-sm font-mono text-white/80 mb-6 leading-relaxed">
+                  We've built your complete company infrastructure—7 AI departments working in parallel. Join our white-glove onboarding program to unlock everything and get personalized support.
                 </p>
-                <ul className="space-y-2 text-sm font-mono text-white/60">
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    Complete website with all pages and sections
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    Downloadable assets (logos, PDFs, templates)
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    Full department outputs and action plans
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    Editable company dashboard
-                  </li>
-                </ul>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-amber-400" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-mono font-bold text-white">Production Website</div>
+                      <div className="text-xs font-mono text-white/60 mt-0.5">
+                        Deployed and ready to go live
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-amber-400" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-mono font-bold text-white">1-on-1 Kickoff Call</div>
+                      <div className="text-xs font-mono text-white/60 mt-0.5">
+                        Personalized onboarding session
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-amber-400" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-mono font-bold text-white">All 7 Departments</div>
+                      <div className="text-xs font-mono text-white/60 mt-0.5">
+                        Legal, brand, web, marketing, sales, finance, ops
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="w-2 h-2 rounded-full bg-amber-400" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-mono font-bold text-white">Priority Support</div>
+                      <div className="text-xs font-mono text-white/60 mt-0.5">
+                        Direct access for 30 days
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {!isAuthenticated && (
-                  <div className="mt-4 pt-4 border-t border-white/10">
-                    <p className="text-xs font-mono text-white/40 mb-3">
-                      Don't have an account? Sign up to get 500 free credits.
+                  <div className="pt-6 border-t border-white/10">
+                    <p className="text-xs font-mono text-white/60 mb-3">
+                      Limited to 10 new companies per week. Your spot is reserved for 24 hours.
                     </p>
                     <button
                       onClick={() => navigate(`/login?redirect=/preview/${buildId}`)}
-                      className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-2"
+                      className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-2 font-bold"
                     >
-                      CREATE FREE ACCOUNT <ArrowRight className="w-3 h-3" />
+                      CREATE ACCOUNT & CLAIM YOUR SPOT <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
 
-                {isAuthenticated && userCredits < build.credits_cost && (
-                  <div className="mt-4 pt-4 border-t border-white/10">
-                    <p className="text-xs font-mono text-white/40 mb-3">
-                      You have {userCredits} credits. Need {build.credits_cost - userCredits} more.
-                    </p>
-                    <button
-                      onClick={() => navigate(`/dashboard/plan?from=preview&buildId=${buildId}`)}
-                      className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-2"
-                    >
-                      <CreditCard className="w-3 h-3" />
-                      BUY CREDITS
-                    </button>
-                  </div>
-                )}
+        {isUnlocked && (
+          <div className="mb-8 p-6 border border-green-400/20 bg-green-400/5 rounded-none">
+            <div className="flex items-center gap-3">
+              <Sparkles className="w-5 h-5 text-green-400" />
+              <div>
+                <h3 className="font-mono font-bold text-green-400 mb-1">
+                  Welcome to Nanowork!
+                </h3>
+                <p className="text-sm font-mono text-white/80">
+                  Check your email for your onboarding schedule. We'll be in touch within 24 hours to set up your kickoff call.
+                </p>
               </div>
             </div>
           </div>
@@ -293,15 +317,18 @@ export default function PreviewPage() {
           <div className="mt-12 text-center">
             <button
               onClick={handleUnlock}
-              disabled={unlocking}
-              className="px-8 py-4 bg-white text-black font-mono text-base font-bold rounded-none hover:bg-white/90 disabled:opacity-50 inline-flex items-center gap-3"
+              className="px-8 py-4 bg-white text-black font-mono text-base font-bold rounded-none hover:bg-white/90 transition-colors inline-flex items-center gap-3"
             >
-              <Lock className="w-5 h-5" />
-              {unlocking ? "UNLOCKING..." : `UNLOCK FOR ${build.credits_cost} CREDITS`}
+              <Crown className="w-5 h-5" />
+              GET WHITE GLOVE ONBOARDING
             </button>
 
-            <p className="text-xs font-mono text-white/40 mt-4">
-              One-time unlock • Instant access • Full company dashboard
+            <p className="text-xs font-mono text-white/60 mt-4 max-w-md mx-auto leading-relaxed">
+              $497 one-time setup • Then $99/month • Includes 1-on-1 kickoff call and 30 days priority support
+            </p>
+
+            <p className="text-xs font-mono text-amber-400 mt-3 font-bold">
+              Limited to 10 new companies per week
             </p>
           </div>
         )}
