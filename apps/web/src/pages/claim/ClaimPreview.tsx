@@ -344,9 +344,7 @@ export default function ClaimPreview() {
             to="/"
             className="flex items-center gap-2 text-content-primary hover:opacity-70 transition-opacity"
           >
-            <div className="w-6 h-6 rounded-lg bg-accent-primary flex items-center justify-center">
-              <Terminal className="w-3.5 h-3.5 text-white" />
-            </div>
+            <Terminal className="w-6 h-6 text-accent-primary stroke-[2.5]" />
             <span className="text-sm font-bold uppercase tracking-wider">Nanowork</span>
           </Link>
 

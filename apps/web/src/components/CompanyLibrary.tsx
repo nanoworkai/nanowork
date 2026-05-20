@@ -321,7 +321,7 @@ function CompanyCard({ company, onClaim }: CompanyCardProps) {
       <div className="p-4">
         <button
           onClick={() => onClaim(company)}
-          className="w-full px-4 py-2.5 bg-accent-primary hover:bg-accent-primary/90 text-white font-mono text-xs uppercase tracking-wider transition-colors border border-accent-primary"
+          className="w-full px-4 py-2.5 bg-content-primary hover:bg-content-primary/90 text-white font-mono text-xs uppercase tracking-wider transition-colors border border-content-primary"
         >
           Claim Company for ${company.price}
         </button>
@@ -439,7 +439,7 @@ export default function CompanyLibrary() {
               onClick={() => setSelectedCategory(category)}
               className={`px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition-colors border ${
                 selectedCategory === category
-                  ? "bg-content-primary text-background-DEFAULT border-content-primary"
+                  ? "bg-content-primary text-white border-content-primary"
                   : "bg-background-elevated text-content-secondary border-border-DEFAULT hover:border-content-tertiary"
               }`}
             >
