@@ -103,7 +103,7 @@ app.use('/documents', documentsRouter);
 app.use('/domains', domainsRouter);
 app.use('/billing', billingRouter);
 app.use('/wallet', walletRouter);
-app.use('/builds', buildsRouter);
+app.use('/build', buildsRouter);
 
 // 404 handler
 app.use((req, res) => {

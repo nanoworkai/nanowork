@@ -171,10 +171,10 @@ router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Res
 });
 
 /**
- * GET /build/stream
+ * GET /stream
  * Server-Sent Events endpoint for streaming build generation
  */
-router.get('/build/stream', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/stream', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { buildId, prompt } = req.query;
 
