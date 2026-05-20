@@ -63,8 +63,8 @@ export default function WhiteGlovePayment({ buildId, companyName, onSuccess }: W
       <div className="max-w-2xl w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 mb-4">
-            <Crown className="w-8 h-8 text-black" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-none bg-white mb-4">
+            <Sparkles className="w-8 h-8 text-black" />
           </div>
           <h1 className="text-3xl font-mono font-bold text-white mb-2">
             Your Company Is Ready
@@ -76,22 +76,22 @@ export default function WhiteGlovePayment({ buildId, companyName, onSuccess }: W
 
         {/* Main Card */}
         <div className="border border-white/10 bg-surface-1 rounded-none overflow-hidden">
-          {/* Premium Badge */}
-          <div className="bg-gradient-to-r from-amber-400/10 to-orange-500/10 border-b border-amber-400/20 px-6 py-3">
+          {/* Header Badge */}
+          <div className="bg-surface-2 border-b border-white/10 px-6 py-3">
             <div className="flex items-center justify-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">
-                White Glove Onboarding
+              <Sparkles className="w-4 h-4 text-white/60" />
+              <span className="text-xs font-mono font-bold text-white/80 uppercase tracking-wider">
+                Complete Setup Package
               </span>
             </div>
           </div>
 
           {/* Content */}
           <div className="p-8">
-            {/* Exclusive Message */}
+            {/* What's Included */}
             <div className="mb-8 pb-8 border-b border-white/10">
               <p className="text-sm font-mono text-white/80 leading-relaxed mb-4">
-                We're onboarding founders one at a time to ensure you get the full attention and support you deserve. Your dedicated onboarding specialist will help you:
+                Get everything you need to launch your company with personalized support. Here's what's included:
               </p>
 
               <ul className="space-y-3">
@@ -203,7 +203,7 @@ export default function WhiteGlovePayment({ buildId, companyName, onSuccess }: W
         {/* Footer Note */}
         <div className="mt-8 text-center">
           <p className="text-xs font-mono text-white/40 leading-relaxed max-w-lg mx-auto">
-            Limited to <span className="text-amber-400 font-bold">10 new companies per week</span> to maintain quality. Your spot is reserved for the next 24 hours.
+            Questions? Reach out anytime—we're here to help you get started.
           </p>
         </div>
       </div>

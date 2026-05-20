@@ -130,25 +130,13 @@ export default function PreviewPage() {
             </div>
 
             {!isUnlocked && (
-              <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                <div className="text-left sm:text-right flex-1 sm:flex-initial">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Crown className="w-4 h-4 text-amber-400" />
-                    <span className="text-xs font-mono text-amber-400 uppercase font-bold">White Glove</span>
-                  </div>
-                  <div className="text-lg font-mono font-bold text-white">
-                    $497 One-Time
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleUnlock}
-                  className="px-4 sm:px-6 py-3 bg-white text-black font-mono text-xs sm:text-sm font-bold rounded-none hover:bg-white/90 transition-colors flex items-center gap-2 whitespace-nowrap"
-                >
-                  <Lock className="w-4 h-4" />
-                  GET STARTED
-                </button>
-              </div>
+              <button
+                onClick={handleUnlock}
+                className="px-4 sm:px-6 py-3 bg-white text-black font-mono text-xs sm:text-sm font-bold rounded-none hover:bg-white/90 transition-colors flex items-center gap-2 whitespace-nowrap"
+              >
+                <Lock className="w-4 h-4" />
+                UNLOCK FULL BUILD
+              </button>
             )}
 
             {isUnlocked && (
@@ -164,24 +152,20 @@ export default function PreviewPage() {
       {/* Preview Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {!isUnlocked && (
-          <div className="mb-8 p-6 sm:p-8 border border-amber-400/20 bg-gradient-to-br from-amber-400/10 to-orange-500/10 rounded-none">
+          <div className="mb-8 p-6 sm:p-8 border border-white/10 bg-surface-1 rounded-none">
             <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
-                <Crown className="w-6 h-6 text-black" />
-              </div>
+              <Sparkles className="w-8 h-8 text-white/60 flex-shrink-0" />
               <div className="flex-1">
                 <h3 className="text-lg sm:text-xl font-mono font-bold text-white mb-2">
                   Your Company Is Ready to Launch
                 </h3>
                 <p className="text-sm font-mono text-white/80 mb-6 leading-relaxed">
-                  We've built your complete company infrastructure—7 AI departments working in parallel. Join our white-glove onboarding program to unlock everything and get personalized support.
+                  We've built your complete company infrastructure—7 AI departments working in parallel. Unlock everything to get full access plus personalized onboarding support.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                   <div className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <div className="w-2 h-2 rounded-full bg-amber-400" />
-                    </div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/60 mt-2 flex-shrink-0" />
                     <div>
                       <div className="text-sm font-mono font-bold text-white">Production Website</div>
                       <div className="text-xs font-mono text-white/60 mt-0.5">
@@ -191,9 +175,7 @@ export default function PreviewPage() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <div className="w-2 h-2 rounded-full bg-amber-400" />
-                    </div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/60 mt-2 flex-shrink-0" />
                     <div>
                       <div className="text-sm font-mono font-bold text-white">1-on-1 Kickoff Call</div>
                       <div className="text-xs font-mono text-white/60 mt-0.5">
@@ -203,9 +185,7 @@ export default function PreviewPage() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <div className="w-2 h-2 rounded-full bg-amber-400" />
-                    </div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/60 mt-2 flex-shrink-0" />
                     <div>
                       <div className="text-sm font-mono font-bold text-white">All 7 Departments</div>
                       <div className="text-xs font-mono text-white/60 mt-0.5">
@@ -215,9 +195,7 @@ export default function PreviewPage() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-amber-400/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <div className="w-2 h-2 rounded-full bg-amber-400" />
-                    </div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/60 mt-2 flex-shrink-0" />
                     <div>
                       <div className="text-sm font-mono font-bold text-white">Priority Support</div>
                       <div className="text-xs font-mono text-white/60 mt-0.5">
@@ -230,13 +208,13 @@ export default function PreviewPage() {
                 {!isAuthenticated && (
                   <div className="pt-6 border-t border-white/10">
                     <p className="text-xs font-mono text-white/60 mb-3">
-                      Limited to 10 new companies per week. Your spot is reserved for 24 hours.
+                      Create an account to unlock your build and get started.
                     </p>
                     <button
                       onClick={() => navigate(`/login?redirect=/preview/${buildId}`)}
-                      className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-2 font-bold"
+                      className="text-xs font-mono text-white hover:text-white/80 flex items-center gap-2 font-bold"
                     >
-                      CREATE ACCOUNT & CLAIM YOUR SPOT <ArrowRight className="w-3 h-3" />
+                      CREATE ACCOUNT <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
                 )}
@@ -319,16 +297,12 @@ export default function PreviewPage() {
               onClick={handleUnlock}
               className="px-8 py-4 bg-white text-black font-mono text-base font-bold rounded-none hover:bg-white/90 transition-colors inline-flex items-center gap-3"
             >
-              <Crown className="w-5 h-5" />
-              GET WHITE GLOVE ONBOARDING
+              <Lock className="w-5 h-5" />
+              UNLOCK FULL BUILD
             </button>
 
             <p className="text-xs font-mono text-white/60 mt-4 max-w-md mx-auto leading-relaxed">
               $497 one-time setup • Then $99/month • Includes 1-on-1 kickoff call and 30 days priority support
-            </p>
-
-            <p className="text-xs font-mono text-amber-400 mt-3 font-bold">
-              Limited to 10 new companies per week
             </p>
           </div>
         )}
