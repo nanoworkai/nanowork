@@ -1,5 +1,5 @@
 /* =========================================================================
-   Dashboard — Vercel-style authenticated product UI
+   Dashboard — Vercel-style authenticated product UI (Light Theme)
    ========================================================================= */
 
 /* Login page -------------------------------------------------------------- */
@@ -193,7 +193,7 @@
   }
   .dash-sidebar.is-open {
     transform: translateX(0);
-    box-shadow: 20px 0 60px -20px rgba(0, 0, 0, 0.5);
+    box-shadow: 20px 0 60px -20px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -201,7 +201,7 @@
   position: fixed;
   inset: 0;
   z-index: 35;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(4px);
 }
 
@@ -460,9 +460,9 @@
 }
 
 .dash-status--active {
-  color: #22c55e;
+  color: #16a34a;
   border-color: rgba(34, 197, 94, 0.3);
-  background: rgba(34, 197, 94, 0.08);
+  background: rgba(34, 197, 94, 0.1);
 }
 
 .dash-status--active .dash-status__dot {
@@ -481,9 +481,9 @@
 }
 
 .dash-status--error {
-  color: #ef4444;
+  color: #dc2626;
   border-color: rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.08);
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .dash-status--error .dash-status__dot {
@@ -687,11 +687,11 @@
 }
 
 .dash-chart__segment--compute {
-  background: #9fd3a5;
+  background: #4ade80;
 }
 
 .dash-chart__segment--storage {
-  background: #8cb4ff;
+  background: #60a5fa;
 }
 
 .dash-chart__tooltip {
@@ -956,7 +956,7 @@
 }
 
 .dash-table__action--danger:hover {
-  background: rgba(239, 68, 68, 0.08);
+  background: rgba(239, 68, 68, 0.1);
   border-color: rgba(239, 68, 68, 0.3);
   color: #ef4444;
 }
@@ -1275,7 +1275,7 @@
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(8px);
   animation: phone-modal-fade 0.15s ease-out;
 }

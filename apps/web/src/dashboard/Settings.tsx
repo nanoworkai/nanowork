@@ -19,10 +19,10 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`p-6 rounded-2xl border ${danger ? "border-red-500/20 bg-red-500/5" : "border-white/5 bg-surface-1"}`}>
+    <div className={`p-6 rounded-xl border ${danger ? "border-red-200 bg-red-50" : "border-border-DEFAULT bg-white"}`}>
       <div className="mb-4">
-        <h2 className={`text-base font-semibold ${danger ? "text-red-400" : "text-white"}`}>{title}</h2>
-        <p className="text-sm text-zinc-500 mt-0.5">{desc}</p>
+        <h2 className={`text-base font-semibold ${danger ? "text-red-600" : "text-text-primary"}`}>{title}</h2>
+        <p className="text-sm text-text-secondary mt-0.5">{desc}</p>
       </div>
       {children}
     </div>
@@ -34,10 +34,10 @@ function SaveButton({ saved, loading, label }: { saved: boolean; loading?: boole
     <button
       type="submit"
       disabled={loading}
-      className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+      className={`px-4 py-2 rounded-md text-sm font-semibold transition-colors ${
         saved
-          ? "bg-green-500/15 text-green-400 border border-green-500/20"
-          : "bg-white hover:bg-white text-white"
+          ? "bg-green-50 text-green-600 border border-green-200"
+          : "bg-accent-primary hover:bg-accent-hover text-white"
       } disabled:opacity-50`}
     >
       {loading ? "Saving…" : saved ? "✓ Saved" : (label ?? "Save")}
@@ -62,13 +62,13 @@ function FieldInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-zinc-400 mb-1.5">{label}</label>
+      <label className="block text-xs font-medium text-text-secondary mb-1.5">{label}</label>
       <input
         type={type}
-        className={`w-full px-3 py-2 rounded-xl text-sm border outline-none transition-colors ${
+        className={`w-full px-3 py-2 text-sm border outline-none transition-colors ${
           readOnly
-            ? "bg-surface-3 border-white/5 text-zinc-500 cursor-default font-mono"
-            : "bg-surface-2 border-white/10 focus:border-white/20/60 text-zinc-100 placeholder-zinc-600"
+            ? "bg-background-subtle border-border-DEFAULT text-text-tertiary cursor-default font-mono rounded-md"
+            : "bg-background-subtle border-border-DEFAULT rounded-md focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 text-text-primary placeholder-text-tertiary"
         }`}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
@@ -135,17 +135,17 @@ function BillingSection() {
     >
       <div className="space-y-4">
         {error && (
-          <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-600 text-sm">
             {error}
           </div>
         )}
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-zinc-300 font-medium capitalize mb-1">
+            <p className="text-sm text-text-primary font-medium capitalize mb-1">
               {profile?.plan ?? "free"} plan
             </p>
-            <p className="text-xs text-zinc-600">
+            <p className="text-xs text-text-tertiary">
               {profile?.subscriptionStatus
                 ? `Status: ${profile.subscriptionStatus}`
                 : profile?.stripeCustomerId
@@ -156,10 +156,10 @@ function BillingSection() {
           <button
             onClick={openPortal}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm font-medium text-zinc-300 hover:text-white transition-all disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 rounded-md bg-background-subtle hover:bg-background-DEFAULT border border-border-DEFAULT text-sm font-medium text-text-secondary hover:text-text-primary transition-all disabled:opacity-50"
           >
             {loading && (
-              <div className="w-3.5 h-3.5 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
+              <div className="w-3.5 h-3.5 border-2 border-border-DEFAULT border-t-accent-primary rounded-full animate-spin" />
             )}
             {loading ? "Opening…" : "Manage billing"}
             {!loading && (
@@ -173,21 +173,21 @@ function BillingSection() {
         </div>
 
         {/* Features List */}
-        <div className="rounded-xl bg-surface-2 border border-white/5 p-4">
-          <p className="text-xs font-medium text-zinc-400 mb-3">In the billing portal you can:</p>
+        <div className="rounded-xl bg-background-subtle border border-border-DEFAULT p-4">
+          <p className="text-xs font-medium text-text-secondary mb-3">In the billing portal you can:</p>
           <div className="space-y-2">
-            <div className="flex items-start gap-2 text-xs text-zinc-500">
-              <CreditCard className="w-3.5 h-3.5 text-zinc-600 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-2 text-xs text-text-secondary">
+              <CreditCard className="w-3.5 h-3.5 text-text-tertiary mt-0.5 flex-shrink-0" />
               <span>Update your payment method</span>
             </div>
-            <div className="flex items-start gap-2 text-xs text-zinc-500">
-              <svg className="w-3.5 h-3.5 text-zinc-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <div className="flex items-start gap-2 text-xs text-text-secondary">
+              <svg className="w-3.5 h-3.5 text-text-tertiary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               <span>View and download invoices</span>
             </div>
-            <div className="flex items-start gap-2 text-xs text-zinc-500">
-              <svg className="w-3.5 h-3.5 text-zinc-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <div className="flex items-start gap-2 text-xs text-text-secondary">
+              <svg className="w-3.5 h-3.5 text-text-tertiary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
               <span>Change or cancel your subscription</span>
@@ -284,23 +284,23 @@ function DeleteSection() {
       {!show ? (
         <button
           onClick={() => setShow(true)}
-          className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-sm font-semibold transition-colors"
+          className="px-4 py-2 rounded-md bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 text-sm font-semibold transition-colors"
         >
           Delete account
         </button>
       ) : (
         <div className="flex flex-col gap-3">
           {error && (
-            <div className="px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            <div className="px-3 py-2 rounded-md bg-red-50 border border-red-200 text-red-600 text-sm">
               {error}
             </div>
           )}
-          <p className="text-sm text-zinc-400">
-            Type <span className="font-mono text-red-400">"{phrase}"</span> to confirm:
+          <p className="text-sm text-text-secondary">
+            Type <span className="font-mono text-red-600">"{phrase}"</span> to confirm:
           </p>
           <input
             type="text"
-            className="w-full px-3 py-2 rounded-xl bg-surface-2 border border-red-500/30 focus:border-red-500/60 text-sm text-zinc-100 outline-none transition-colors"
+            className="w-full px-3 py-2 bg-background-subtle border border-red-300 rounded-md focus:border-red-500 focus:ring-2 focus:ring-red-500/20 text-sm text-text-primary outline-none transition-colors"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder={phrase}
@@ -311,7 +311,7 @@ function DeleteSection() {
             <button
               onClick={handleDelete}
               disabled={confirm !== phrase || deleting}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
             >
               {deleting && (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -321,7 +321,7 @@ function DeleteSection() {
             <button
               onClick={() => { setShow(false); setConfirm(""); setError(null); }}
               disabled={deleting}
-              className="px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-zinc-400 hover:text-zinc-200 text-sm font-medium transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-md bg-background-subtle hover:bg-background-DEFAULT border border-border-DEFAULT text-text-secondary hover:text-text-primary text-sm font-medium transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
@@ -404,22 +404,22 @@ function AIEmailSection() {
       <div className="space-y-4">
         {/* Email Display */}
         <div>
-          <label className="block text-xs font-medium text-zinc-400 mb-1.5">Agent Email Address</label>
+          <label className="block text-xs font-medium text-text-secondary mb-1.5">Agent Email Address</label>
           <div className="flex items-center gap-2">
-            <div className="flex-1 px-3 py-2 rounded-xl bg-surface-2 border border-white/10 flex items-center justify-between group">
+            <div className="flex-1 px-3 py-2 rounded-md bg-background-subtle border border-border-DEFAULT flex items-center justify-between group">
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <Mail className="w-4 h-4 text-zinc-500 flex-shrink-0" />
-                <span className="text-sm font-mono text-zinc-200 truncate">{profile.aiEmail}</span>
+                <Mail className="w-4 h-4 text-text-tertiary flex-shrink-0" />
+                <span className="text-sm font-mono text-text-primary truncate">{profile.aiEmail}</span>
               </div>
               <button
                 onClick={copyToClipboard}
-                className="p-1.5 rounded-lg hover:bg-white/5 transition-colors flex-shrink-0"
+                className="p-1.5 rounded-md hover:bg-background-DEFAULT transition-colors flex-shrink-0"
                 title="Copy to clipboard"
               >
                 {copied ? (
-                  <Check className="w-4 h-4 text-green-400" />
+                  <Check className="w-4 h-4 text-green-600" />
                 ) : (
-                  <Copy className="w-4 h-4 text-zinc-400 group-hover:text-zinc-200" />
+                  <Copy className="w-4 h-4 text-text-tertiary group-hover:text-text-primary" />
                 )}
               </button>
             </div>
@@ -427,9 +427,9 @@ function AIEmailSection() {
         </div>
 
         {/* Explanation */}
-        <div className="px-4 py-3 rounded-xl bg-surface-2 border border-white/5">
-          <p className="text-xs text-zinc-400 leading-relaxed">
-            <strong className="text-zinc-300">How it works:</strong> Contacts can email your AI agent directly at this address.
+        <div className="px-4 py-3 rounded-xl bg-background-subtle border border-border-DEFAULT">
+          <p className="text-xs text-text-secondary leading-relaxed">
+            <strong className="text-text-primary">How it works:</strong> Contacts can email your AI agent directly at this address.
             Your agent will read, understand, and respond to messages automatically, handling inquiries 24/7.
           </p>
         </div>
@@ -437,17 +437,17 @@ function AIEmailSection() {
         {/* Inbox Toggle */}
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-2">
-            <Inbox className="w-4 h-4 text-zinc-400" />
-            <span className="text-sm font-medium text-zinc-300">Recent Messages</span>
+            <Inbox className="w-4 h-4 text-text-tertiary" />
+            <span className="text-sm font-medium text-text-primary">Recent Messages</span>
             {emails.length > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-white/10 text-xs font-semibold text-zinc-400">
+              <span className="px-2 py-0.5 rounded-full bg-background-DEFAULT text-xs font-semibold text-text-tertiary">
                 {emails.length}
               </span>
             )}
           </div>
           <button
             onClick={() => setShowInbox(!showInbox)}
-            className="text-xs font-semibold text-zinc-400 hover:text-white transition-colors"
+            className="text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors"
           >
             {showInbox ? 'Hide' : 'Show'}
           </button>
@@ -455,49 +455,49 @@ function AIEmailSection() {
 
         {/* Inbox View */}
         {showInbox && (
-          <div className="rounded-xl bg-surface-2 border border-white/5 overflow-hidden">
+          <div className="rounded-xl bg-background-subtle border border-border-DEFAULT overflow-hidden">
             {loading ? (
               <div className="p-6 text-center">
-                <div className="w-6 h-6 border-2 border-zinc-600 border-t-white rounded-full animate-spin mx-auto mb-2" />
-                <p className="text-xs text-zinc-500">Loading messages...</p>
+                <div className="w-6 h-6 border-2 border-border-DEFAULT border-t-accent-primary rounded-full animate-spin mx-auto mb-2" />
+                <p className="text-xs text-text-secondary">Loading messages...</p>
               </div>
             ) : emails.length === 0 ? (
               <div className="p-6 text-center">
-                <Mail className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
-                <p className="text-sm text-zinc-500 mb-1">No messages yet</p>
-                <p className="text-xs text-zinc-600">
+                <Mail className="w-8 h-8 text-text-tertiary mx-auto mb-2" />
+                <p className="text-sm text-text-secondary mb-1">No messages yet</p>
+                <p className="text-xs text-text-tertiary">
                   When contacts email your agent, messages will appear here
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-border-DEFAULT">
                 {emails.map((email) => (
-                  <div key={email.id} className="p-4 hover:bg-white/3 transition-colors">
+                  <div key={email.id} className="p-4 hover:bg-background-DEFAULT transition-colors">
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="text-sm font-semibold text-zinc-200 truncate">
+                          <p className="text-sm font-semibold text-text-primary truncate">
                             {email.from_name || email.from_address}
                           </p>
                           {email.status === 'processed' && (
-                            <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">
+                            <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-green-50 text-green-600 border border-green-200">
                               ✓ Replied
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-zinc-500 font-mono truncate">
+                        <p className="text-xs text-text-tertiary font-mono truncate">
                           {email.from_address}
                         </p>
                       </div>
-                      <span className="text-xs text-zinc-600 whitespace-nowrap">
+                      <span className="text-xs text-text-tertiary whitespace-nowrap">
                         {formatDate(email.received_at)}
                       </span>
                     </div>
-                    <p className="text-sm text-zinc-300 font-medium mb-1 truncate">
+                    <p className="text-sm text-text-primary font-medium mb-1 truncate">
                       {email.subject || '(No subject)'}
                     </p>
                     {email.body_text && (
-                      <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
                         {email.body_text}
                       </p>
                     )}
@@ -568,36 +568,36 @@ function PlanSection() {
           return (
             <div
               key={plan.tier}
-              className={`relative p-5 rounded-2xl border flex flex-col transition-all ${
+              className={`relative p-5 rounded-xl border flex flex-col transition-all ${
                 isCurrent
-                  ? "border-white/20 bg-white/10"
+                  ? "border-accent-primary bg-accent-primary/5"
                   : isRecommended
-                  ? "border-white/15 bg-surface-1"
-                  : "border-white/5 bg-surface-1"
+                  ? "border-border-DEFAULT bg-white shadow-sm"
+                  : "border-border-DEFAULT bg-white"
               }`}
             >
               {isRecommended && !isCurrent && (
-                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-white text-black px-2.5 py-0.5 rounded-full">
+                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-accent-primary text-white px-2.5 py-0.5 rounded-full">
                   Popular
                 </span>
               )}
               {isCurrent && (
-                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-green-500 text-white px-2.5 py-0.5 rounded-full">
+                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-green-600 text-white px-2.5 py-0.5 rounded-full">
                   Current
                 </span>
               )}
 
-              <h3 className="text-base font-bold text-white">{plan.name}</h3>
+              <h3 className="text-base font-bold text-text-primary">{plan.name}</h3>
               <div className="flex items-baseline gap-1 mt-1 mb-2">
-                <span className="text-2xl font-bold text-white">${plan.price}</span>
-                <span className="text-xs text-zinc-500">/mo</span>
+                <span className="text-2xl font-bold text-text-primary">${plan.price}</span>
+                <span className="text-xs text-text-tertiary">/mo</span>
               </div>
-              <p className="text-xs text-zinc-500 mb-4">{plan.desc}</p>
+              <p className="text-xs text-text-secondary mb-4">{plan.desc}</p>
 
               <ul className="flex-1 flex flex-col gap-1.5 mb-5">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-1.5 text-xs text-zinc-400">
-                    <svg className="flex-shrink-0 mt-0.5 text-green-400" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <li key={f} className="flex items-start gap-1.5 text-xs text-text-secondary">
+                    <svg className="flex-shrink-0 mt-0.5 text-green-600" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     {f}
@@ -606,14 +606,14 @@ function PlanSection() {
               </ul>
 
               {isCurrent ? (
-                <button disabled className="w-full py-2 rounded-lg text-xs font-semibold bg-surface-3 text-zinc-600 cursor-default">
+                <button disabled className="w-full py-2 rounded-md text-xs font-semibold bg-background-subtle text-text-tertiary cursor-default">
                   Current plan
                 </button>
               ) : (
                 <button
                   onClick={() => setConfirm(plan.tier)}
-                  className={`w-full py-2 rounded-lg text-xs font-semibold transition-colors ${
-                    isRecommended ? "bg-white hover:bg-zinc-100 text-black" : "bg-surface-2 hover:bg-surface-3 border border-white/10 text-zinc-300 hover:text-white"
+                  className={`w-full py-2 rounded-md text-xs font-semibold transition-colors ${
+                    isRecommended ? "bg-accent-primary hover:bg-accent-hover text-white" : "bg-background-subtle hover:bg-background-DEFAULT border border-border-DEFAULT text-text-primary"
                   }`}
                 >
                   Switch to {plan.name}
@@ -626,23 +626,23 @@ function PlanSection() {
 
       {/* Confirm modal */}
       {confirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4" onClick={() => setConfirm(null)}>
-          <div className="w-full max-w-sm bg-surface-1 border border-white/10 rounded-2xl p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-white mb-2">Switch plan</h3>
-            <p className="text-sm text-zinc-400 mb-6">
-              Switch to the <span className="text-white font-semibold">{PLANS.find((p) => p.tier === confirm)?.name}</span> plan? Changes take effect immediately.
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={() => setConfirm(null)}>
+          <div className="w-full max-w-sm bg-white border border-border-DEFAULT rounded-xl p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-text-primary mb-2">Switch plan</h3>
+            <p className="text-sm text-text-secondary mb-6">
+              Switch to the <span className="text-text-primary font-semibold">{PLANS.find((p) => p.tier === confirm)?.name}</span> plan? Changes take effect immediately.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setConfirm(null)}
-                className="flex-1 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors"
+                className="flex-1 py-2 rounded-md bg-background-subtle hover:bg-background-DEFAULT border border-border-DEFAULT text-sm text-text-secondary hover:text-text-primary font-medium transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleSwitch(confirm)}
                 disabled={switching}
-                className="flex-1 py-2 rounded-xl bg-white hover:bg-zinc-100 disabled:opacity-50 text-black text-sm font-semibold transition-colors"
+                className="flex-1 py-2 rounded-md bg-accent-primary hover:bg-accent-hover disabled:opacity-50 text-white text-sm font-semibold transition-colors"
               >
                 {switching ? "Switching…" : "Confirm"}
               </button>
@@ -705,22 +705,22 @@ function DomainsSection() {
         desc={`Your business is served at *.${PLATFORM_HOST}`}
       >
         <form onSubmit={handleSubdomainSave} className="flex flex-col gap-3">
-          <div className="flex items-center gap-1 px-3 py-2 rounded-xl bg-surface-2 border border-white/10 focus-within:border-white/20 transition-colors">
-            <span className="text-xs text-zinc-600">https://</span>
+          <div className="flex items-center gap-1 px-3 py-2 bg-background-subtle border border-border-DEFAULT rounded-md focus-within:border-accent-primary focus-within:ring-2 focus-within:ring-accent-primary/20 transition-colors">
+            <span className="text-xs text-text-tertiary">https://</span>
             <input
-              className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-600 outline-none min-w-0"
+              className="flex-1 bg-transparent text-sm text-text-primary placeholder-text-tertiary outline-none min-w-0"
               type="text"
               value={subdomain}
               onChange={(e) => setSubdomain(normalizeSubdomain(e.target.value))}
               placeholder="your-app"
             />
-            <span className="text-xs text-zinc-600 whitespace-nowrap">.{PLATFORM_HOST}</span>
+            <span className="text-xs text-text-tertiary whitespace-nowrap">.{PLATFORM_HOST}</span>
           </div>
-          {subError && <p className="text-xs text-red-400">{subError}</p>}
+          {subError && <p className="text-xs text-red-600">{subError}</p>}
           <div className="flex items-center gap-2">
             <a
               href={fullUrl}
-              className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors"
+              className="flex items-center gap-1.5 text-xs text-text-tertiary hover:text-text-primary transition-colors"
               target="_blank"
               rel="noreferrer"
             >
@@ -743,18 +743,18 @@ function DomainsSection() {
           <div className="flex justify-end">
             <button
               onClick={() => setShowAdd(!showAdd)}
-              className="px-3 py-1.5 rounded-lg bg-white hover:bg-zinc-100 text-black text-xs font-semibold transition-colors"
+              className="px-3 py-1.5 rounded-md bg-accent-primary hover:bg-accent-hover text-white text-xs font-semibold transition-colors"
             >
               {showAdd ? "Cancel" : "+ Add domain"}
             </button>
           </div>
 
           {showAdd && (
-            <div className="p-5 rounded-xl bg-surface-2 border border-white/5">
-              <label className="block text-xs font-medium text-zinc-400 mb-2">Domain name</label>
+            <div className="p-5 rounded-xl bg-background-subtle border border-border-DEFAULT">
+              <label className="block text-xs font-medium text-text-secondary mb-2">Domain name</label>
               <div className="flex gap-2 mb-4">
                 <input
-                  className="flex-1 px-3 py-2 rounded-lg bg-surface-3 border border-white/10 focus:border-white/20 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors"
+                  className="flex-1 px-3 py-2 bg-background-subtle border border-border-DEFAULT rounded-md focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 text-sm text-text-primary placeholder-text-tertiary outline-none transition-colors"
                   type="text"
                   placeholder="yourbrand.com"
                   value={newDomain}
@@ -765,43 +765,43 @@ function DomainsSection() {
                 <button
                   onClick={handleAddDomain}
                   disabled={!newDomain.trim()}
-                  className="px-4 py-2 rounded-lg bg-white hover:bg-zinc-100 disabled:opacity-40 text-black text-sm font-semibold transition-colors"
+                  className="px-4 py-2 rounded-md bg-accent-primary hover:bg-accent-hover disabled:opacity-40 text-white text-sm font-semibold transition-colors"
                 >
                   Add domain
                 </button>
               </div>
               {newDomain && (
-                <div className="rounded-lg bg-surface-3 border border-white/5 p-4">
+                <div className="rounded-md bg-amber-50 border border-amber-200 p-4">
                   <div className="flex items-start gap-2 mb-3">
-                    <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                    <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
                     <div className="flex-1">
-                      <p className="text-xs font-semibold text-amber-400 mb-1">DNS Configuration Required</p>
-                      <p className="text-xs text-zinc-500">Add this CNAME record at your DNS provider:</p>
+                      <p className="text-xs font-semibold text-amber-900 mb-1">DNS Configuration Required</p>
+                      <p className="text-xs text-amber-700">Add this CNAME record at your DNS provider:</p>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface-0/50 border border-white/5">
+                    <div className="flex items-center justify-between gap-2 p-2 rounded bg-white border border-amber-200">
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-zinc-500 mb-0.5">Type</p>
-                        <p className="text-sm font-mono text-zinc-200">CNAME</p>
+                        <p className="text-xs text-text-tertiary mb-0.5">Type</p>
+                        <p className="text-sm font-mono text-text-primary">CNAME</p>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-zinc-500 mb-0.5">Name</p>
-                        <p className="text-sm font-mono text-zinc-200 truncate">{newDomain}</p>
+                        <p className="text-xs text-text-tertiary mb-0.5">Name</p>
+                        <p className="text-sm font-mono text-text-primary truncate">{newDomain}</p>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-zinc-500 mb-0.5">Value</p>
-                        <p className="text-sm font-mono text-zinc-200">nanowork.app</p>
+                        <p className="text-xs text-text-tertiary mb-0.5">Value</p>
+                        <p className="text-sm font-mono text-text-primary">nanowork.app</p>
                       </div>
                       <button
                         onClick={() => copyToClipboard(`${newDomain} CNAME nanowork.app`)}
-                        className="p-2 hover:bg-white/5 rounded transition-colors"
+                        className="p-2 hover:bg-background-DEFAULT rounded transition-colors"
                         title="Copy DNS record"
                       >
                         {copied ? (
-                          <Check className="w-4 h-4 text-green-400" />
+                          <Check className="w-4 h-4 text-green-600" />
                         ) : (
-                          <Copy className="w-4 h-4 text-zinc-400" />
+                          <Copy className="w-4 h-4 text-text-tertiary" />
                         )}
                       </button>
                     </div>
@@ -812,22 +812,22 @@ function DomainsSection() {
           )}
 
           {profile?.customDomain ? (
-            <div className="rounded-xl bg-surface-2 border border-white/5 p-4">
+            <div className="rounded-xl bg-background-subtle border border-border-DEFAULT p-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm text-zinc-200 font-medium">{profile.customDomain}</p>
-                    <span className="text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <p className="text-sm text-text-primary font-medium">{profile.customDomain}</p>
+                    <span className="text-xs font-semibold text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       Active
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-600 mt-0.5">Your custom domain is connected and live</p>
+                  <p className="text-xs text-text-tertiary mt-0.5">Your custom domain is connected and live</p>
                   <a
                     href={`https://${profile.customDomain}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors mt-2"
+                    className="flex items-center gap-1.5 text-xs text-text-tertiary hover:text-text-primary transition-colors mt-2"
                   >
                     <span>Visit site</span>
                     <ExternalLink className="w-3 h-3" />
@@ -839,7 +839,7 @@ function DomainsSection() {
                       updateProfile({ customDomain: undefined });
                     }
                   }}
-                  className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-colors"
+                  className="p-2 rounded-md hover:bg-red-50 text-text-tertiary hover:text-red-600 transition-colors"
                   title="Remove domain"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -849,10 +849,10 @@ function DomainsSection() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 text-zinc-600">
+            <div className="text-center py-8 text-text-tertiary">
               <Globe className="w-8 h-8 mx-auto mb-3 opacity-40" />
               <p className="text-sm">No custom domain connected yet.</p>
-              <p className="text-xs text-zinc-700 mt-1">Click "Add domain" above to get started.</p>
+              <p className="text-xs text-text-tertiary mt-1">Click "Add domain" above to get started.</p>
             </div>
           )}
         </div>
@@ -889,14 +889,14 @@ function LogoutSection() {
     >
       <div className="space-y-3">
         {error && (
-          <div className="px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="px-3 py-2 rounded-md bg-red-50 border border-red-200 text-red-600 text-sm">
             {error}
           </div>
         )}
         <button
           onClick={handleLogout}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm font-medium text-zinc-300 hover:text-white transition-all disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 rounded-md bg-background-subtle hover:bg-background-DEFAULT border border-border-DEFAULT text-sm font-medium text-text-secondary hover:text-text-primary transition-all disabled:opacity-50"
         >
           <LogOut className="w-4 h-4" />
           {loading ? "Signing out…" : "Sign out"}
@@ -920,12 +920,12 @@ export default function Settings() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-zinc-500 text-sm mt-1">Manage your account, billing, and domain configuration.</p>
+        <h1 className="text-2xl font-bold text-text-primary">Settings</h1>
+        <p className="text-text-secondary text-sm mt-1">Manage your account, billing, and domain configuration.</p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-2 mb-6 border-b border-white/5 overflow-x-auto">
+      <div className="flex gap-2 mb-6 border-b border-border-DEFAULT overflow-x-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -934,8 +934,8 @@ export default function Settings() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab.id
-                  ? "text-white border-white"
-                  : "text-zinc-500 border-transparent hover:text-zinc-300"
+                  ? "text-accent-primary border-accent-primary"
+                  : "text-text-secondary border-transparent hover:text-text-primary"
               }`}
             >
               <Icon className="w-4 h-4" />

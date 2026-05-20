@@ -20,11 +20,11 @@ export default function UserAppHome() {
   return (
     <div className="user-app-page">
       <section className="user-app-hero">
-        <h2 className="user-app-hero__title">Welcome to your app</h2>
-        <p className="user-app-hero__desc">{app.tagline}</p>
+        <h1 className="user-app-hero__title">Welcome to your app</h1>
+        <p className="user-app-hero__description">{app.tagline}</p>
         <form className="user-app-hero__form" onSubmit={onSubmit}>
-          <label className="user-app-sr" htmlFor="hp-email">
-            Email
+          <label className="user-app-visually-hidden" htmlFor="hp-email">
+            Email address
           </label>
           <input
             id="hp-email"
@@ -32,29 +32,30 @@ export default function UserAppHome() {
             type="email"
             required
             autoComplete="email"
-            placeholder="you@company.com"
+            placeholder="Enter your email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            aria-describedby={submitted ? "hp-success" : undefined}
           />
           <button type="submit" className="user-app-btn user-app-btn--primary">
-            {submitted ? "You’re in" : "Join"}
+            {submitted ? "You’re in!" : "Join waitlist"}
           </button>
         </form>
-        {submitted && <p className="user-app-toast">Added to your live leads list.</p>}
+        {submitted && <p id="hp-success" className="user-app-message user-app-message--success" role="status">Added to your live leads list.</p>}
       </section>
 
-      <div className="user-app-kpis">
-        <div className="user-app-kpi">
-          <span className="user-app-kpi__label">Leads (live db)</span>
-          <span className="user-app-kpi__value">{count}</span>
+      <div className="user-app-stats">
+        <div className="user-app-stat">
+          <span className="user-app-stat__label">Leads collected</span>
+          <span className="user-app-stat__value">{count}</span>
         </div>
-        <div className="user-app-kpi">
-          <span className="user-app-kpi__label">API base</span>
-          <span className="user-app-kpi__value user-app-kpi__value--sm mono">/api/sandbox/{app.slug}/v1</span>
+        <div className="user-app-stat">
+          <span className="user-app-stat__label">API endpoint</span>
+          <span className="user-app-stat__value user-app-stat__value--small">/api/sandbox/{app.slug}/v1</span>
         </div>
-        <div className="user-app-kpi">
-          <span className="user-app-kpi__label">Last signup</span>
-          <span className="user-app-kpi__value user-app-kpi__value--sm">
+        <div className="user-app-stat">
+          <span className="user-app-stat__label">Most recent signup</span>
+          <span className="user-app-stat__value user-app-stat__value--small">
             {last
               ? new Date(last.createdAt).toLocaleString(undefined, {
                   month: "short",
@@ -62,15 +63,15 @@ export default function UserAppHome() {
                   hour: "2-digit",
                   minute: "2-digit",
                 })
-              : "—"}
+              : "None yet"}
           </span>
         </div>
       </div>
 
-      <p className="user-app-hint">
-        This is a real client bundle talking to a provisioned data layer. View rows in{" "}
-        <Link to="/app/leads">Leads</Link> and your HTTP contract in <Link to="/app/api">API</Link>
-        — then <Link to="/app/redeem">redeem</Link> to keep it online after preview.
+      <p className="user-app-info">
+        This is a fully functional preview with real data. View your collected leads in{" "}
+        <Link to="/app/leads">Leads</Link>, explore your API in <Link to="/app/api">API</Link>,
+        and <Link to="/app/redeem">redeem your app</Link> to keep it running beyond the preview period.
       </p>
     </div>
   );

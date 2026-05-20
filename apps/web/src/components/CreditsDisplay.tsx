@@ -31,11 +31,11 @@ export function CreditsDisplay({ onBuyClick, compact = false }: CreditsDisplayPr
   const isCritical = balance < 10;
 
   return (
-    <div className={`flex items-center gap-3 ${compact ? "" : "px-4 py-2.5 rounded-lg bg-surface-2 border border-white/10"}`}>
+    <div className={`flex items-center gap-3 ${compact ? "" : "px-4 py-3 rounded-xl bg-white border border-gray-200 shadow-sm"}`}>
       {/* Credits Icon */}
-      <div className={`flex-shrink-0 w-8 h-8 rounded-lg ${isCritical ? "bg-red-500/20" : isLow ? "bg-yellow-500/20" : "bg-white/20"} flex items-center justify-center`}>
+      <div className={`flex-shrink-0 w-9 h-9 rounded-lg ${isCritical ? "bg-red-50" : isLow ? "bg-amber-50" : "bg-blue-50"} flex items-center justify-center`}>
         <svg
-          className={`w-4 h-4 ${isCritical ? "text-red-400" : isLow ? "text-yellow-400" : "text-white"}`}
+          className={`w-5 h-5 ${isCritical ? "text-red-600" : isLow ? "text-amber-600" : "text-blue-600"}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -52,20 +52,20 @@ export function CreditsDisplay({ onBuyClick, compact = false }: CreditsDisplayPr
       {/* Balance Display */}
       <div className="flex-1">
         <div className="flex items-baseline gap-2">
-          <span className={`text-lg font-bold tabular-nums ${isCritical ? "text-red-400" : isLow ? "text-yellow-400" : "text-white"}`}>
+          <span className={`text-xl font-semibold tabular-nums ${isCritical ? "text-red-600" : isLow ? "text-amber-600" : "text-gray-900"}`}>
             {formatCredits(balance)}
           </span>
-          <span className="text-xs text-zinc-500">credits</span>
+          <span className="text-sm text-gray-500 font-medium">credits</span>
         </div>
 
         {/* Warning Messages */}
         {isCritical && !compact && (
-          <div className="text-xs text-red-400 mt-0.5">
+          <div className="text-sm text-red-600 mt-0.5 font-medium">
             Critical - buy more to continue
           </div>
         )}
         {isLow && !isCritical && !compact && (
-          <div className="text-xs text-yellow-400 mt-0.5">
+          <div className="text-sm text-amber-600 mt-0.5 font-medium">
             Running low - consider buying more
           </div>
         )}
@@ -75,7 +75,7 @@ export function CreditsDisplay({ onBuyClick, compact = false }: CreditsDisplayPr
       {!compact && (
         <button
           onClick={onBuyClick}
-          className="px-3 py-1.5 rounded-lg bg-white hover:bg-white text-white text-sm font-medium transition-colors whitespace-nowrap"
+          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all shadow-sm hover:shadow whitespace-nowrap"
         >
           Buy More
         </button>

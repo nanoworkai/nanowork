@@ -81,47 +81,47 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-0 flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-bg-primary via-bg-secondary to-bg-primary flex flex-col items-center justify-center px-4 py-8">
       {/* Logo */}
       <Link
         to="/"
-        className="flex items-center gap-2 text-white font-mono text-sm font-bold uppercase tracking-wider mb-8 sm:mb-12 hover:opacity-70 transition-opacity"
+        className="flex items-center gap-2 text-text-primary text-lg font-semibold mb-8 sm:mb-12 hover:text-accent-primary transition-colors"
       >
-        <Terminal className="w-4 h-4 sm:w-5 sm:h-5" />
+        <Terminal className="w-5 h-5 sm:w-6 sm:h-6" />
         Nanowork
       </Link>
 
-      {/* Terminal Login Card */}
+      {/* Login Card */}
       <div className="w-full max-w-md">
-        <div className="card-lg rounded-none border border-white/10">
+        <div className="bg-white rounded-xl shadow-card border border-border-subtle overflow-hidden">
           {/* Header */}
-          <div className="border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4 bg-surface-1">
+          <div className="border-b border-border-subtle px-4 sm:px-6 py-4 sm:py-5 bg-bg-tertiary">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/60" />
-              <span className="text-[10px] sm:text-xs font-mono font-bold text-white/60 uppercase tracking-wider">
+              <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-text-tertiary" />
+              <span className="text-sm sm:text-base font-medium text-text-secondary">
                 Authentication Required
               </span>
               <div className="flex-1" />
               <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-400" />
-                <span className="text-[10px] sm:text-xs font-mono text-white/40">SECURE</span>
+                <div className="w-2 h-2 rounded-full bg-status-success" />
+                <span className="text-xs sm:text-sm text-text-tertiary">Secure</span>
               </div>
             </div>
           </div>
 
           <div className="p-4 sm:p-6">
             {/* Tab Switcher */}
-            <div className="flex gap-0 mb-4 sm:mb-6 border border-white/10">
+            <div className="flex gap-1 mb-4 sm:mb-6 p-1 bg-bg-tertiary rounded-lg">
               <button
                 type="button"
                 onClick={() => {
                   setTab("signin");
                   setError("");
                 }}
-                className={`flex-1 py-2.5 sm:py-3 text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider transition-colors ${
+                className={`flex-1 py-2.5 sm:py-3 text-sm font-medium rounded-md transition-all ${
                   tab === "signin"
-                    ? "bg-white text-black"
-                    : "bg-transparent text-white/60 hover:text-white hover:bg-white/5"
+                    ? "bg-white text-text-primary shadow-sm"
+                    : "text-text-secondary hover:text-text-primary hover:bg-white/50"
                 }`}
               >
                 Sign In
@@ -132,10 +132,10 @@ export default function Login() {
                   setTab("signup");
                   setError("");
                 }}
-                className={`flex-1 py-2.5 sm:py-3 text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider transition-colors border-l border-white/10 ${
+                className={`flex-1 py-2.5 sm:py-3 text-sm font-medium rounded-md transition-all ${
                   tab === "signup"
-                    ? "bg-white text-black"
-                    : "bg-transparent text-white/60 hover:text-white hover:bg-white/5"
+                    ? "bg-white text-text-primary shadow-sm"
+                    : "text-text-secondary hover:text-text-primary hover:bg-white/50"
                 }`}
               >
                 Sign Up
@@ -146,16 +146,16 @@ export default function Login() {
               {tab === "signup" && (
                 <div>
                   <label
-                    className="block text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-2"
+                    className="block text-sm font-medium text-text-secondary mb-2"
                     htmlFor="login-name"
                   >
                     Name
                   </label>
                   <input
                     id="login-name"
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-xs sm:text-sm font-mono outline-none transition-colors"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-bg-tertiary border border-border-default focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 text-text-primary placeholder-text-tertiary text-sm outline-none transition-all"
                     type="text"
-                    placeholder="FULL NAME"
+                    placeholder="Enter your full name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     autoComplete="name"
@@ -165,16 +165,16 @@ export default function Login() {
 
               <div>
                 <label
-                  className="block text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-2"
+                  className="block text-sm font-medium text-text-secondary mb-2"
                   htmlFor="login-email"
                 >
                   Email Address
                 </label>
                 <input
                   id="login-email"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-xs sm:text-sm font-mono outline-none transition-colors"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-bg-tertiary border border-border-default focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 text-text-primary placeholder-text-tertiary text-sm outline-none transition-all"
                   type="email"
-                  placeholder="USER@DOMAIN.COM"
+                  placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   autoFocus
@@ -186,7 +186,7 @@ export default function Login() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label
-                    className="block text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider"
+                    className="block text-sm font-medium text-text-secondary"
                     htmlFor="login-password"
                   >
                     Password
@@ -194,7 +194,7 @@ export default function Login() {
                   {tab === "signin" && (
                     <Link
                       to="/forgot-password"
-                      className="text-[10px] sm:text-xs font-mono text-white/50 hover:text-white transition-colors uppercase tracking-wider"
+                      className="text-sm text-accent-primary hover:text-accent-hover transition-colors"
                     >
                       Forgot?
                     </Link>
@@ -202,9 +202,9 @@ export default function Login() {
                 </div>
                 <input
                   id="login-password"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-xs sm:text-sm font-mono outline-none transition-colors"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-bg-tertiary border border-border-default focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 text-text-primary placeholder-text-tertiary text-sm outline-none transition-all"
                   type="password"
-                  placeholder="••••••••••••••••"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete={tab === "signup" ? "new-password" : "current-password"}
@@ -213,10 +213,10 @@ export default function Login() {
               </div>
 
               {success && (
-                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-green-400/20 bg-green-400/5">
+                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-status-success/20 bg-status-success/5 rounded-lg">
                   <div className="flex items-start gap-2">
-                    <span className="text-[10px] sm:text-xs font-mono text-green-400 mt-0.5">SUCCESS:</span>
-                    <p className="text-[10px] sm:text-xs font-mono text-green-400 leading-relaxed flex-1">
+                    <span className="text-xs sm:text-sm font-medium text-status-success mt-0.5">Success:</span>
+                    <p className="text-xs sm:text-sm text-status-success leading-relaxed flex-1">
                       {success}
                     </p>
                   </div>
@@ -224,10 +224,10 @@ export default function Login() {
               )}
 
               {error && (
-                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-red-400/20 bg-red-400/5">
+                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-status-error/20 bg-status-error/5 rounded-lg">
                   <div className="flex items-start gap-2">
-                    <span className="text-[10px] sm:text-xs font-mono text-red-400 mt-0.5">ERROR:</span>
-                    <p className="text-[10px] sm:text-xs font-mono text-red-400 leading-relaxed flex-1">
+                    <span className="text-xs sm:text-sm font-medium text-status-error mt-0.5">Error:</span>
+                    <p className="text-xs sm:text-sm text-status-error leading-relaxed flex-1">
                       {error}
                     </p>
                   </div>
@@ -237,36 +237,36 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 sm:py-3.5 rounded-none bg-white hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed text-black font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors mt-2"
+                className="w-full py-3 sm:py-3.5 rounded-lg bg-accent-primary hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors mt-2 shadow-sm"
               >
                 {loading
                   ? tab === "signup"
-                    ? "CREATING..."
-                    : "AUTHENTICATING..."
+                    ? "Creating account..."
+                    : "Signing in..."
                   : tab === "signup"
                   ? "Create Account"
-                  : "Authenticate"}
+                  : "Sign In"}
               </button>
             </form>
           </div>
 
           {/* Footer */}
-          <div className="border-t border-white/10 px-4 sm:px-6 py-3 sm:py-4 bg-surface-1">
-            <p className="text-[10px] sm:text-xs font-mono text-white/30 text-center leading-relaxed">
-              ENCRYPTED CONNECTION · ENTERPRISE SECURITY
+          <div className="border-t border-border-subtle px-4 sm:px-6 py-3 sm:py-4 bg-bg-tertiary">
+            <p className="text-xs sm:text-sm text-text-tertiary text-center">
+              Encrypted connection · Enterprise security
             </p>
           </div>
         </div>
       </div>
 
-      <p className="text-[10px] sm:text-xs font-mono text-white/30 mt-6 sm:mt-8 text-center px-4 leading-relaxed">
-        BY CONTINUING YOU AGREE TO{" "}
-        <a href="#" className="text-white/50 hover:text-white transition-colors underline">
-          TERMS
+      <p className="text-xs sm:text-sm text-text-tertiary mt-6 sm:mt-8 text-center px-4">
+        By continuing you agree to{" "}
+        <a href="#" className="text-accent-primary hover:text-accent-hover transition-colors underline">
+          Terms
         </a>{" "}
-        AND{" "}
-        <a href="#" className="text-white/50 hover:text-white transition-colors underline">
-          PRIVACY POLICY
+        and{" "}
+        <a href="#" className="text-accent-primary hover:text-accent-hover transition-colors underline">
+          Privacy Policy
         </a>
       </p>
     </div>

@@ -78,24 +78,24 @@ export function CreditsPurchaseModal({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
         onClick={onClose}
       />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-surface-1 rounded-2xl border border-white/10 shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="bg-background-elevated rounded-2xl shadow-2xl border border-border-DEFAULT max-w-4xl w-full max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="sticky top-0 bg-surface-1 border-b border-white/10 px-8 py-6 flex items-center justify-between">
+          <div className="sticky top-0 bg-background-elevated border-b border-border-DEFAULT px-8 py-6 flex items-center justify-between rounded-t-2xl">
             <div>
-              <h2 className="text-2xl font-bold text-white">Buy Credits</h2>
-              <p className="text-sm text-zinc-400 mt-1">
+              <h2 className="text-2xl font-bold text-content-DEFAULT">Buy Credits</h2>
+              <p className="text-sm text-content-subtle mt-1">
                 Choose a package to power your AI companies
               </p>
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+              className="w-8 h-8 rounded-lg hover:bg-background-hover flex items-center justify-center text-content-subtle hover:text-content-DEFAULT transition-colors"
             >
               <svg
                 className="w-5 h-5"
@@ -120,14 +120,14 @@ export function CreditsPurchaseModal({
                 key={pkg.id}
                 className={`relative rounded-xl border-2 p-6 transition-all ${
                   pkg.popular
-                    ? "border-white/20 bg-white/5"
-                    : "border-white/10 hover:border-white/20"
+                    ? "border-accent-blue bg-accent-blue/5"
+                    : "border-border-DEFAULT hover:border-border-hover"
                 }`}
               >
                 {/* Popular Badge */}
                 {pkg.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <div className="px-3 py-1 rounded-full bg-white text-white text-xs font-bold">
+                    <div className="px-3 py-1 rounded-full bg-accent-blue text-white text-xs font-bold">
                       MOST POPULAR
                     </div>
                   </div>
@@ -135,21 +135,21 @@ export function CreditsPurchaseModal({
 
                 {/* Package Details */}
                 <div className="text-center">
-                  <div className="text-lg font-bold text-white mb-1">
+                  <div className="text-lg font-bold text-content-DEFAULT mb-1">
                     {pkg.name}
                   </div>
-                  <div className="text-3xl font-bold text-white mb-1">
+                  <div className="text-3xl font-bold text-content-DEFAULT mb-1">
                     {pkg.credits.toLocaleString()}
                   </div>
-                  <div className="text-sm text-zinc-400 mb-4">credits</div>
+                  <div className="text-sm text-content-subtle mb-4">credits</div>
 
                   {/* Price */}
                   <div className="mb-4">
-                    <div className="text-2xl font-bold text-white">
+                    <div className="text-2xl font-bold text-content-DEFAULT">
                       ${pkg.price}
                     </div>
                     {'savings' in pkg && pkg.savings && (
-                      <div className="text-xs text-white font-medium mt-1">
+                      <div className="text-xs text-accent-green font-medium mt-1">
                         Save {pkg.savings}
                       </div>
                     )}
@@ -161,8 +161,8 @@ export function CreditsPurchaseModal({
                     disabled={loading}
                     className={`w-full py-3 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                       pkg.popular
-                        ? "bg-white hover:bg-white text-white"
-                        : "bg-white/10 hover:bg-white/20 text-white"
+                        ? "bg-accent-blue hover:bg-accent-blue/90 text-white"
+                        : "bg-background-hover hover:bg-background-press text-content-DEFAULT"
                     }`}
                   >
                     {loading && selectedPackage === pkg.id ? (
@@ -196,19 +196,19 @@ export function CreditsPurchaseModal({
 
                 {/* Features */}
                 <div className="mt-6 space-y-2">
-                  <div className="text-xs text-zinc-500 font-medium">
+                  <div className="text-xs text-content-subtle font-medium">
                     INCLUDES:
                   </div>
-                  <div className="text-sm text-zinc-400">
+                  <div className="text-sm text-content-muted">
                     • Company creation
                   </div>
-                  <div className="text-sm text-zinc-400">
+                  <div className="text-sm text-content-muted">
                     • Agent actions
                   </div>
-                  <div className="text-sm text-zinc-400">
+                  <div className="text-sm text-content-muted">
                     • Email sending
                   </div>
-                  <div className="text-sm text-zinc-400">
+                  <div className="text-sm text-content-muted">
                     • API calls
                   </div>
                 </div>
@@ -217,8 +217,8 @@ export function CreditsPurchaseModal({
           </div>
 
           {/* Footer Note */}
-          <div className="border-t border-white/10 px-8 py-4 text-center">
-            <p className="text-xs text-zinc-500">
+          <div className="border-t border-border-DEFAULT px-8 py-4 text-center rounded-b-2xl">
+            <p className="text-xs text-content-subtle">
               Credits never expire. Secure payment via Stripe.
             </p>
           </div>
