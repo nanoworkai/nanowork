@@ -7,7 +7,7 @@ import { getSupabase } from '../services/supabase';
 const router = Router();
 
 /**
- * POST /builds/generate-name
+ * POST /build/generate-name
  * Generate an AI build name from a prompt
  */
 router.post('/generate-name', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
@@ -59,7 +59,7 @@ Examples: "Dog Walking App", "Restaurant Booking System", "Fitness Tracker"`,
 });
 
 /**
- * GET /builds
+ * GET /build
  * Get all builds for the authenticated user's agent
  */
 router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
@@ -90,7 +90,7 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
 });
 
 /**
- * POST /builds
+ * POST /build
  * Create a new build for the authenticated user's agent
  */
 router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
@@ -131,7 +131,7 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
 });
 
 /**
- * PATCH /builds/:id
+ * PATCH /build/:id
  * Update a build (rename, update activity)
  */
 router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
@@ -369,7 +369,7 @@ Make tasks realistic and specific to the user's prompt. Keep task descriptions c
 });
 
 /**
- * DELETE /builds/:id
+ * DELETE /build/:id
  * Delete a build
  */
 router.delete('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
@@ -402,7 +402,7 @@ router.delete('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Re
 });
 
 /**
- * GET /builds/:id
+ * GET /build/:id
  * Get a specific build
  */
 router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {

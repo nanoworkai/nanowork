@@ -94,7 +94,7 @@ class ApiClient {
   }
 
   async getBuild(id: string): Promise<BuildResponse> {
-    return this.request<BuildResponse>(`/api/builds/${id}`);
+    return this.request<BuildResponse>(`/api/build/${id}`);
   }
 
   // Payments

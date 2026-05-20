@@ -589,7 +589,7 @@ export default function Overview() {
     if (!session?.access_token) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/builds`, {
+      const res = await fetch(`${apiUrl}/api/build`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
         },
@@ -628,7 +628,7 @@ export default function Overview() {
     if (!session?.access_token) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/builds`, {
+      const res = await fetch(`${apiUrl}/api/build`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -653,7 +653,7 @@ export default function Overview() {
 
     try {
       // Generate AI name for the build
-      const nameRes = await fetch(`${apiUrl}/api/builds/generate-name`, {
+      const nameRes = await fetch(`${apiUrl}/api/build/generate-name`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -669,7 +669,7 @@ export default function Overview() {
       }
 
       // Update build with name and prompt
-      await fetch(`${apiUrl}/api/builds/${activeBuild.id}`, {
+      await fetch(`${apiUrl}/api/build/${activeBuild.id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -703,7 +703,7 @@ export default function Overview() {
     if (!session?.access_token) return;
 
     try {
-      await fetch(`${apiUrl}/api/builds/${id}`, {
+      await fetch(`${apiUrl}/api/build/${id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -726,7 +726,7 @@ export default function Overview() {
     if (!session?.access_token) return;
 
     try {
-      await fetch(`${apiUrl}/api/builds/${id}`, {
+      await fetch(`${apiUrl}/api/build/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
