@@ -54,23 +54,53 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
+
+    // Basic validation
+    if (!email || !password) {
+      setError("Email and password are required");
+      setLoading(false);
+      return;
+    }
 
     if (tab === "signup") {
+      // Password strength validation for signup
+      if (password.length < 6) {
+        setError("Password must be at least 6 characters long");
+        setLoading(false);
+        return;
+      }
+
       const { error: err } = await signUp(email, password, name);
       setLoading(false);
       if (err) {
-        setError(err);
+        // Improve error messages
+        if (err.includes("already registered")) {
+          setError("This email is already registered. Please sign in instead.");
+        } else if (err.includes("Invalid email")) {
+          setError("Please enter a valid email address");
+        } else {
+          setError(err);
+        }
       } else {
-        const dest = pendingPrompt
-          ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
-          : nextPath;
-        navigate(dest);
+        // Check if email confirmation is required
+        setSuccess("Account created successfully! Check your email to verify your account, then sign in.");
+        // Don't auto-navigate on signup - user needs to verify email first
+        setTab("signin");
+        setPassword("");
       }
     } else {
       const { error: err } = await signIn(email, password);
       setLoading(false);
       if (err) {
-        setError(err);
+        // Improve error messages
+        if (err.includes("Invalid login credentials")) {
+          setError("Invalid email or password. Please try again.");
+        } else if (err.includes("Email not confirmed")) {
+          setError("Please verify your email before signing in. Check your inbox for the confirmation link.");
+        } else {
+          setError(err);
+        }
       } else {
         const dest = pendingPrompt
           ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
@@ -189,7 +219,7 @@ export default function Login() {
                     className="block text-sm font-medium text-text-secondary"
                     htmlFor="login-password"
                   >
-                    Password
+                    Password {tab === "signup" && <span className="text-text-tertiary">(min. 6 characters)</span>}
                   </label>
                   {tab === "signin" && (
                     <Link
@@ -204,11 +234,12 @@ export default function Login() {
                   id="login-password"
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-bg-tertiary border border-border-default focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 text-text-primary placeholder-text-tertiary text-sm outline-none transition-all"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder={tab === "signup" ? "Create a secure password" : "Enter your password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete={tab === "signup" ? "new-password" : "current-password"}
                   required
+                  minLength={tab === "signup" ? 6 : undefined}
                 />
               </div>
 

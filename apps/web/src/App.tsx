@@ -31,10 +31,24 @@ import { useAuth } from "./context/AuthContext";
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
   const { pathname, search } = useLocation();
-  if (isLoading) return null;
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-accent-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-text-secondary text-sm">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Navigate to={`/login?redirect=${encodeURIComponent(pathname + search)}`} replace />;
   }
+
   return <>{children}</>;
 }
 

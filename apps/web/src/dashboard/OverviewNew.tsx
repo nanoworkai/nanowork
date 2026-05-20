@@ -53,7 +53,7 @@ function useAgentStream(buildId: string | null, prompt: string | null, enabled: 
     if (!enabled || !prompt || !buildId) return;
     if (esRef.current) esRef.current.close();
 
-    const apiBase = import.meta.env.VITE_API_BASE_URL ?? "";
+    const apiBase = import.meta.env.VITE_API_URL || '';
     const url = `${apiBase}/api/build/stream?buildId=${buildId}&prompt=${encodeURIComponent(prompt)}`;
     const es = new EventSource(url);
     esRef.current = es;

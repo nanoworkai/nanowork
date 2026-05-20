@@ -250,7 +250,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, name?: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -260,6 +260,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (error) return { error: error.message };
+
+    // Check if email confirmation is required
+    // If user is null but session exists, email confirmation is disabled
+    // If user exists but session is null, email confirmation is required
+    if (data.user && !data.session) {
+      return { error: "Please check your email to confirm your account before signing in." };
+    }
 
     // Profile is automatically created by database trigger
     return { error: null };

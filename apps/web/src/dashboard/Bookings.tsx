@@ -19,7 +19,8 @@ export default function Bookings() {
   async function fetchBookings() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/rent/bookings?limit=50`, {
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${apiUrl}/api/rent/bookings?limit=50`, {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
         },

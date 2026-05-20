@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Building2, Calendar, Zap } from "lucide-react";
 
 /**
@@ -334,6 +335,7 @@ function CompanyCard({ company, onClaim }: CompanyCardProps) {
 // ──────────────────────────────────────────────────────────────────────────────
 
 export default function CompanyLibrary() {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const filteredCompanies = COMPANY_IDEAS.filter((company) => {
@@ -341,8 +343,8 @@ export default function CompanyLibrary() {
   });
 
   const handleClaim = (company: CompanyIdea) => {
-    console.log("Claiming company:", company);
-    alert(`Ready to claim ${company.name} for $${company.price}!\n\nThis will:\n1. Process payment\n2. Set up your company\n3. Deploy all 7 departments\n4. Give you full access`);
+    // Navigate to claim preview page
+    navigate(`/claim/${company.id}/preview`);
   };
 
   // Calculate days until next refresh
