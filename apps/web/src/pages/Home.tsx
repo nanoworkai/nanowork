@@ -240,65 +240,6 @@ function TerminalPrompt() {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// DATA GRID - Infrastructure specs
-// ──────────────────────────────────────────────────────────────────────────────
-
-function DepartmentGrid() {
-  const departments = [
-    {
-      name: "Legal",
-      description: "Sets up your company, writes terms and privacy policies, drafts contractor agreements, and keeps you compliant with regulations.",
-    },
-    {
-      name: "Brand",
-      description: "Designs your logo, builds brand guidelines, defines your voice and colors, and creates a visual identity people remember.",
-    },
-    {
-      name: "Web",
-      description: "Builds your website, sets up e-commerce and checkout, hosts everything, and ships updates that actually work in production.",
-    },
-    {
-      name: "Marketing",
-      description: "Plans content, writes for SEO, runs email campaigns, manages social media, and tracks what's actually driving growth.",
-    },
-    {
-      name: "Sales",
-      description: "Reaches out to prospects, manages your pipeline, qualifies leads, tracks deals, and turns conversations into customers.",
-    },
-    {
-      name: "Finance",
-      description: "Tracks revenue, manages expenses, sends invoices, processes payments, and keeps your books accurate and up to date.",
-    },
-    {
-      name: "Operations",
-      description: "Automates workflows, manages deployments, monitors uptime, coordinates vendors, and makes sure everything runs smoothly.",
-    },
-  ];
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-      {departments.map((dept, i) => (
-        <div key={i} className="card rounded-xl border border-border-DEFAULT p-4 sm:p-6 hover:bg-background-subtle transition-colors">
-          <div className="flex items-start justify-between mb-3 sm:mb-4">
-            <h3 className="text-sm sm:text-base font-bold text-content-primary">
-              {dept.name}
-            </h3>
-            <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-accent-success animate-pulse" />
-              <span className="text-[10px] font-mono text-accent-success">ACTIVE</span>
-            </div>
-          </div>
-
-          <p className="text-xs text-content-secondary leading-relaxed">
-            {dept.description}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
 // MAIN COMPONENT
 // ──────────────────────────────────────────────────────────────────────────────
 
@@ -359,21 +300,6 @@ export default function Home() {
           </div>
 
           <TerminalPrompt />
-        </section>
-
-        {/* Department Grid */}
-        <section className="py-8 sm:py-12">
-          <div className="mb-4 sm:mb-6">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-[10px] sm:text-xs font-bold text-content-tertiary uppercase tracking-wider">
-                Your Autonomous Team
-              </span>
-              <div className="flex-1 h-px bg-border-DEFAULT" />
-              <span className="text-[10px] sm:text-xs font-mono text-accent-success whitespace-nowrap">7 DEPARTMENTS</span>
-            </div>
-          </div>
-
-          <DepartmentGrid />
         </section>
 
         {/* Company Library - Browse pre-built companies */}

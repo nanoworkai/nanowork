@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { Building2, Tag, Sparkles, ArrowRight, Filter } from "lucide-react";
+import { Building2, Calendar, Zap } from "lucide-react";
 
 /**
- * COMPANY LIBRARY DESIGN PRINCIPLES:
+ * COMPANY LIBRARY - AI-GENERATED BUSINESS CATALOG
  *
- * 1. GALLERY AESTHETIC: Clean grid showcasing pre-built companies like art pieces
- * 2. DISCOVERY-FOCUSED: Browse, filter, and explore rather than build from scratch
- * 3. LIGHT & INVITING: Friendly cards with soft shadows and hover interactions
- * 4. CLEAR VALUE: $100 price point prominent but not aggressive
- * 5. CATEGORY ORGANIZATION: Industries clearly labeled for easy browsing
+ * Professional, data-dense catalog of AI-generated business opportunities.
+ * Terminal/Bloomberg aesthetic - serious, minimal, no fluff.
+ * Weekly refresh cycle clearly communicated.
  */
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -236,7 +234,13 @@ const COMPANY_IDEAS: CompanyIdea[] = [
 ];
 
 const CATEGORIES = ["All", "E-Commerce", "SaaS", "Services", "Education", "Health & Fitness", "Creator Economy", "Fintech", "Events", "Healthcare", "HR Tech"];
-const COMPLEXITY_LEVELS = ["All", "Simple", "Moderate", "Advanced"];
+
+// Current batch info (in production, this would come from API)
+const CURRENT_BATCH = {
+  number: 47,
+  generated: "2026-05-13",
+  nextRefresh: "2026-05-27",
+};
 
 // ──────────────────────────────────────────────────────────────────────────────
 // COMPANY CARD COMPONENT
@@ -248,114 +252,77 @@ interface CompanyCardProps {
 }
 
 function CompanyCard({ company, onClaim }: CompanyCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <div
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="group relative bg-background-elevated rounded-xl border border-border-DEFAULT hover:border-border-medium hover:shadow-lg transition-all duration-300 overflow-hidden"
-    >
-      {/* Top Badge */}
-      <div className="absolute top-3 right-3 z-10">
-        <div className="px-2.5 py-1 rounded-full bg-accent-primary/10 border border-accent-primary/20">
-          <span className="text-[10px] font-bold text-accent-primary uppercase tracking-wider">
-            ${company.price}
-          </span>
+    <div className="border border-border-DEFAULT hover:border-content-tertiary transition-colors bg-background-elevated">
+      {/* Header - Company Info */}
+      <div className="border-b border-border-DEFAULT p-4">
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-mono text-[10px] text-content-tertiary uppercase tracking-wider">
+                {company.category}
+              </span>
+            </div>
+            <h3 className="text-base font-semibold text-content-primary mb-1 truncate">
+              {company.name}
+            </h3>
+          </div>
+          <div className="text-right">
+            <div className="font-mono text-lg font-bold text-content-primary">
+              ${company.price}
+            </div>
+          </div>
         </div>
+        <p className="text-sm text-content-secondary leading-snug line-clamp-2">
+          {company.tagline}
+        </p>
       </div>
 
-      {/* Content */}
-      <div className="p-5">
-        {/* Header */}
-        <div className="mb-3">
-          <div className="flex items-center gap-2 mb-2">
-            <Building2 className="w-4 h-4 text-content-tertiary" />
-            <span className="text-[10px] font-bold text-content-tertiary uppercase tracking-wider">
-              {company.category}
-            </span>
+      {/* Data Section */}
+      <div className="p-4 space-y-3 border-b border-border-DEFAULT bg-background-DEFAULT">
+        {/* Revenue */}
+        <div>
+          <div className="font-mono text-[9px] text-content-tertiary uppercase tracking-wider mb-0.5">
+            Revenue Potential
           </div>
-          <h3 className="text-lg font-bold text-content-primary mb-1.5">
-            {company.name}
-          </h3>
-          <p className="text-sm text-content-secondary leading-relaxed line-clamp-2">
-            {company.tagline}
-          </p>
+          <div className="font-mono text-xs text-content-primary">
+            {company.revenue_potential}
+          </div>
         </div>
 
-        {/* Features - Always visible */}
-        <div className="mb-4">
-          <div className="text-[10px] font-bold text-content-tertiary uppercase tracking-wider mb-2">
-            Key Features
+        {/* Target Market */}
+        <div>
+          <div className="font-mono text-[9px] text-content-tertiary uppercase tracking-wider mb-0.5">
+            Target Market
           </div>
-          <ul className="space-y-1.5">
-            {company.features.slice(0, 3).map((feature, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-content-secondary">
-                <span className="text-accent-primary mt-0.5">•</span>
-                <span className="leading-relaxed">{feature}</span>
+          <div className="text-xs text-content-secondary">
+            {company.target_market}
+          </div>
+        </div>
+
+        {/* Features */}
+        <div>
+          <div className="font-mono text-[9px] text-content-tertiary uppercase tracking-wider mb-1">
+            Included Infrastructure
+          </div>
+          <ul className="space-y-0.5">
+            {company.features.map((feature, i) => (
+              <li key={i} className="text-xs text-content-secondary leading-snug flex">
+                <span className="text-content-tertiary mr-2">•</span>
+                <span>{feature}</span>
               </li>
             ))}
           </ul>
         </div>
+      </div>
 
-        {/* Hover Details */}
-        <div
-          className={`transition-all duration-300 overflow-hidden ${
-            isHovered ? "max-h-32 opacity-100 mb-4" : "max-h-0 opacity-0 mb-0"
-          }`}
-        >
-          <div className="space-y-2 pt-2 border-t border-border-DEFAULT">
-            <div>
-              <span className="text-[10px] font-bold text-content-tertiary uppercase tracking-wider">
-                Revenue Potential
-              </span>
-              <p className="text-xs text-content-primary font-medium">{company.revenue_potential}</p>
-            </div>
-            <div>
-              <span className="text-[10px] font-bold text-content-tertiary uppercase tracking-wider">
-                Target Market
-              </span>
-              <p className="text-xs text-content-secondary">{company.target_market}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between gap-3">
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1.5">
-            {company.tags.slice(0, 2).map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-background-subtle text-[10px] text-content-tertiary"
-              >
-                <Tag className="w-2.5 h-2.5" />
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          {/* Complexity Badge */}
-          <span
-            className={`px-2 py-0.5 rounded-md text-[10px] font-medium ${
-              company.complexity === "Simple"
-                ? "bg-accent-success/10 text-accent-success"
-                : company.complexity === "Moderate"
-                ? "bg-accent-warning/10 text-accent-warning"
-                : "bg-accent-secondary/10 text-accent-secondary"
-            }`}
-          >
-            {company.complexity}
-          </span>
-        </div>
-
-        {/* CTA Button */}
+      {/* Action */}
+      <div className="p-4">
         <button
           onClick={() => onClaim(company)}
-          className="w-full mt-4 px-4 py-2.5 rounded-lg bg-accent-primary hover:bg-accent-primary/90 text-white text-sm font-bold uppercase tracking-wider transition-all duration-200 flex items-center justify-center gap-2 group-hover:shadow-md"
+          className="w-full px-4 py-2.5 bg-content-primary hover:bg-content-secondary text-background-DEFAULT font-mono text-xs uppercase tracking-wider transition-colors border border-content-primary"
         >
-          Claim This Company
-          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+          Claim Company
         </button>
       </div>
     </div>
@@ -368,110 +335,129 @@ function CompanyCard({ company, onClaim }: CompanyCardProps) {
 
 export default function CompanyLibrary() {
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedComplexity, setSelectedComplexity] = useState("All");
-  const [showFilters, setShowFilters] = useState(false);
 
   const filteredCompanies = COMPANY_IDEAS.filter((company) => {
-    const matchesCategory = selectedCategory === "All" || company.category === selectedCategory;
-    const matchesComplexity = selectedComplexity === "All" || company.complexity === selectedComplexity;
-    return matchesCategory && matchesComplexity;
+    return selectedCategory === "All" || company.category === selectedCategory;
   });
 
   const handleClaim = (company: CompanyIdea) => {
     console.log("Claiming company:", company);
-    // TODO: Implement claim flow (payment, company creation)
     alert(`Ready to claim ${company.name} for $${company.price}!\n\nThis will:\n1. Process payment\n2. Set up your company\n3. Deploy all 7 departments\n4. Give you full access`);
   };
 
+  // Calculate days until next refresh
+  const today = new Date();
+  const nextRefresh = new Date(CURRENT_BATCH.nextRefresh);
+  const daysUntilRefresh = Math.ceil((nextRefresh.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
   return (
     <section className="py-12 sm:py-16">
-      {/* Section Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <Sparkles className="w-5 h-5 text-accent-primary" />
-          <h2 className="text-2xl sm:text-3xl font-bold text-content-primary uppercase tracking-tight">
-            Company Library
-          </h2>
+      {/* Header with AI-Generated Context */}
+      <div className="mb-8 border-b border-border-DEFAULT pb-8">
+        <div className="flex items-start justify-between gap-6 mb-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-3">
+              <Zap className="w-6 h-6 text-content-primary" />
+              <h2 className="text-2xl sm:text-3xl font-bold text-content-primary font-mono uppercase tracking-tight">
+                AI-Generated Companies
+              </h2>
+            </div>
+            <p className="text-base text-content-primary mb-2 max-w-3xl">
+              Fresh batch generated weekly. Claim any company for $100.
+            </p>
+            <p className="text-sm text-content-secondary max-w-3xl leading-relaxed">
+              Each company includes complete operational infrastructure: branding, website, marketing automation, sales pipeline, and all 7 core departments ready to run.
+            </p>
+          </div>
+
+          {/* Batch Info Card */}
+          <div className="hidden lg:block border border-border-DEFAULT bg-background-elevated p-4 min-w-[200px]">
+            <div className="space-y-2">
+              <div>
+                <div className="font-mono text-[9px] text-content-tertiary uppercase tracking-wider mb-0.5">
+                  Current Batch
+                </div>
+                <div className="font-mono text-xl font-bold text-content-primary">
+                  #{CURRENT_BATCH.number}
+                </div>
+              </div>
+              <div className="border-t border-border-DEFAULT pt-2">
+                <div className="font-mono text-[9px] text-content-tertiary uppercase tracking-wider mb-0.5">
+                  Generated
+                </div>
+                <div className="font-mono text-xs text-content-secondary">
+                  {CURRENT_BATCH.generated}
+                </div>
+              </div>
+              <div className="border-t border-border-DEFAULT pt-2">
+                <div className="font-mono text-[9px] text-content-tertiary uppercase tracking-wider mb-0.5">
+                  Next Refresh
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-3 h-3 text-content-tertiary" />
+                  <span className="font-mono text-xs text-content-primary">
+                    {daysUntilRefresh}d
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <p className="text-sm text-content-secondary max-w-3xl leading-relaxed mb-2">
-          Browse pre-built companies ready to launch. Each includes branding, website, marketing, sales automation, and full operational infrastructure.
-        </p>
-        <p className="text-sm text-content-primary font-medium">
-          Claim any company for just $100 and start running it immediately.
-        </p>
+
+        {/* Mobile Batch Info */}
+        <div className="lg:hidden border border-border-DEFAULT bg-background-elevated p-3">
+          <div className="flex items-center justify-between gap-4 text-xs">
+            <div>
+              <span className="font-mono text-content-tertiary uppercase tracking-wider">Batch</span>
+              <span className="font-mono font-bold text-content-primary ml-2">#{CURRENT_BATCH.number}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div>
+                <span className="font-mono text-content-tertiary">Generated</span>
+                <span className="font-mono text-content-secondary ml-2">{CURRENT_BATCH.generated}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-3 h-3 text-content-tertiary" />
+                <span className="font-mono text-content-primary">{daysUntilRefresh}d</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Filters */}
+      {/* Industry Filter */}
       <div className="mb-6">
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border-DEFAULT hover:bg-background-subtle transition-colors mb-4 sm:hidden"
-        >
-          <Filter className="w-4 h-4" />
-          <span className="text-sm font-medium text-content-primary">
-            {showFilters ? "Hide" : "Show"} Filters
-          </span>
-        </button>
+        <div className="font-mono text-[10px] text-content-tertiary uppercase tracking-wider mb-3">
+          Filter by Industry
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {CATEGORIES.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition-colors border ${
+                selectedCategory === category
+                  ? "bg-content-primary text-background-DEFAULT border-content-primary"
+                  : "bg-background-elevated text-content-secondary border-border-DEFAULT hover:border-content-tertiary"
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
 
-        <div className={`${showFilters ? "block" : "hidden"} sm:block space-y-4`}>
-          {/* Category Filter */}
-          <div>
-            <label className="text-xs font-bold text-content-tertiary uppercase tracking-wider mb-2 block">
-              Industry
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    selectedCategory === category
-                      ? "bg-accent-primary text-white shadow-sm"
-                      : "bg-background-subtle text-content-secondary hover:bg-background-muted"
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Complexity Filter */}
-          <div>
-            <label className="text-xs font-bold text-content-tertiary uppercase tracking-wider mb-2 block">
-              Complexity
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {COMPLEXITY_LEVELS.map((level) => (
-                <button
-                  key={level}
-                  onClick={() => setSelectedComplexity(level)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    selectedComplexity === level
-                      ? "bg-accent-primary text-white shadow-sm"
-                      : "bg-background-subtle text-content-secondary hover:bg-background-muted"
-                  }`}
-                >
-                  {level}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Results Count */}
-          <div className="flex items-center justify-between pt-2 border-t border-border-DEFAULT">
-            <span className="text-xs font-mono text-content-tertiary">
-              {filteredCompanies.length} {filteredCompanies.length === 1 ? "company" : "companies"} available
+        {/* Results Count */}
+        <div className="mt-4 pt-3 border-t border-border-DEFAULT">
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-xs text-content-tertiary">
+              <span className="text-content-primary font-bold">{filteredCompanies.length}</span> available
             </span>
-            {(selectedCategory !== "All" || selectedComplexity !== "All") && (
+            {selectedCategory !== "All" && (
               <button
-                onClick={() => {
-                  setSelectedCategory("All");
-                  setSelectedComplexity("All");
-                }}
-                className="text-xs text-accent-primary hover:text-accent-primary/80 font-medium transition-colors"
+                onClick={() => setSelectedCategory("All")}
+                className="font-mono text-xs text-content-primary hover:text-content-secondary uppercase tracking-wider transition-colors"
               >
-                Clear filters
+                Clear Filter
               </button>
             )}
           </div>
@@ -487,22 +473,21 @@ export default function CompanyLibrary() {
 
       {/* Empty State */}
       {filteredCompanies.length === 0 && (
-        <div className="text-center py-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-background-subtle border border-border-DEFAULT mb-4">
+        <div className="text-center py-16 border border-border-DEFAULT bg-background-elevated">
+          <div className="inline-flex items-center justify-center w-16 h-16 border border-border-DEFAULT bg-background-DEFAULT mb-4">
             <Building2 className="w-7 h-7 text-content-tertiary" />
           </div>
-          <h3 className="text-lg font-bold text-content-primary mb-2">No companies found</h3>
+          <h3 className="font-mono text-sm font-bold text-content-primary uppercase tracking-wider mb-2">
+            No Companies Found
+          </h3>
           <p className="text-sm text-content-secondary mb-4">
-            Try adjusting your filters to see more options
+            No companies match the selected filter
           </p>
           <button
-            onClick={() => {
-              setSelectedCategory("All");
-              setSelectedComplexity("All");
-            }}
-            className="text-sm text-accent-primary hover:text-accent-primary/80 font-medium transition-colors"
+            onClick={() => setSelectedCategory("All")}
+            className="font-mono text-xs text-content-primary hover:text-content-secondary uppercase tracking-wider transition-colors"
           >
-            Reset filters
+            Reset Filter
           </button>
         </div>
       )}
