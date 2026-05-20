@@ -38,6 +38,7 @@ export default {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'system-ui', 'sans-serif'],
         display: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['SF Mono', 'Monaco', 'Cascadia Code', 'Consolas', 'monospace'],
+        serif: ['Merriweather', 'Georgia', 'Cambria', 'Times New Roman', 'serif'],
       },
       borderRadius: {
         none: '0',
