@@ -19,13 +19,13 @@ export default {
           muted: "#a8a29e",      // Hints
           inverse: "#fafaf9",    // For dark sections
         },
-        // Friendly, accessible accents
+        // Industrial, professional accents
         accent: {
-          primary: "#0ea5e9",    // Sky blue - trustworthy
-          secondary: "#8b5cf6",  // Purple - premium
-          success: "#10b981",    // Emerald - friendly
-          warning: "#f59e0b",    // Amber - attention
-          danger: "#ef4444",     // Red - errors
+          primary: "#ea580c",    // Industrial orange - machinery, manufacturing
+          secondary: "#64748b",  // Steel blue-gray - industrial equipment
+          success: "#059669",    // Forest green - more muted
+          warning: "#d97706",    // Darker amber - industrial caution
+          danger: "#dc2626",     // Deeper red - more serious
         },
         // Soft borders
         border: {

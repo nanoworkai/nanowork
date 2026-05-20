@@ -204,8 +204,9 @@ export default function Bookings() {
                         <button
                           onClick={async () => {
                             try {
+                              const apiUrl = import.meta.env.VITE_API_URL || '';
                               const res = await fetch(
-                                `/api/rent/bookings/${booking.id}/credentials`,
+                                `${apiUrl}/api/rent/bookings/${booking.id}/credentials`,
                                 {
                                   headers: {
                                     Authorization: `Bearer ${session?.access_token}`,
@@ -234,7 +235,8 @@ export default function Bookings() {
                                 return;
 
                               try {
-                                await fetch(`/api/rent/bookings/${booking.id}`, {
+                                const apiUrl = import.meta.env.VITE_API_URL || '';
+                                await fetch(`${apiUrl}/api/rent/bookings/${booking.id}`, {
                                   method: "DELETE",
                                   headers: {
                                     Authorization: `Bearer ${session?.access_token}`,

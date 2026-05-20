@@ -6,9 +6,7 @@ export default function NotFound() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 text-center">
       {/* Logo */}
       <Link to="/" className="flex items-center gap-2.5 text-content-primary font-bold text-[15px] mb-12 hover:opacity-70 transition-opacity uppercase tracking-wider">
-        <div className="w-6 h-6 rounded-lg bg-accent-primary flex items-center justify-center">
-          <Terminal className="w-3.5 h-3.5 text-white" />
-        </div>
+        <Terminal className="w-6 h-6 text-accent-primary stroke-[2.5]" />
         Nanowork
       </Link>
 

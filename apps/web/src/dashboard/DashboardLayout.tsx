@@ -64,9 +64,7 @@ export default function DashboardLayout() {
         {/* Header */}
         <div className="border-b border-border-DEFAULT p-4 bg-background-elevated">
           <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-7 h-7 rounded-lg bg-accent-primary flex items-center justify-center">
-              <Terminal className="w-4 h-4 text-white" />
-            </div>
+            <Terminal className="w-7 h-7 text-accent-primary stroke-[2.5]" />
             <span className="font-bold text-content-primary text-sm">
               Nanowork
             </span>
@@ -128,7 +126,7 @@ export default function DashboardLayout() {
             onClick={() => setUserMenuOpen(!userMenuOpen)}
             className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-background-subtle transition-colors"
           >
-            <div className="w-9 h-9 rounded-lg bg-background-subtle border border-border-DEFAULT flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 bg-background-subtle border border-border-DEFAULT flex items-center justify-center flex-shrink-0">
               <span className="text-xs font-bold text-content-primary">{initials}</span>
             </div>
             <div className="flex-1 min-w-0 text-left">

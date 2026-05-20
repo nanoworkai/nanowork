@@ -3,6 +3,17 @@ import { useNavigate, useSearchParams, Link, useLocation } from "react-router-do
 import { useAuth } from "../context/AuthContext";
 import { Terminal, Lock } from "lucide-react";
 
+/**
+ * INDUSTRIAL LOGIN DESIGN:
+ * - Sharp edges, no rounded corners
+ * - Hard borders instead of soft shadows
+ * - Terminal/data-dense aesthetic
+ * - Monospace fonts for system feel
+ * - Square logo, no circles
+ * - Minimal, functional forms
+ * - Industrial color scheme
+ */
+
 type Tab = "signin" | "signup";
 
 function safeNextPath(raw: string | null): string {
@@ -19,7 +30,9 @@ export default function Login() {
   const nextPath = safeNextPath(searchParams.get("redirect") ?? searchParams.get("next"));
   const pendingPrompt = searchParams.get("p");
 
-  const [tab, setTab] = useState<Tab>("signin");
+  // Auto-select tab based on route
+  const initialTab = location.pathname === "/signup" ? "signup" : "signin";
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -111,47 +124,48 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-bg-primary via-bg-secondary to-bg-primary flex flex-col items-center justify-center px-4 py-8">
-      {/* Logo */}
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-8">
+      {/* Logo - Square, terminal style */}
       <Link
         to="/"
-        className="flex items-center gap-2 text-text-primary text-lg font-semibold mb-8 sm:mb-12 hover:text-accent-primary transition-colors"
+        className="flex items-center gap-2 text-content-primary text-sm mb-8 sm:mb-12 hover:opacity-70 transition-opacity"
       >
-        <Terminal className="w-5 h-5 sm:w-6 sm:h-6" />
-        Nanowork
+        <Terminal className="w-7 h-7 text-accent-primary stroke-[2.5]" />
+        <span className="font-bold uppercase tracking-wider">Nanowork</span>
       </Link>
 
-      {/* Login Card */}
+      {/* Login Card - Sharp edges, hard borders */}
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-xl shadow-card border border-border-subtle overflow-hidden">
-          {/* Header */}
-          <div className="border-b border-border-subtle px-4 sm:px-6 py-4 sm:py-5 bg-bg-tertiary">
+        <div className="bg-background-elevated border-2 border-border-DEFAULT">
+          {/* Header - Terminal style */}
+          <div className="border-b-2 border-border-DEFAULT px-4 sm:px-6 py-3 sm:py-4 bg-background-subtle">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-text-tertiary" />
-              <span className="text-sm sm:text-base font-medium text-text-secondary">
-                Authentication Required
+              <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-content-tertiary" />
+              <span className="text-xs sm:text-sm font-bold text-content-secondary uppercase tracking-wider font-mono">
+                AUTH_REQUIRED
               </span>
               <div className="flex-1" />
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-status-success" />
-                <span className="text-xs sm:text-sm text-text-tertiary">Secure</span>
+                <div className="w-2 h-2 bg-accent-success" />
+                <span className="text-[10px] sm:text-xs text-content-tertiary font-mono uppercase">SECURE</span>
               </div>
             </div>
           </div>
 
           <div className="p-4 sm:p-6">
-            {/* Tab Switcher */}
-            <div className="flex gap-1 mb-4 sm:mb-6 p-1 bg-bg-tertiary rounded-lg">
+            {/* Tab Switcher - Sharp edges */}
+            <div className="flex gap-0 mb-4 sm:mb-6 border-2 border-border-DEFAULT">
               <button
                 type="button"
                 onClick={() => {
                   setTab("signin");
                   setError("");
+                  setSuccess("");
                 }}
-                className={`flex-1 py-2.5 sm:py-3 text-sm font-medium rounded-md transition-all ${
+                className={`flex-1 py-2.5 sm:py-3 text-xs font-bold uppercase tracking-wider transition-colors font-mono ${
                   tab === "signin"
-                    ? "bg-white text-text-primary shadow-sm"
-                    : "text-text-secondary hover:text-text-primary hover:bg-white/50"
+                    ? "bg-accent-primary text-white"
+                    : "bg-background-subtle text-content-secondary hover:bg-background-muted border-r-2 border-border-DEFAULT"
                 }`}
               >
                 Sign In
@@ -161,11 +175,12 @@ export default function Login() {
                 onClick={() => {
                   setTab("signup");
                   setError("");
+                  setSuccess("");
                 }}
-                className={`flex-1 py-2.5 sm:py-3 text-sm font-medium rounded-md transition-all ${
+                className={`flex-1 py-2.5 sm:py-3 text-xs font-bold uppercase tracking-wider transition-colors font-mono ${
                   tab === "signup"
-                    ? "bg-white text-text-primary shadow-sm"
-                    : "text-text-secondary hover:text-text-primary hover:bg-white/50"
+                    ? "bg-accent-primary text-white"
+                    : "bg-background-subtle text-content-secondary hover:bg-background-muted"
                 }`}
               >
                 Sign Up
@@ -176,14 +191,14 @@ export default function Login() {
               {tab === "signup" && (
                 <div>
                   <label
-                    className="block text-sm font-medium text-text-secondary mb-2"
+                    className="block text-xs font-bold text-content-secondary mb-2 uppercase tracking-wider font-mono"
                     htmlFor="login-name"
                   >
                     Name
                   </label>
                   <input
                     id="login-name"
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-bg-tertiary border border-border-default focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 text-text-primary placeholder-text-tertiary text-sm outline-none transition-all"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background-subtle border-2 border-border-DEFAULT focus:border-accent-primary text-content-primary placeholder-content-muted text-sm outline-none transition-colors"
                     type="text"
                     placeholder="Enter your full name"
                     value={name}
@@ -195,14 +210,14 @@ export default function Login() {
 
               <div>
                 <label
-                  className="block text-sm font-medium text-text-secondary mb-2"
+                  className="block text-xs font-bold text-content-secondary mb-2 uppercase tracking-wider font-mono"
                   htmlFor="login-email"
                 >
                   Email Address
                 </label>
                 <input
                   id="login-email"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-bg-tertiary border border-border-default focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 text-text-primary placeholder-text-tertiary text-sm outline-none transition-all"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background-subtle border-2 border-border-DEFAULT focus:border-accent-primary text-content-primary placeholder-content-muted text-sm outline-none transition-colors"
                   type="email"
                   placeholder="you@example.com"
                   value={email}
@@ -216,23 +231,23 @@ export default function Login() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label
-                    className="block text-sm font-medium text-text-secondary"
+                    className="block text-xs font-bold text-content-secondary uppercase tracking-wider font-mono"
                     htmlFor="login-password"
                   >
-                    Password {tab === "signup" && <span className="text-text-tertiary">(min. 6 characters)</span>}
+                    Password {tab === "signup" && <span className="text-content-tertiary font-normal lowercase">(min. 6 chars)</span>}
                   </label>
                   {tab === "signin" && (
                     <Link
                       to="/forgot-password"
-                      className="text-sm text-accent-primary hover:text-accent-hover transition-colors"
+                      className="text-xs text-accent-primary hover:text-accent-primary/80 transition-colors font-bold uppercase tracking-wider font-mono"
                     >
-                      Forgot?
+                      Reset?
                     </Link>
                   )}
                 </div>
                 <input
                   id="login-password"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-bg-tertiary border border-border-default focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20 text-text-primary placeholder-text-tertiary text-sm outline-none transition-all"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background-subtle border-2 border-border-DEFAULT focus:border-accent-primary text-content-primary placeholder-content-muted text-sm outline-none transition-colors"
                   type="password"
                   placeholder={tab === "signup" ? "Create a secure password" : "Enter your password"}
                   value={password}
@@ -244,10 +259,10 @@ export default function Login() {
               </div>
 
               {success && (
-                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-status-success/20 bg-status-success/5 rounded-lg">
+                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-accent-success bg-accent-success/5">
                   <div className="flex items-start gap-2">
-                    <span className="text-xs sm:text-sm font-medium text-status-success mt-0.5">Success:</span>
-                    <p className="text-xs sm:text-sm text-status-success leading-relaxed flex-1">
+                    <span className="text-xs sm:text-sm font-bold text-accent-success uppercase tracking-wider font-mono">Success:</span>
+                    <p className="text-xs sm:text-sm text-accent-success leading-relaxed flex-1">
                       {success}
                     </p>
                   </div>
@@ -255,10 +270,10 @@ export default function Login() {
               )}
 
               {error && (
-                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-status-error/20 bg-status-error/5 rounded-lg">
+                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-accent-danger bg-accent-danger/5">
                   <div className="flex items-start gap-2">
-                    <span className="text-xs sm:text-sm font-medium text-status-error mt-0.5">Error:</span>
-                    <p className="text-xs sm:text-sm text-status-error leading-relaxed flex-1">
+                    <span className="text-xs sm:text-sm font-bold text-accent-danger uppercase tracking-wider font-mono">Error:</span>
+                    <p className="text-xs sm:text-sm text-accent-danger leading-relaxed flex-1">
                       {error}
                     </p>
                   </div>
@@ -268,7 +283,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 sm:py-3.5 rounded-lg bg-accent-primary hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors mt-2 shadow-sm"
+                className="w-full py-3 sm:py-3.5 bg-accent-primary hover:bg-accent-primary/90 disabled:opacity-30 disabled:cursor-not-allowed text-white text-xs font-bold uppercase tracking-wider transition-colors mt-2 border-2 border-accent-primary font-mono"
               >
                 {loading
                   ? tab === "signup"
@@ -281,22 +296,23 @@ export default function Login() {
             </form>
           </div>
 
-          {/* Footer */}
-          <div className="border-t border-border-subtle px-4 sm:px-6 py-3 sm:py-4 bg-bg-tertiary">
-            <p className="text-xs sm:text-sm text-text-tertiary text-center">
-              Encrypted connection · Enterprise security
+          {/* Footer - Terminal style */}
+          <div className="border-t-2 border-border-DEFAULT px-4 sm:px-6 py-3 sm:py-4 bg-background-subtle">
+            <p className="text-[10px] sm:text-xs text-content-tertiary text-center font-mono uppercase tracking-wider">
+              Encrypted Connection • Enterprise Security
             </p>
           </div>
         </div>
       </div>
 
-      <p className="text-xs sm:text-sm text-text-tertiary mt-6 sm:mt-8 text-center px-4">
+      {/* Legal footer - Terminal style */}
+      <p className="text-[10px] sm:text-xs text-content-tertiary mt-6 sm:mt-8 text-center px-4 font-mono">
         By continuing you agree to{" "}
-        <a href="#" className="text-accent-primary hover:text-accent-hover transition-colors underline">
+        <a href="#" className="text-accent-primary hover:text-accent-primary/80 transition-colors uppercase font-bold">
           Terms
         </a>{" "}
         and{" "}
-        <a href="#" className="text-accent-primary hover:text-accent-hover transition-colors underline">
+        <a href="#" className="text-accent-primary hover:text-accent-primary/80 transition-colors uppercase font-bold">
           Privacy Policy
         </a>
       </p>

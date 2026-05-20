@@ -103,12 +103,17 @@ function useAgentStream(buildId: string | null, prompt: string | null, enabled: 
       es.close();
     });
 
-    es.onerror = () => {
-      setError("Connection lost");
+    es.onerror = (err) => {
+      console.error('SSE connection error:', err);
+      setError("Connection lost. The build may still be processing in the background.");
       es.close();
     };
 
-    return () => es.close();
+    return () => {
+      if (es.readyState !== EventSource.CLOSED) {
+        es.close();
+      }
+    };
   }, [buildId, prompt, enabled]);
 
   return { meta, depts, feed, done, error };
@@ -746,10 +751,10 @@ export default function Overview() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background-subtle">
+      <div className="flex items-center justify-center min-h-[60vh] bg-background-subtle">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-gray-200 border-t-accent-primary rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-sm text-gray-600">Loading...</p>
+          <p className="text-sm text-gray-600">Loading your builds...</p>
         </div>
       </div>
     );
@@ -846,14 +851,23 @@ export default function Overview() {
           </>
         ) : (
           <div className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-4">No build selected</p>
+            <div className="text-center max-w-md mx-auto px-4">
+              <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-6">
+                <Terminal className="w-8 h-8 text-gray-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">Welcome to Nanowork</h2>
+              <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+                Get started by creating your first build. Our AI agents will work across 7 departments to bring your vision to life.
+              </p>
               <button
                 onClick={handleNewBuild}
-                className="px-6 py-3 rounded-md bg-accent-primary hover:bg-accent-primary/90 text-white text-xs font-semibold transition-colors"
+                className="px-6 py-3 rounded-md bg-accent-primary hover:bg-accent-primary/90 text-white text-sm font-semibold transition-colors shadow-sm"
               >
                 Create your first build
               </button>
+              <p className="text-xs text-gray-500 mt-4">
+                Free plan includes 1 business build with full agent access
+              </p>
             </div>
           </div>
         )}
