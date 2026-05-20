@@ -325,20 +325,14 @@ export default function Home() {
                 Dashboard
               </Link>
             ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="hidden sm:block px-5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-white/60 hover:text-white transition-colors"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/login"
-                  className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-none bg-white text-black text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
-                >
-                  Start
-                </Link>
-              </>
+              <a
+                href="https://calendly.com/jordan_plows"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-none bg-white text-black text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
+              >
+                Request Access
+              </a>
             )}
           </nav>
         </div>
@@ -524,13 +518,15 @@ export default function Home() {
             <p className="text-xs sm:text-sm font-mono text-white/70 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
               $497 one-time setup includes your complete company infrastructure, 1-on-1 kickoff call, and 30 days of priority support. Limited to 10 new companies per week to ensure you get our full attention.
             </p>
-            <Link
-              to="/login"
+            <a
+              href="https://calendly.com/jordan_plows"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
             >
-              Reserve Your Spot
+              Request Access
               <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </Link>
+            </a>
             <p className="text-xs font-mono text-amber-400/80 mt-4 font-medium">
               Next available: May 20, 2026 • 3 spots remaining
             </p>
