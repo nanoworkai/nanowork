@@ -320,9 +320,9 @@ function CompanyCard({ company, onClaim }: CompanyCardProps) {
       <div className="p-4">
         <button
           onClick={() => onClaim(company)}
-          className="w-full px-4 py-2.5 bg-content-primary hover:bg-content-secondary text-background-DEFAULT font-mono text-xs uppercase tracking-wider transition-colors border border-content-primary"
+          className="w-full px-4 py-2.5 bg-accent-primary hover:bg-accent-primary/90 text-white font-mono text-xs uppercase tracking-wider transition-colors border border-accent-primary"
         >
-          Claim Company
+          Claim Company for ${company.price}
         </button>
       </div>
     </div>

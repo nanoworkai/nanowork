@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
-// import Login from "./pages/Login";
+import Login from "./pages/Login";
 // import ForgotPassword from "./pages/ForgotPassword";
 // import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -22,6 +22,10 @@ import UserAppLeads from "./pages/user-app/UserAppLeads";
 import UserAppAPI from "./pages/user-app/UserAppAPI";
 import UserAppSettings from "./pages/user-app/UserAppSettings";
 import UserAppRedeem from "./pages/user-app/UserAppRedeem";
+import ClaimedCompany from "./pages/ClaimedCompany";
+// TODO: Create claim flow components
+// import ClaimPreview from "./pages/claim/ClaimPreview";
+// import ClaimPayment from "./pages/claim/ClaimPayment";
 import { useAuth } from "./context/AuthContext";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -38,13 +42,19 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      {/* <Route path="/login" element={<Login />} /> */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Login />} />
       {/* <Route path="/forgot-password" element={<ForgotPassword />} /> */}
       {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/revenue" element={<Revenue />} />
       <Route path="/swipe" element={<Swipe />} />
       <Route path="/preview/:buildId" element={<PreviewPage />} />
+
+      {/* Claim flow routes */}
+      {/* <Route path="/claim/:companyId/preview" element={<ClaimPreview />} /> */}
+      {/* <Route path="/claim/:companyId/payment" element={<ClaimPayment />} /> */}
+      <Route path="/claimed/:companyId" element={<ClaimedCompany />} />
 
       {/* Dashboard routes - authenticated */}
       <Route

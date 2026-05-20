@@ -258,7 +258,7 @@ export default function Home() {
             <span className="text-xs sm:text-sm font-bold uppercase tracking-wider">Nanowork</span>
           </Link>
 
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-2">
             {isAuthenticated ? (
               <Link
                 to="/dashboard"
@@ -267,14 +267,20 @@ export default function Home() {
                 Dashboard
               </Link>
             ) : (
-              <a
-                href="https://calendly.com/jordan_plows"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-md bg-accent-primary text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider hover:bg-accent-primary/90 transition-colors"
-              >
-                Request Access
-              </a>
+              <>
+                <Link
+                  to="/login"
+                  className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-md border border-border-DEFAULT text-content-primary text-[10px] sm:text-xs font-bold uppercase tracking-wider hover:bg-background-subtle transition-colors"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-md bg-accent-primary text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider hover:bg-accent-primary/90 transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </>
             )}
           </nav>
         </div>
