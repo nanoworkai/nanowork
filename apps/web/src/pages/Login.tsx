@@ -84,7 +84,7 @@ export default function Login() {
         return;
       }
 
-      const { error: err } = await signUp(email, password, name);
+      const { error: err, message: successMessage } = await signUp(email, password, name);
       setLoading(false);
       if (err) {
         // Improve error messages
@@ -95,11 +95,14 @@ export default function Login() {
         } else {
           setError(err);
         }
+      } else if (successMessage) {
+        // Email confirmation is required - show success message without navigating
+        setSuccess(successMessage);
+        // Do not navigate - user needs to confirm email first
       } else {
-        // Check if email confirmation is required
-        setSuccess("Account created successfully! Check your email to verify your account, then sign in.");
-        // Navigate to dashboard after successful signup (if email verification is disabled, user will be authenticated)
-        // If email verification is enabled, the useEffect will handle redirect after user verifies and signs in
+        // Account created and logged in automatically (email confirmation disabled)
+        setSuccess("Account created successfully!");
+        // Navigate to dashboard after successful signup
         const dest = pendingPrompt
           ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
           : nextPath;

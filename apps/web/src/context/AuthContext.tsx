@@ -73,7 +73,7 @@ interface AuthContextValue {
 
   // Auth methods
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, name?: string) => Promise<{ error: string | null }>;
+  signUp: (email: string, password: string, name?: string) => Promise<{ error: string | null; message?: string }>;
   requestOtp: (phone: string) => Promise<{ error: string | null }>;
   verifyOtp: (phone: string, token: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
@@ -97,7 +97,7 @@ const AuthContext = createContext<AuthContextValue>({
   refreshCompanies: async () => {},
   canCreateCompany: () => false,
   signIn: async () => ({ error: null }),
-  signUp: async () => ({ error: null }),
+  signUp: async () => ({ error: null, message: undefined }),
   requestOtp: async () => ({ error: null }),
   verifyOtp: async () => ({ error: null }),
   logout: async () => {},
@@ -265,7 +265,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // If user is null but session exists, email confirmation is disabled
     // If user exists but session is null, email confirmation is required
     if (data.user && !data.session) {
-      return { error: "Please check your email to confirm your account before signing in." };
+      return {
+        error: null,
+        message: "Account created successfully! Please check your email to confirm your account before signing in."
+      };
     }
 
     // Profile is automatically created by database trigger
