@@ -294,6 +294,69 @@ router.get('/stream', requireUserAuth, async (req: AuthenticatedRequest, res: Re
       return;
     }
 
+    // IDEMPOTENCY CHECK 1: If build is already complete with data, replay it
+    if (build.status === 'unlocked' && build.build_data) {
+      // Set SSE headers
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
+
+      const sendEvent = (event: string, data: any) => {
+        res.write(`event: ${event}\n`);
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+      };
+
+      // Replay existing build data
+      const buildPlan = build.build_data;
+
+      // Send meta event
+      sendEvent('meta', {
+        company_name: buildPlan.company_name || 'New Company',
+        tagline: buildPlan.tagline || 'Building something great',
+      });
+
+      // Replay departments and tasks
+      for (const dept of buildPlan.departments || []) {
+        sendEvent('dept_start', {
+          dept: dept.name,
+          icon: dept.icon || '📦',
+          task_count: (dept.tasks || []).length,
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        for (const task of dept.tasks || []) {
+          sendEvent('task', {
+            dept: dept.name,
+            task: task,
+          });
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+
+        sendEvent('dept_done', {
+          dept: dept.name,
+          output: dept.output || `Completed ${dept.name} tasks`,
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+
+      sendEvent('done', {});
+      removeConnection(req.user.id, buildId);
+      res.end();
+      return;
+    }
+
+    // IDEMPOTENCY CHECK 2: If build is currently generating, reject concurrent request
+    if (build.status === 'generating') {
+      res.status(409).json({
+        error: 'Build generation already in progress',
+        message: 'Another stream is actively generating this build. Please wait for it to complete.'
+      });
+      return;
+    }
+
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
     if (!anthropicApiKey) {
       res.status(500).json({ error: 'Anthropic API not configured' });

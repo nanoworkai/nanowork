@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import { getSupabase } from './services/supabase';
 
 // Import routes
 import provisionRouter from './routes/internal/provision';
@@ -91,13 +92,47 @@ app.use(cors({
   credentials: true,
 }));
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({
-    ok: true,
-    tables: 15,
-    timestamp: new Date().toISOString(),
-  });
+// Health check endpoint - tests database connectivity
+app.get('/health', async (req, res) => {
+  try {
+    // Test database connectivity with a simple query
+    const supabase = getSupabase();
+    const { error } = await supabase
+      .from('agents')
+      .select('id')
+      .limit(1)
+      .single();
+
+    // If query fails (but not because of "no rows"), database is unreachable
+    if (error && error.code !== 'PGRST116') {
+      console.error('Health check database error:', error);
+      res.status(503).json({
+        ok: false,
+        database: 'disconnected',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        uptime: Math.floor(process.uptime()),
+      });
+      return;
+    }
+
+    // Database is healthy
+    res.status(200).json({
+      ok: true,
+      database: 'connected',
+      timestamp: new Date().toISOString(),
+      uptime: Math.floor(process.uptime()),
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(503).json({
+      ok: false,
+      database: 'error',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+      uptime: Math.floor(process.uptime()),
+    });
+  }
 });
 
 // Internal routes (protected by internal token)
@@ -139,8 +174,29 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 });
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`   Health check: http://localhost:${PORT}/health`);
   console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
 });
+
+// Graceful shutdown handler
+function gracefulShutdown(signal: string) {
+  console.log(`${signal} received, starting graceful shutdown...`);
+
+  // Stop accepting new connections
+  server.close(() => {
+    console.log('Server closed - all connections finished');
+    process.exit(0);
+  });
+
+  // Force shutdown after timeout to prevent hanging
+  setTimeout(() => {
+    console.error('Forced shutdown after timeout - some connections may have been terminated');
+    process.exit(1);
+  }, 30000); // 30 second timeout
+}
+
+// Register shutdown handlers
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));

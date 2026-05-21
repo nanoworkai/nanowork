@@ -282,7 +282,7 @@ export interface Database {
         Row: {
           id: string
           user_id: string
-          type: 'purchase' | 'usage' | 'refund' | 'bonus' | 'expiration'
+          type: 'topup' | 'spend' | 'refund'
           amount: number
           balance_after: number
           company_id: string | null
@@ -297,7 +297,7 @@ export interface Database {
         Insert: {
           id?: string
           user_id: string
-          type: 'purchase' | 'usage' | 'refund' | 'bonus' | 'expiration'
+          type: 'topup' | 'spend' | 'refund'
           amount: number
           balance_after: number
           company_id?: string | null
@@ -312,7 +312,7 @@ export interface Database {
         Update: {
           id?: string
           user_id?: string
-          type?: 'purchase' | 'usage' | 'refund' | 'bonus' | 'expiration'
+          type?: 'topup' | 'spend' | 'refund'
           amount?: number
           balance_after?: number
           company_id?: string | null

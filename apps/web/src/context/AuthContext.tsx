@@ -362,7 +362,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Insert transaction (this will trigger auto-update of balance via DB function)
     const { error } = await supabase.from("credits_transactions").insert({
       user_id: user.id,
-      type: "usage",
+      type: "spend",
       amount: -amount,
       balance_after: newBalance,
       company_id: companyId || null,
