@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Coins, TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
-import { loadStripe, Stripe } from "@stripe/stripe-js";
+import { loadStripe, type Stripe } from "@stripe/stripe-js";
 
 // Lazy load Stripe only when needed to avoid HTTP warnings on localhost
 let stripePromise: Promise<Stripe | null> | null = null;

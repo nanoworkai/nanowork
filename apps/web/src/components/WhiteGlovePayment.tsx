@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { loadStripe, Stripe } from "@stripe/stripe-js";
+import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { Shield, Check, Sparkles, Lock } from "lucide-react";
 
 interface WhiteGlovePaymentProps {
