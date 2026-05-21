@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { requireUserAuth } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types';
-import { getContacts, upsertContact, updateContact, createInteraction } from '../services/supabase';
+import { getSupabase, getContacts, upsertContact, updateContact, createInteraction } from '../services/supabase';
 
 const router = Router();
 
@@ -69,6 +69,19 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
  */
 router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
+    // Verify the contact belongs to this agent
+    const { data: existing, error: fetchError } = await getSupabase()
+      .from('contacts')
+      .select('id, agent_id')
+      .eq('id', req.params.id)
+      .eq('agent_id', req.agent!.id)
+      .single();
+
+    if (fetchError || !existing) {
+      res.status(404).json({ error: 'Contact not found' });
+      return;
+    }
+
     const { name, email, phone, company, status } = req.body;
 
     const contact = await updateContact(req.params.id, {
