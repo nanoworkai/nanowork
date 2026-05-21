@@ -13,10 +13,12 @@ interface CompanyData {
 let stripePromise: Promise<Stripe | null> | null = null;
 const getStripe = () => {
   if (!stripePromise) {
-    const key = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-    if (key) {
+    const key = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string;
+    // Check if key exists and is not empty or placeholder
+    if (key && key.trim() && !key.includes('your_test_key_here')) {
       stripePromise = loadStripe(key);
     } else {
+      console.warn('Stripe publishable key not configured or is placeholder');
       stripePromise = Promise.resolve(null);
     }
   }
