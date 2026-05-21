@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     branch: main
-    buildCommand: npm ci && npm run build && cd backend && npm ci
+    buildCommand: npm ci && npm run build && cd backend && npm ci && npm run build
     startCommand: npm start
     healthCheckPath: /health
     envVars:
