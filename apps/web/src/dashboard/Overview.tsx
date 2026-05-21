@@ -68,7 +68,7 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
     setConnecting(true);
     setError(null);
 
-    const apiBase = import.meta.env.VITE_API_BASE_URL ?? "";
+    const apiBase = import.meta.env.VITE_API_URL ?? "";
     const url = `${apiBase}/api/build/stream?prompt=${encodeURIComponent(promptToUse)}`;
     const es = new EventSource(url);
     esRef.current = es;

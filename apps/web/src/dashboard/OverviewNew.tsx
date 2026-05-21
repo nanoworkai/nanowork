@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Terminal, ChevronDown, Edit2, Trash2 } from "lucide-react";
+import { Terminal, ChevronDown, Edit2, Trash2, AlertCircle, XCircle } from "lucide-react";
 
 /**
  * Light redesign dashboard with soft colors and rounded corners
@@ -575,6 +575,7 @@ export default function Overview() {
   const [buildEnabled, setBuildEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [apiErrors, setApiErrors] = useState<Array<{ operation: string; error: string; timestamp: Date }>>([]);
 
   const { meta, depts, feed, done, error } = useAgentStream(
     activeBuild?.id || null,
