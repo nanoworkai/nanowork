@@ -91,20 +91,20 @@ app.use('/internal', provisionRouter);
 app.use('/webhooks/email', emailWebhookRouter);
 
 // API routes (protected by user auth)
-app.use('/agents', agentsRouter);
-app.use('/businesses', businessesRouter);
-app.use('/apps', appsRouter);
-app.use('/landing-pages', landingPagesRouter);
-app.use('/deployments', deploymentsRouter);
-app.use('/conversations', conversationsRouter);
-app.use('/tasks', tasksRouter);
-app.use('/contacts', contactsRouter);
-app.use('/payments', paymentsRouter);
-app.use('/documents', documentsRouter);
-app.use('/domains', domainsRouter);
-app.use('/billing', billingRouter);
-app.use('/wallet', walletRouter);
-app.use('/build', buildsRouter);
+app.use('/api/agents', agentsRouter);
+app.use('/api/businesses', businessesRouter);
+app.use('/api/apps', appsRouter);
+app.use('/api/landing-pages', landingPagesRouter);
+app.use('/api/deployments', deploymentsRouter);
+app.use('/api/conversations', conversationsRouter);
+app.use('/api/tasks', tasksRouter);
+app.use('/api/contacts', contactsRouter);
+app.use('/api/payments', paymentsRouter);
+app.use('/api/documents', documentsRouter);
+app.use('/api/domains', domainsRouter);
+app.use('/api/billing', billingRouter);
+app.use('/api/wallet', walletRouter);
+app.use('/api/build', buildsRouter);
 
 // Serve static files from frontend build (production only)
 if (process.env.NODE_ENV === 'production') {

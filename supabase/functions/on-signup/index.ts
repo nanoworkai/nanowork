@@ -36,20 +36,19 @@ serve(async (req) => {
       )
     }
 
-    // Call backend to provision agents
-    const provisionUrl = `${BACKEND_URL}/api/agents/internal/provision-agent`
+    // Call backend to provision agent
+    const provisionUrl = `${BACKEND_URL}/internal/provision-agent`
 
-    console.log(`Provisioning agents for user ${payload.user_id}`)
+    console.log(`Provisioning agent for user ${payload.user_id}`)
 
     const response = await fetch(provisionUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Internal-Token": INTERNAL_TOKEN,
+        "Authorization": `Bearer ${INTERNAL_TOKEN}`,
       },
       body: JSON.stringify({
         user_id: payload.user_id,
-        email: payload.email,
       }),
     })
 
@@ -66,10 +65,10 @@ serve(async (req) => {
     }
 
     const result = await response.json()
-    console.log(`Successfully provisioned ${result.agents?.length || 0} agents`)
+    console.log(`Successfully provisioned agent for user ${payload.user_id}`)
 
     return new Response(
-      JSON.stringify({ success: true, agents: result.agents }),
+      JSON.stringify({ success: true, agent: result.agent, created: result.created }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     )
 

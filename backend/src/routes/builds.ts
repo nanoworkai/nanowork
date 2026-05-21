@@ -60,20 +60,20 @@ Examples: "Dog Walking App", "Restaurant Booking System", "Fitness Tracker"`,
 
 /**
  * GET /build
- * Get all builds for the authenticated user's agent
+ * Get all builds for the authenticated user
  */
 router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.agent) {
-      res.status(403).json({ error: 'No agent found for user' });
+    if (!req.user) {
+      res.status(403).json({ error: 'No user found' });
       return;
     }
 
     const { data, error } = await getSupabase()
-      .from('generated_apps')
+      .from('builds')
       .select('*')
-      .eq('agent_id', req.agent.id)
-      .order('last_activity_at', { ascending: false });
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to fetch builds: ${error.message}`);
@@ -91,27 +91,26 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
 
 /**
  * POST /build
- * Create a new build for the authenticated user's agent
+ * Create a new build for the authenticated user
  */
 router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.agent) {
-      res.status(403).json({ error: 'No agent found for user' });
+    if (!req.user) {
+      res.status(403).json({ error: 'No user found' });
       return;
     }
 
-    const { name = 'New Build', prompt = '' } = req.body;
+    const { company_name, prompt = '', tagline } = req.body;
 
     const { data, error } = await getSupabase()
-      .from('generated_apps')
+      .from('builds')
       .insert({
-        agent_id: req.agent.id,
-        name,
+        user_id: req.user.id,
+        company_name,
         prompt,
+        tagline,
         status: 'generating',
-        framework: 'react',
-        tech_stack: [],
-        last_activity_at: new Date().toISOString(),
+        credits_cost: 100,
       })
       .select()
       .single();
@@ -132,27 +131,29 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
 
 /**
  * PATCH /build/:id
- * Update a build (rename, update activity)
+ * Update a build (update company name, tagline, status)
  */
 router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.agent) {
-      res.status(403).json({ error: 'No agent found for user' });
+    if (!req.user) {
+      res.status(403).json({ error: 'No user found' });
       return;
     }
 
     const { id } = req.params;
-    const { name, last_activity_at } = req.body;
+    const { company_name, tagline, status, build_data } = req.body;
 
     const updateData: any = {};
-    if (name !== undefined) updateData.name = name;
-    if (last_activity_at !== undefined) updateData.last_activity_at = last_activity_at;
+    if (company_name !== undefined) updateData.company_name = company_name;
+    if (tagline !== undefined) updateData.tagline = tagline;
+    if (status !== undefined) updateData.status = status;
+    if (build_data !== undefined) updateData.build_data = build_data;
 
     const { data, error } = await getSupabase()
-      .from('generated_apps')
+      .from('builds')
       .update(updateData)
       .eq('id', id)
-      .eq('agent_id', req.agent.id)
+      .eq('user_id', req.user.id)
       .select()
       .single();
 
@@ -188,17 +189,17 @@ router.get('/stream', requireUserAuth, async (req: AuthenticatedRequest, res: Re
       return;
     }
 
-    if (!req.agent) {
-      res.status(403).json({ error: 'No agent found for user' });
+    if (!req.user) {
+      res.status(403).json({ error: 'No user found' });
       return;
     }
 
-    // Verify the build belongs to the user's agent
+    // Verify the build belongs to the user
     const { data: build, error: buildError } = await getSupabase()
-      .from('generated_apps')
+      .from('builds')
       .select('*')
       .eq('id', buildId)
-      .eq('agent_id', req.agent.id)
+      .eq('user_id', req.user.id)
       .single();
 
     if (buildError || !build) {
@@ -339,10 +340,10 @@ Make tasks realistic and specific to the user's prompt. Keep task descriptions c
 
       // Update build status in database
       await getSupabase()
-        .from('generated_apps')
+        .from('builds')
         .update({
-          status: 'complete',
-          last_activity_at: new Date().toISOString(),
+          status: 'unlocked',
+          build_data: buildPlan,
         })
         .eq('id', buildId);
 
@@ -374,18 +375,18 @@ Make tasks realistic and specific to the user's prompt. Keep task descriptions c
  */
 router.delete('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.agent) {
-      res.status(403).json({ error: 'No agent found for user' });
+    if (!req.user) {
+      res.status(403).json({ error: 'No user found' });
       return;
     }
 
     const { id } = req.params;
 
     const { error } = await getSupabase()
-      .from('generated_apps')
+      .from('builds')
       .delete()
       .eq('id', id)
-      .eq('agent_id', req.agent.id);
+      .eq('user_id', req.user.id);
 
     if (error) {
       throw new Error(`Failed to delete build: ${error.message}`);
@@ -407,18 +408,18 @@ router.delete('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Re
  */
 router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    if (!req.agent) {
-      res.status(403).json({ error: 'No agent found for user' });
+    if (!req.user) {
+      res.status(403).json({ error: 'No user found' });
       return;
     }
 
     const { id } = req.params;
 
     const { data, error } = await getSupabase()
-      .from('generated_apps')
+      .from('builds')
       .select('*')
       .eq('id', id)
-      .eq('agent_id', req.agent.id)
+      .eq('user_id', req.user.id)
       .single();
 
     if (error || !data) {
