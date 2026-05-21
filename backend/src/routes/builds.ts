@@ -216,6 +216,45 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
 });
 
 /**
+ * POST /build/preview
+ * Create an anonymous preview build (no authentication required)
+ */
+router.post('/preview', async (req, res: Response) => {
+  try {
+    const { prompt } = req.body;
+
+    if (!prompt || typeof prompt !== 'string') {
+      res.status(400).json({ error: 'Prompt is required' });
+      return;
+    }
+
+    // Create anonymous preview build
+    const { data, error } = await getSupabase()
+      .from('builds')
+      .insert({
+        user_id: null, // Anonymous build
+        prompt,
+        status: 'preview',
+        credits_cost: 0, // Free preview
+      })
+      .select()
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Failed to create preview: ${error?.message || 'unknown error'}`);
+    }
+
+    res.json({ build_id: data.id });
+  } catch (error) {
+    console.error('Create preview error:', error);
+    res.status(500).json({
+      error: 'Failed to create preview',
+      message: error instanceof Error ? error.message : 'unknown error',
+    });
+  }
+});
+
+/**
  * PATCH /build/:id
  * Update a build (update company name, tagline, status)
  */
