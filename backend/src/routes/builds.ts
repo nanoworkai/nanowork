@@ -7,6 +7,36 @@ import { spendCredits, InsufficientCreditsError } from '../services/creditServic
 
 const router = Router();
 
+// Track active SSE connections per user to prevent DoS
+const activeConnections = new Map<string, Set<string>>();
+const MAX_CONNECTIONS_PER_USER = 3;
+const ANTHROPIC_TIMEOUT_MS = 30000; // 30 seconds
+
+function addConnection(userId: string, buildId: string): boolean {
+  if (!activeConnections.has(userId)) {
+    activeConnections.set(userId, new Set());
+  }
+
+  const userConnections = activeConnections.get(userId)!;
+
+  if (userConnections.size >= MAX_CONNECTIONS_PER_USER) {
+    return false; // Too many connections
+  }
+
+  userConnections.add(buildId);
+  return true;
+}
+
+function removeConnection(userId: string, buildId: string): void {
+  const userConnections = activeConnections.get(userId);
+  if (userConnections) {
+    userConnections.delete(buildId);
+    if (userConnections.size === 0) {
+      activeConnections.delete(userId);
+    }
+  }
+}
+
 /**
  * POST /build/generate-name
  * Generate an AI build name from a prompt
@@ -220,6 +250,9 @@ router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Res
  * Server-Sent Events endpoint for streaming build generation
  */
 router.get('/stream', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+  let keepAliveInterval: NodeJS.Timeout | null = null;
+  let connectionAdded = false;
+
   try {
     const { buildId, prompt } = req.query;
 
@@ -237,6 +270,16 @@ router.get('/stream', requireUserAuth, async (req: AuthenticatedRequest, res: Re
       res.status(403).json({ error: 'No user found' });
       return;
     }
+
+    // Check connection limit
+    if (!addConnection(req.user.id, buildId)) {
+      res.status(429).json({
+        error: 'Too many active streams',
+        message: `Maximum ${MAX_CONNECTIONS_PER_USER} concurrent build streams allowed`
+      });
+      return;
+    }
+    connectionAdded = true;
 
     // Verify the build belongs to the user
     const { data: build, error: buildError } = await getSupabase()
@@ -269,15 +312,34 @@ router.get('/stream', requireUserAuth, async (req: AuthenticatedRequest, res: Re
       res.write(`data: ${JSON.stringify(data)}\n\n`);
     };
 
-    // Keep connection alive with periodic comments
-    const keepAliveInterval = setInterval(() => {
-      res.write(': keepalive\n\n');
-    }, 15000);
+    // Cleanup function
+    const cleanup = async (updateStatus?: 'failed' | 'unlocked') => {
+      if (keepAliveInterval) {
+        clearInterval(keepAliveInterval);
+        keepAliveInterval = null;
+      }
+      if (connectionAdded) {
+        removeConnection(req.user!.id, buildId);
+        connectionAdded = false;
+      }
+      if (updateStatus) {
+        await getSupabase()
+          .from('builds')
+          .update({ status: updateStatus })
+          .eq('id', buildId)
+          .eq('user_id', req.user!.id);
+      }
+    };
 
     // Clean up on client disconnect
-    req.on('close', () => {
-      clearInterval(keepAliveInterval);
+    req.on('close', async () => {
+      await cleanup('failed');
     });
+
+    // Start keepalive interval AFTER validation passes
+    keepAliveInterval = setInterval(() => {
+      res.write(': keepalive\n\n');
+    }, 15000);
 
     try {
       const anthropic = new Anthropic({
@@ -308,7 +370,8 @@ Output format must be valid JSON with this structure:
 
 Make tasks realistic and specific to the user's prompt. Keep task descriptions concise (under 10 words).`;
 
-      const message = await anthropic.messages.create({
+      // Create API call with timeout
+      const apiCallPromise = anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
         system: systemPrompt,
@@ -319,6 +382,12 @@ Make tasks realistic and specific to the user's prompt. Keep task descriptions c
           },
         ],
       });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('AI request timed out')), ANTHROPIC_TIMEOUT_MS)
+      );
+
+      const message = await Promise.race([apiCallPromise, timeoutPromise]) as Anthropic.Messages.Message;
 
       // Parse the AI response
       const textContent = message.content.find((block) => block.type === 'text');
@@ -389,17 +458,18 @@ Make tasks realistic and specific to the user's prompt. Keep task descriptions c
           status: 'unlocked',
           build_data: buildPlan,
         })
-        .eq('id', buildId);
+        .eq('id', buildId)
+        .eq('user_id', req.user!.id);
 
-      // Close connection
-      clearInterval(keepAliveInterval);
+      // Close connection and cleanup
+      await cleanup(); // Don't update status, already set to 'unlocked'
       res.end();
     } catch (aiError) {
       console.error('AI generation error:', aiError);
       sendEvent('error', {
         message: aiError instanceof Error ? aiError.message : 'Failed to generate build',
       });
-      clearInterval(keepAliveInterval);
+      await cleanup('failed');
       res.end();
     }
   } catch (error) {
