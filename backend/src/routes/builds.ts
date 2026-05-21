@@ -79,7 +79,13 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
       throw new Error(`Failed to fetch builds: ${error.message}`);
     }
 
-    res.json({ builds: data || [] });
+    // Map company_name to name for frontend compatibility
+    const builds = (data || []).map((build: any) => ({
+      ...build,
+      name: build.company_name || 'Untitled Build',
+    }));
+
+    res.json({ builds });
   } catch (error) {
     console.error('Get builds error:', error);
     res.status(500).json({
@@ -119,7 +125,13 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
       throw new Error(`Failed to create build: ${error?.message || 'unknown error'}`);
     }
 
-    res.json({ build: data });
+    // Map company_name to name for frontend compatibility
+    const build = {
+      ...data,
+      name: data.company_name || 'Untitled Build',
+    };
+
+    res.json({ build });
   } catch (error) {
     console.error('Create build error:', error);
     res.status(500).json({
@@ -141,13 +153,16 @@ router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Res
     }
 
     const { id } = req.params;
-    const { company_name, tagline, status, build_data } = req.body;
+    const { company_name, name, tagline, status, build_data, last_activity_at } = req.body;
 
     const updateData: any = {};
+    // Accept both 'name' (from frontend) and 'company_name' (database field)
     if (company_name !== undefined) updateData.company_name = company_name;
+    if (name !== undefined) updateData.company_name = name;
     if (tagline !== undefined) updateData.tagline = tagline;
     if (status !== undefined) updateData.status = status;
     if (build_data !== undefined) updateData.build_data = build_data;
+    if (last_activity_at !== undefined) updateData.last_activity_at = last_activity_at;
 
     const { data, error } = await getSupabase()
       .from('builds')
@@ -161,7 +176,13 @@ router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Res
       throw new Error(`Failed to update build: ${error?.message || 'not found'}`);
     }
 
-    res.json({ build: data });
+    // Map company_name to name for frontend compatibility
+    const build = {
+      ...data,
+      name: data.company_name || 'Untitled Build',
+    };
+
+    res.json({ build });
   } catch (error) {
     console.error('Update build error:', error);
     res.status(500).json({
@@ -427,7 +448,13 @@ router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Respo
       return;
     }
 
-    res.json({ build: data });
+    // Map company_name to name for frontend compatibility
+    const build = {
+      ...data,
+      name: data.company_name || 'Untitled Build',
+    };
+
+    res.json({ build });
   } catch (error) {
     console.error('Get build error:', error);
     res.status(500).json({
