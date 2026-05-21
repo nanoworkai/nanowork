@@ -56,15 +56,6 @@ export function getSupabase(): SupabaseClient {
     realtime: {
       transport: ws as any,
     },
-    // Connection pool configuration for free tier database
-    // min: 2 - maintains minimum connections to reduce cold start latency
-    // max: 10 - limits connections to prevent exhausting database pool on Render free tier
-    db: {
-      pool: {
-        min: 2,
-        max: 10,
-      },
-    },
   });
 
   return supabase;

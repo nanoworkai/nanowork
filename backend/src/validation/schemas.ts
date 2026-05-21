@@ -15,27 +15,23 @@ export const updateBuildSchema = z.object({
   company_name: z.string().min(1, 'Company name cannot be empty').max(100, 'Company name too long').optional(),
   name: z.string().min(1, 'Name cannot be empty').max(100, 'Name too long').optional(),
   tagline: z.string().max(200, 'Tagline too long').optional(),
-  status: z.enum(['generating', 'unlocked', 'failed'], {
-    errorMap: () => ({ message: 'Invalid status value' })
-  }).optional(),
-  build_data: z.record(z.any()).optional(),
-  last_activity_at: z.string().datetime().optional(),
+  status: z.enum(['generating', 'unlocked', 'failed']).optional(),
+  build_data: z.record(z.string(), z.any()).optional(),
+  last_activity_at: z.string().optional(),
 });
 
 export const generateNameSchema = z.object({
   prompt: z.string().min(1, 'Prompt is required').max(2000, 'Prompt too long'),
 });
 
-// Contact schemas
+// Contact schemas - status values from Contact type: 'lead' | 'customer' | 'partner' | 'archived'
 export const createContactSchema = z.object({
   name: z.string().min(1, 'Name is required').max(200, 'Name too long'),
   email: z.string().email('Invalid email format').max(255, 'Email too long').optional().or(z.literal('')),
   phone: z.string().max(50, 'Phone number too long').optional().or(z.literal('')),
   company: z.string().max(200, 'Company name too long').optional(),
   business_id: z.string().uuid('Invalid business ID').optional(),
-  status: z.enum(['lead', 'contacted', 'qualified', 'customer', 'inactive'], {
-    errorMap: () => ({ message: 'Invalid status value' })
-  }).optional(),
+  status: z.enum(['lead', 'customer', 'partner', 'archived']).optional(),
 });
 
 export const updateContactSchema = z.object({
@@ -43,9 +39,7 @@ export const updateContactSchema = z.object({
   email: z.string().email('Invalid email format').max(255, 'Email too long').optional().or(z.literal('')),
   phone: z.string().max(50, 'Phone number too long').optional().or(z.literal('')),
   company: z.string().max(200, 'Company name too long').optional(),
-  status: z.enum(['lead', 'contacted', 'qualified', 'customer', 'inactive'], {
-    errorMap: () => ({ message: 'Invalid status value' })
-  }).optional(),
+  status: z.enum(['lead', 'customer', 'partner', 'archived']).optional(),
 });
 
 export const createInteractionSchema = z.object({

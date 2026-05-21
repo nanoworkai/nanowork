@@ -464,86 +464,42 @@ Output format must be valid JSON with this structure:
 
 Make tasks realistic and specific to the user's prompt. Keep task descriptions concise (under 10 words).`;
 
-      // Create streaming API call with timeout
-      let accumulatedText = '';
-      let streamEnded = false;
-      let timeoutId: NodeJS.Timeout | null = null;
-
-      const streamPromise = new Promise<void>(async (resolve, reject) => {
-        try {
-          const stream = await anthropic.messages.stream({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 4096,
-            system: systemPrompt,
-            messages: [
-              {
-                role: 'user',
-                content: `Generate a build plan for: ${prompt}`,
-              },
-            ],
-          });
-
-          // Send initial connecting event
-          sendEvent('ai_start', { message: 'AI generation started' });
-
-          // Handle text chunks
-          stream.on('text', (text: string) => {
-            accumulatedText += text;
-            // Optionally send chunks to frontend for real-time display
-            sendEvent('ai_chunk', { text });
-          });
-
-          // Handle stream completion
-          stream.on('message_stop', () => {
-            streamEnded = true;
-            if (timeoutId) clearTimeout(timeoutId);
-            resolve();
-          });
-
-          // Handle stream errors
-          stream.on('error', (error: Error) => {
-            streamEnded = true;
-            if (timeoutId) clearTimeout(timeoutId);
-            reject(error);
-          });
-        } catch (error) {
-          streamEnded = true;
-          if (timeoutId) clearTimeout(timeoutId);
-          reject(error);
-        }
+      // Create API call with timeout
+      const apiCallPromise = anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [
+          {
+            role: 'user',
+            content: `Generate a build plan for: ${prompt}`,
+          },
+        ],
       });
 
-      // Setup timeout
-      const timeoutPromise = new Promise<void>((_, reject) => {
-        timeoutId = setTimeout(() => {
-          if (!streamEnded) {
-            reject(new Error('AI request timed out'));
-          }
-        }, ANTHROPIC_TIMEOUT_MS);
-      });
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('AI request timed out')), ANTHROPIC_TIMEOUT_MS)
+      );
 
-      // Wait for stream to complete or timeout
-      await Promise.race([streamPromise, timeoutPromise]);
+      const message = await Promise.race([apiCallPromise, timeoutPromise]) as Anthropic.Messages.Message;
 
-      // Send completion event
-      sendEvent('ai_done', { message: 'AI generation completed' });
-
-      // Parse the accumulated AI response
-      if (!accumulatedText) {
+      // Parse the AI response
+      const textContent = message.content.find((block) => block.type === 'text');
+      if (!textContent || !('text' in textContent)) {
         throw new Error('No text content in AI response');
       }
 
       let buildPlan;
       try {
         // Extract JSON from potential markdown code blocks
-        let jsonText = accumulatedText.trim();
+        let jsonText = textContent.text.trim();
         const jsonMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
         if (jsonMatch) {
           jsonText = jsonMatch[1];
         }
         buildPlan = JSON.parse(jsonText);
       } catch (parseError) {
-        console.error('Failed to parse AI response:', accumulatedText);
+        console.error('Failed to parse AI response:', textContent.text);
         throw new Error('Failed to parse AI response as JSON');
       }
 
