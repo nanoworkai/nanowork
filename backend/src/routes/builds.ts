@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { requireUserAuth } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types';
 import { getSupabase } from '../services/supabase';
+import { spendCredits, InsufficientCreditsError } from '../services/creditService';
 
 const router = Router();
 
@@ -107,7 +108,29 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
     }
 
     const { company_name, prompt = '', tagline } = req.body;
+    const cost = 100;
 
+    // Check and deduct credits before creating build
+    let newBalance: number;
+    try {
+      newBalance = await spendCredits(
+        req.user.id,
+        cost,
+        'Build generation'
+      );
+    } catch (creditError) {
+      if (creditError instanceof InsufficientCreditsError) {
+        res.status(402).json({
+          error: 'Insufficient credits',
+          required: cost,
+          message: 'Your balance is too low. Please top up to continue.'
+        });
+        return;
+      }
+      throw creditError;
+    }
+
+    // Credits successfully deducted, now create the build
     const { data, error } = await getSupabase()
       .from('builds')
       .insert({
@@ -116,7 +139,7 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
         prompt,
         tagline,
         status: 'generating',
-        credits_cost: 100,
+        credits_cost: cost,
       })
       .select()
       .single();
@@ -131,7 +154,7 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
       name: data.company_name || 'Untitled Build',
     };
 
-    res.json({ build });
+    res.json({ build, new_balance: newBalance });
   } catch (error) {
     console.error('Create build error:', error);
     res.status(500).json({
