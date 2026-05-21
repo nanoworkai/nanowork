@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-const API = import.meta.env.VITE_API_URL || 'https://api.nanowork.app/v1'
+const API = import.meta.env.VITE_API_URL || ''
 
 export interface ScrapeResult {
   url:           string
