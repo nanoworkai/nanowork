@@ -4,6 +4,12 @@ import { requireUserAuth } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types';
 import { getSupabase } from '../services/supabase';
 import { spendCredits, InsufficientCreditsError } from '../services/creditService';
+import {
+  createBuildSchema,
+  updateBuildSchema,
+  generateNameSchema,
+  streamQuerySchema
+} from '../validation/schemas';
 
 const router = Router();
 
@@ -43,12 +49,17 @@ function removeConnection(userId: string, buildId: string): void {
  */
 router.post('/generate-name', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { prompt } = req.body;
-
-    if (!prompt) {
-      res.status(400).json({ error: 'Prompt is required' });
+    // Validate request body
+    const validation = generateNameSchema.safeParse(req.body);
+    if (!validation.success) {
+      res.status(400).json({
+        error: 'Validation failed',
+        details: validation.error.issues
+      });
       return;
     }
+
+    const { prompt } = validation.data;
 
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
     if (!anthropicApiKey) {
@@ -137,7 +148,17 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
       return;
     }
 
-    const { company_name, prompt = '', tagline } = req.body;
+    // Validate request body
+    const validation = createBuildSchema.safeParse(req.body);
+    if (!validation.success) {
+      res.status(400).json({
+        error: 'Validation failed',
+        details: validation.error.issues
+      });
+      return;
+    }
+
+    const { company_name, prompt, tagline } = validation.data;
     const cost = 100;
 
     // Check and deduct credits before creating build
@@ -205,8 +226,18 @@ router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Res
       return;
     }
 
+    // Validate request body
+    const validation = updateBuildSchema.safeParse(req.body);
+    if (!validation.success) {
+      res.status(400).json({
+        error: 'Validation failed',
+        details: validation.error.issues
+      });
+      return;
+    }
+
     const { id } = req.params;
-    const { company_name, name, tagline, status, build_data, last_activity_at } = req.body;
+    const { company_name, name, tagline, status, build_data, last_activity_at } = validation.data;
 
     const updateData: any = {};
     // Accept both 'name' (from frontend) and 'company_name' (database field)
@@ -254,17 +285,17 @@ router.get('/stream', requireUserAuth, async (req: AuthenticatedRequest, res: Re
   let connectionAdded = false;
 
   try {
-    const { buildId, prompt } = req.query;
-
-    if (!buildId || typeof buildId !== 'string') {
-      res.status(400).json({ error: 'buildId is required' });
+    // Validate query parameters
+    const validation = streamQuerySchema.safeParse(req.query);
+    if (!validation.success) {
+      res.status(400).json({
+        error: 'Validation failed',
+        details: validation.error.issues
+      });
       return;
     }
 
-    if (!prompt || typeof prompt !== 'string') {
-      res.status(400).json({ error: 'prompt is required' });
-      return;
-    }
+    const { buildId, prompt } = validation.data;
 
     if (!req.user) {
       res.status(403).json({ error: 'No user found' });
@@ -433,42 +464,86 @@ Output format must be valid JSON with this structure:
 
 Make tasks realistic and specific to the user's prompt. Keep task descriptions concise (under 10 words).`;
 
-      // Create API call with timeout
-      const apiCallPromise = anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: `Generate a build plan for: ${prompt}`,
-          },
-        ],
+      // Create streaming API call with timeout
+      let accumulatedText = '';
+      let streamEnded = false;
+      let timeoutId: NodeJS.Timeout | null = null;
+
+      const streamPromise = new Promise<void>(async (resolve, reject) => {
+        try {
+          const stream = await anthropic.messages.stream({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 4096,
+            system: systemPrompt,
+            messages: [
+              {
+                role: 'user',
+                content: `Generate a build plan for: ${prompt}`,
+              },
+            ],
+          });
+
+          // Send initial connecting event
+          sendEvent('ai_start', { message: 'AI generation started' });
+
+          // Handle text chunks
+          stream.on('text', (text: string) => {
+            accumulatedText += text;
+            // Optionally send chunks to frontend for real-time display
+            sendEvent('ai_chunk', { text });
+          });
+
+          // Handle stream completion
+          stream.on('message_stop', () => {
+            streamEnded = true;
+            if (timeoutId) clearTimeout(timeoutId);
+            resolve();
+          });
+
+          // Handle stream errors
+          stream.on('error', (error: Error) => {
+            streamEnded = true;
+            if (timeoutId) clearTimeout(timeoutId);
+            reject(error);
+          });
+        } catch (error) {
+          streamEnded = true;
+          if (timeoutId) clearTimeout(timeoutId);
+          reject(error);
+        }
       });
 
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('AI request timed out')), ANTHROPIC_TIMEOUT_MS)
-      );
+      // Setup timeout
+      const timeoutPromise = new Promise<void>((_, reject) => {
+        timeoutId = setTimeout(() => {
+          if (!streamEnded) {
+            reject(new Error('AI request timed out'));
+          }
+        }, ANTHROPIC_TIMEOUT_MS);
+      });
 
-      const message = await Promise.race([apiCallPromise, timeoutPromise]) as Anthropic.Messages.Message;
+      // Wait for stream to complete or timeout
+      await Promise.race([streamPromise, timeoutPromise]);
 
-      // Parse the AI response
-      const textContent = message.content.find((block) => block.type === 'text');
-      if (!textContent || !('text' in textContent)) {
+      // Send completion event
+      sendEvent('ai_done', { message: 'AI generation completed' });
+
+      // Parse the accumulated AI response
+      if (!accumulatedText) {
         throw new Error('No text content in AI response');
       }
 
       let buildPlan;
       try {
         // Extract JSON from potential markdown code blocks
-        let jsonText = textContent.text.trim();
+        let jsonText = accumulatedText.trim();
         const jsonMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
         if (jsonMatch) {
           jsonText = jsonMatch[1];
         }
         buildPlan = JSON.parse(jsonText);
       } catch (parseError) {
-        console.error('Failed to parse AI response:', textContent.text);
+        console.error('Failed to parse AI response:', accumulatedText);
         throw new Error('Failed to parse AI response as JSON');
       }
 
