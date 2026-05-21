@@ -36,3 +36,13 @@ services:
         sync: false
       - key: CLOUDFLARE_API_TOKEN
         sync: false
+      - key: AGENT_EMAIL_DOMAIN
+        value: nanowork.ai
+      - key: STRIPE_PRICE_STARTER
+        sync: false
+      - key: STRIPE_PRICE_GROWTH
+        sync: false
+      - key: STRIPE_PRICE_SCALE
+        sync: false
+      - key: STRIPE_PRICE_ENTERPRISE
+        sync: false

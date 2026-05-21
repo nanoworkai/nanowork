@@ -23,14 +23,36 @@ import walletRouter from './routes/wallet';
 import buildsRouter from './routes/builds';
 
 // Validate required environment variables
-const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY'];
+function validateEnvironmentVariables() {
+  const requiredEnvVars = [
+    'SUPABASE_URL',
+    'SUPABASE_SERVICE_KEY',
+    'STRIPE_SECRET_KEY',
+    'STRIPE_WEBHOOK_SECRET',
+    'INTERNAL_TOKEN',
+    'ANTHROPIC_API_KEY',
+    'AGENT_EMAIL_DOMAIN',
+  ];
 
-for (const envVar of requiredEnvVars) {
-  if (!process.env[envVar]) {
-    console.error(`ERROR: ${envVar} environment variable is not set`);
+  const missingVars: string[] = [];
+
+  for (const envVar of requiredEnvVars) {
+    if (!process.env[envVar]) {
+      missingVars.push(envVar);
+    }
+  }
+
+  if (missingVars.length > 0) {
+    console.error('\n❌ ERROR: Missing required environment variables:\n');
+    missingVars.forEach((varName) => {
+      console.error(`   - ${varName}`);
+    });
+    console.error('\nServer cannot start without these variables. Please set them in your .env file.\n');
     process.exit(1);
   }
 }
+
+validateEnvironmentVariables();
 
 // Create Express app
 const app = express();
@@ -42,20 +64,14 @@ app.use('/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWeb
 
 app.use(express.json());
 
-// CORS configuration - allow all production and development URLs
-const allowedOrigins = [
-  'https://nanowork.ai',
-  'https://www.nanowork.ai',
-  'https://nanowork-5k9.pages.dev', // Cloudflare Pages production URL
-  'http://localhost:5173',
-  'http://localhost:3000',
-  'http://localhost:5174',
-];
-
-// Add FRONTEND_URL from environment if set
-if (process.env.FRONTEND_URL) {
-  allowedOrigins.push(process.env.FRONTEND_URL);
-}
+// CORS configuration - use environment variable or development defaults
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+  : [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://localhost:5174',
+    ];
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -106,21 +122,12 @@ app.use('/api/billing', billingRouter);
 app.use('/api/wallet', walletRouter);
 app.use('/api/build', buildsRouter);
 
-// Serve static files from frontend build (production only)
-if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '../../apps/web/dist');
-  app.use(express.static(frontendPath));
-
-  // SPA fallback - serve index.html for all non-API routes
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
-  });
-} else {
-  // 404 handler for development
-  app.use((req, res) => {
-    res.status(404).json({ error: 'Not found' });
-  });
-}
+// Note: Frontend is deployed separately (Cloudflare Pages).
+// Backend only serves API routes - no static file serving needed.
+// 404 handler for unmatched routes
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
 
 // Error handler
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -136,17 +143,4 @@ app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`   Health check: http://localhost:${PORT}/health`);
   console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
-
-  // Log warnings for missing optional env vars
-  const optionalEnvVars = [
-    'ANTHROPIC_API_KEY',
-    'STRIPE_SECRET_KEY',
-    'INTERNAL_TOKEN',
-  ];
-
-  for (const envVar of optionalEnvVars) {
-    if (!process.env[envVar]) {
-      console.warn(`⚠️  ${envVar} not configured - related features will be disabled`);
-    }
-  }
 });

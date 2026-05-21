@@ -79,6 +79,31 @@ async function handlePaymentIntentSucceeded(paymentIntent: any) {
 
   console.log('Credit top-up payment succeeded:', paymentIntent.id, 'user:', userId, 'credits:', creditAmount);
 
+  // Idempotency check: verify this payment intent hasn't been processed already
+  // This prevents duplicate credit additions if Stripe retries the webhook
+  const supabase = getSupabase();
+  const { data: existingTransaction, error: checkError } = await supabase
+    .from('credit_transactions')
+    .select('id')
+    .eq('stripe_payment_intent_id', paymentIntent.id)
+    .single();
+
+  if (existingTransaction) {
+    console.log('Webhook already processed for payment intent:', paymentIntent.id);
+    return;
+  }
+
+  if (checkError && checkError.code !== 'PGRST116') {
+    // PGRST116 = no rows returned (expected when payment is new)
+    // Any other error should be logged
+    console.error('Error checking for existing transaction:', checkError);
+  }
+
+  // NOTE: Consider adding a UNIQUE constraint on stripe_payment_intent_id column
+  // in credit_transactions table to enforce idempotency at the database level:
+  // ALTER TABLE credit_transactions ADD CONSTRAINT unique_stripe_payment_intent
+  // UNIQUE (stripe_payment_intent_id);
+
   try {
     const newBalance = await addCredits(
       userId,
