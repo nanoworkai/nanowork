@@ -219,7 +219,7 @@ export class MockEventSource {
   public onerror: ((event: Event) => void) | null = null;
   public onopen: ((event: Event) => void) | null = null;
 
-  constructor(private prompt: string) {
+  constructor(prompt: string) {
     this.events = Array.from(generateMockStreamEvents(prompt));
 
     // Simulate connection delay

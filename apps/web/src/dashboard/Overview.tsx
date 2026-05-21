@@ -4,6 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { fetchUserApps, type UserApp } from "../lib/apps";
 import { ExternalLink, Code, Crown } from "lucide-react";
+import DevModeBanner from "../components/DevModeBanner";
+import { MockEventSource, isDevelopment } from "../lib/devMode";
 
 /**
  * DASHBOARD DESIGN PRINCIPLES:
@@ -47,7 +49,8 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
-  const esRef = useRef<EventSource | null>(null);
+  const [isMock, setIsMock] = useState(false);
+  const esRef = useRef<EventSource | MockEventSource | null>(null);
   const retryCountRef = useRef(0);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const maxRetries = 3;
@@ -137,7 +140,63 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
           connect(promptToUse);
         }, 2000);
       } else {
-        setError("Unable to connect to the server. Please check your connection and refresh.");
+        // In development mode, fall back to mock stream after max retries
+        if (isDevelopment) {
+          console.warn('[DEV MODE] Max retries reached, using mock stream');
+          setIsMock(true);
+          setError(null);
+
+          const mockEs = new MockEventSource(promptToUse);
+          esRef.current = mockEs;
+
+          const mockOn = (type: string, handler: (d: unknown) => void) => {
+            mockEs.addEventListener(type, (e: MessageEvent) => {
+              try { handler(JSON.parse(e.data)); } catch { /* ignore */ }
+            });
+          };
+
+          mockOn("meta", (d: unknown) => {
+            const data = d as { company_name: string; tagline: string };
+            setMeta({ companyName: data.company_name, tagline: data.tagline });
+          });
+
+          mockOn("dept_start", (d: unknown) => {
+            const data = d as { dept: string; icon: string; task_count: number };
+            setDepts((prev) => ({
+              ...prev,
+              [data.dept]: { icon: data.icon, taskCount: data.task_count, tasks: [], output: "", status: "running" },
+            }));
+          });
+
+          mockOn("task", (d: unknown) => {
+            const data = d as { dept: string; task: string };
+            setDepts((prev) => ({
+              ...prev,
+              [data.dept]: prev[data.dept]
+                ? { ...prev[data.dept], tasks: [...prev[data.dept].tasks, data.task] }
+                : prev[data.dept],
+            }));
+            setFeed((prev) => [{ dept: data.dept, task: data.task, ts: Date.now() }, ...prev.slice(0, 29)]);
+          });
+
+          mockOn("dept_done", (d: unknown) => {
+            const data = d as { dept: string; output: string };
+            setDepts((prev) => ({
+              ...prev,
+              [data.dept]: prev[data.dept]
+                ? { ...prev[data.dept], output: data.output, status: "done" }
+                : prev[data.dept],
+            }));
+          });
+
+          mockOn("done", () => {
+            setDone(true);
+            setConnecting(false);
+            mockEs.close();
+          });
+        } else {
+          setError("Unable to connect to the server. Please check your connection and refresh.");
+        }
       }
     };
   };
@@ -166,7 +225,7 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
     }
   };
 
-  return { meta, depts, feed, done, error, connecting, retry };
+  return { meta, depts, feed, done, error, connecting, retry, isMock };
 }
 
 // ── Department Card ───────────────────────────────────────────────────────────
@@ -334,7 +393,7 @@ export default function Overview() {
   const [userApps, setUserApps] = useState<UserApp[]>([]);
   const [appsLoading, setAppsLoading] = useState(true);
 
-  const { meta, depts, feed, done, error, connecting, retry } = useAgentStream(activePrompt, buildEnabled);
+  const { meta, depts, feed, done, error, connecting, retry, isMock } = useAgentStream(activePrompt, buildEnabled);
 
   // Load user's apps
   useEffect(() => {
@@ -378,9 +437,13 @@ export default function Overview() {
   const totalDone = Object.values(depts).filter((d) => d.status === "done").length;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 bg-background-subtle min-h-screen">
-      {/* Header */}
-      <div className="mb-6 sm:mb-8">
+    <>
+      {/* Development Mode Banner */}
+      {isMock && <DevModeBanner message="Using mock streaming data - backend unavailable" />}
+
+      <div className={`max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 bg-background-subtle min-h-screen ${isMock ? 'pt-16' : ''}`}>
+        {/* Header */}
+        <div className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2">
           <div className="flex-1">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
@@ -563,6 +626,7 @@ export default function Overview() {
         </div>
       )}
 
-    </div>
+      </div>
+    </>
   );
 }

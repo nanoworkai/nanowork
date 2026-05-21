@@ -3,7 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Terminal, ChevronDown, Edit2, Trash2, AlertCircle, XCircle } from "lucide-react";
 import DevModeBanner from "../components/DevModeBanner";
-import { fetchWithDevFallback, MOCK_RESPONSES, MockEventSource, isDevelopment, type MockBuild } from "../lib/devMode";
+import { MockEventSource, isDevelopment } from "../lib/devMode";
+import { ApiError } from "../types/errors";
+import { ErrorDiagnostics } from "../components/ErrorDiagnostics";
+import { buildApi } from "../lib/apiWithErrors";
 
 
 /**
@@ -50,7 +53,8 @@ function useAgentStream(buildId: string | null, prompt: string | null, enabled: 
   const [feed, setFeed] = useState<TaskEntry[]>([]);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const esRef = useRef<EventSource | null>(null);
+  const [isMock, setIsMock] = useState(false);
+  const esRef = useRef<EventSource | MockEventSource | null>(null);
 
   useEffect(() => {
     if (!enabled || !prompt || !buildId) return;
@@ -58,6 +62,8 @@ function useAgentStream(buildId: string | null, prompt: string | null, enabled: 
 
     const apiBase = import.meta.env.VITE_API_URL || '';
     const url = `${apiBase}/api/build/stream?buildId=${buildId}&prompt=${encodeURIComponent(prompt)}`;
+
+    // Try real EventSource first
     const es = new EventSource(url);
     esRef.current = es;
 
@@ -108,8 +114,64 @@ function useAgentStream(buildId: string | null, prompt: string | null, enabled: 
 
     es.onerror = (err) => {
       console.error('SSE connection error:', err);
-      setError("Connection lost. The build may still be processing in the background.");
       es.close();
+
+      // In development mode, fall back to mock stream
+      if (isDevelopment && prompt) {
+        console.warn('[DEV MODE] SSE connection failed, using mock stream');
+        setIsMock(true);
+        setError(null);
+
+        const mockEs = new MockEventSource(prompt);
+        esRef.current = mockEs;
+
+        const mockOn = (type: string, handler: (d: unknown) => void) => {
+          mockEs.addEventListener(type, (e: MessageEvent) => {
+            try { handler(JSON.parse(e.data)); } catch { /* ignore */ }
+          });
+        };
+
+        mockOn("meta", (d: unknown) => {
+          const data = d as { company_name: string; tagline: string };
+          setMeta({ companyName: data.company_name, tagline: data.tagline });
+        });
+
+        mockOn("dept_start", (d: unknown) => {
+          const data = d as { dept: string; icon: string; task_count: number };
+          setDepts((prev) => ({
+            ...prev,
+            [data.dept]: { icon: data.icon, taskCount: data.task_count, tasks: [], output: "", status: "running" },
+          }));
+        });
+
+        mockOn("task", (d: unknown) => {
+          const data = d as { dept: string; task: string };
+          setDepts((prev) => ({
+            ...prev,
+            [data.dept]: prev[data.dept]
+              ? { ...prev[data.dept], tasks: [...prev[data.dept].tasks, data.task] }
+              : prev[data.dept],
+          }));
+          setFeed((prev) => [{ dept: data.dept, task: data.task, ts: Date.now() }, ...prev.slice(0, 29)]);
+        });
+
+        mockOn("dept_done", (d: unknown) => {
+          const data = d as { dept: string; output: string };
+          setDepts((prev) => ({
+            ...prev,
+            [data.dept]: prev[data.dept]
+              ? { ...prev[data.dept], output: data.output, status: "done" }
+              : prev[data.dept],
+          }));
+        });
+
+        mockOn("done", () => {
+          setDone(true);
+          mockEs.close();
+        });
+      } else {
+        setError("Connection lost. The build may still be processing in the background.");
+      }
     };
 
     return () => {
@@ -119,7 +181,7 @@ function useAgentStream(buildId: string | null, prompt: string | null, enabled: 
     };
   }, [buildId, prompt, enabled]);
 
-  return { meta, depts, feed, done, error };
+  return { meta, depts, feed, done, error, isMock };
 }
 
 // ── Department Card ───────────────────────────────────────────────────────────
@@ -621,53 +683,51 @@ export default function Overview() {
   const [loading, setLoading] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [apiErrors, setApiErrors] = useState<Array<{ operation: string; error: string; timestamp: Date }>>([]);
+  const [criticalError, setCriticalError] = useState<ApiError | null>(null);
 
-  const { meta, depts, feed, done, error } = useAgentStream(
+  const { meta, depts, feed, done, error, isMock } = useAgentStream(
     activeBuild?.id || null,
     activeBuild?.prompt || null,
     buildEnabled
   );
-
-  const apiUrl = import.meta.env.VITE_API_URL || '';
 
   // Load builds
   const loadBuilds = async () => {
     if (!session?.access_token) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/build`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
+      setCriticalError(null);
+      const { builds: loadedBuilds } = await buildApi.list(session.access_token);
+      setBuilds(loadedBuilds);
 
-      if (res.ok) {
-        const { builds: loadedBuilds } = await res.json();
-        setBuilds(loadedBuilds);
-
-        // If no buildId in URL but we have builds, navigate to most recent
-        if (!buildId && loadedBuilds.length > 0) {
-          navigate(`/dashboard/builds/${loadedBuilds[0].id}`, { replace: true });
-        } else if (buildId) {
-          const build = loadedBuilds.find((b: Build) => b.id === buildId);
-          if (build) {
-            setActiveBuild(build);
-            if (build.prompt && build.status === 'generating') {
-              setBuildEnabled(true);
-            }
+      // If no buildId in URL but we have builds, navigate to most recent
+      if (!buildId && loadedBuilds.length > 0) {
+        navigate(`/dashboard/builds/${loadedBuilds[0].id}`, { replace: true });
+      } else if (buildId) {
+        const build = loadedBuilds.find((b: Build) => b.id === buildId);
+        if (build) {
+          setActiveBuild(build);
+          if (build.prompt && build.status === 'generating') {
+            setBuildEnabled(true);
           }
         }
-      } else {
-        const errorText = await res.text();
-        const errorMsg = `Failed to load builds (${res.status}): ${errorText}`;
-        setApiErrors((prev) => [...prev, { operation: 'Load Builds', error: errorMsg, timestamp: new Date() }]);
-        // Continue with empty builds list
-        setBuilds([]);
       }
     } catch (err) {
-      const errorMsg = `Failed to load builds: ${err instanceof Error ? err.message : String(err)}`;
-      console.error(errorMsg);
-      setApiErrors((prev) => [...prev, { operation: 'Load Builds', error: errorMsg, timestamp: new Date() }]);
+      console.error('Failed to load builds:', err);
+      if (err instanceof ApiError) {
+        setCriticalError(err);
+        setApiErrors((prev) => [...prev, {
+          operation: 'Load Builds',
+          error: err.getUserMessage(),
+          timestamp: new Date()
+        }]);
+      } else {
+        setApiErrors((prev) => [...prev, {
+          operation: 'Load Builds',
+          error: err instanceof Error ? err.message : String(err),
+          timestamp: new Date()
+        }]);
+      }
       // Continue with empty builds list
       setBuilds([]);
     } finally {
@@ -688,40 +748,26 @@ export default function Overview() {
     if (!session?.access_token) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/build`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt: '' }),
-      });
-
-      if (res.ok) {
-        const { build } = await res.json();
-        setBuilds((prev) => [build, ...prev]);
-        navigate(`/dashboard/builds/${build.id}`);
-      } else {
-        const errorText = await res.text();
-        const errorMsg = `Failed to create build (${res.status}): ${errorText}`;
-        setApiErrors((prev) => [...prev, { operation: 'Create Build', error: errorMsg, timestamp: new Date() }]);
-
-        // Create a mock build to allow flow to continue
-        const mockBuild: Build = {
-          id: `mock-${Date.now()}`,
-          name: 'New Build (Offline)',
-          prompt: '',
-          status: 'draft',
-          last_activity_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-        };
-        setBuilds((prev) => [mockBuild, ...prev]);
-        navigate(`/dashboard/builds/${mockBuild.id}`);
-      }
+      setCriticalError(null);
+      const { build } = await buildApi.create(session.access_token, '');
+      setBuilds((prev) => [build, ...prev]);
+      navigate(`/dashboard/builds/${build.id}`);
     } catch (err) {
-      const errorMsg = `Failed to create build: ${err instanceof Error ? err.message : String(err)}`;
-      console.error(errorMsg);
-      setApiErrors((prev) => [...prev, { operation: 'Create Build', error: errorMsg, timestamp: new Date() }]);
+      console.error('Failed to create build:', err);
+      if (err instanceof ApiError) {
+        setCriticalError(err);
+        setApiErrors((prev) => [...prev, {
+          operation: 'Create Build',
+          error: err.getUserMessage(),
+          timestamp: new Date()
+        }]);
+      } else {
+        setApiErrors((prev) => [...prev, {
+          operation: 'Create Build',
+          error: err instanceof Error ? err.message : String(err),
+          timestamp: new Date()
+        }]);
+      }
 
       // Create a mock build to allow flow to continue
       const mockBuild: Build = {
@@ -742,57 +788,32 @@ export default function Overview() {
     if (!activeBuild || !session?.access_token) return;
 
     let buildName = 'New Build';
-    let nameGenerationFailed = false;
 
+    // Generate AI name for the build
     try {
-      // Generate AI name for the build
-      const nameRes = await fetch(`${apiUrl}/api/build/generate-name`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt }),
-      });
-
-      if (nameRes.ok) {
-        const { name } = await nameRes.json();
-        buildName = name;
-      } else {
-        nameGenerationFailed = true;
-        const errorText = await nameRes.text();
-        const errorMsg = `Failed to generate build name (${nameRes.status}): ${errorText}`;
-        setApiErrors((prev) => [...prev, { operation: 'Generate Build Name', error: errorMsg, timestamp: new Date() }]);
-      }
+      const { name } = await buildApi.generateName(session.access_token, prompt);
+      buildName = name;
     } catch (err) {
-      nameGenerationFailed = true;
-      const errorMsg = `Failed to generate build name: ${err instanceof Error ? err.message : String(err)}`;
-      console.error(errorMsg);
-      setApiErrors((prev) => [...prev, { operation: 'Generate Build Name', error: errorMsg, timestamp: new Date() }]);
+      console.warn('Failed to generate AI name, using default:', err);
+      if (err instanceof ApiError) {
+        setApiErrors((prev) => [...prev, {
+          operation: 'Generate Build Name',
+          error: err.getUserMessage(),
+          timestamp: new Date()
+        }]);
+      }
+      // Continue with default name
     }
 
+    // Update build with name and prompt
     try {
-      // Update build with name and prompt
-      const updateRes = await fetch(`${apiUrl}/api/build/${activeBuild.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: buildName,
-          prompt: prompt,
-          last_activity_at: new Date().toISOString(),
-        }),
+      await buildApi.update(session.access_token, activeBuild.id, {
+        name: buildName,
+        prompt: prompt,
+        last_activity_at: new Date().toISOString(),
       });
 
-      if (!updateRes.ok) {
-        const errorText = await updateRes.text();
-        const errorMsg = `Failed to update build (${updateRes.status}): ${errorText}`;
-        setApiErrors((prev) => [...prev, { operation: 'Update Build', error: errorMsg, timestamp: new Date() }]);
-      }
-
-      // Update local state regardless of API success
+      // Update local state on success
       setActiveBuild((prev) => prev ? { ...prev, name: buildName, prompt } : null);
       setBuilds((prev) =>
         prev.map((b) => (b.id === activeBuild.id ? { ...b, name: buildName, prompt, last_activity_at: new Date().toISOString() } : b))
@@ -800,9 +821,21 @@ export default function Overview() {
 
       setBuildEnabled(true);
     } catch (err) {
-      const errorMsg = `Failed to start build: ${err instanceof Error ? err.message : String(err)}`;
-      console.error(errorMsg);
-      setApiErrors((prev) => [...prev, { operation: 'Update Build', error: errorMsg, timestamp: new Date() }]);
+      console.error('Failed to update build:', err);
+      if (err instanceof ApiError) {
+        setCriticalError(err);
+        setApiErrors((prev) => [...prev, {
+          operation: 'Update Build',
+          error: err.getUserMessage(),
+          timestamp: new Date()
+        }]);
+      } else {
+        setApiErrors((prev) => [...prev, {
+          operation: 'Update Build',
+          error: err instanceof Error ? err.message : String(err),
+          timestamp: new Date()
+        }]);
+      }
 
       // Update local state to allow flow to continue
       setActiveBuild((prev) => prev ? { ...prev, name: buildName, prompt } : null);
@@ -824,30 +857,28 @@ export default function Overview() {
     if (!session?.access_token) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/build/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name }),
-      });
+      await buildApi.update(session.access_token, id, { name });
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        const errorMsg = `Failed to rename build (${res.status}): ${errorText}`;
-        setApiErrors((prev) => [...prev, { operation: 'Rename Build', error: errorMsg, timestamp: new Date() }]);
-      }
-
-      // Update local state regardless of API success
+      // Update local state on success
       setBuilds((prev) => prev.map((b) => (b.id === id ? { ...b, name } : b)));
       if (activeBuild?.id === id) {
         setActiveBuild((prev) => prev ? { ...prev, name } : null);
       }
     } catch (err) {
-      const errorMsg = `Failed to rename build: ${err instanceof Error ? err.message : String(err)}`;
-      console.error(errorMsg);
-      setApiErrors((prev) => [...prev, { operation: 'Rename Build', error: errorMsg, timestamp: new Date() }]);
+      console.error('Failed to rename build:', err);
+      if (err instanceof ApiError) {
+        setApiErrors((prev) => [...prev, {
+          operation: 'Rename Build',
+          error: err.getUserMessage(),
+          timestamp: new Date()
+        }]);
+      } else {
+        setApiErrors((prev) => [...prev, {
+          operation: 'Rename Build',
+          error: err instanceof Error ? err.message : String(err),
+          timestamp: new Date()
+        }]);
+      }
 
       // Update local state to allow flow to continue
       setBuilds((prev) => prev.map((b) => (b.id === id ? { ...b, name } : b)));
@@ -862,20 +893,9 @@ export default function Overview() {
     if (!session?.access_token) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/build/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
+      await buildApi.delete(session.access_token, id);
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        const errorMsg = `Failed to delete build (${res.status}): ${errorText}`;
-        setApiErrors((prev) => [...prev, { operation: 'Delete Build', error: errorMsg, timestamp: new Date() }]);
-      }
-
-      // Update local state regardless of API success
+      // Update local state on success
       const remainingBuilds = builds.filter((b) => b.id !== id);
       setBuilds(remainingBuilds);
 
@@ -888,9 +908,20 @@ export default function Overview() {
         }
       }
     } catch (err) {
-      const errorMsg = `Failed to delete build: ${err instanceof Error ? err.message : String(err)}`;
-      console.error(errorMsg);
-      setApiErrors((prev) => [...prev, { operation: 'Delete Build', error: errorMsg, timestamp: new Date() }]);
+      console.error('Failed to delete build:', err);
+      if (err instanceof ApiError) {
+        setApiErrors((prev) => [...prev, {
+          operation: 'Delete Build',
+          error: err.getUserMessage(),
+          timestamp: new Date()
+        }]);
+      } else {
+        setApiErrors((prev) => [...prev, {
+          operation: 'Delete Build',
+          error: err instanceof Error ? err.message : String(err),
+          timestamp: new Date()
+        }]);
+      }
 
       // Update local state to allow flow to continue
       const remainingBuilds = builds.filter((b) => b.id !== id);
@@ -928,10 +959,31 @@ export default function Overview() {
 
   return (
     <div className="min-h-screen bg-background-subtle">
+      {/* Development Mode Banner */}
+      {(isMock || apiErrors.length > 0) && (
+        <DevModeBanner
+          message={
+            isMock
+              ? 'Using mock streaming data - backend unavailable'
+              : `${apiErrors.length} API error(s) - flow continued with fallbacks`
+          }
+        />
+      )}
+
       {/* Main Content - Full width, no sidebar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 ${(isMock || apiErrors.length > 0) ? 'pt-16' : ''}`}>
         {activeBuild ? (
           <>
+            {/* Critical Error with Full Diagnostics */}
+            {criticalError && (
+              <div className="mb-6">
+                <ErrorDiagnostics
+                  error={criticalError}
+                  onDismiss={() => setCriticalError(null)}
+                />
+              </div>
+            )}
+
             {/* API Error Display */}
             <ApiErrorDisplay errors={apiErrors} onDismiss={dismissError} />
 
