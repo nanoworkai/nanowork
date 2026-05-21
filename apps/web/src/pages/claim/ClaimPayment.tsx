@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { Shield, Check, Lock, Building2, CreditCard, AlertCircle } from "lucide-react";
 
 interface CompanyData {
@@ -9,7 +9,19 @@ interface CompanyData {
   description?: string;
 }
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
+// Lazy load Stripe only when needed to avoid HTTP warnings on localhost
+let stripePromise: Promise<Stripe | null> | null = null;
+const getStripe = () => {
+  if (!stripePromise) {
+    const key = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+    if (key) {
+      stripePromise = loadStripe(key);
+    } else {
+      stripePromise = Promise.resolve(null);
+    }
+  }
+  return stripePromise;
+};
 
 export default function ClaimPayment() {
   const { companyId } = useParams<{ companyId: string }>();
@@ -51,9 +63,9 @@ export default function ClaimPayment() {
     setError(null);
 
     try {
-      const stripe = await stripePromise;
+      const stripe = await getStripe();
       if (!stripe) {
-        throw new Error("Stripe failed to load");
+        throw new Error("Stripe failed to load. Please check your payment configuration.");
       }
 
       // Create checkout session for company claim

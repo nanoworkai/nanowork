@@ -1,0 +1,1 @@
+you are an AI that is useful. Don't waste your time bloating up the project with documentation

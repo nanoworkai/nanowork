@@ -1,9 +1,21 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Coins, TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe, Stripe } from "@stripe/stripe-js";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+// Lazy load Stripe only when needed to avoid HTTP warnings on localhost
+let stripePromise: Promise<Stripe | null> | null = null;
+const getStripe = () => {
+  if (!stripePromise) {
+    const key = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+    if (key) {
+      stripePromise = loadStripe(key);
+    } else {
+      stripePromise = Promise.resolve(null);
+    }
+  }
+  return stripePromise;
+};
 
 interface CreditTransaction {
   id: string;
@@ -112,9 +124,9 @@ export default function Wallet() {
       const { clientSecret } = await res.json();
 
       // Redirect to Stripe checkout
-      const stripe = await stripePromise;
+      const stripe = await getStripe();
       if (!stripe) {
-        throw new Error('Stripe not loaded');
+        throw new Error('Stripe not loaded. Please check your payment configuration.');
       }
 
       const { error: stripeError } = await stripe.confirmCardPayment(clientSecret);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { Shield, Check, Sparkles, Lock } from "lucide-react";
 
 interface WhiteGlovePaymentProps {
@@ -8,7 +8,19 @@ interface WhiteGlovePaymentProps {
   onSuccess?: () => void; // eslint-disable-line @typescript-eslint/no-unused-vars
 }
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "");
+// Lazy load Stripe only when needed to avoid HTTP warnings on localhost
+let stripePromise: Promise<Stripe | null> | null = null;
+const getStripe = () => {
+  if (!stripePromise) {
+    const key = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+    if (key) {
+      stripePromise = loadStripe(key);
+    } else {
+      stripePromise = Promise.resolve(null);
+    }
+  }
+  return stripePromise;
+};
 
 export default function WhiteGlovePayment({ buildId, companyName }: WhiteGlovePaymentProps) {
   const [loading, setLoading] = useState(false);
@@ -19,9 +31,9 @@ export default function WhiteGlovePayment({ buildId, companyName }: WhiteGlovePa
     setError(null);
 
     try {
-      const stripe = await stripePromise;
+      const stripe = await getStripe();
       if (!stripe) {
-        throw new Error("Stripe failed to load");
+        throw new Error("Stripe failed to load. Please check your payment configuration.");
       }
 
       // Create checkout session
