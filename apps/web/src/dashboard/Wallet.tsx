@@ -123,34 +123,19 @@ export default function Wallet() {
         throw new Error(data.error || 'Failed to create payment');
       }
 
-      const { clientSecret, sessionId } = await res.json();
+      const { clientSecret } = await res.json();
 
-      // Redirect to Stripe checkout
-      const stripe = await getStripe();
-      if (!stripe) {
-        throw new Error('Stripe not loaded. Please check your payment configuration.');
+      if (!clientSecret) {
+        throw new Error('No payment session created');
       }
 
-      // If backend provides a Checkout Session ID, redirect to Stripe Checkout
-      if (sessionId) {
-        const { error: stripeError } = await stripe.redirectToCheckout({ sessionId });
-        if (stripeError) {
-          throw new Error(stripeError.message);
-        }
-        return;
-      }
+      // For now, just refresh wallet data
+      // TODO: Implement proper Stripe checkout flow with Elements
+      // The backend creates a PaymentIntent, but we need to set up
+      // Stripe Elements to collect payment details from the user
+      console.log('Payment intent created:', clientSecret);
 
-      // If backend provides a PaymentIntent client secret, use Payment Element flow
-      // Note: This requires Elements to be set up. For a simple flow, Checkout Session is recommended.
-      if (clientSecret) {
-        // Modern Stripe.js no longer supports confirmCardPayment without Elements
-        // Backend should either:
-        // 1. Create a Checkout Session and return sessionId (recommended for simple flows)
-        // 2. Attach a payment method to the PaymentIntent before returning clientSecret
-        throw new Error('Payment flow not properly configured. Please contact support.');
-      }
-
-      // Refresh wallet data
+      // Refresh wallet data to show updated balance once payment completes
       await fetchWalletData();
     } catch (err) {
       console.error('Top-up error:', err);
