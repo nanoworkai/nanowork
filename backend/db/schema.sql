@@ -180,6 +180,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Atomic credit addition function (for Stripe webhooks)
+CREATE OR REPLACE FUNCTION add_credits(
+  p_user_id UUID,
+  p_amount INTEGER
+) RETURNS INTEGER AS $$
+DECLARE
+  v_new_balance INTEGER;
+BEGIN
+  -- Lock the row for update and increment atomically
+  UPDATE profiles
+  SET credits = credits + p_amount,
+      updated_at = NOW()
+  WHERE id = p_user_id
+  RETURNING credits INTO v_new_balance;
+
+  -- Check if user exists
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'User profile not found';
+  END IF;
+
+  -- Return new balance
+  RETURN v_new_balance;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- ============================================================================
 -- TRIGGERS
 -- ============================================================================
