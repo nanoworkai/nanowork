@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
 import { getSupabase } from './services/supabase';
 
 // Import routes
@@ -134,7 +136,28 @@ app.use('/api/billing', billingRouter);
 app.use('/api/wallet', walletRouter);
 app.use('/api/build', buildsRouter);
 
-// Error handler - MUST be registered before static/SPA fallback
+// Serve frontend static files (React app built by Vite)
+// Frontend is copied to backend/public during build
+const frontendDist = path.join(__dirname, '..', 'public');
+
+console.log('=== FRONTEND PATH DIAGNOSTICS ===');
+console.log('__dirname:', __dirname);
+console.log('Frontend dist path:', frontendDist);
+console.log('index.html exists:', fs.existsSync(path.join(frontendDist, 'index.html')));
+console.log('assets/ exists:', fs.existsSync(path.join(frontendDist, 'assets')));
+if (fs.existsSync(path.join(frontendDist, 'assets'))) {
+  console.log('assets/ contents:', fs.readdirSync(path.join(frontendDist, 'assets')).slice(0, 5));
+}
+console.log('=================================');
+
+app.use(express.static(frontendDist));
+
+// All non-API routes return index.html (React Router support)
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(frontendDist, 'index.html'));
+});
+
+// Error handler (for route errors, not 404s)
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('[500 ERROR]', err.message, err.stack);
   res.status(500).json({
@@ -142,11 +165,6 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
     message: NODE_ENV === 'development' ? err.message : undefined,
     detail: err.message
   });
-});
-
-// 404 handler for unknown routes - frontend is served separately
-app.use((_req, res) => {
-  res.status(404).json({ error: 'Not found' });
 });
 
 // Start server
