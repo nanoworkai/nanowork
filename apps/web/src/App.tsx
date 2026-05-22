@@ -29,6 +29,7 @@ import ClaimPreview from "./pages/claim/ClaimPreview";
 import ClaimPayment from "./pages/claim/ClaimPayment";
 import { useAuth } from "./context/AuthContext";
 import { isSupabaseConfigured } from "./lib/supabase";
+import { startKeepAlive } from "./utils/keepAlive";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, authError, retryAuth } = useAuth();
@@ -250,6 +251,12 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  // Start keep-alive ping to prevent Render free tier from spinning down
+  useEffect(() => {
+    const cleanup = startKeepAlive();
+    return cleanup;
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />
