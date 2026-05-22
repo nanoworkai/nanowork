@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 import { getSupabase } from './services/supabase';
 
 // Import routes
@@ -145,42 +144,9 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   });
 });
 
-// Serve frontend static files (React app built by Vite)
-// Frontend is copied to backend/public during build
-const frontendDist = path.join(__dirname, '..', 'public');
-const fs = require('fs');
-
-// Comprehensive path debugging
-console.log('=== FRONTEND PATH DIAGNOSTICS ===');
-console.log('process.cwd():', process.cwd());
-console.log('__dirname:', __dirname);
-console.log('Frontend dist path:', frontendDist);
-console.log('index.html exists:', fs.existsSync(path.join(frontendDist, 'index.html')));
-console.log('assets/ exists:', fs.existsSync(path.join(frontendDist, 'assets')));
-if (fs.existsSync(path.join(frontendDist, 'assets'))) {
-  console.log('assets/ contents:', fs.readdirSync(path.join(frontendDist, 'assets')).slice(0, 5));
-}
-console.log('=================================');
-
-// Serve static files
-app.use(express.static(frontendDist));
-
-// SPA fallback - serve index.html for all non-API routes
-app.get('*', (req, res) => {
-  const indexPath = path.join(frontendDist, 'index.html');
-  console.log(`[spa-fallback] ${req.path} -> ${indexPath}`);
-
-  if (!fs.existsSync(indexPath)) {
-    console.error(`[spa-fallback] index.html not found at: ${indexPath}`);
-    return res.status(503).json({
-      error: 'Frontend not built',
-      expected: indexPath,
-      cwd: process.cwd(),
-      dirname: __dirname
-    });
-  }
-
-  res.sendFile(indexPath);
+// 404 handler for unknown routes - frontend is served separately
+app.use((_req, res) => {
+  res.status(404).json({ error: 'Not found' });
 });
 
 // Start server
