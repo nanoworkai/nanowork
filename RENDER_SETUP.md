@@ -1,85 +1,138 @@
 # Render.com Deployment Setup
 
+## 🏗️ Architecture: Separate Services
+
+This app now deploys as **two separate Render services**:
+
+1. **nanowork-frontend** (Static Site) - Serves the React app
+2. **nanowork-backend** (Web Service) - Handles API, webhooks, health checks
+
 ## ⚠️ Critical: Environment Variables Required
 
-Add these environment variables in the Render Dashboard for your `nanowork-web` service:
+### Frontend Service (`nanowork-frontend`)
 
-### 1. CORS_ORIGIN (Critical)
-```
-https://your-app.onrender.com
-```
-**Why:** Backend defaults to localhost origins, blocking production frontend
+Set these in the Render Dashboard:
 
-### 2. FRONTEND_URL (Critical) 
 ```
-https://your-app.onrender.com
+VITE_API_URL=https://nanowork-backend.onrender.com
+VITE_SITE_URL=https://nanowork-frontend.onrender.com
+VITE_SUPABASE_URL=https://jxkvpzvwpxrabsubovmt.supabase.co
+VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
+VITE_STRIPE_PUBLISHABLE_KEY=<your-stripe-publishable-key>
 ```
-**Why:** Stripe billing portal redirects will go to localhost without this
 
-### 3. All Other Variables
-Ensure these are set with your production values:
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_KEY` 
-- `SUPABASE_ANON_KEY`
-- `ANTHROPIC_API_KEY`
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `INTERNAL_TOKEN`
-- `CF_ACCOUNT_ID`
-- `CLOUDFLARE_API_TOKEN`
+**Important:** Replace the backend URL with your actual backend service URL from Render.
+
+### Backend Service (`nanowork-backend`)
+
+Set these in the Render Dashboard:
+
+```
+CORS_ORIGIN=https://nanowork-frontend.onrender.com
+FRONTEND_URL=https://nanowork-frontend.onrender.com
+SUPABASE_URL=https://jxkvpzvwpxrabsubovmt.supabase.co
+SUPABASE_SERVICE_KEY=<your-service-role-key>
+SUPABASE_ANON_KEY=<your-anon-key>
+ANTHROPIC_API_KEY=<your-anthropic-key>
+STRIPE_SECRET_KEY=<your-stripe-secret-key>
+STRIPE_WEBHOOK_SECRET=<your-webhook-secret>
+INTERNAL_TOKEN=<generate-secure-token>
+CF_ACCOUNT_ID=<your-cloudflare-account-id>
+CLOUDFLARE_API_TOKEN=<your-cloudflare-token>
+```
+
+**Important:** Replace frontend URLs with your actual frontend service URL from Render.
 
 ## ✅ Fixed Issues
 
-### 1. AGENT_EMAIL_DOMAIN Not Required
-- Made optional with placeholder fallback
-- Will work now without this env var
-- Add it later when you enable agent email functionality
+### 1. Static Site Service Added
+- Created separate `nanowork-frontend` static site service
+- `staticPublishPath: ./apps/web/dist` points to correct build output
+- SPA routing configured with `/*` rewrite to `/index.html`
 
-### 2. Build Command Cleaned
-- Removed debug `ls -la` commands
-- Simplified from 9 operations to 6
-- Still creates backend/public and copies frontend
+### 2. Backend Static Serving Removed
+- Removed `express.static()` and SPA fallback from backend
+- Backend now only handles API routes, webhooks, health checks
+- No more complex build command copying frontend to backend
 
-### 3. Secrets Sanitized
+### 3. AGENT_EMAIL_DOMAIN Made Optional
+- Added placeholder fallback for when feature isn't enabled yet
+- Won't block deployment anymore
+
+### 4. Secrets Sanitized
 - Removed live API keys from `backend/.env.example`
-- File is now safe to commit
 
-## 🔍 Remaining Architecture Notes
+## 🚀 Deployment Process
 
-### Current Setup (Monolithic - Correct for Free Tier)
-- Single Render service bundles frontend + backend
-- Frontend builds to `apps/web/dist`
-- Gets copied to `backend/public/`
-- Express serves static files + API
-
-**This is correct for free tier.** Don't change to separate services unless you upgrade to paid plan.
-
-### Build Process Flow
+### Frontend Build (Static Site)
 ```bash
-1. cd apps/web && npm install && npm run build    # Build React frontend
-2. mkdir -p backend/public                         # Ensure dir exists  
-3. cp -r apps/web/dist/* backend/public/          # Copy to backend
-4. cd backend && npm install && npm run build      # Build Express backend
+cd apps/web
+npm install
+npm run build
+# Outputs to apps/web/dist
+# Render publishes dist/ as static site
 ```
 
-## 🚀 Next Steps
+### Backend Build (Web Service)
+```bash
+cd backend
+npm install
+npm run build
+# Outputs to backend/dist
+# Render runs: node dist/index.js
+```
 
-1. **Push these changes to GitHub**
-2. **In Render Dashboard:**
-   - Set `CORS_ORIGIN` to your production URL
-   - Set `FRONTEND_URL` to your production URL
-   - Verify all other env vars are set
-3. **Trigger a new deploy**
-4. **Test the deployment:**
-   - Visit your app URL
+## 📋 Next Steps
+
+1. **Push these changes to GitHub:**
+   ```bash
+   git add -A
+   git commit -m "fix: split into separate frontend static site and backend services"
+   git push origin main
+   ```
+
+2. **Watch both services deploy in Render Dashboard:**
+   - `nanowork-frontend` should show Vite build output and file uploads
+   - `nanowork-backend` should show TypeScript compilation and server start
+
+3. **Configure environment variables:**
+   - Set frontend env vars (VITE_API_URL, etc.)
+   - Set backend env vars (CORS_ORIGIN, FRONTEND_URL, etc.)
+   - **Replace placeholder URLs with actual Render URLs after first deploy**
+
+4. **Update CORS after URLs are known:**
+   - Get frontend URL: `https://nanowork-frontend.onrender.com`
+   - Get backend URL: `https://nanowork-backend.onrender.com`
+   - Set CORS_ORIGIN on backend to frontend URL
+   - Set VITE_API_URL on frontend to backend URL
+   - Redeploy both services
+
+5. **Test the deployment:**
+   - Visit frontend URL
    - Try logging in (Supabase auth)
    - Check that API calls work (CORS)
    - Test Stripe billing portal redirect
 
-## 📝 Known Issues to Monitor
+## 🔍 Architecture Benefits
 
-- **Build complexity:** 6-step chained command could still fail silently
-- **No build caching:** Frontend rebuilds every time even if unchanged
-- **Workspace resolution:** `npm run build -w web` might fail in clean Render env
-  
-If deployment still fails, check Render logs for which step is breaking.
+- **Faster deploys:** Backend changes don't rebuild frontend
+- **Better caching:** Static CDN for frontend assets
+- **Cleaner separation:** Frontend can't break backend and vice versa
+- **Easier debugging:** Separate logs for each service
+
+## 📝 Troubleshooting
+
+### Frontend deploy fails
+- Check build log for Vite errors
+- Verify `apps/web/dist` is created
+- Check `staticPublishPath: ./apps/web/dist` is correct
+
+### Backend can't connect to frontend (CORS errors)
+- Verify `CORS_ORIGIN` is set on backend
+- Make sure it matches frontend URL exactly
+- Check no trailing slash
+
+### Frontend can't reach backend (network errors)
+- Verify `VITE_API_URL` is set on frontend
+- Make sure it matches backend URL exactly
+- Redeploy frontend after changing env vars
