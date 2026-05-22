@@ -2,17 +2,17 @@ services:
   - type: web
     name: nanowork-web
     runtime: node
-    region: oregon
-    plan: free
-    branch: main
     buildCommand: npm run build -w web && cd backend && npm install && npm run build
     startCommand: cd backend && npm start
-    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
+      - key: CORS_ORIGIN
+        value: https://nanowork-web.onrender.com,https://nanowork.app
+      - key: FRONTEND_URL
+        value: https://nanowork-web.onrender.com
       - key: PORT
-        value: 3000
+        sync: false
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_KEY
@@ -31,15 +31,3 @@ services:
         sync: false
       - key: CLOUDFLARE_API_TOKEN
         sync: false
-      - key: VITE_API_URL
-        value: ""
-      - key: VITE_SITE_URL
-        value: https://nanowork.app
-      - key: VITE_SUPABASE_URL
-        sync: false
-      - key: VITE_SUPABASE_ANON_KEY
-        sync: false
-      - key: FRONTEND_URL
-        value: https://nanowork.onrender.com
-      - key: CORS_ORIGIN
-        value: https://nanowork.onrender.com,https://nanowork.app
