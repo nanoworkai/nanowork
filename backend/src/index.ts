@@ -136,19 +136,27 @@ app.use('/api/wallet', walletRouter);
 app.use('/api/build', buildsRouter);
 
 // Serve frontend static files (React app built by Vite)
-// Use path.resolve to get absolute path from repo root
-const frontendDist = path.resolve(__dirname, '..', '..', 'apps', 'web', 'dist');
+// Frontend is copied to backend/public during build
+const frontendDist = path.join(__dirname, '..', 'public');
+const fs = require('fs');
 
-console.log('[static] __dirname:', __dirname);
-console.log('[static] Serving frontend from:', frontendDist);
-console.log('[static] Index path:', path.join(frontendDist, 'index.html'));
+// Comprehensive path debugging
+console.log('=== FRONTEND PATH DIAGNOSTICS ===');
+console.log('process.cwd():', process.cwd());
+console.log('__dirname:', __dirname);
+console.log('Frontend dist path:', frontendDist);
+console.log('index.html exists:', fs.existsSync(path.join(frontendDist, 'index.html')));
+console.log('assets/ exists:', fs.existsSync(path.join(frontendDist, 'assets')));
+if (fs.existsSync(path.join(frontendDist, 'assets'))) {
+  console.log('assets/ contents:', fs.readdirSync(path.join(frontendDist, 'assets')).slice(0, 5));
+}
+console.log('=================================');
 
 app.use(express.static(frontendDist));
 
 // All non-API routes return index.html (React Router support)
 app.get('*', (req, res) => {
   const indexPath = path.join(frontendDist, 'index.html');
-  console.log('[static] Serving index.html for:', req.path);
   res.sendFile(indexPath);
 });
 
