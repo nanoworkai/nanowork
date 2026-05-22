@@ -2,13 +2,17 @@ services:
   - type: web
     name: nanowork-web
     runtime: node
+    branch: main
+    region: oregon
+    plan: free
+    healthCheckPath: /health
     buildCommand: npm run build -w web && cd backend && npm install && npm run build
     startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: CORS_ORIGIN
-        value: https://nanowork-web.onrender.com,https://nanowork.app
+        value: https://nanowork-web.onrender.com
       - key: FRONTEND_URL
         value: https://nanowork-web.onrender.com
       - key: PORT
