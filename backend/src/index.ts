@@ -137,11 +137,13 @@ app.use('/api/billing', billingRouter);
 app.use('/api/wallet', walletRouter);
 app.use('/api/build', buildsRouter);
 
-// Note: Frontend is deployed separately (Cloudflare Pages).
-// Backend only serves API routes - no static file serving needed.
-// 404 handler for unmatched routes
-app.use((req, res) => {
-  res.status(404).json({ error: 'Not found' });
+// Serve frontend static files (React app built by Vite)
+const frontendPath = path.join(__dirname, '../../apps/web/dist');
+app.use(express.static(frontendPath));
+
+// All non-API routes return index.html (React Router support)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 // Error handler
