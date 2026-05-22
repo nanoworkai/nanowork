@@ -135,6 +135,16 @@ app.use('/api/billing', billingRouter);
 app.use('/api/wallet', walletRouter);
 app.use('/api/build', buildsRouter);
 
+// Error handler - MUST be registered before static/SPA fallback
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('[500 ERROR]', err.message, err.stack);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: NODE_ENV === 'development' ? err.message : undefined,
+    detail: err.message
+  });
+});
+
 // Serve frontend static files (React app built by Vite)
 // Frontend is copied to backend/public during build
 const frontendDist = path.join(__dirname, '..', 'public');
@@ -152,21 +162,25 @@ if (fs.existsSync(path.join(frontendDist, 'assets'))) {
 }
 console.log('=================================');
 
+// Serve static files
 app.use(express.static(frontendDist));
 
-// All non-API routes return index.html (React Router support)
+// SPA fallback - serve index.html for all non-API routes
 app.get('*', (req, res) => {
   const indexPath = path.join(frontendDist, 'index.html');
-  res.sendFile(indexPath);
-});
+  console.log(`[spa-fallback] ${req.path} -> ${indexPath}`);
 
-// Error handler
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Unhandled error:', err);
-  res.status(500).json({
-    error: 'Internal server error',
-    message: NODE_ENV === 'development' ? err.message : undefined,
-  });
+  if (!fs.existsSync(indexPath)) {
+    console.error(`[spa-fallback] index.html not found at: ${indexPath}`);
+    return res.status(503).json({
+      error: 'Frontend not built',
+      expected: indexPath,
+      cwd: process.cwd(),
+      dirname: __dirname
+    });
+  }
+
+  res.sendFile(indexPath);
 });
 
 // Start server
