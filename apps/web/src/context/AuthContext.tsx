@@ -60,6 +60,7 @@ export interface UserProfile {
 interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
+  authError: string | null;
   user: User | null;
   session: Session | null;
   profile: UserProfile | null;
@@ -83,11 +84,15 @@ interface AuthContextValue {
 
   // Credits management
   deductCredits: (amount: number, description: string, usageType: string, companyId?: string) => Promise<boolean>;
+
+  // Retry mechanism
+  retryAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
   isAuthenticated: false,
   isLoading: true,
+  authError: null,
   user: null,
   session: null,
   profile: null,
@@ -103,6 +108,7 @@ const AuthContext = createContext<AuthContextValue>({
   logout: async () => {},
   updateProfile: async () => {},
   deductCredits: async () => false,
+  retryAuth: async () => {},
 });
 
 // Legacy phone-based subdomain generator (unused with email auth)
@@ -118,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const activeCompany = companies.find(c => c.id === activeCompanyId) || companies[0] || null;
 
@@ -192,6 +199,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // Safety timeout: if loading takes more than 10 seconds, force stop loading
+    const timeoutId = setTimeout(() => {
+      if (isLoading) {
+        console.error("[AuthContext] Authentication timeout after 10 seconds");
+
+        // Diagnostic information
+        const diagnostics = {
+          supabaseConfigured: isSupabaseConfigured,
+          hasSession: !!session,
+          hasUser: !!user,
+          hasProfile: !!profile,
+          timestamp: new Date().toISOString(),
+        };
+
+        console.error("[AuthContext] Diagnostics:", diagnostics);
+
+        setAuthError(
+          "Authentication is taking longer than expected. This may be due to network issues or configuration problems. Please try again."
+        );
+        setIsLoading(false);
+      }
+    }, 10000); // 10 seconds
+
+    return () => clearTimeout(timeoutId);
+  }, [isLoading, session, user, profile]);
+
+  useEffect(() => {
     // If Supabase is not configured, skip auth entirely
     if (!isSupabaseConfigured) {
       console.warn("[AuthContext] Running in fallback mode - no authentication");
@@ -222,6 +256,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }).catch((err) => {
       console.error("[AuthContext] Failed to get session:", err);
+      setAuthError(`Failed to initialize authentication: ${err.message || "Unknown error"}`);
       setIsLoading(false);
     });
 
@@ -387,11 +422,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return true;
   }, [user, profile]);
 
+  const retryAuth = useCallback(async () => {
+    setIsLoading(true);
+    setAuthError(null);
+
+    if (!isSupabaseConfigured) {
+      setAuthError("Supabase is not configured. Please check your environment variables.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { data: { session: s }, error } = await supabase.auth.getSession();
+
+      if (error) throw error;
+
+      setSession(s);
+      setUser(s?.user ?? null);
+
+      if (s?.user) {
+        await loadProfile(s.user);
+        await loadCompanies(s.user.id).catch(() => {
+          // Companies table might not exist yet - that's okay
+        });
+      }
+
+      setIsLoading(false);
+    } catch (err: any) {
+      console.error("[AuthContext] Retry failed:", err);
+      setAuthError(`Authentication retry failed: ${err.message || "Unknown error"}`);
+      setIsLoading(false);
+    }
+  }, [loadProfile, loadCompanies]);
+
   return (
     <AuthContext.Provider
       value={{
         isAuthenticated: !!session,
         isLoading,
+        authError,
         user,
         session,
         profile,
@@ -407,6 +476,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshCompanies,
         canCreateCompany,
         deductCredits,
+        retryAuth,
       }}
     >
       {children}
