@@ -23,37 +23,14 @@ import billingRouter from './routes/billing';
 import walletRouter from './routes/wallet';
 import buildsRouter from './routes/builds';
 
-// Validate required environment variables
-function validateEnvironmentVariables() {
-  const requiredEnvVars = [
-    'SUPABASE_URL',
-    'SUPABASE_SERVICE_KEY',
-    'STRIPE_SECRET_KEY',
-    'STRIPE_WEBHOOK_SECRET',
-    'INTERNAL_TOKEN',
-    'ANTHROPIC_API_KEY',
-    'AGENT_EMAIL_DOMAIN',
-  ];
-
-  const missingVars: string[] = [];
-
-  for (const envVar of requiredEnvVars) {
-    if (!process.env[envVar]) {
-      missingVars.push(envVar);
-    }
-  }
-
-  if (missingVars.length > 0) {
-    console.error('\n❌ ERROR: Missing required environment variables:\n');
-    missingVars.forEach((varName) => {
-      console.error(`   - ${varName}`);
-    });
-    console.error('\nServer cannot start without these variables. Please set them in your .env file.\n');
-    process.exit(1);
-  }
-}
-
-validateEnvironmentVariables();
+// Environment variables with fallback to empty strings
+const SUPABASE_URL = process.env.SUPABASE_URL ?? '';
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY ?? '';
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY ?? '';
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET ?? '';
+const INTERNAL_TOKEN = process.env.INTERNAL_TOKEN ?? '';
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY ?? '';
+const AGENT_EMAIL_DOMAIN = process.env.AGENT_EMAIL_DOMAIN ?? '';
 
 // Create Express app
 const app = express();
@@ -66,8 +43,11 @@ app.use('/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWeb
 app.use(express.json());
 
 // CORS configuration - use environment variable or development defaults
-const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+const CORS_ORIGIN = process.env.CORS_ORIGIN ?? '';
+const NODE_ENV = process.env.NODE_ENV ?? 'development';
+
+const allowedOrigins = CORS_ORIGIN
+  ? CORS_ORIGIN.split(',').map(origin => origin.trim())
   : [
       'http://localhost:5173',
       'http://localhost:3000',
@@ -169,7 +149,7 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   console.error('Unhandled error:', err);
   res.status(500).json({
     error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined,
+    message: NODE_ENV === 'development' ? err.message : undefined,
   });
 });
 
@@ -177,7 +157,7 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 const server = app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`   Health check: http://localhost:${PORT}/health`);
-  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`   Environment: ${NODE_ENV}`);
 });
 
 // Graceful shutdown handler
