@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "npm run dev:web",
     "dev:web": "npm run dev -w web",
-    "build": "npm run build -w web && cd backend && npm run build",
+    "build": "npm run build -w web && cd backend && npm install && npm run build",
     "build:prod": "npm run build -w web && cd backend && npm ci --omit=dev && npm run build",
     "start": "cd backend && npm start",
     "generate:og": "node scripts/generate-og-image.js"
