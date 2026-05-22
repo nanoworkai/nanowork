@@ -14,7 +14,7 @@ This app now deploys as **two separate Render services**:
 Set these in the Render Dashboard:
 
 ```
-VITE_API_URL=https://nanowork-backend.onrender.com
+VITE_API_URL=https://backend-6ea2.onrender.com
 VITE_SITE_URL=https://nanowork-frontend.onrender.com
 VITE_SUPABASE_URL=https://jxkvpzvwpxrabsubovmt.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4a3ZwenZ3cHhyYWJzdWJvdm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzNDI2NTUsImV4cCI6MjA5MzkxODY1NX0.My6MlqVWNm7wg08MD_Y86yPyzLbID_WwlduoEtSssYA
@@ -22,8 +22,8 @@ VITE_STRIPE_PUBLISHABLE_KEY=<your-stripe-publishable-key>
 ```
 
 **Important:** 
-- Replace `VITE_API_URL` with your actual backend service URL from Render (e.g., `https://nanowork-web-abc123.onrender.com`)
-- Replace `VITE_SITE_URL` with your actual frontend URL from Render
+- Backend URL is: `https://backend-6ea2.onrender.com`
+- Replace `VITE_SITE_URL` with your actual frontend URL from Render (wait for frontend deploy to get this)
 - Get your Stripe publishable key from Stripe dashboard
 
 ### Backend Service (`nanowork-backend`)
