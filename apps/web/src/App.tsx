@@ -33,7 +33,6 @@ import { isSupabaseConfigured } from "./lib/supabase";
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, authError, retryAuth } = useAuth();
   const { pathname, search } = useLocation();
-  const [loadingStartTime] = useState(() => Date.now());
   const [showSlowWarning, setShowSlowWarning] = useState(false);
   const [showRetryButton, setShowRetryButton] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
