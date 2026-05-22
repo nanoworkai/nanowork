@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
 import { getSupabase } from './services/supabase';
 
 // Import routes
@@ -134,8 +136,14 @@ app.use('/api/billing', billingRouter);
 app.use('/api/wallet', walletRouter);
 app.use('/api/build', buildsRouter);
 
-// Note: Frontend is served by a separate Render static site service
-// Backend only handles API routes, webhooks, and health checks
+// Serve static frontend files (after all API routes)
+const publicPath = path.join(__dirname, '..', 'public');
+if (fs.existsSync(publicPath)) {
+  app.use(express.static(publicPath));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(publicPath, 'index.html'));
+  });
+}
 
 // Error handler
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
