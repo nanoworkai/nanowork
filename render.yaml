@@ -35,3 +35,38 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false
+
+  - type: cron
+    name: nanowork-healthcheck
+    runtime: node
+    region: oregon
+    plan: free
+    schedule: "*/10 * * * *"
+    buildCommand: echo "no build needed"
+    startCommand: |
+      node -e "
+        fetch('https://nanowork-web.onrender.com/health')
+          .then(r => r.json())
+          .then(d => {
+            console.log('[healthcheck]', JSON.stringify(d));
+            if (d.status !== 'ok') process.exit(1);
+          })
+          .catch(e => {
+            console.error('[healthcheck] FAILED:', e.message);
+            process.exit(1);
+          });
+      "
+
+  - type: cron
+    name: nanowork-keepalive
+    runtime: node
+    region: oregon
+    plan: free
+    schedule: "*/14 * * * *"
+    buildCommand: echo "no build needed"
+    startCommand: |
+      node -e "
+        fetch('https://nanowork-web.onrender.com/health')
+          .then(() => console.log('[keepalive] ok', new Date().toISOString()))
+          .catch(e => console.error('[keepalive] failed:', e.message));
+      "

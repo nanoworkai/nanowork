@@ -72,10 +72,12 @@ app.use(cors({
   credentials: true,
 }));
 
-// Health check endpoint - tests database connectivity
-app.get('/health', async (req, res) => {
+// Health check endpoint - comprehensive service checks
+app.get('/health', async (_req, res) => {
+  const checks: Record<string, string> = {};
+
+  // Check Supabase database connectivity
   try {
-    // Test database connectivity with a simple query
     const supabase = getSupabase();
     const { error } = await supabase
       .from('agents')
@@ -83,36 +85,32 @@ app.get('/health', async (req, res) => {
       .limit(1)
       .single();
 
-    // If query fails (but not because of "no rows"), database is unreachable
-    if (error && error.code !== 'PGRST116') {
-      console.error('Health check database error:', error);
-      res.status(503).json({
-        ok: false,
-        database: 'disconnected',
-        error: error.message,
-        timestamp: new Date().toISOString(),
-        uptime: Math.floor(process.uptime()),
-      });
-      return;
-    }
-
-    // Database is healthy
-    res.status(200).json({
-      ok: true,
-      database: 'connected',
-      timestamp: new Date().toISOString(),
-      uptime: Math.floor(process.uptime()),
-    });
-  } catch (error) {
-    console.error('Health check error:', error);
-    res.status(503).json({
-      ok: false,
-      database: 'error',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString(),
-      uptime: Math.floor(process.uptime()),
-    });
+    // PGRST116 = no rows, which is fine (table exists but empty)
+    checks.supabase = (!error || error.code === 'PGRST116') ? 'ok' : 'error';
+  } catch {
+    checks.supabase = 'error';
   }
+
+  // Check Anthropic API key exists
+  checks.anthropic = process.env.ANTHROPIC_API_KEY ? 'ok' : 'missing';
+
+  // Check Stripe API key exists
+  checks.stripe = process.env.STRIPE_SECRET_KEY ? 'ok' : 'missing';
+
+  // Check Supabase credentials exist
+  checks.supabase_config = (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) ? 'ok' : 'missing';
+
+  // Check internal token exists
+  checks.internal_token = process.env.INTERNAL_TOKEN ? 'ok' : 'missing';
+
+  const allOk = Object.values(checks).every(v => v === 'ok');
+
+  res.status(allOk ? 200 : 503).json({
+    status: allOk ? 'ok' : 'degraded',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
+    services: checks
+  });
 });
 
 // Internal routes (protected by internal token)
