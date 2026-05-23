@@ -138,7 +138,20 @@ app.use('/api/build', buildsRouter);
 
 // Serve static frontend files (after all API routes)
 const publicPath = path.join(__dirname, '..', 'public');
+console.log('[static] publicPath:', publicPath, 'exists:', fs.existsSync(publicPath));
 if (fs.existsSync(publicPath)) {
+  // Log files in public directory for debugging
+  try {
+    const files = fs.readdirSync(publicPath);
+    console.log('[static] Files in public:', files);
+    if (files.includes('assets')) {
+      const assetFiles = fs.readdirSync(path.join(publicPath, 'assets'));
+      console.log('[static] Files in assets:', assetFiles.slice(0, 5));
+    }
+  } catch (e) {
+    console.error('[static] Failed to read public dir:', e);
+  }
+
   // Serve static assets with explicit MIME types
   app.use(express.static(publicPath, {
     setHeaders: (res, filePath) => {
@@ -151,17 +164,18 @@ if (fs.existsSync(publicPath)) {
     }
   }));
 
-  // SPA catchall - only for non-API/asset routes
+  // SPA catchall - only for non-API routes
+  // Don't exclude /assets/ - if express.static didn't find it, we want it to 404, not serve index.html
   app.use((req, res, next) => {
-    // Let API, webhook, health, internal, and asset routes pass through
+    // Let API, webhook, health, and internal routes pass through to 404/error
     if (req.path.startsWith('/api/') ||
         req.path.startsWith('/internal/') ||
         req.path.startsWith('/webhooks/') ||
-        req.path.startsWith('/assets/') ||
         req.path === '/health') {
       return next();
     }
-    // Everything else gets the SPA
+    // All other routes get the SPA (including /assets/* if the file wasn't found)
+    // This is intentional - Vite generates hashed filenames, so missing assets = old deployment
     res.sendFile(path.join(publicPath, 'index.html'));
   });
 }
