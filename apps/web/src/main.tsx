@@ -1,19 +1,5 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import "./index.css";
-import App from "./App";
-import { AuthProvider } from "./context/AuthContext";
+import ReactDOM from 'react-dom/client'
 
-const root = document.getElementById("root");
-if (!root) throw new Error('Missing root element with id "root"');
-
-createRoot(root).render(
-  <StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </BrowserRouter>
-  </StrictMode>
-);
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <h1>Nanowork is live</h1>
+)
