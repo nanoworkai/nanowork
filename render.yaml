@@ -1,40 +1,65 @@
 services:
-  - type: web
-    name: nanowork-web
-    runtime: node
+  # BACKEND COMMENTED OUT FOR TESTING
+  # - type: web
+  #   name: nanowork-web
+  #   runtime: node
+  #   branch: main
+  #   region: oregon
+  #   plan: free
+  #   healthCheckPath: /health
+  #   buildCommand: npm run build
+  #   startCommand: cd backend && node dist/index.js
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production
+  #     - key: PORT
+  #       sync: false
+  #     - key: SUPABASE_URL
+  #       sync: false
+  #     - key: SUPABASE_SERVICE_KEY
+  #       sync: false
+  #     - key: SUPABASE_ANON_KEY
+  #       sync: false
+  #     - key: ANTHROPIC_API_KEY
+  #       sync: false
+  #     - key: STRIPE_SECRET_KEY
+  #       sync: false
+  #     - key: STRIPE_WEBHOOK_SECRET
+  #       sync: false
+  #     - key: INTERNAL_TOKEN
+  #       sync: false
+  #     - key: CF_ACCOUNT_ID
+  #       sync: false
+  #     - key: CLOUDFLARE_API_TOKEN
+  #       sync: false
+  #     - key: CORS_ORIGIN
+  #       value: https://www.nanowork.ai
+  #     - key: FRONTEND_URL
+  #       value: https://www.nanowork.ai
+  #     - key: VITE_API_URL
+  #       sync: false
+  #     - key: VITE_SITE_URL
+  #       sync: false
+  #     - key: VITE_SUPABASE_URL
+  #       sync: false
+  #     - key: VITE_SUPABASE_ANON_KEY
+  #       sync: false
+  #     - key: VITE_STRIPE_PUBLISHABLE_KEY
+  #       sync: false
+
+  # FRONTEND ONLY - TESTING
+  - type: static
+    name: nanowork-frontend-test
     branch: main
     region: oregon
     plan: free
-    healthCheckPath: /health
-    buildCommand: npm run build
-    startCommand: cd backend && node dist/index.js
+    buildCommand: cd apps/web && npm install && npm run build
+    staticPublishPath: ./apps/web/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        sync: false
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_KEY
-        sync: false
-      - key: SUPABASE_ANON_KEY
-        sync: false
-      - key: ANTHROPIC_API_KEY
-        sync: false
-      - key: STRIPE_SECRET_KEY
-        sync: false
-      - key: STRIPE_WEBHOOK_SECRET
-        sync: false
-      - key: INTERNAL_TOKEN
-        sync: false
-      - key: CF_ACCOUNT_ID
-        sync: false
-      - key: CLOUDFLARE_API_TOKEN
-        sync: false
-      - key: CORS_ORIGIN
-        value: https://www.nanowork.ai
-      - key: FRONTEND_URL
-        value: https://www.nanowork.ai
       - key: VITE_API_URL
         sync: false
       - key: VITE_SITE_URL
@@ -46,37 +71,38 @@ services:
       - key: VITE_STRIPE_PUBLISHABLE_KEY
         sync: false
 
-  - type: cron
-    name: nanowork-healthcheck
-    runtime: node
-    region: oregon
-    plan: free
-    schedule: "*/10 * * * *"
-    buildCommand: echo "no build needed"
-    startCommand: |
-      node -e "
-        fetch('https://nanowork-web.onrender.com/health')
-          .then(r => r.json())
-          .then(d => {
-            console.log('[healthcheck]', JSON.stringify(d));
-            if (d.status !== 'ok') process.exit(1);
-          })
-          .catch(e => {
-            console.error('[healthcheck] FAILED:', e.message);
-            process.exit(1);
-          });
-      "
+  # CRONS COMMENTED OUT - NO BACKEND TO CHECK
+  # - type: cron
+  #   name: nanowork-healthcheck
+  #   runtime: node
+  #   region: oregon
+  #   plan: free
+  #   schedule: "*/10 * * * *"
+  #   buildCommand: echo "no build needed"
+  #   startCommand: |
+  #     node -e "
+  #       fetch('https://nanowork-web.onrender.com/health')
+  #         .then(r => r.json())
+  #         .then(d => {
+  #           console.log('[healthcheck]', JSON.stringify(d));
+  #           if (d.status !== 'ok') process.exit(1);
+  #         })
+  #         .catch(e => {
+  #           console.error('[healthcheck] FAILED:', e.message);
+  #           process.exit(1);
+  #         });
+  #     "
 
-  - type: cron
-    name: nanowork-keepalive
-    runtime: node
-    region: oregon
-    plan: free
-    schedule: "*/14 * * * *"
-    buildCommand: echo "no build needed"
-    startCommand: |
-      node -e "
-        fetch('https://nanowork-web.onrender.com/health')
-          .then(() => console.log('[keepalive] ok', new Date().toISOString()))
-          .catch(e => console.error('[keepalive] failed:', e.message));
-      "
+  # - type: cron
+  #   name: nanowork-keepalive
+  #   runtime: node
+  #   region: oregon
+  #   plan: free
+  #   schedule: "*/14 * * * *"
+  #   buildCommand: echo "no build needed"
+  #   startCommand: |
+  #     node -e "
+  #       fetch('https://nanowork-web.onrender.com/health')
+  #         .then(() => console.log('[keepalive] ok', new Date().toISOString()))
+  #         .catch(e => console.error('[keepalive] failed:', e.message));
+  #     "
