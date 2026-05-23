@@ -1,0 +1,12 @@
+services:
+  - type: static
+    name: nanowork-frontend-v2
+    branch: main
+    region: oregon
+    plan: free
+    buildCommand: cd apps/web && npm install && npm run build
+    staticPublishPath: apps/web/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
