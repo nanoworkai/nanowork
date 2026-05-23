@@ -1,6 +1,6 @@
 services:
   - type: static
-    name: nanowork-frontend
+    name: nanowork-frontend-v2
     branch: main
     region: oregon
     plan: free
