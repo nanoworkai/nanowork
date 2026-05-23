@@ -139,15 +139,25 @@ app.use('/api/build', buildsRouter);
 // Serve static frontend files (after all API routes)
 const publicPath = path.join(__dirname, '..', 'public');
 if (fs.existsSync(publicPath)) {
-  // Serve static assets first
-  app.use(express.static(publicPath));
+  // Serve static assets with explicit MIME types
+  app.use(express.static(publicPath, {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.js')) {
+        res.setHeader('Content-Type', 'application/javascript');
+      }
+      if (filePath.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css');
+      }
+    }
+  }));
 
-  // SPA catchall - only for non-API routes
+  // SPA catchall - only for non-API/asset routes
   app.use((req, res, next) => {
-    // Let API, webhook, health, and internal routes pass through
+    // Let API, webhook, health, internal, and asset routes pass through
     if (req.path.startsWith('/api/') ||
         req.path.startsWith('/internal/') ||
         req.path.startsWith('/webhooks/') ||
+        req.path.startsWith('/assets/') ||
         req.path === '/health') {
       return next();
     }
