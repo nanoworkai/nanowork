@@ -139,8 +139,19 @@ app.use('/api/build', buildsRouter);
 // Serve static frontend files (after all API routes)
 const publicPath = path.join(__dirname, '..', 'public');
 if (fs.existsSync(publicPath)) {
+  // Serve static assets first
   app.use(express.static(publicPath));
-  app.get('*', (_req, res) => {
+
+  // SPA catchall - only for non-API routes
+  app.use((req, res, next) => {
+    // Let API, webhook, health, and internal routes pass through
+    if (req.path.startsWith('/api/') ||
+        req.path.startsWith('/internal/') ||
+        req.path.startsWith('/webhooks/') ||
+        req.path === '/health') {
+      return next();
+    }
+    // Everything else gets the SPA
     res.sendFile(path.join(publicPath, 'index.html'));
   });
 }
