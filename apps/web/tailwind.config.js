@@ -4,13 +4,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Monochromatic base - pure blacks and grays only
+        // Monochromatic base - dark but not pure black for better readability
         surface: {
-          0: "#000000",     // Pure black background
-          1: "#0a0a0a",     // Slightly lifted surface
-          2: "#111111",     // Card background
-          3: "#1a1a1a",     // Elevated card
-          4: "#242424",     // Hover state
+          0: "#0d0d0d",     // Main background - dark charcoal
+          1: "#161616",     // Slightly lifted surface
+          2: "#1e1e1e",     // Card background
+          3: "#262626",     // Elevated card
+          4: "#303030",     // Hover state
         },
         // Minimal accent - used only for active states and CTAs
         accent: {
