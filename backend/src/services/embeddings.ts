@@ -62,7 +62,7 @@ class OpenAIEmbeddingProvider implements EmbeddingProvider {
         throw new Error(`Embedding API error: ${response.status} ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data: any = await response.json();
       return data.data[0].embedding;
     } catch (error) {
       console.error('[Embeddings] Failed to generate embedding:', error);
@@ -103,7 +103,7 @@ class VoyageEmbeddingProvider implements EmbeddingProvider {
         throw new Error(`Voyage API error: ${response.status} ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data: any = await response.json();
       return data.data[0].embedding;
     } catch (error) {
       console.error('[Embeddings] Failed to generate embedding:', error);
