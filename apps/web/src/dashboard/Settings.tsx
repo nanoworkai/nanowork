@@ -37,7 +37,7 @@ function SaveButton({ saved, loading, label }: { saved: boolean; loading?: boole
       className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
         saved
           ? "bg-green-500/15 text-green-400 border border-green-500/20"
-          : "bg-white hover:bg-white text-white"
+          : "bg-white hover:bg-zinc-100 text-black"
       } disabled:opacity-50`}
     >
       {loading ? "Saving…" : saved ? "✓ Saved" : (label ?? "Save")}
