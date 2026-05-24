@@ -32,11 +32,33 @@ export async function requireUserAuth(
     }
 
     // Fetch the agent for this user
-    const agent = await getAgentByUserId(user.id);
+    let agent = await getAgentByUserId(user.id);
 
+    // Auto-create agent if it doesn't exist (for users who signed up before webhook was configured)
     if (!agent) {
-      res.status(403).json({ error: 'No agent found for this user' });
-      return;
+      try {
+        const slug = nanoid(8).toLowerCase().replace(/[^a-z0-9]/g, '');
+        const domain = process.env.AGENT_EMAIL_DOMAIN || 'agent.nanowork.ai';
+        const email = `a-${slug}@${domain}`;
+
+        agent = await createAgent({
+          user_id: user.id,
+          slug,
+          email,
+          name: `Agent ${slug}`,
+          stripe_account_id: null,
+          stripe_onboarding_complete: false,
+          system_prompt: null,
+          status: 'active',
+          metadata: {},
+        });
+
+        console.log(`Auto-created agent ${agent.id} for user ${user.id}`);
+      } catch (error) {
+        console.error('Failed to auto-create agent:', error);
+        res.status(500).json({ error: 'Failed to provision agent' });
+        return;
+      }
     }
 
     // Attach user and agent to request
