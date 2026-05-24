@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+
+# Post-Commit Hook for Auto-Commit System
+# Runs after a successful commit to trigger follow-up actions
+
+set -euo pipefail
+
+# Directories
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+CONFIG_DIR="$PROJECT_ROOT/.claude/auto-commit"
+CONFIG_FILE="$CONFIG_DIR/config.json"
+LOG_DIR="$CONFIG_DIR/logs"
+LOG_FILE="$LOG_DIR/hooks.log"
+
+# Ensure log directory exists
+mkdir -p "$LOG_DIR"
+
+# Logging function
+log_hook() {
+    local level=$1
+    shift
+    local message="$@"
+    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    echo "[$timestamp] [post-commit] [$level] $message" >> "$LOG_FILE"
+}
+
+# Check if auto-commit is enabled
+is_enabled() {
+    if [ ! -f "$CONFIG_FILE" ]; then
+        log_hook "WARN" "Config file not found: $CONFIG_FILE"
+        return 1
+    fi
+
+    local enabled=$(jq -r '.enabled // false' "$CONFIG_FILE" 2>/dev/null)
+    if [ "$enabled" != "true" ]; then
+        log_hook "INFO" "Auto-commit is disabled, skipping"
+        return 1
+    fi
+
+    return 0
+}
+
+# Get the commit SHA and message
+get_commit_info() {
+    local commit_sha=$(git rev-parse HEAD)
+    local commit_msg=$(git log -1 --pretty=%B)
+    local commit_author=$(git log -1 --pretty=%an)
+
+    log_hook "INFO" "Commit: $commit_sha by $commit_author"
+    log_hook "INFO" "Message: $commit_msg"
+
+    # Store commit info in temp file for other processes
+    local commit_info_file="$CONFIG_DIR/last-commit.json"
+    cat > "$commit_info_file" <<EOF
+{
+  "sha": "$commit_sha",
+  "message": $(echo "$commit_msg" | jq -Rs .),
+  "author": "$commit_author",
+  "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+}
+EOF
+}
+
+# Check if this is an auto-generated commit to prevent loops
+is_auto_commit() {
+    local commit_msg=$(git log -1 --pretty=%B)
+
+    # Check for auto-commit markers
+    if echo "$commit_msg" | grep -qE "(Auto-commit:|🤖|chore: auto-save)"; then
+        return 0
+    fi
+
+    return 1
+}
+
+# Trigger webhook or notification (optional)
+trigger_notification() {
+    local webhook_url=$(jq -r '.webhookUrl // ""' "$CONFIG_FILE" 2>/dev/null)
+
+    if [ -n "$webhook_url" ] && [ "$webhook_url" != "null" ]; then
+        local commit_sha=$(git rev-parse HEAD)
+        local commit_msg=$(git log -1 --pretty=%B | head -1)
+
+        # Send notification (non-blocking)
+        (
+            curl -X POST "$webhook_url" \
+                -H "Content-Type: application/json" \
+                -d "{\"event\":\"commit\",\"sha\":\"$commit_sha\",\"message\":\"$commit_msg\"}" \
+                --max-time 5 \
+                --silent \
+                > /dev/null 2>&1
+        ) &
+
+        log_hook "INFO" "Triggered webhook notification"
+    fi
+}
+
+# Update statistics
+update_stats() {
+    local stats_file="$CONFIG_DIR/stats.json"
+
+    if [ ! -f "$stats_file" ]; then
+        cat > "$stats_file" <<EOF
+{
+  "totalCommits": 0,
+  "autoCommits": 0,
+  "manualCommits": 0,
+  "lastCommit": null
+}
+EOF
+    fi
+
+    local is_auto=false
+    if is_auto_commit; then
+        is_auto=true
+    fi
+
+    # Update stats using jq
+    local temp_file=$(mktemp)
+    jq --arg ts "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+       --argjson auto "$is_auto" \
+       '.totalCommits += 1 |
+        .lastCommit = $ts |
+        if $auto then .autoCommits += 1 else .manualCommits += 1 end' \
+       "$stats_file" > "$temp_file" && mv "$temp_file" "$stats_file"
+
+    log_hook "INFO" "Updated commit statistics"
+}
+
+# Clean up old logs (keep last 100 entries)
+cleanup_logs() {
+    if [ -f "$LOG_FILE" ]; then
+        local line_count=$(wc -l < "$LOG_FILE")
+        if [ "$line_count" -gt 100 ]; then
+            tail -100 "$LOG_FILE" > "$LOG_FILE.tmp"
+            mv "$LOG_FILE.tmp" "$LOG_FILE"
+            log_hook "INFO" "Cleaned up old log entries"
+        fi
+    fi
+}
+
+# Main execution
+main() {
+    log_hook "INFO" "Post-commit hook triggered"
+
+    # Check if auto-commit is enabled
+    if ! is_enabled; then
+        exit 0
+    fi
+
+    # Get commit information
+    get_commit_info
+
+    # Update statistics
+    update_stats
+
+    # Trigger notifications if configured
+    trigger_notification
+
+    # Cleanup old logs
+    cleanup_logs
+
+    log_hook "INFO" "Post-commit hook completed successfully"
+}
+
+# Run main, but don't fail the commit if something goes wrong
+main || {
+    log_hook "ERROR" "Post-commit hook failed, but commit succeeded"
+    exit 0
+}

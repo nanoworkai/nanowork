@@ -1,0 +1,42 @@
+{
+  "enabled": true,
+  "interval": 300,
+  "maxFilesPerCommit": 5,
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "*.log",
+    ".env*",
+    "*.lock",
+    "*.min.js",
+    "*.map"
+  ],
+  "commitMessageTemplate": {
+    "type": "conventional",
+    "maxLength": 72,
+    "includeScope": true,
+    "allowedTypes": [
+      "feat",
+      "fix",
+      "docs",
+      "style",
+      "refactor",
+      "perf",
+      "test",
+      "build",
+      "ci",
+      "chore"
+    ]
+  },
+  "autoStage": true,
+  "smartSplitting": true,
+  "debounceMs": 2000,
+  "requireMinChanges": 1,
+  "stopWords": [
+    "WIP",
+    "TODO",
+    "FIXME",
+    "XXX"
+  ]
+}

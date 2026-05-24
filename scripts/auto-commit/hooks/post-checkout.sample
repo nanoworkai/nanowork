@@ -1,0 +1,199 @@
+#!/usr/bin/env bash
+
+# Post-Checkout Hook for Auto-Commit System
+# Runs after git checkout to optionally trigger auto-commit mode
+
+set -euo pipefail
+
+# Hook receives three parameters:
+# $1 = ref of the previous HEAD
+# $2 = ref of the new HEAD
+# $3 = flag indicating whether it was a branch checkout (1) or file checkout (0)
+
+PREV_HEAD=$1
+NEW_HEAD=$2
+BRANCH_CHECKOUT=$3
+
+# Directories
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+CONFIG_DIR="$PROJECT_ROOT/.claude/auto-commit"
+CONFIG_FILE="$CONFIG_DIR/config.json"
+LOG_DIR="$CONFIG_DIR/logs"
+LOG_FILE="$LOG_DIR/hooks.log"
+
+# Ensure log directory exists
+mkdir -p "$LOG_DIR"
+
+# Logging function
+log_hook() {
+    local level=$1
+    shift
+    local message="$@"
+    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    echo "[$timestamp] [post-checkout] [$level] $message" >> "$LOG_FILE"
+}
+
+# Check if auto-commit on checkout is enabled
+is_auto_commit_on_checkout_enabled() {
+    if [ ! -f "$CONFIG_FILE" ]; then
+        return 1
+    fi
+
+    local enabled=$(jq -r '.enabled // false' "$CONFIG_FILE" 2>/dev/null)
+    local auto_on_checkout=$(jq -r '.autoCommitOnCheckout // false' "$CONFIG_FILE" 2>/dev/null)
+
+    if [ "$enabled" = "true" ] && [ "$auto_on_checkout" = "true" ]; then
+        return 0
+    fi
+
+    return 1
+}
+
+# Get branch name
+get_branch_name() {
+    git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "detached"
+}
+
+# Check if we're on a protected branch
+is_protected_branch() {
+    local branch=$1
+    local protected_branches=("main" "master" "production" "prod")
+
+    for protected in "${protected_branches[@]}"; do
+        if [ "$branch" = "$protected" ]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+# Check if branch has uncommitted changes
+has_uncommitted_changes() {
+    if [ -n "$(git status --porcelain)" ]; then
+        return 0
+    fi
+    return 1
+}
+
+# Auto-commit changes if enabled
+auto_commit_changes() {
+    local branch=$1
+
+    log_hook "INFO" "Checking for uncommitted changes on branch: $branch"
+
+    if ! has_uncommitted_changes; then
+        log_hook "INFO" "No uncommitted changes found"
+        return 0
+    fi
+
+    # Don't auto-commit on protected branches
+    if is_protected_branch "$branch"; then
+        log_hook "WARN" "Skipping auto-commit on protected branch: $branch"
+        return 0
+    fi
+
+    log_hook "INFO" "Auto-committing changes after checkout"
+
+    # Stage all changes
+    git add -A
+
+    # Create auto-commit message
+    local commit_msg="chore: auto-save after checkout to $branch
+
+This commit was automatically created by the auto-commit system
+after checking out branch '$branch'.
+
+Previous HEAD: $PREV_HEAD
+New HEAD: $NEW_HEAD"
+
+    # Commit changes
+    if git commit -m "$commit_msg" 2>/dev/null; then
+        log_hook "INFO" "Auto-commit successful"
+        echo "Auto-committed changes after checkout to $branch"
+    else
+        log_hook "ERROR" "Auto-commit failed"
+    fi
+}
+
+# Signal watcher to restart if running
+signal_watcher() {
+    local watcher_pid_file="$CONFIG_DIR/watcher.pid"
+
+    if [ -f "$watcher_pid_file" ]; then
+        local watcher_pid=$(cat "$watcher_pid_file")
+
+        if kill -0 "$watcher_pid" 2>/dev/null; then
+            log_hook "INFO" "Signaling watcher (PID: $watcher_pid) to refresh"
+            # Send SIGHUP to reload
+            kill -HUP "$watcher_pid" 2>/dev/null || true
+        else
+            # Clean up stale PID file
+            rm "$watcher_pid_file"
+            log_hook "WARN" "Removed stale watcher PID file"
+        fi
+    fi
+}
+
+# Update checkout history
+update_checkout_history() {
+    local branch=$1
+    local history_file="$CONFIG_DIR/checkout-history.json"
+
+    if [ ! -f "$history_file" ]; then
+        echo "[]" > "$history_file"
+    fi
+
+    local entry=$(cat <<EOF
+{
+  "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+  "prevHead": "$PREV_HEAD",
+  "newHead": "$NEW_HEAD",
+  "branch": "$branch",
+  "branchCheckout": $BRANCH_CHECKOUT
+}
+EOF
+)
+
+    # Add entry to history (keep last 50)
+    local temp_file=$(mktemp)
+    jq --argjson entry "$entry" '. += [$entry] | .[-50:]' "$history_file" > "$temp_file" && mv "$temp_file" "$history_file"
+
+    log_hook "INFO" "Updated checkout history"
+}
+
+# Main execution
+main() {
+    log_hook "INFO" "Post-checkout hook triggered (branch checkout: $BRANCH_CHECKOUT)"
+
+    # Only process branch checkouts, not file checkouts
+    if [ "$BRANCH_CHECKOUT" != "1" ]; then
+        log_hook "INFO" "File checkout detected, skipping"
+        exit 0
+    fi
+
+    local branch=$(get_branch_name)
+    log_hook "INFO" "Checked out branch: $branch (prev: $PREV_HEAD, new: $NEW_HEAD)"
+
+    # Update checkout history
+    update_checkout_history "$branch"
+
+    # Auto-commit if enabled and appropriate
+    if is_auto_commit_on_checkout_enabled; then
+        auto_commit_changes "$branch"
+    else
+        log_hook "INFO" "Auto-commit on checkout is disabled"
+    fi
+
+    # Signal watcher to refresh
+    signal_watcher
+
+    log_hook "INFO" "Post-checkout hook completed successfully"
+}
+
+# Run main, but don't fail the checkout if something goes wrong
+main || {
+    log_hook "ERROR" "Post-checkout hook failed, but checkout succeeded"
+    exit 0
+}

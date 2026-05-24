@@ -1,0 +1,52 @@
+{
+  "name": "@nanowork/auto-commit",
+  "version": "1.0.0",
+  "description": "Intelligent git auto-commit tool with AI-generated commit messages",
+  "main": "dist/index.js",
+  "bin": {
+    "auto-commit": "dist/cli.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "tsx watch src/cli.ts",
+    "install-hooks": "node dist/install-hooks.js",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "watch": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "git",
+    "commit",
+    "auto-commit",
+    "ai",
+    "anthropic",
+    "claude",
+    "version-control"
+  ],
+  "author": "Jordan Plows",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.1",
+    "chokidar": "^4.0.1",
+    "commander": "^12.1.0",
+    "ora": "^8.1.1",
+    "chalk": "^5.3.0",
+    "simple-git": "^3.27.0",
+    "cli-table3": "^0.6.5",
+    "boxen": "^8.0.1",
+    "prompts": "^2.4.2",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5.7.2",
+    "tsx": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

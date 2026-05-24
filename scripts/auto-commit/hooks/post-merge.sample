@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+
+# Post-Merge Hook for Auto-Commit System
+# Runs after a successful git merge to handle conflicts and auto-commits
+
+set -euo pipefail
+
+# Hook receives one parameter:
+# $1 = flag indicating whether the merge was a squash merge (1) or not (0)
+
+SQUASH_MERGE=${1:-0}
+
+# Directories
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+CONFIG_DIR="$PROJECT_ROOT/.claude/auto-commit"
+CONFIG_FILE="$CONFIG_DIR/config.json"
+LOG_DIR="$CONFIG_DIR/logs"
+LOG_FILE="$LOG_DIR/hooks.log"
+
+# Ensure log directory exists
+mkdir -p "$LOG_DIR"
+
+# Logging function
+log_hook() {
+    local level=$1
+    shift
+    local message="$@"
+    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    echo "[$timestamp] [post-merge] [$level] $message" >> "$LOG_FILE"
+}
+
+# Check if auto-commit on merge is enabled
+is_auto_commit_on_merge_enabled() {
+    if [ ! -f "$CONFIG_FILE" ]; then
+        return 1
+    fi
+
+    local enabled=$(jq -r '.enabled // false' "$CONFIG_FILE" 2>/dev/null)
+    local auto_on_merge=$(jq -r '.autoCommitOnMerge // false' "$CONFIG_FILE" 2>/dev/null)
+
+    if [ "$enabled" = "true" ] && [ "$auto_on_merge" = "true" ]; then
+        return 0
+    fi
+
+    return 1
+}
+
+# Check for merge conflicts
+has_merge_conflicts() {
+    if [ -f "$PROJECT_ROOT/.git/MERGE_HEAD" ]; then
+        # Check for conflict markers in tracked files
+        if git diff --name-only --diff-filter=U | grep -q .; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
+# Get merge information
+get_merge_info() {
+    local merge_head=""
+    local merge_msg=""
+
+    if [ -f "$PROJECT_ROOT/.git/MERGE_HEAD" ]; then
+        merge_head=$(cat "$PROJECT_ROOT/.git/MERGE_HEAD")
+    fi
+
+    if [ -f "$PROJECT_ROOT/.git/MERGE_MSG" ]; then
+        merge_msg=$(cat "$PROJECT_ROOT/.git/MERGE_MSG")
+    fi
+
+    log_hook "INFO" "Merge HEAD: ${merge_head:-none}"
+    log_hook "INFO" "Merge type: $([ "$SQUASH_MERGE" = "1" ] && echo "squash" || echo "normal")"
+
+    # Store merge info
+    local merge_info_file="$CONFIG_DIR/last-merge.json"
+    cat > "$merge_info_file" <<EOF
+{
+  "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+  "mergeHead": "${merge_head:-}",
+  "squash": $([ "$SQUASH_MERGE" = "1" ] && echo "true" || echo "false"),
+  "message": $(echo "${merge_msg:-}" | jq -Rs .)
+}
+EOF
+}
+
+# Handle merge conflicts notification
+notify_conflicts() {
+    log_hook "WARN" "Merge conflicts detected"
+
+    # List conflicted files
+    local conflicted_files=$(git diff --name-only --diff-filter=U)
+
+    log_hook "WARN" "Conflicted files:"
+    echo "$conflicted_files" | while read -r file; do
+        log_hook "WARN" "  - $file"
+    done
+
+    # Create conflict report
+    local conflict_report="$CONFIG_DIR/merge-conflicts.json"
+    local files_json=$(echo "$conflicted_files" | jq -R . | jq -s .)
+
+    cat > "$conflict_report" <<EOF
+{
+  "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+  "files": $files_json,
+  "resolved": false
+}
+EOF
+
+    echo "⚠️  Merge conflicts detected. Please resolve them manually."
+}
+
+# Auto-commit post-merge changes
+auto_commit_post_merge() {
+    if ! is_auto_commit_on_merge_enabled; then
+        log_hook "INFO" "Auto-commit on merge is disabled"
+        return 0
+    fi
+
+    # Don't auto-commit if there are conflicts
+    if has_merge_conflicts; then
+        notify_conflicts
+        return 0
+    fi
+
+    # Check for any remaining changes
+    if [ -n "$(git status --porcelain)" ]; then
+        log_hook "INFO" "Auto-committing post-merge changes"
+
+        git add -A
+
+        local commit_msg="chore: auto-save after merge
+
+This commit was automatically created by the auto-commit system
+after a successful merge.
+
+Merge type: $([ "$SQUASH_MERGE" = "1" ] && echo "squash" || echo "normal")"
+
+        if git commit -m "$commit_msg" 2>/dev/null; then
+            log_hook "INFO" "Auto-commit successful"
+            echo "Auto-committed post-merge changes"
+        else
+            log_hook "ERROR" "Auto-commit failed"
+        fi
+    fi
+}
+
+# Update dependencies if package files changed
+check_dependency_updates() {
+    local changed_files=$(git diff --name-only HEAD@{1} HEAD 2>/dev/null || echo "")
+
+    # Check if package.json or package-lock.json changed
+    if echo "$changed_files" | grep -qE "package(-lock)?\.json"; then
+        log_hook "INFO" "Package files changed, dependencies may need updating"
+
+        # Create a notification file for the watcher
+        local update_needed_file="$CONFIG_DIR/update-deps-needed"
+        echo "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" > "$update_needed_file"
+
+        echo "📦 Package files changed. Run 'npm install' to update dependencies."
+    fi
+}
+
+# Signal watcher to refresh
+signal_watcher() {
+    local watcher_pid_file="$CONFIG_DIR/watcher.pid"
+
+    if [ -f "$watcher_pid_file" ]; then
+        local watcher_pid=$(cat "$watcher_pid_file")
+
+        if kill -0 "$watcher_pid" 2>/dev/null; then
+            log_hook "INFO" "Signaling watcher (PID: $watcher_pid) to refresh"
+            kill -HUP "$watcher_pid" 2>/dev/null || true
+        fi
+    fi
+}
+
+# Update merge statistics
+update_merge_stats() {
+    local stats_file="$CONFIG_DIR/stats.json"
+
+    if [ ! -f "$stats_file" ]; then
+        cat > "$stats_file" <<EOF
+{
+  "totalCommits": 0,
+  "autoCommits": 0,
+  "manualCommits": 0,
+  "totalMerges": 0,
+  "lastCommit": null,
+  "lastMerge": null
+}
+EOF
+    fi
+
+    local temp_file=$(mktemp)
+    jq --arg ts "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+       '.totalMerges += 1 |
+        .lastMerge = $ts' \
+       "$stats_file" > "$temp_file" && mv "$temp_file" "$stats_file"
+
+    log_hook "INFO" "Updated merge statistics"
+}
+
+# Main execution
+main() {
+    log_hook "INFO" "Post-merge hook triggered (squash: $SQUASH_MERGE)"
+
+    # Get merge information
+    get_merge_info
+
+    # Update statistics
+    update_merge_stats
+
+    # Check for conflicts
+    if has_merge_conflicts; then
+        notify_conflicts
+    else
+        # Auto-commit if enabled
+        auto_commit_post_merge
+
+        # Check for dependency updates
+        check_dependency_updates
+
+        # Signal watcher
+        signal_watcher
+    fi
+
+    log_hook "INFO" "Post-merge hook completed successfully"
+}
+
+# Run main, but don't fail the merge if something goes wrong
+main || {
+    log_hook "ERROR" "Post-merge hook failed, but merge succeeded"
+    exit 0
+}
