@@ -5,7 +5,7 @@
       "cron": "*/1 * * * *",
       "prompt": "Check for uncommitted changes and auto-commit them:\n\n1. Run `git status --porcelain` to check for changes\n2. If there are changes (output is not empty):\n   - Stage all changes: `git add -A`\n   - Create a commit with current timestamp: `git commit -m \"auto: $(date '+%Y-%m-%d %H:%M:%S')\"`\n   - Report briefly what was committed\n3. If no changes, remain silent\n\nImportant: Keep the response very brief. Only report if a commit was made.",
       "createdAt": 1779593310015,
-      "lastFiredAt": 1779595443754,
+      "lastFiredAt": 1779595504008,
       "recurring": true,
       "createdBySessionId": "16874745-4943-42a5-a22b-a6e51f1debcb",
       "createdByPid": 84862,
