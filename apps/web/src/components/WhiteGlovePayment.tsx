@@ -12,7 +12,7 @@ interface WhiteGlovePaymentProps {
 let stripePromise: Promise<Stripe | null> | null = null;
 const getStripe = () => {
   if (!stripePromise) {
-    const key = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string;
+    const key = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? '';
     // Check if key exists and is not empty or placeholder
     if (key && key.trim() && !key.includes('your_test_key_here')) {
       stripePromise = loadStripe(key);
@@ -40,7 +40,7 @@ export default function WhiteGlovePayment({ buildId, companyName }: WhiteGlovePa
 
       // Create checkout session
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || ""}/api/checkout/create-session`,
+        `${import.meta.env.VITE_API_URL ?? ""}/api/checkout/create-session`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
