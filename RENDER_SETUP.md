@@ -14,16 +14,17 @@ This app now deploys as **two separate Render services**:
 Set these in the Render Dashboard:
 
 ```
-VITE_API_URL=https://backend-6ea2.onrender.com
-VITE_SITE_URL=https://nanowork-frontend.onrender.com
-VITE_SUPABASE_URL=https://jxkvpzvwpxrabsubovmt.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp4a3ZwenZ3cHhyYWJzdWJvdm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzNDI2NTUsImV4cCI6MjA5MzkxODY1NX0.My6MlqVWNm7wg08MD_Y86yPyzLbID_WwlduoEtSssYA
+VITE_API_URL=https://your-backend.onrender.com
+VITE_SITE_URL=https://your-frontend.onrender.com
+VITE_SUPABASE_URL=<your-supabase-project-url>
+VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 VITE_STRIPE_PUBLISHABLE_KEY=<your-stripe-publishable-key>
 ```
 
 **Important:** 
-- Backend URL is: `https://backend-6ea2.onrender.com`
+- Replace `VITE_API_URL` with your actual backend URL from Render
 - Replace `VITE_SITE_URL` with your actual frontend URL from Render (wait for frontend deploy to get this)
+- Get your Supabase URL and anon key from your Supabase project dashboard
 - Get your Stripe publishable key from Stripe dashboard
 
 ### Backend Service (`nanowork-backend`)
@@ -31,9 +32,9 @@ VITE_STRIPE_PUBLISHABLE_KEY=<your-stripe-publishable-key>
 Set these in the Render Dashboard:
 
 ```
-CORS_ORIGIN=https://nanowork-frontend.onrender.com
-FRONTEND_URL=https://nanowork-frontend.onrender.com
-SUPABASE_URL=https://jxkvpzvwpxrabsubovmt.supabase.co
+CORS_ORIGIN=https://your-frontend.onrender.com
+FRONTEND_URL=https://your-frontend.onrender.com
+SUPABASE_URL=<your-supabase-project-url>
 SUPABASE_SERVICE_KEY=<your-service-role-key>
 SUPABASE_ANON_KEY=<your-anon-key>
 ANTHROPIC_API_KEY=<your-anthropic-key>
@@ -104,8 +105,8 @@ npm run build
    - **Replace placeholder URLs with actual Render URLs after first deploy**
 
 4. **Update CORS after URLs are known:**
-   - Get frontend URL: `https://nanowork-frontend.onrender.com`
-   - Get backend URL: `https://nanowork-backend.onrender.com`
+   - Get frontend URL: `https://your-frontend.onrender.com`
+   - Get backend URL: `https://your-backend.onrender.com`
    - Set CORS_ORIGIN on backend to frontend URL
    - Set VITE_API_URL on frontend to backend URL
    - Redeploy both services
