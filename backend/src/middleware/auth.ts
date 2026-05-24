@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
+import { nanoid } from 'nanoid';
 import { getSupabase } from '../services/supabase';
-import { getAgentByUserId } from '../services/supabase';
+import { getAgentByUserId, createAgent } from '../services/supabase';
 import { AuthenticatedRequest } from '../types';
 
 /**
