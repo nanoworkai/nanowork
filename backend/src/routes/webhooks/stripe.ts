@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { getStripeInstance } from '../../services/stripe';
 import { getSupabase } from '../../services/supabase';
+import { removeCustomDomain } from '../../services/cloudflare';
 import { addCredits } from '../../services/creditService';
 
 const router = Router();
@@ -79,31 +80,6 @@ async function handlePaymentIntentSucceeded(paymentIntent: any) {
 
   console.log('Credit top-up payment succeeded:', paymentIntent.id, 'user:', userId, 'credits:', creditAmount);
 
-  // Idempotency check: verify this payment intent hasn't been processed already
-  // This prevents duplicate credit additions if Stripe retries the webhook
-  const supabase = getSupabase();
-  const { data: existingTransaction, error: checkError } = await supabase
-    .from('credit_transactions')
-    .select('id')
-    .eq('stripe_payment_intent_id', paymentIntent.id)
-    .single();
-
-  if (existingTransaction) {
-    console.log('Webhook already processed for payment intent:', paymentIntent.id);
-    return;
-  }
-
-  if (checkError && checkError.code !== 'PGRST116') {
-    // PGRST116 = no rows returned (expected when payment is new)
-    // Any other error should be logged
-    console.error('Error checking for existing transaction:', checkError);
-  }
-
-  // NOTE: Consider adding a UNIQUE constraint on stripe_payment_intent_id column
-  // in credit_transactions table to enforce idempotency at the database level:
-  // ALTER TABLE credit_transactions ADD CONSTRAINT unique_stripe_payment_intent
-  // UNIQUE (stripe_payment_intent_id);
-
   try {
     const newBalance = await addCredits(
       userId,
@@ -120,7 +96,7 @@ async function handlePaymentIntentSucceeded(paymentIntent: any) {
 
 /**
  * Handle subscription.deleted event
- * - Reset deployment domain fields if custom domain subscription
+ * - Remove custom domain from Cloudflare and reset deployment
  * - Reset user plan to free
  */
 async function handleSubscriptionDeleted(subscription: any) {
@@ -157,13 +133,26 @@ async function handleSubscriptionDeleted(subscription: any) {
   // Find deployment by subscription ID (domain subscription)
   const { data: deployment, error: findError } = await supabase
     .from('deployments')
-    .select('id, custom_domain')
+    .select('id, custom_domain, cloudflare_project_name')
     .eq('domain_subscription_id', subscriptionId)
     .single();
 
   if (findError || !deployment) {
     console.log('No deployment found for subscription (may be user subscription)');
     return;
+  }
+
+  const customDomain = deployment.custom_domain;
+  const projectName = deployment.cloudflare_project_name || 'nanowork-app';
+
+  // Remove domain from Cloudflare
+  if (customDomain) {
+    const removeResult = await removeCustomDomain(projectName, customDomain);
+    if (!removeResult.success) {
+      console.error('Failed to remove domain from Cloudflare:', removeResult.error);
+    } else {
+      console.log('Removed domain from Cloudflare:', customDomain);
+    }
   }
 
   // Reset deployment domain fields

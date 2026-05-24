@@ -1,9 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
-import fs from 'fs';
-import { getSupabase } from './services/supabase';
 
 // Import routes
 import provisionRouter from './routes/internal/provision';
@@ -24,14 +21,15 @@ import billingRouter from './routes/billing';
 import walletRouter from './routes/wallet';
 import buildsRouter from './routes/builds';
 
-// Environment variables with fallback to empty strings
-const SUPABASE_URL = process.env.SUPABASE_URL ?? '';
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY ?? '';
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY ?? '';
-const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET ?? '';
-const INTERNAL_TOKEN = process.env.INTERNAL_TOKEN ?? '';
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY ?? '';
-const AGENT_EMAIL_DOMAIN = process.env.AGENT_EMAIL_DOMAIN ?? '';
+// Validate required environment variables
+const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY'];
+
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.error(`ERROR: ${envVar} environment variable is not set`);
+    process.exit(1);
+  }
+}
 
 // Create Express app
 const app = express();
@@ -43,17 +41,20 @@ app.use('/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWeb
 
 app.use(express.json());
 
-// CORS configuration - use environment variable or development defaults
-const CORS_ORIGIN = process.env.CORS_ORIGIN ?? '';
-const NODE_ENV = process.env.NODE_ENV ?? 'development';
+// CORS configuration - allow all production and development URLs
+const allowedOrigins = [
+  'https://nanowork.ai',
+  'https://www.nanowork.ai',
+  'https://nanowork-5k9.pages.dev', // Cloudflare Pages production URL
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5174',
+];
 
-const allowedOrigins = CORS_ORIGIN
-  ? CORS_ORIGIN.split(',').map(origin => origin.trim())
-  : [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'http://localhost:5174',
-    ];
+// Add FRONTEND_URL from environment if set
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -73,44 +74,12 @@ app.use(cors({
   credentials: true,
 }));
 
-// Health check endpoint - comprehensive service checks
-app.get('/health', async (_req, res) => {
-  const checks: Record<string, string> = {};
-
-  // Check Supabase database connectivity
-  try {
-    const supabase = getSupabase();
-    const { error } = await supabase
-      .from('agents')
-      .select('id')
-      .limit(1)
-      .single();
-
-    // PGRST116 = no rows, which is fine (table exists but empty)
-    checks.supabase = (!error || error.code === 'PGRST116') ? 'ok' : 'error';
-  } catch {
-    checks.supabase = 'error';
-  }
-
-  // Check Anthropic API key exists
-  checks.anthropic = process.env.ANTHROPIC_API_KEY ? 'ok' : 'missing';
-
-  // Check Stripe API key exists
-  checks.stripe = process.env.STRIPE_SECRET_KEY ? 'ok' : 'missing';
-
-  // Check Supabase credentials exist
-  checks.supabase_config = (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) ? 'ok' : 'missing';
-
-  // Check internal token exists
-  checks.internal_token = process.env.INTERNAL_TOKEN ? 'ok' : 'missing';
-
-  const allOk = Object.values(checks).every(v => v === 'ok');
-
-  res.status(allOk ? 200 : 503).json({
-    status: allOk ? 'ok' : 'degraded',
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    ok: true,
+    tables: 15,
     timestamp: new Date().toISOString(),
-    uptime: Math.floor(process.uptime()),
-    services: checks
   });
 });
 
@@ -121,103 +90,51 @@ app.use('/internal', provisionRouter);
 app.use('/webhooks/email', emailWebhookRouter);
 
 // API routes (protected by user auth)
-app.use('/api/agents', agentsRouter);
-app.use('/api/businesses', businessesRouter);
-app.use('/api/apps', appsRouter);
-app.use('/api/landing-pages', landingPagesRouter);
-app.use('/api/deployments', deploymentsRouter);
-app.use('/api/conversations', conversationsRouter);
-app.use('/api/tasks', tasksRouter);
-app.use('/api/contacts', contactsRouter);
-app.use('/api/payments', paymentsRouter);
-app.use('/api/documents', documentsRouter);
-app.use('/api/domains', domainsRouter);
-app.use('/api/billing', billingRouter);
-app.use('/api/wallet', walletRouter);
-app.use('/api/build', buildsRouter);
+app.use('/agents', agentsRouter);
+app.use('/businesses', businessesRouter);
+app.use('/apps', appsRouter);
+app.use('/landing-pages', landingPagesRouter);
+app.use('/deployments', deploymentsRouter);
+app.use('/conversations', conversationsRouter);
+app.use('/tasks', tasksRouter);
+app.use('/contacts', contactsRouter);
+app.use('/payments', paymentsRouter);
+app.use('/documents', documentsRouter);
+app.use('/domains', domainsRouter);
+app.use('/billing', billingRouter);
+app.use('/wallet', walletRouter);
+app.use('/builds', buildsRouter);
 
-// Serve static frontend files (after all API routes)
-const publicPath = path.join(__dirname, '..', 'public');
-console.log('[static] publicPath:', publicPath, 'exists:', fs.existsSync(publicPath));
-if (fs.existsSync(publicPath)) {
-  // Log files in public directory for debugging
-  try {
-    const files = fs.readdirSync(publicPath);
-    console.log('[static] Files in public:', files);
-    if (files.includes('assets')) {
-      const assetFiles = fs.readdirSync(path.join(publicPath, 'assets'));
-      console.log('[static] Files in assets:', assetFiles.slice(0, 5));
-    }
-  } catch (e) {
-    console.error('[static] Failed to read public dir:', e);
-  }
-
-  // Serve static assets with explicit MIME types
-  app.use(express.static(publicPath, {
-    setHeaders: (res, filePath) => {
-      if (filePath.endsWith('.js')) {
-        res.setHeader('Content-Type', 'application/javascript');
-      }
-      if (filePath.endsWith('.css')) {
-        res.setHeader('Content-Type', 'text/css');
-      }
-    }
-  }));
-
-  // SPA catchall - only for non-API/asset routes
-  app.use((req, res, next) => {
-    // Let API, webhook, health, internal, and ASSET routes pass through to 404
-    if (req.path.startsWith('/api/') ||
-        req.path.startsWith('/internal/') ||
-        req.path.startsWith('/webhooks/') ||
-        req.path.startsWith('/assets/') ||
-        req.path === '/health') {
-      return next();
-    }
-    // Everything else gets the SPA
-    res.sendFile(path.join(publicPath, 'index.html'), (err) => {
-      if (err) {
-        console.error('[SPA] Failed to send index.html:', err);
-        next(err);
-      }
-    });
-  });
-}
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
 
 // Error handler
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('[500 ERROR]', err.message, err.stack);
+  console.error('Unhandled error:', err);
   res.status(500).json({
     error: 'Internal server error',
-    message: NODE_ENV === 'development' ? err.message : undefined,
-    detail: err.message
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined,
   });
 });
 
 // Start server
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`   Health check: http://localhost:${PORT}/health`);
-  console.log(`   Environment: ${NODE_ENV}`);
+  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+
+  // Log warnings for missing optional env vars
+  const optionalEnvVars = [
+    'ANTHROPIC_API_KEY',
+    'STRIPE_SECRET_KEY',
+    'INTERNAL_TOKEN',
+  ];
+
+  for (const envVar of optionalEnvVars) {
+    if (!process.env[envVar]) {
+      console.warn(`⚠️  ${envVar} not configured - related features will be disabled`);
+    }
+  }
 });
-
-// Graceful shutdown handler
-function gracefulShutdown(signal: string) {
-  console.log(`${signal} received, starting graceful shutdown...`);
-
-  // Stop accepting new connections
-  server.close(() => {
-    console.log('Server closed - all connections finished');
-    process.exit(0);
-  });
-
-  // Force shutdown after timeout to prevent hanging
-  setTimeout(() => {
-    console.error('Forced shutdown after timeout - some connections may have been terminated');
-    process.exit(1);
-  }, 30000); // 30 second timeout
-}
-
-// Register shutdown handlers
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));

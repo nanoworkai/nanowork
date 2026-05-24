@@ -1,12 +1,7 @@
 import { Router, Response } from 'express';
 import { requireUserAuth } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types';
-import { getSupabase, getContacts, upsertContact, updateContact, createInteraction } from '../services/supabase';
-import {
-  createContactSchema,
-  updateContactSchema,
-  createInteractionSchema
-} from '../validation/schemas';
+import { getContacts, upsertContact, updateContact, createInteraction } from '../services/supabase';
 
 const router = Router();
 
@@ -40,17 +35,12 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
  */
 router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // Validate request body
-    const validation = createContactSchema.safeParse(req.body);
-    if (!validation.success) {
-      res.status(400).json({
-        error: 'Validation failed',
-        details: validation.error.issues
-      });
+    const { name, email, phone, company, business_id, status } = req.body;
+
+    if (!name) {
+      res.status(400).json({ error: 'name is required' });
       return;
     }
-
-    const { name, email, phone, company, business_id, status } = validation.data;
 
     const contact = await upsertContact({
       agent_id: req.agent!.id,
@@ -79,30 +69,7 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
  */
 router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // Validate request body
-    const validation = updateContactSchema.safeParse(req.body);
-    if (!validation.success) {
-      res.status(400).json({
-        error: 'Validation failed',
-        details: validation.error.issues
-      });
-      return;
-    }
-
-    // Verify the contact belongs to this agent
-    const { data: existing, error: fetchError } = await getSupabase()
-      .from('contacts')
-      .select('id, agent_id')
-      .eq('id', req.params.id)
-      .eq('agent_id', req.agent!.id)
-      .single();
-
-    if (fetchError || !existing) {
-      res.status(404).json({ error: 'Contact not found' });
-      return;
-    }
-
-    const { name, email, phone, company, status } = validation.data;
+    const { name, email, phone, company, status } = req.body;
 
     const contact = await updateContact(req.params.id, {
       ...(name && { name }),
@@ -128,17 +95,12 @@ router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Res
  */
 router.post('/:id/interactions', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // Validate request body
-    const validation = createInteractionSchema.safeParse(req.body);
-    if (!validation.success) {
-      res.status(400).json({
-        error: 'Validation failed',
-        details: validation.error.issues
-      });
+    const { interaction_type, notes } = req.body;
+
+    if (!interaction_type) {
+      res.status(400).json({ error: 'interaction_type is required' });
       return;
     }
-
-    const { interaction_type, notes } = validation.data;
 
     const interaction = await createInteraction({
       contact_id: req.params.id,

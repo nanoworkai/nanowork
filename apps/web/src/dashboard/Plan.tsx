@@ -65,13 +65,13 @@ export default function Plan() {
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Plan</h1>
-          <p className="text-text-secondary text-sm mt-1">Manage your subscription.</p>
+          <h1 className="text-2xl font-bold text-white">Plan</h1>
+          <p className="text-zinc-500 text-sm mt-1">Manage your subscription.</p>
         </div>
         {profile?.stripeCustomerId && (
           <button
             onClick={openBillingPortal}
-            className="flex items-center gap-2 px-4 py-2 rounded-md bg-background-subtle hover:bg-background-DEFAULT border border-border-DEFAULT text-sm text-text-secondary hover:text-text-primary transition-all font-medium"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-300 hover:text-white transition-all font-medium"
           >
             Manage billing
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -90,36 +90,36 @@ export default function Plan() {
           return (
             <div
               key={plan.tier}
-              className={`relative p-5 rounded-xl border flex flex-col transition-all ${
+              className={`relative p-5 rounded-2xl border flex flex-col transition-all ${
                 isCurrent
-                  ? "border-accent-primary bg-accent-primary/5 shadow-sm"
+                  ? "border-white/20/40 bg-white/10"
                   : isRecommended
-                  ? "border-border-DEFAULT bg-white shadow-sm"
-                  : "border-border-DEFAULT bg-white"
+                  ? "border-white/15 bg-surface-1"
+                  : "border-white/5 bg-surface-1"
               }`}
             >
               {isRecommended && !isCurrent && (
-                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-accent-primary text-white px-2.5 py-0.5 rounded-full">
+                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-white text-white px-2.5 py-0.5 rounded-full">
                   Popular
                 </span>
               )}
               {isCurrent && (
-                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-green-600 text-white px-2.5 py-0.5 rounded-full">
+                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-green-500 text-white px-2.5 py-0.5 rounded-full">
                   Current
                 </span>
               )}
 
-              <h3 className="text-base font-bold text-text-primary">{plan.name}</h3>
+              <h3 className="text-base font-bold text-white">{plan.name}</h3>
               <div className="flex items-baseline gap-1 mt-1 mb-2">
-                <span className="text-2xl font-bold text-text-primary">${plan.price}</span>
-                <span className="text-xs text-text-tertiary">/mo</span>
+                <span className="text-2xl font-bold text-white">${plan.price}</span>
+                <span className="text-xs text-zinc-500">/mo</span>
               </div>
-              <p className="text-xs text-text-secondary mb-4">{plan.desc}</p>
+              <p className="text-xs text-zinc-500 mb-4">{plan.desc}</p>
 
               <ul className="flex-1 flex flex-col gap-1.5 mb-5">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-1.5 text-xs text-text-secondary">
-                    <svg className="flex-shrink-0 mt-0.5 text-green-600" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <li key={f} className="flex items-start gap-1.5 text-xs text-zinc-400">
+                    <svg className="flex-shrink-0 mt-0.5 text-green-400" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     {f}
@@ -128,14 +128,14 @@ export default function Plan() {
               </ul>
 
               {isCurrent ? (
-                <button disabled className="w-full py-2 rounded-md text-xs font-semibold bg-background-subtle text-text-tertiary cursor-default">
+                <button disabled className="w-full py-2 rounded-lg text-xs font-semibold bg-surface-3 text-zinc-600 cursor-default">
                   Current plan
                 </button>
               ) : (
                 <button
                   onClick={() => setConfirm(plan.tier)}
-                  className={`w-full py-2 rounded-md text-xs font-semibold transition-colors ${
-                    isRecommended ? "bg-accent-primary hover:bg-accent-hover text-white" : "bg-background-subtle hover:bg-background-DEFAULT border border-border-DEFAULT text-text-primary"
+                  className={`w-full py-2 rounded-lg text-xs font-semibold transition-colors ${
+                    isRecommended ? "bg-white hover:bg-white text-white" : "bg-surface-2 hover:bg-surface-3 border border-white/10 text-zinc-300 hover:text-white"
                   }`}
                 >
                   Switch to {plan.name}
@@ -148,23 +148,23 @@ export default function Plan() {
 
       {/* Confirm modal */}
       {confirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={() => setConfirm(null)}>
-          <div className="w-full max-w-sm bg-white border border-border-DEFAULT rounded-xl p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-text-primary mb-2">Switch plan</h3>
-            <p className="text-sm text-text-secondary mb-6">
-              Switch to the <span className="text-text-primary font-semibold">{PLANS.find((p) => p.tier === confirm)?.name}</span> plan? Changes take effect immediately.
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4" onClick={() => setConfirm(null)}>
+          <div className="w-full max-w-sm bg-surface-1 border border-white/10 rounded-2xl p-6 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-white mb-2">Switch plan</h3>
+            <p className="text-sm text-zinc-400 mb-6">
+              Switch to the <span className="text-white font-semibold">{PLANS.find((p) => p.tier === confirm)?.name}</span> plan? Changes take effect immediately.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setConfirm(null)}
-                className="flex-1 py-2 rounded-md bg-background-subtle hover:bg-background-DEFAULT border border-border-DEFAULT text-sm text-text-secondary hover:text-text-primary font-medium transition-colors"
+                className="flex-1 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleSwitch(confirm)}
                 disabled={switching}
-                className="flex-1 py-2 rounded-md bg-accent-primary hover:bg-accent-hover disabled:opacity-50 text-white text-sm font-semibold transition-colors"
+                className="flex-1 py-2 rounded-xl bg-white hover:bg-white disabled:opacity-50 text-white text-sm font-semibold transition-colors"
               >
                 {switching ? "Switching…" : "Confirm"}
               </button>

@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Lock, Sparkles, ArrowRight, Terminal } from "lucide-react";
-import WhiteGlovePayment from "../components/WhiteGlovePayment";
+import { Lock, Sparkles, CreditCard, ArrowRight } from "lucide-react";
 
 interface BuildData {
   id: string;
@@ -24,24 +23,24 @@ export default function PreviewPage() {
   const { buildId } = useParams<{ buildId: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const [searchParams] = useSearchParams();
 
   const [build, setBuild] = useState<BuildData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showPayment, setShowPayment] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Check if user just unlocked via Stripe
-  const justUnlocked = searchParams.get("unlocked") === "true";
+  const [userCredits, setUserCredits] = useState<number>(0);
 
   useEffect(() => {
     loadBuild();
-  }, [buildId]);
+    if (isAuthenticated) {
+      loadCredits();
+    }
+  }, [buildId, isAuthenticated]);
 
   async function loadBuild() {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL ?? ""}/api/build/${buildId}`
+        `${import.meta.env.VITE_API_URL || ""}/api/build/${buildId}`
       );
 
       if (!response.ok) {
@@ -57,23 +56,57 @@ export default function PreviewPage() {
     }
   }
 
-  function handleUnlock() {
+  async function loadCredits() {
+    // TODO: Implement credits fetching from API
+    setUserCredits(250); // Mock for now
+  }
+
+  async function handleUnlock() {
     if (!isAuthenticated) {
       // Redirect to signup with return URL
       navigate(`/login?redirect=/preview/${buildId}`);
       return;
     }
 
-    // Show payment modal
-    setShowPayment(true);
+    if (userCredits < (build?.credits_cost || 0)) {
+      // Redirect to buy credits
+      navigate(`/dashboard/plan?from=preview&buildId=${buildId}`);
+      return;
+    }
+
+    setUnlocking(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || ""}/api/build/${buildId}/unlock`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || "Failed to unlock build");
+      }
+
+      const data = await response.json();
+
+      // Redirect to full build
+      navigate(data.full_url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to unlock");
+    } finally {
+      setUnlocking(false);
+    }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-border-DEFAULT border-t-accent-primary rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-sm font-mono text-content-secondary">LOADING BUILD...</p>
+          <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm font-mono text-white/60">LOADING BUILD...</p>
         </div>
       </div>
     );
@@ -81,12 +114,12 @@ export default function PreviewPage() {
 
   if (error || !build) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center max-w-md">
-          <p className="text-sm font-mono text-accent-danger mb-4">{error || "BUILD NOT FOUND"}</p>
+          <p className="text-sm font-mono text-red-400 mb-4">{error || "BUILD NOT FOUND"}</p>
           <button
             onClick={() => navigate("/")}
-            className="text-xs font-mono text-content-secondary hover:text-content-primary transition-colors"
+            className="text-xs font-mono text-white/60 hover:text-white"
           >
             ← BACK TO HOME
           </button>
@@ -95,54 +128,44 @@ export default function PreviewPage() {
     );
   }
 
-  const isUnlocked = build.status === "unlocked" || justUnlocked;
+  const isUnlocked = build.status === "unlocked";
   const depts = build.build_data?.departments || {};
   const deptNames = Object.keys(depts);
 
-  // Show payment modal
-  if (showPayment) {
-    return (
-      <WhiteGlovePayment
-        buildId={buildId!}
-        companyName={build.company_name}
-        onSuccess={() => {
-          setShowPayment(false);
-          navigate(`/preview/${buildId}?unlocked=true`);
-        }}
-      />
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background text-content-primary">
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <div className="border-b border-border-DEFAULT bg-background-elevated">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 border-2 border-accent-primary flex items-center justify-center flex-shrink-0">
-                <Terminal className="w-6 h-6 text-accent-primary stroke-[2.5]" />
-              </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-mono font-bold">{build.company_name}</h1>
-                <p className="text-xs sm:text-sm font-mono text-content-secondary mt-1">{build.tagline}</p>
-              </div>
+      <div className="border-b border-white/10 bg-surface-1">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-mono font-bold">{build.company_name}</h1>
+              <p className="text-sm font-mono text-white/60 mt-1">{build.tagline}</p>
             </div>
 
             {!isUnlocked && (
-              <button
-                onClick={handleUnlock}
-                className="px-4 sm:px-6 py-3 bg-accent-primary text-white font-mono text-xs sm:text-sm font-bold rounded-md hover:bg-accent-primary/90 transition-colors flex items-center gap-2 whitespace-nowrap"
-              >
-                <Lock className="w-4 h-4" />
-                UNLOCK FULL BUILD
-              </button>
-            )}
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <div className="text-xs font-mono text-white/40 uppercase">Preview Mode</div>
+                  <div className="text-lg font-mono font-bold text-amber-400">
+                    {build.credits_cost} Credits to Unlock
+                  </div>
+                </div>
 
-            {isUnlocked && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-accent-success/10 border border-accent-success/20 rounded-md">
-                <Sparkles className="w-4 h-4 text-accent-success" />
-                <span className="text-xs font-mono text-accent-success font-bold uppercase">Unlocked</span>
+                <button
+                  onClick={handleUnlock}
+                  disabled={unlocking}
+                  className="px-6 py-3 bg-white text-black font-mono text-sm font-bold rounded-none hover:bg-white/90 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {unlocking ? (
+                    "UNLOCKING..."
+                  ) : (
+                    <>
+                      <Lock className="w-4 h-4" />
+                      UNLOCK FULL BUILD
+                    </>
+                  )}
+                </button>
               </div>
             )}
           </div>
@@ -150,90 +173,65 @@ export default function PreviewPage() {
       </div>
 
       {/* Preview Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {!isUnlocked && (
-          <div className="mb-8 p-6 sm:p-8 border border-border-DEFAULT bg-background-elevated rounded-xl">
-            <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-              <Sparkles className="w-8 h-8 text-content-secondary flex-shrink-0" />
+          <div className="mb-8 p-6 border border-amber-400/20 bg-amber-400/5 rounded-none">
+            <div className="flex items-start gap-4">
+              <Sparkles className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h3 className="text-lg sm:text-xl font-mono font-bold text-content-primary mb-2">
-                  Your Company Is Ready to Launch
+                <h3 className="font-mono font-bold text-amber-400 mb-2">
+                  🎉 YOUR COMPANY IS READY
                 </h3>
-                <p className="text-sm font-mono text-content-secondary mb-6 leading-relaxed">
-                  We've built your complete company infrastructure—7 AI departments working in parallel. Unlock everything to get full access plus personalized onboarding support.
+                <p className="text-sm font-mono text-white/80 mb-4">
+                  You're viewing a limited preview. Unlock the full build to get:
                 </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                  <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent-success mt-2 flex-shrink-0" />
-                    <div>
-                      <div className="text-sm font-mono font-bold text-content-primary">Production Website</div>
-                      <div className="text-xs font-mono text-content-secondary mt-0.5">
-                        Deployed and ready to go live
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent-success mt-2 flex-shrink-0" />
-                    <div>
-                      <div className="text-sm font-mono font-bold text-content-primary">1-on-1 Kickoff Call</div>
-                      <div className="text-xs font-mono text-content-secondary mt-0.5">
-                        Personalized onboarding session
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent-success mt-2 flex-shrink-0" />
-                    <div>
-                      <div className="text-sm font-mono font-bold text-content-primary">All 7 Departments</div>
-                      <div className="text-xs font-mono text-content-secondary mt-0.5">
-                        Legal, brand, web, marketing, sales, finance, ops
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent-success mt-2 flex-shrink-0" />
-                    <div>
-                      <div className="text-sm font-mono font-bold text-content-primary">Priority Support</div>
-                      <div className="text-xs font-mono text-content-secondary mt-0.5">
-                        Direct access for 30 days
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ul className="space-y-2 text-sm font-mono text-white/60">
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    Complete website with all pages and sections
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    Downloadable assets (logos, PDFs, templates)
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    Full department outputs and action plans
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    Editable company dashboard
+                  </li>
+                </ul>
 
                 {!isAuthenticated && (
-                  <div className="pt-6 border-t border-border-DEFAULT">
-                    <p className="text-xs font-mono text-content-secondary mb-3">
-                      Create an account to unlock your build and get started.
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <p className="text-xs font-mono text-white/40 mb-3">
+                      Don't have an account? Sign up to get 500 free credits.
                     </p>
                     <button
                       onClick={() => navigate(`/login?redirect=/preview/${buildId}`)}
-                      className="text-xs font-mono text-content-primary hover:text-content-secondary transition-colors flex items-center gap-2 font-bold"
+                      className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-2"
                     >
-                      CREATE ACCOUNT <ArrowRight className="w-3 h-3" />
+                      CREATE FREE ACCOUNT <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
                 )}
-              </div>
-            </div>
-          </div>
-        )}
 
-        {isUnlocked && (
-          <div className="mb-8 p-6 border border-accent-success/20 bg-accent-success/5 rounded-xl">
-            <div className="flex items-center gap-3">
-              <Sparkles className="w-5 h-5 text-accent-success" />
-              <div>
-                <h3 className="font-mono font-bold text-accent-success mb-1">
-                  Welcome to Nanowork!
-                </h3>
-                <p className="text-sm font-mono text-content-secondary">
-                  Check your email for your onboarding schedule. We'll be in touch within 24 hours to set up your kickoff call.
-                </p>
+                {isAuthenticated && userCredits < build.credits_cost && (
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <p className="text-xs font-mono text-white/40 mb-3">
+                      You have {userCredits} credits. Need {build.credits_cost - userCredits} more.
+                    </p>
+                    <button
+                      onClick={() => navigate(`/dashboard/plan?from=preview&buildId=${buildId}`)}
+                      className="text-xs font-mono text-amber-400 hover:text-amber-300 flex items-center gap-2"
+                    >
+                      <CreditCard className="w-3 h-3" />
+                      BUY CREDITS
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -246,20 +244,20 @@ export default function PreviewPage() {
             return (
               <div
                 key={deptName}
-                className="border border-border-DEFAULT bg-background-elevated rounded-xl p-6 hover:bg-background-subtle transition-colors"
+                className="border border-white/10 bg-surface-1 rounded-none p-6"
               >
-                <h3 className="font-mono font-bold text-content-primary mb-2">{deptName}</h3>
-                <p className="text-xs font-mono text-content-secondary mb-4">{dept.first_output}</p>
+                <h3 className="font-mono font-bold text-white mb-2">{deptName}</h3>
+                <p className="text-xs font-mono text-white/60 mb-4">{dept.first_output}</p>
 
                 <div className="space-y-2">
                   {dept.tasks.slice(0, isUnlocked ? dept.tasks.length : 2).map((task, i) => (
                     <div key={i} className="flex items-start gap-2">
-                      <div className="w-1 h-1 rounded-full bg-accent-success mt-2 flex-shrink-0" />
-                      <span className="text-xs font-mono text-content-secondary">{task}</span>
+                      <div className="w-1 h-1 rounded-full bg-green-400 mt-2 flex-shrink-0" />
+                      <span className="text-xs font-mono text-white/80">{task}</span>
                     </div>
                   ))}
                   {!isUnlocked && dept.tasks.length > 2 && (
-                    <div className="text-xs font-mono text-content-tertiary italic">
+                    <div className="text-xs font-mono text-white/40 italic">
                       + {dept.tasks.length - 2} more tasks (unlock to see)
                     </div>
                   )}
@@ -273,19 +271,19 @@ export default function PreviewPage() {
             deptNames.slice(3).map((deptName) => (
               <div
                 key={deptName}
-                className="border border-border-DEFAULT bg-background-elevated/50 rounded-xl p-6 relative overflow-hidden"
+                className="border border-white/10 bg-surface-1/50 rounded-none p-6 relative overflow-hidden"
               >
-                <div className="absolute inset-0 backdrop-blur-sm bg-background/60 flex items-center justify-center">
+                <div className="absolute inset-0 backdrop-blur-sm bg-black/60 flex items-center justify-center">
                   <div className="text-center">
-                    <Lock className="w-8 h-8 text-content-tertiary mx-auto mb-2" />
-                    <p className="text-xs font-mono text-content-secondary font-bold">
+                    <Lock className="w-8 h-8 text-white/40 mx-auto mb-2" />
+                    <p className="text-xs font-mono text-white/60 font-bold">
                       UNLOCK TO VIEW
                     </p>
                   </div>
                 </div>
 
-                <h3 className="font-mono font-bold text-content-primary mb-2">{deptName}</h3>
-                <div className="h-20 bg-background-subtle rounded-lg" />
+                <h3 className="font-mono font-bold text-white mb-2">{deptName}</h3>
+                <div className="h-20 bg-white/5 rounded-none" />
               </div>
             ))}
         </div>
@@ -295,14 +293,15 @@ export default function PreviewPage() {
           <div className="mt-12 text-center">
             <button
               onClick={handleUnlock}
-              className="px-8 py-4 bg-accent-primary text-white font-mono text-base font-bold rounded-md hover:bg-accent-primary/90 transition-colors inline-flex items-center gap-3"
+              disabled={unlocking}
+              className="px-8 py-4 bg-white text-black font-mono text-base font-bold rounded-none hover:bg-white/90 disabled:opacity-50 inline-flex items-center gap-3"
             >
               <Lock className="w-5 h-5" />
-              UNLOCK FULL BUILD
+              {unlocking ? "UNLOCKING..." : `UNLOCK FOR ${build.credits_cost} CREDITS`}
             </button>
 
-            <p className="text-xs font-mono text-content-secondary mt-4 max-w-md mx-auto leading-relaxed">
-              $497 one-time setup • Then $99/month • Includes 1-on-1 kickoff call and 30 days priority support
+            <p className="text-xs font-mono text-white/40 mt-4">
+              One-time unlock • Instant access • Full company dashboard
             </p>
           </div>
         )}

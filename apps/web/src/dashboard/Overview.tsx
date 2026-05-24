@@ -4,17 +4,15 @@ import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { fetchUserApps, type UserApp } from "../lib/apps";
 import { ExternalLink, Code, Crown } from "lucide-react";
-import DevModeBanner from "../components/DevModeBanner";
-import { MockEventSource, isDevelopment } from "../lib/devMode";
 
 /**
  * DASHBOARD DESIGN PRINCIPLES:
  *
  * 1. DATA DENSITY: Show real information immediately - no empty states
  * 2. GRID SYSTEM: Precise 8px grid for alignment
- * 3. STATUS INDICATORS: Color-coded badges with soft backgrounds
- * 4. LIGHT THEME: Soft colors with proper contrast
- * 5. CARD HIERARCHY: Rounded corners with soft shadows
+ * 3. STATUS INDICATORS: Minimal dots and labels, no animations
+ * 4. MONOCHROME: Only white/gray shades, no color
+ * 5. CARD HIERARCHY: Subtle shadows and borders create depth
  */
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -49,8 +47,7 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
-  const [isMock, setIsMock] = useState(false);
-  const esRef = useRef<EventSource | MockEventSource | null>(null);
+  const esRef = useRef<EventSource | null>(null);
   const retryCountRef = useRef(0);
   const reconnectTimeoutRef = useRef<number | null>(null);
   const maxRetries = 3;
@@ -71,7 +68,7 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
     setConnecting(true);
     setError(null);
 
-    const apiBase = import.meta.env.VITE_API_URL ?? "";
+    const apiBase = import.meta.env.VITE_API_BASE_URL ?? "";
     const url = `${apiBase}/api/build/stream?prompt=${encodeURIComponent(promptToUse)}`;
     const es = new EventSource(url);
     esRef.current = es;
@@ -140,63 +137,7 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
           connect(promptToUse);
         }, 2000);
       } else {
-        // In development mode, fall back to mock stream after max retries
-        if (isDevelopment) {
-          console.warn('[DEV MODE] Max retries reached, using mock stream');
-          setIsMock(true);
-          setError(null);
-
-          const mockEs = new MockEventSource(promptToUse);
-          esRef.current = mockEs;
-
-          const mockOn = (type: string, handler: (d: unknown) => void) => {
-            mockEs.addEventListener(type, (e: MessageEvent) => {
-              try { handler(JSON.parse(e.data)); } catch { /* ignore */ }
-            });
-          };
-
-          mockOn("meta", (d: unknown) => {
-            const data = d as { company_name: string; tagline: string };
-            setMeta({ companyName: data.company_name, tagline: data.tagline });
-          });
-
-          mockOn("dept_start", (d: unknown) => {
-            const data = d as { dept: string; icon: string; task_count: number };
-            setDepts((prev) => ({
-              ...prev,
-              [data.dept]: { icon: data.icon, taskCount: data.task_count, tasks: [], output: "", status: "running" },
-            }));
-          });
-
-          mockOn("task", (d: unknown) => {
-            const data = d as { dept: string; task: string };
-            setDepts((prev) => ({
-              ...prev,
-              [data.dept]: prev[data.dept]
-                ? { ...prev[data.dept], tasks: [...prev[data.dept].tasks, data.task] }
-                : prev[data.dept],
-            }));
-            setFeed((prev) => [{ dept: data.dept, task: data.task, ts: Date.now() }, ...prev.slice(0, 29)]);
-          });
-
-          mockOn("dept_done", (d: unknown) => {
-            const data = d as { dept: string; output: string };
-            setDepts((prev) => ({
-              ...prev,
-              [data.dept]: prev[data.dept]
-                ? { ...prev[data.dept], output: data.output, status: "done" }
-                : prev[data.dept],
-            }));
-          });
-
-          mockOn("done", () => {
-            setDone(true);
-            setConnecting(false);
-            mockEs.close();
-          });
-        } else {
-          setError("Unable to connect to the server. Please check your connection and refresh.");
-        }
+        setError("Unable to connect to the server. Please check your connection and refresh.");
       }
     };
   };
@@ -225,7 +166,7 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
     }
   };
 
-  return { meta, depts, feed, done, error, connecting, retry, isMock };
+  return { meta, depts, feed, done, error, connecting, retry };
 }
 
 // ── Department Card ───────────────────────────────────────────────────────────
@@ -233,13 +174,13 @@ function useAgentStream(prompt: string | null, enabled: boolean) {
 function DeptCard({ name, state }: { name: string; state: DeptState | undefined }) {
   if (!state) {
     return (
-      <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 opacity-40">
+      <div className="card rounded-xl p-5 opacity-40">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className="text-base">⋯</span>
-            <span className="text-sm font-semibold text-gray-600">{name}</span>
+            <span className="text-sm font-semibold text-white/60">{name}</span>
           </div>
-          <span className="px-2 py-1 text-xs bg-gray-100 text-gray-500 rounded-full">Queued</span>
+          <span className="text-xs font-mono text-white/30">QUEUED</span>
         </div>
       </div>
     );
@@ -249,33 +190,31 @@ function DeptCard({ name, state }: { name: string; state: DeptState | undefined 
   const progress = tasks.length / Math.max(taskCount, 1);
 
   return (
-    <div className={`bg-white rounded-xl p-5 shadow-sm border border-gray-200 transition-all duration-150 ${
-      status === "done" ? "bg-gray-50" : ""
+    <div className={`card rounded-xl p-5 transition-all duration-150 ${
+      status === "done" ? "bg-surface-3" : ""
     }`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-base">{icon}</span>
-          <span className="text-sm font-semibold text-gray-900">{name}</span>
+          <span className="text-sm font-semibold text-white">{name}</span>
         </div>
         <div className="flex items-center gap-2">
           {status === "running" && (
-            <span className={`px-2 py-1 text-xs bg-accent-primary/10 text-accent-primary rounded-full`}>
-              {tasks.length}/{taskCount}
-            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
           )}
-          {status === "done" && (
-            <span className="px-2 py-1 text-xs bg-accent-success/10 text-accent-success rounded-full">
-              Done
-            </span>
-          )}
+          <span className={`text-xs font-mono ${
+            status === "done" ? "text-white/60" : "text-white/40"
+          }`}>
+            {status === "done" ? "DONE" : `${tasks.length}/${taskCount}`}
+          </span>
         </div>
       </div>
 
       {/* Tasks */}
       <div className="space-y-1.5 mb-3">
         {tasks.slice(-3).map((task, i) => (
-          <div key={i} className="text-xs text-gray-600 leading-relaxed">
+          <div key={i} className="text-xs text-white/50 leading-relaxed">
             {task}
           </div>
         ))}
@@ -283,9 +222,9 @@ function DeptCard({ name, state }: { name: string; state: DeptState | undefined 
 
       {/* Progress bar */}
       {status === "running" && (
-        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className="h-px bg-white/5 rounded-full overflow-hidden">
           <div
-            className="h-full bg-accent-primary transition-all duration-300"
+            className="h-full bg-white/30 transition-all duration-300"
             style={{ width: `${progress * 100}%` }}
           />
         </div>
@@ -293,7 +232,7 @@ function DeptCard({ name, state }: { name: string; state: DeptState | undefined 
 
       {/* Output */}
       {output && status === "done" && (
-        <div className="mt-3 pt-3 text-xs text-gray-500 leading-relaxed border-t border-gray-200">
+        <div className="mt-3 pt-3 text-xs text-white/40 leading-relaxed" style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
           {output}
         </div>
       )}
@@ -310,20 +249,20 @@ function LiveFeed({ entries }: { entries: TaskEntry[] }) {
   if (!entries.length) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div className="card-lg rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-3 flex items-center gap-2 border-b border-gray-200 bg-gray-50">
-        <span className="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse" />
-        <span className="text-xs font-semibold text-gray-700">Live Output</span>
+      <div className="px-5 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+        <span className="text-xs font-bold text-white/60 uppercase tracking-wider">Live Output</span>
       </div>
 
       {/* Feed */}
       <div className="max-h-64 overflow-y-auto">
         {entries.slice().reverse().map((e, i) => (
-          <div key={i} className="px-5 py-2.5 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0">
+          <div key={i} className="px-5 py-2.5 hover:bg-white/3 transition-colors" style={{ borderBottom: i < entries.length - 1 ? '1px solid rgba(255, 255, 255, 0.02)' : 'none' }}>
             <div className="flex items-start gap-3">
-              <span className="text-xs text-gray-500 w-20 flex-shrink-0">[{e.dept}]</span>
-              <span className="text-xs text-gray-700 leading-relaxed">{e.task}</span>
+              <span className="text-xs text-white/30 font-mono w-20 flex-shrink-0">[{e.dept}]</span>
+              <span className="text-xs text-white/60 leading-relaxed">{e.task}</span>
             </div>
           </div>
         ))}
@@ -346,13 +285,14 @@ function PromptForm({ onStart, loading }: { onStart: (p: string) => void; loadin
   };
 
   return (
-    <div className="bg-white rounded-xl p-5 sm:p-8 shadow-sm border border-gray-200">
-      <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">What are you building?</h2>
-      <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6">
+    <div className="card-lg rounded-2xl p-5 sm:p-8">
+      <h2 className="text-lg sm:text-xl font-bold text-white mb-2 tracking-tight">What are you building?</h2>
+      <p className="text-xs sm:text-sm text-white/50 mb-4 sm:mb-6">
         One prompt launches all seven departments in parallel.
       </p>
       <textarea
-        className="w-full bg-gray-50 rounded-md px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-gray-900 placeholder-gray-400 resize-none outline-none mb-4 border border-gray-200 focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/20"
+        className="w-full bg-surface-3 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-white placeholder-white/30 resize-none outline-none mb-4"
+        style={{ border: '1px solid rgba(255, 255, 255, 0.08)' }}
         rows={3}
         placeholder="Premium dog gear DTC, $45 AOV, ship US — I want real revenue in 30 days."
         value={value}
@@ -362,11 +302,11 @@ function PromptForm({ onStart, loading }: { onStart: (p: string) => void; loadin
       <button
         onClick={handleSubmit}
         disabled={!value.trim() || loading}
-        className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 rounded-md bg-accent-primary hover:bg-accent-primary/90 disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold text-xs sm:text-sm transition-colors"
+        className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-white hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed text-black font-semibold text-xs sm:text-sm transition-colors"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">
-            <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <span className="w-3.5 h-3.5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
             Connecting...
           </span>
         ) : (
@@ -393,7 +333,7 @@ export default function Overview() {
   const [userApps, setUserApps] = useState<UserApp[]>([]);
   const [appsLoading, setAppsLoading] = useState(true);
 
-  const { meta, depts, feed, done, error, connecting, retry, isMock } = useAgentStream(activePrompt, buildEnabled);
+  const { meta, depts, feed, done, error, connecting, retry } = useAgentStream(activePrompt, buildEnabled);
 
   // Load user's apps
   useEffect(() => {
@@ -437,31 +377,28 @@ export default function Overview() {
   const totalDone = Object.values(depts).filter((d) => d.status === "done").length;
 
   return (
-    <>
-      {/* Development Mode Banner */}
-      {isMock && <DevModeBanner message="Using mock streaming data - backend unavailable" />}
-
-      <div className={`max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 bg-background-subtle min-h-screen ${isMock ? 'pt-16' : ''}`}>
-        {/* Header */}
-        <div className="mb-6 sm:mb-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      {/* Header */}
+      <div className="mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2">
           <div className="flex-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               {meta?.companyName ?? profile?.businessName ?? "Your Build"}
             </h1>
             {buildEnabled && (
               <div className="flex items-center gap-3 mt-2">
                 {done ? (
-                  <span className="px-2 py-1 text-xs bg-accent-success/10 text-accent-success rounded-full font-semibold">All departments live</span>
+                  <span className="text-xs sm:text-sm text-white/50 font-semibold">All departments live</span>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-1 text-xs bg-accent-primary/10 text-accent-primary rounded-full font-semibold">{totalDone} of 7 complete</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    <span className="text-xs sm:text-sm text-white/50 font-semibold">{totalDone} of 7 complete</span>
                   </div>
                 )}
                 {done && (
                   <button
                     onClick={() => { setBuildEnabled(false); setActivePrompt(null); }}
-                    className="text-xs text-gray-500 hover:text-gray-700 underline transition-colors"
+                    className="text-xs text-white/40 hover:text-white/60 underline transition-colors"
                   >
                     New build
                   </button>
@@ -471,16 +408,16 @@ export default function Overview() {
           </div>
 
           {/* Credits Display */}
-          <div className="bg-white rounded-xl p-4 flex-shrink-0 shadow-sm border border-gray-200">
+          <div className="card rounded-xl p-4 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="flex flex-col">
-                <span className="text-xs text-gray-500 font-semibold">Credits</span>
-                <span className="text-2xl font-bold text-gray-900 tabular-nums">{profile?.creditsBalance ?? 0}</span>
+                <span className="text-xs text-white/40 font-semibold uppercase tracking-wider">Credits</span>
+                <span className="text-2xl font-bold text-white tabular-nums">{profile?.creditsBalance ?? 0}</span>
               </div>
-              <div className="h-10 w-px bg-gray-200" />
+              <div className="h-10 w-px bg-white/10" />
               <div className="flex flex-col">
-                <span className="text-xs text-gray-500 font-semibold">Builds</span>
-                <span className="text-lg font-bold text-gray-600 tabular-nums">
+                <span className="text-xs text-white/40 font-semibold uppercase tracking-wider">Builds</span>
+                <span className="text-lg font-bold text-white/60 tabular-nums">
                   {profile?.totalCompaniesCreated ?? 0} / {profile?.monthlyCompanyLimit ?? 1}
                 </span>
               </div>
@@ -489,27 +426,27 @@ export default function Overview() {
         </div>
 
         {meta?.tagline && (
-          <p className="text-sm text-gray-600 italic">"{meta.tagline}"</p>
+          <p className="text-sm text-white/40 italic">"{meta.tagline}"</p>
         )}
 
         {activePrompt && (
-          <div className="mt-4 bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200">
-            <div className="text-xs text-gray-500 font-semibold mb-1">Prompt</div>
-            <div className="text-sm text-gray-700">"{activePrompt}"</div>
+          <div className="mt-4 card rounded-xl px-4 py-3">
+            <div className="text-xs text-white/30 font-semibold uppercase tracking-wider mb-1">Prompt</div>
+            <div className="text-sm text-white/60">"{activePrompt}"</div>
           </div>
         )}
       </div>
 
       {/* Error */}
       {error && (
-        <div className="mb-6 bg-red-50 rounded-xl px-5 py-4 border border-red-200">
+        <div className="mb-6 card rounded-xl px-5 py-4" style={{ border: '1px solid rgba(255, 100, 100, 0.2)', background: 'rgba(255, 100, 100, 0.05)' }}>
           <div className="flex items-center justify-between gap-4">
-            <div className="text-sm text-red-800">{error}</div>
+            <div className="text-sm text-white/80">{error}</div>
             {!error.includes("refresh") && (
               <button
                 onClick={retry}
                 disabled={connecting}
-                className="px-4 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-md transition-colors"
+                className="px-4 py-2 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
               >
                 {connecting ? "Connecting..." : "Try again"}
               </button>
@@ -523,25 +460,25 @@ export default function Overview() {
         <div className="mb-8">
           {/* Welcome message for new users */}
           {!profile?.businessPrompt && userApps.length === 0 && (
-            <div className="mb-6 bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+            <div className="mb-6 card rounded-2xl p-6 border-white/10">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
                   <span className="text-xl">👋</span>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-base font-bold text-gray-900 mb-1">Welcome to Nanowork</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                  <h3 className="text-base font-bold text-white mb-1">Welcome to Nanowork</h3>
+                  <p className="text-sm text-white/60 leading-relaxed mb-4">
                     Build a complete AI-powered business in minutes. Enter your idea below, and our 7 departments
                     (Legal, Brand, Web, Marketing, Sales, Finance, Ops) will work in parallel to launch your company.
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <div className="text-xs bg-gray-50 px-3 py-1.5 rounded-lg text-gray-600 border border-gray-200">
+                    <div className="text-xs bg-surface-3 px-3 py-1.5 rounded-lg text-white/50 border border-white/5">
                       ✓ No coding required
                     </div>
-                    <div className="text-xs bg-gray-50 px-3 py-1.5 rounded-lg text-gray-600 border border-gray-200">
+                    <div className="text-xs bg-surface-3 px-3 py-1.5 rounded-lg text-white/50 border border-white/5">
                       ✓ Live in 30 days
                     </div>
-                    <div className="text-xs bg-gray-50 px-3 py-1.5 rounded-lg text-gray-600 border border-gray-200">
+                    <div className="text-xs bg-surface-3 px-3 py-1.5 rounded-lg text-white/50 border border-white/5">
                       ✓ Real revenue
                     </div>
                   </div>
@@ -572,23 +509,23 @@ export default function Overview() {
       {/* User Apps */}
       {!appsLoading && userApps.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Your Apps</h2>
+          <h2 className="text-lg font-bold text-white mb-4">Your Apps</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {userApps.map((app) => (
-              <div key={app.slug} className="bg-white rounded-xl p-5 hover:shadow-md transition-all duration-150 border border-gray-200">
+              <div key={app.slug} className="card rounded-xl p-5 hover:bg-surface-3 transition-all duration-150">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-1">
+                    <h3 className="text-sm font-bold text-white mb-1">
                       {app.app_name || app.slug}
                     </h3>
                     {app.is_paid && (
                       <div className="flex items-center gap-1.5 mt-1">
-                        <Crown className="w-3 h-3 text-amber-500" />
-                        <span className="text-xs text-amber-600 font-semibold">Pro</span>
+                        <Crown className="w-3 h-3 text-amber-400" />
+                        <span className="text-xs text-amber-400 font-semibold">Pro</span>
                       </div>
                     )}
                   </div>
-                  <span className="text-xs text-gray-500">v{app.iterations}</span>
+                  <span className="text-xs text-white/40 font-mono">v{app.iterations}</span>
                 </div>
 
                 <div className="flex items-center gap-2 mt-4">
@@ -596,7 +533,7 @@ export default function Overview() {
                     href={`https://${app.slug}.nanowork.app`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 px-3 py-2 bg-accent-primary hover:bg-accent-primary/90 text-white text-xs font-semibold rounded-md transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 px-3 py-2 bg-white hover:bg-white/90 text-black text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     Open
@@ -606,7 +543,7 @@ export default function Overview() {
                       href={app.github_repo_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3 py-2 bg-background-subtle hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-semibold rounded-md transition-colors flex items-center gap-2"
+                      className="px-3 py-2 bg-surface-3 hover:bg-white/5 border border-white/10 text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-2"
                     >
                       <Code className="w-3.5 h-3.5" />
                     </a>
@@ -614,8 +551,8 @@ export default function Overview() {
                 </div>
 
                 {app.deployed_at && (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <span className="text-xs text-gray-500">
+                  <div className="mt-3 pt-3 border-t border-white/5">
+                    <span className="text-xs text-white/30">
                       Deployed {new Date(app.deployed_at).toLocaleDateString()}
                     </span>
                   </div>
@@ -626,7 +563,6 @@ export default function Overview() {
         </div>
       )}
 
-      </div>
-    </>
+    </div>
   );
 }

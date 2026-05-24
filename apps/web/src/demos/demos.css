@@ -6,8 +6,8 @@
   min-height: 100dvh;
   position: relative;
   z-index: 2;
-  background: var(--g-bg, #fafafa);
-  color: var(--g-text, #1a1a1a);
+  background: var(--g-bg, #0c0d10);
+  color: var(--g-text, #e8e6e1);
   font-family: var(--font-sans);
   line-height: 1.55;
 }
@@ -16,11 +16,11 @@
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(10, 11, 14, 0.82);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  color: #1a1a1a;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
 }
 
 .demo-bar__inner {
@@ -37,29 +37,29 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  color: rgba(0, 0, 0, 0.65);
+  color: rgba(255, 255, 255, 0.75);
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 500;
   padding: 0.3rem 0.6rem;
   border-radius: 999px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .demo-bar__back:hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: #000;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
 }
 
 .demo-bar__label {
   font-size: 0.8rem;
-  color: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.55);
   text-align: center;
 }
 
 .demo-bar__label strong {
-  color: #000;
+  color: #fff;
   font-weight: 600;
 }
 
@@ -69,8 +69,8 @@
   gap: 0.35rem;
   padding: 0.45rem 0.85rem;
   border-radius: 999px;
-  background: var(--accent, #8b6d3f);
-  color: #ffffff;
+  background: var(--accent, #c4a574);
+  color: #0c0d10;
   font-size: 0.82rem;
   font-weight: 600;
   text-decoration: none;
@@ -85,13 +85,13 @@
 
 .demo-bar__cta--ghost {
   background: transparent;
-  color: #1a1a1a;
-  border: 1px solid rgba(0, 0, 0, 0.18);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .demo-bar__sold {
   font-size: 0.8rem;
-  color: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.6);
   font-style: italic;
 }
 
@@ -152,7 +152,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.5rem 0 1.5rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .lamina__brand {
@@ -195,7 +195,7 @@
 
 .lamina__panel {
   background: var(--g-surface);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   padding: 2rem;
   margin-top: 2rem;
@@ -239,7 +239,7 @@
   height: var(--size);
   border-radius: 50%;
   background:
-    conic-gradient(var(--g-accent) var(--ring), rgba(0, 0, 0, 0.08) 0);
+    conic-gradient(var(--g-accent) var(--ring), rgba(255, 255, 255, 0.06) 0);
   display: grid;
   place-items: center;
   position: relative;
@@ -282,8 +282,8 @@
   grid-template-columns: auto 1fr auto;
   gap: 1rem;
   align-items: center;
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 14px;
   padding: 0.9rem 1rem;
 }
@@ -292,9 +292,9 @@
   width: 32px;
   height: 32px;
   border-radius: 10px;
-  border: 1.5px solid rgba(0, 0, 0, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
   background: transparent;
-  color: #ffffff;
+  color: var(--g-bg);
   cursor: pointer;
   font-size: 1rem;
   font-weight: 700;
@@ -335,7 +335,7 @@
   flex: 1;
   height: 5px;
   border-radius: 3px;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .lamina-habit__dot.is-on {
@@ -359,8 +359,8 @@
 
 .lamina__add input {
   flex: 1;
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 0.75rem 1rem;
   color: var(--g-text);
@@ -373,7 +373,7 @@
 
 .lamina__add button {
   background: var(--g-accent);
-  color: #ffffff;
+  color: var(--g-bg);
   border: none;
   border-radius: 12px;
   padding: 0 1.2rem;
@@ -395,7 +395,7 @@
 .lamina__week {
   margin-top: 2.5rem;
   background: var(--g-surface);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   padding: 1.75rem 2rem;
 }
@@ -451,7 +451,7 @@
 .lamina__cell {
   height: 22px;
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .lamina__cell.is-on {
@@ -494,7 +494,7 @@
   justify-content: space-between;
   gap: 1.5rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   flex-wrap: wrap;
 }
 
@@ -572,7 +572,7 @@
 .ovenly__filters button {
   background: transparent;
   color: var(--g-muted);
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
   padding: 0.5rem 1rem;
   font: inherit;
@@ -582,7 +582,7 @@
 }
 
 .ovenly__filters button.is-active {
-  color: #ffffff;
+  color: var(--g-bg);
   background: var(--g-accent);
   border-color: var(--g-accent);
 }
@@ -603,7 +603,7 @@
 
 .ovenly-item {
   background: var(--g-surface);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 18px;
   overflow: hidden;
   display: flex;
@@ -622,7 +622,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+  background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
 }
 
 .ovenly-item__body {
@@ -664,7 +664,7 @@
   letter-spacing: 0.1em;
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--g-muted);
 }
 
@@ -674,19 +674,19 @@
 }
 
 .ovenly-tag--low {
-  color: #b8830f;
-  border-color: rgba(184, 131, 15, 0.4);
+  color: #e9bf6a;
+  border-color: rgba(233, 191, 106, 0.4);
 }
 
 .ovenly-tag--soldout {
   color: var(--g-muted);
-  border-color: rgba(0, 0, 0, 0.1);
+  border-color: rgba(255, 255, 255, 0.08);
   text-decoration: line-through;
 }
 
 .ovenly-item__add {
   background: var(--g-accent);
-  color: #ffffff;
+  color: var(--g-bg);
   border: none;
   border-radius: 999px;
   padding: 0.45rem 0.95rem;
@@ -706,7 +706,7 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 999px;
   padding: 0.15rem 0.5rem;
 }
@@ -730,7 +730,7 @@
 
 .ovenly__cart {
   background: var(--g-surface);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   padding: 1.5rem 1.5rem 1.75rem;
   position: sticky;
@@ -744,7 +744,7 @@
   font-weight: 500;
   margin-bottom: 1rem;
   padding-bottom: 0.8rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .ovenly__empty {
@@ -772,7 +772,7 @@
 }
 
 .ovenly__totals {
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   padding-top: 0.75rem;
   display: flex;
   flex-direction: column;
@@ -792,7 +792,7 @@
   font-weight: 600;
   margin-top: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .ovenly__pickup {
@@ -805,8 +805,8 @@
 }
 
 .ovenly__pickup select {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   padding: 0.5rem 0.7rem;
   color: var(--g-text);
@@ -816,7 +816,7 @@
 .ovenly__place {
   width: 100%;
   background: var(--g-accent);
-  color: #ffffff;
+  color: var(--g-bg);
   border: none;
   border-radius: 12px;
   padding: 0.9rem 1rem;
@@ -874,7 +874,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 1.25rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   flex-wrap: wrap;
 }
 
@@ -914,7 +914,7 @@
   font-size: 0.78rem;
   color: var(--g-muted);
   padding: 0.3rem 0.7rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
 }
 
@@ -939,7 +939,7 @@
 
 .parcel__stats > div {
   background: var(--g-surface);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 14px;
   padding: 1rem 1.25rem;
   display: flex;
@@ -969,7 +969,7 @@
 
 .parcel__list {
   background: var(--g-surface);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   overflow: hidden;
 }
@@ -978,13 +978,13 @@
   display: flex;
   gap: 0.6rem;
   padding: 0.9rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .parcel__list-head input {
   flex: 1;
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   padding: 0.55rem 0.85rem;
   color: var(--g-text);
@@ -994,7 +994,7 @@
 
 .parcel__new {
   background: var(--g-accent);
-  color: #ffffff;
+  color: var(--g-bg);
   border: none;
   border-radius: 10px;
   padding: 0 1rem;
@@ -1020,7 +1020,7 @@
   padding: 0.85rem 1rem;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   color: var(--g-text);
   font: inherit;
   font-size: 0.85rem;
@@ -1030,7 +1030,7 @@
 
 .parcel-row:hover,
 .parcel-row.is-active {
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .parcel-row__stage {
@@ -1039,14 +1039,14 @@
   letter-spacing: 0.09em;
   padding: 0.18rem 0.55rem;
   border-radius: 999px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: var(--g-muted);
   white-space: nowrap;
   justify-self: start;
 }
 
 .parcel-row__stage--label {
-  color: #666666;
+  color: #bcbcbc;
 }
 
 .parcel-row__stage--in_transit {
@@ -1055,13 +1055,13 @@
 }
 
 .parcel-row__stage--out_for_delivery {
-  color: #d97706;
-  border-color: rgba(217, 119, 6, 0.4);
+  color: #ffb86b;
+  border-color: rgba(255, 184, 107, 0.4);
 }
 
 .parcel-row__stage--delivered {
-  color: #059669;
-  border-color: rgba(5, 150, 105, 0.35);
+  color: #7bd3a8;
+  border-color: rgba(123, 211, 168, 0.35);
 }
 
 .parcel-row__id {
@@ -1087,7 +1087,7 @@
 
 .parcel__detail {
   background: var(--g-surface);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   padding: 1.5rem;
 }
@@ -1140,7 +1140,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 2px solid rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   margin-top: 2px;
 }
 
@@ -1166,7 +1166,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem 1.5rem;
   padding: 1rem;
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 12px;
   margin-bottom: 1.25rem;
 }
@@ -1191,7 +1191,7 @@
 
 .parcel__advance {
   background: var(--g-accent);
-  color: #ffffff;
+  color: var(--g-bg);
   border: none;
   border-radius: 12px;
   padding: 0.8rem 1.2rem;
@@ -1201,7 +1201,7 @@
 }
 
 .parcel__advance:disabled {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--g-muted);
   cursor: default;
 }

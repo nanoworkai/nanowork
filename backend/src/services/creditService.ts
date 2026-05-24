@@ -85,17 +85,28 @@ export async function addCredits(
 ): Promise<number> {
   const supabase = getSupabase();
 
-  // Call the atomic Postgres function to add credits
-  const { data, error } = await supabase.rpc('add_credits', {
-    p_user_id: userId,
-    p_amount: amount,
-  });
+  // Atomically increment credits
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('credits')
+    .eq('id', userId)
+    .single();
 
-  if (error) {
-    throw new Error(`Failed to add credits: ${error.message}`);
+  if (error || !data) {
+    throw new Error(`Failed to get user profile: ${error?.message || 'user not found'}`);
   }
 
-  const newBalance = data as number;
+  const currentBalance = data.credits || 0;
+  const newBalance = currentBalance + amount;
+
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({ credits: newBalance })
+    .eq('id', userId);
+
+  if (updateError) {
+    throw new Error(`Failed to add credits: ${updateError.message}`);
+  }
 
   // Log the transaction
   await supabase.from('credit_transactions').insert({

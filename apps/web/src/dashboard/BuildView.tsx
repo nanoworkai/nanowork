@@ -41,7 +41,7 @@ export default function BuildView() {
 
       // Fallback to legacy API
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL ?? ""}/api/build/${buildId}`,
+        `${import.meta.env.VITE_API_URL || ""}/api/build/${buildId}`,
         { credentials: "include" }
       );
 

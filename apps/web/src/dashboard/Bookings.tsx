@@ -19,8 +19,7 @@ export default function Bookings() {
   async function fetchBookings() {
     setLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL ?? '';
-      const res = await fetch(`${apiUrl}/api/rent/bookings?limit=50`, {
+      const res = await fetch(`/api/rent/bookings?limit=50`, {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
         },
@@ -59,8 +58,8 @@ export default function Bookings() {
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">My Bookings</h1>
-        <p className="text-slate-500">Manage your resource reservations</p>
+        <h1 className="text-2xl font-semibold text-slate-900 mb-2">My Bookings</h1>
+        <p className="text-slate-600">Manage your resource reservations</p>
       </div>
 
       {/* Filters */}
@@ -69,10 +68,10 @@ export default function Bookings() {
           <button
             key={f}
             onClick={() => setFilter(f as typeof filter)}
-            className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all capitalize ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
               filter === f
-                ? "bg-slate-900 text-white shadow-sm"
-                : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:shadow-sm"
+                ? "bg-slate-900 text-white"
+                : "bg-white border border-slate-200 text-slate-700 hover:border-slate-900"
             }`}
           >
             {f}
@@ -81,12 +80,12 @@ export default function Bookings() {
       </div>
 
       {loading ? (
-        <div className="text-center py-20 text-slate-400">Loading bookings...</div>
+        <div className="text-center py-20 text-slate-500">Loading bookings...</div>
       ) : filteredBookings.length === 0 ? (
         <div className="text-center py-20">
-          <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg
-              className="w-8 h-8 text-slate-300"
+              className="w-8 h-8 text-slate-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -99,10 +98,10 @@ export default function Bookings() {
               />
             </svg>
           </div>
-          <p className="text-slate-500 mb-4">No bookings yet</p>
+          <p className="text-slate-600 mb-4">No bookings yet</p>
           <button
             onClick={() => navigate("/rent")}
-            className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-colors shadow-sm"
+            className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-colors"
           >
             Browse Marketplace
           </button>
@@ -119,11 +118,11 @@ export default function Bookings() {
             return (
               <div
                 key={booking.id}
-                className="border border-slate-200 rounded-2xl p-6 bg-white hover:border-slate-300 hover:shadow-sm transition-all"
+                className="border-2 border-slate-200 rounded-2xl p-6 bg-white hover:border-slate-300 transition-colors"
               >
                 <div className="flex items-start gap-6">
                   {/* Icon */}
-                  <div className="w-14 h-14 rounded-xl bg-slate-50 flex items-center justify-center text-2xl flex-shrink-0">
+                  <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center text-2xl flex-shrink-0">
                     {booking.item.icon_emoji || "📦"}
                   </div>
 
@@ -131,10 +130,10 @@ export default function Bookings() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-4 mb-2">
                       <div>
-                        <h3 className="text-lg font-bold text-slate-900 mb-1">
+                        <h3 className="text-lg font-semibold text-slate-900 mb-1">
                           {booking.item.name}
                         </h3>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-slate-600">
                           {startTime.toLocaleDateString("en-US", {
                             weekday: "short",
                             month: "short",
@@ -144,7 +143,7 @@ export default function Bookings() {
                         </p>
                       </div>
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
                           statusColors[booking.status]
                         }`}
                       >
@@ -152,7 +151,7 @@ export default function Bookings() {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-6 text-sm text-slate-500 mb-4">
+                    <div className="flex items-center gap-6 text-sm text-slate-600 mb-4">
                       <div className="flex items-center gap-2">
                         <svg
                           className="w-4 h-4"
@@ -195,7 +194,7 @@ export default function Bookings() {
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => navigate(`/rent/${booking.item.slug}`)}
-                        className="text-sm text-slate-600 hover:text-slate-900 font-semibold"
+                        className="text-sm text-slate-700 hover:text-slate-900 font-medium"
                       >
                         View Resource →
                       </button>
@@ -204,9 +203,8 @@ export default function Bookings() {
                         <button
                           onClick={async () => {
                             try {
-                              const apiUrl = import.meta.env.VITE_API_URL ?? '';
                               const res = await fetch(
-                                `${apiUrl}/api/rent/bookings/${booking.id}/credentials`,
+                                `/api/rent/bookings/${booking.id}/credentials`,
                                 {
                                   headers: {
                                     Authorization: `Bearer ${session?.access_token}`,
@@ -219,7 +217,7 @@ export default function Bookings() {
                               alert("Failed to get credentials");
                             }
                           }}
-                          className="text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                         >
                           Get Access Credentials
                         </button>
@@ -235,8 +233,7 @@ export default function Bookings() {
                                 return;
 
                               try {
-                                const apiUrl = import.meta.env.VITE_API_URL ?? '';
-                                await fetch(`${apiUrl}/api/rent/bookings/${booking.id}`, {
+                                await fetch(`/api/rent/bookings/${booking.id}`, {
                                   method: "DELETE",
                                   headers: {
                                     Authorization: `Bearer ${session?.access_token}`,
@@ -247,7 +244,7 @@ export default function Bookings() {
                                 alert("Failed to cancel booking");
                               }
                             }}
-                            className="text-sm text-red-600 hover:text-red-700 font-semibold"
+                            className="text-sm text-red-600 hover:text-red-800 font-medium"
                           >
                             Cancel Booking
                           </button>

@@ -1,8 +1,5 @@
--- Nanowork Database Schema (LEGACY - DEPRECATED)
+-- Nanowork Database Schema
 -- AI-run company builder with 7 autonomous agent departments
--- NOTE: This schema has been superseded by the user-based agents system
--- The 'agents' table below conflicts with the new schema in 20260520000001
--- A cleanup migration (20260521000001) handles this conflict
 
 -- ============================================================================
 -- PROFILES TABLE

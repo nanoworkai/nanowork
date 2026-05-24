@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    color-scheme: light;
+    color-scheme: dark;
   }
 
   * {
@@ -16,31 +16,31 @@
   }
 
   body {
-    @apply bg-background text-content-primary antialiased;
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+    @apply bg-surface-0 text-zinc-100 antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    @apply bg-accent-primary/20 text-content-primary;
+    @apply bg-white/20 text-white;
   }
 
-  /* Friendly scrollbar */
+  /* Premium scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-background-subtle;
+    @apply bg-surface-1;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-border-strong rounded-full;
+    @apply bg-surface-4 rounded-full;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #78716c;
+    background: #3a3a3c;
   }
 }
 
@@ -49,37 +49,45 @@
     text-wrap: balance;
   }
 
-  /* Soft card surfaces with breathing room */
+  /* Card surface with precise depth */
   .card {
-    @apply bg-background-elevated shadow-md rounded-lg;
-    border: 1px solid #e7e5e4;
+    @apply bg-surface-2 shadow-card;
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .card-lg {
-    @apply bg-background-elevated shadow-lg rounded-xl;
-    border: 1px solid #e7e5e4;
+    @apply bg-surface-2 shadow-card-lg;
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .card-xl {
-    @apply bg-background-elevated shadow-xl rounded-2xl;
-    border: 1px solid #d6d3d1;
+    @apply bg-surface-2 shadow-card-xl;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   /* Hover states - subtle lift */
   .card-hover:hover {
-    @apply shadow-xl;
-    border-color: rgba(14, 165, 233, 0.3);
-    transform: translateY(-2px);
-    transition: all 0.2s ease;
+    @apply bg-surface-3;
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
   }
 
-  /* Soft separator */
+  /* Separator line */
   .separator {
     height: 1px;
-    background-color: #e7e5e4;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
   }
 
   /* Stock ticker scroll animation */
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
   .animate-scroll {
     animation: scroll 60s linear infinite;
   }

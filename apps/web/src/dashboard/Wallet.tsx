@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Coins, TrendingUp, TrendingDown, AlertCircle } from "lucide-react";
+import { loadStripe } from "@stripe/stripe-js";
 
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
 interface CreditTransaction {
   id: string;
@@ -37,7 +39,7 @@ export default function Wallet() {
     if (!session?.access_token) return;
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL ?? '';
+      const apiUrl = import.meta.env.VITE_API_URL || '';
 
       // Fetch balance
       const balanceRes = await fetch(`${apiUrl}/api/wallet/balance`, {
@@ -71,7 +73,7 @@ export default function Wallet() {
 
   const fetchBundles = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL ?? '';
+      const apiUrl = import.meta.env.VITE_API_URL || '';
       const res = await fetch(`${apiUrl}/api/wallet/bundles`);
 
       if (res.ok) {
@@ -90,7 +92,7 @@ export default function Wallet() {
     setError(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL ?? '';
+      const apiUrl = import.meta.env.VITE_API_URL || '';
 
       // Create payment intent
       const res = await fetch(`${apiUrl}/api/wallet/topup`, {
@@ -109,17 +111,19 @@ export default function Wallet() {
 
       const { clientSecret } = await res.json();
 
-      if (!clientSecret) {
-        throw new Error('No payment session created');
+      // Redirect to Stripe checkout
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('Stripe not loaded');
       }
 
-      // For now, just refresh wallet data
-      // TODO: Implement proper Stripe checkout flow with Elements
-      // The backend creates a PaymentIntent, but we need to set up
-      // Stripe Elements to collect payment details from the user
-      console.log('Payment intent created:', clientSecret);
+      const { error: stripeError } = await stripe.confirmCardPayment(clientSecret);
 
-      // Refresh wallet data to show updated balance once payment completes
+      if (stripeError) {
+        throw new Error(stripeError.message);
+      }
+
+      // Refresh wallet data
       await fetchWalletData();
     } catch (err) {
       console.error('Top-up error:', err);
@@ -147,7 +151,7 @@ export default function Wallet() {
     return (
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-2 border-border-DEFAULT border-t-accent-primary rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -159,24 +163,24 @@ export default function Wallet() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-text-primary">Wallet</h1>
-        <p className="text-text-secondary text-sm mt-1">Manage your credit balance and view transaction history.</p>
+        <h1 className="text-2xl font-bold text-white">Wallet</h1>
+        <p className="text-zinc-500 text-sm mt-1">Manage your credit balance and view transaction history.</p>
       </div>
 
       {/* Balance Card */}
-      <div className="mb-6 p-6 rounded-xl border border-border-DEFAULT bg-white">
+      <div className="mb-6 p-6 rounded-2xl border border-white/10 bg-surface-1">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Coins className="w-5 h-5 text-text-tertiary" />
-              <p className="text-sm font-medium text-text-secondary">Current Balance</p>
+              <Coins className="w-5 h-5 text-zinc-400" />
+              <p className="text-sm font-medium text-zinc-400">Current Balance</p>
             </div>
-            <p className="text-4xl font-bold text-text-primary">{balance ?? '—'} <span className="text-xl text-text-tertiary">credits</span></p>
+            <p className="text-4xl font-bold text-white">{balance ?? '—'} <span className="text-xl text-zinc-500">credits</span></p>
           </div>
           {lowBalance && (
-            <div className={`flex items-center gap-2 px-3 py-2 rounded-md ${zeroBalance ? 'bg-red-50 border border-red-200' : 'bg-yellow-50 border border-yellow-200'}`}>
-              <AlertCircle className={`w-4 h-4 ${zeroBalance ? 'text-red-600' : 'text-yellow-600'}`} />
-              <span className={`text-xs font-semibold ${zeroBalance ? 'text-red-600' : 'text-yellow-600'}`}>
+            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${zeroBalance ? 'bg-red-500/10 border border-red-500/20' : 'bg-yellow-500/10 border border-yellow-500/20'}`}>
+              <AlertCircle className={`w-4 h-4 ${zeroBalance ? 'text-red-400' : 'text-yellow-400'}`} />
+              <span className={`text-xs font-semibold ${zeroBalance ? 'text-red-400' : 'text-yellow-400'}`}>
                 {zeroBalance ? 'Out of credits' : 'Low balance'}
               </span>
             </div>
@@ -184,8 +188,8 @@ export default function Wallet() {
         </div>
 
         {zeroBalance && (
-          <div className="mt-4 px-4 py-3 rounded-md bg-red-50 border border-red-200">
-            <p className="text-sm text-red-600">
+          <div className="mt-4 px-4 py-3 rounded-xl bg-red-500/5 border border-red-500/10">
+            <p className="text-sm text-red-400">
               Your agent is out of credits. Top up your balance to continue using agent features.
             </p>
           </div>
@@ -194,50 +198,50 @@ export default function Wallet() {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-6 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-600 text-sm">
+        <div className="mb-6 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
           {error}
         </div>
       )}
 
       {/* Credit Bundles */}
       <div className="mb-8">
-        <h2 className="text-lg font-semibold text-text-primary mb-4">Top Up Credits</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">Top Up Credits</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {bundles.map((bundle) => (
             <div
               key={bundle.id}
-              className={`p-6 rounded-xl border transition-all ${
+              className={`p-6 rounded-2xl border transition-all ${
                 bundle.id === 'popular'
-                  ? 'border-accent-primary bg-accent-primary/5 shadow-sm'
-                  : 'border-border-DEFAULT bg-white hover:border-accent-primary/50'
+                  ? 'border-white/20 bg-surface-2 ring-2 ring-white/10'
+                  : 'border-white/5 bg-surface-1 hover:border-white/10'
               }`}
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-base font-semibold text-text-primary mb-1">{bundle.label}</h3>
-                  <p className="text-2xl font-bold text-text-primary">{bundle.credits} <span className="text-sm text-text-tertiary">credits</span></p>
+                  <h3 className="text-base font-semibold text-white mb-1">{bundle.label}</h3>
+                  <p className="text-2xl font-bold text-white">{bundle.credits} <span className="text-sm text-zinc-500">credits</span></p>
                 </div>
                 {bundle.id === 'popular' && (
-                  <span className="px-2 py-1 rounded-md bg-accent-primary/10 text-xs font-semibold text-accent-primary">
+                  <span className="px-2 py-1 rounded-lg bg-white/10 text-xs font-semibold text-white">
                     Popular
                   </span>
                 )}
               </div>
-              <p className="text-text-secondary text-sm mb-4">${bundle.priceUsd} USD</p>
+              <p className="text-zinc-400 text-sm mb-4">${bundle.priceUsd} USD</p>
               <button
                 onClick={() => handleTopUp(bundle.id)}
                 disabled={purchasing !== null}
-                className={`w-full px-4 py-2.5 rounded-md text-sm font-semibold transition-all ${
+                className={`w-full px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   purchasing === bundle.id
-                    ? 'bg-background-subtle text-text-tertiary'
+                    ? 'bg-white/10 text-zinc-400'
                     : bundle.id === 'popular'
-                    ? 'bg-accent-primary text-white hover:bg-accent-hover'
-                    : 'bg-background-subtle text-text-primary hover:bg-background-DEFAULT border border-border-DEFAULT'
+                    ? 'bg-white text-black hover:bg-zinc-100'
+                    : 'bg-surface-3 text-white hover:bg-surface-4 border border-white/10'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {purchasing === bundle.id ? (
                   <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-border-DEFAULT border-t-accent-primary rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
                     <span>Processing...</span>
                   </div>
                 ) : (
@@ -251,45 +255,45 @@ export default function Wallet() {
 
       {/* Transaction History */}
       <div>
-        <h2 className="text-lg font-semibold text-text-primary mb-4">Transaction History</h2>
-        <div className="rounded-xl border border-border-DEFAULT bg-white overflow-hidden">
+        <h2 className="text-lg font-semibold text-white mb-4">Transaction History</h2>
+        <div className="rounded-2xl border border-white/5 bg-surface-1 overflow-hidden">
           {transactions.length === 0 ? (
             <div className="p-8 text-center">
-              <Coins className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
-              <p className="text-sm text-text-secondary mb-1">No transactions yet</p>
-              <p className="text-xs text-text-tertiary">Your credit activity will appear here</p>
+              <Coins className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
+              <p className="text-sm text-zinc-500 mb-1">No transactions yet</p>
+              <p className="text-xs text-zinc-600">Your credit activity will appear here</p>
             </div>
           ) : (
-            <div className="divide-y divide-border-DEFAULT">
+            <div className="divide-y divide-white/5">
               {transactions.map((tx) => (
-                <div key={tx.id} className="p-4 hover:bg-background-subtle transition-colors">
+                <div key={tx.id} className="p-4 hover:bg-white/3 transition-colors">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <div className={`p-2 rounded-md ${
+                      <div className={`p-2 rounded-lg ${
                         tx.type === 'topup'
-                          ? 'bg-green-50'
+                          ? 'bg-green-500/10'
                           : tx.type === 'spend'
-                          ? 'bg-red-50'
-                          : 'bg-blue-50'
+                          ? 'bg-red-500/10'
+                          : 'bg-blue-500/10'
                       }`}>
                         {tx.type === 'topup' ? (
-                          <TrendingUp className="w-4 h-4 text-green-600" />
+                          <TrendingUp className="w-4 h-4 text-green-400" />
                         ) : (
-                          <TrendingDown className="w-4 h-4 text-red-600" />
+                          <TrendingDown className="w-4 h-4 text-red-400" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-text-primary truncate">
+                        <p className="text-sm font-medium text-white truncate">
                           {tx.description || (tx.type === 'topup' ? 'Credit top-up' : 'Credit spent')}
                         </p>
-                        <p className="text-xs text-text-tertiary mt-0.5">
+                        <p className="text-xs text-zinc-500 mt-0.5">
                           {formatDate(tx.created_at)} · Balance after: {tx.balance_after} credits
                         </p>
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className={`text-sm font-semibold ${
-                        tx.amount > 0 ? 'text-green-600' : 'text-red-600'
+                        tx.amount > 0 ? 'text-green-400' : 'text-red-400'
                       }`}>
                         {tx.amount > 0 ? '+' : ''}{tx.amount}
                       </p>

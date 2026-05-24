@@ -3,17 +3,6 @@ import { useNavigate, useSearchParams, Link, useLocation } from "react-router-do
 import { useAuth } from "../context/AuthContext";
 import { Terminal, Lock } from "lucide-react";
 
-/**
- * INDUSTRIAL LOGIN DESIGN:
- * - Sharp edges, no rounded corners
- * - Hard borders instead of soft shadows
- * - Terminal/data-dense aesthetic
- * - Monospace fonts for system feel
- * - Square logo, no circles
- * - Minimal, functional forms
- * - Industrial color scheme
- */
-
 type Tab = "signin" | "signup";
 
 function safeNextPath(raw: string | null): string {
@@ -30,9 +19,7 @@ export default function Login() {
   const nextPath = safeNextPath(searchParams.get("redirect") ?? searchParams.get("next"));
   const pendingPrompt = searchParams.get("p");
 
-  // Auto-select tab based on route
-  const initialTab = location.pathname === "/signup" ? "signup" : "signin";
-  const [tab, setTab] = useState<Tab>(initialTab);
+  const [tab, setTab] = useState<Tab>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -67,42 +54,13 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    setSuccess("");
-
-    // Basic validation
-    if (!email || !password) {
-      setError("Email and password are required");
-      setLoading(false);
-      return;
-    }
 
     if (tab === "signup") {
-      // Password strength validation for signup
-      if (password.length < 6) {
-        setError("Password must be at least 6 characters long");
-        setLoading(false);
-        return;
-      }
-
-      const { error: err, message: successMessage } = await signUp(email, password, name);
+      const { error: err } = await signUp(email, password, name);
       setLoading(false);
       if (err) {
-        // Improve error messages
-        if (err.includes("already registered")) {
-          setError("This email is already registered. Please sign in instead.");
-        } else if (err.includes("Invalid email")) {
-          setError("Please enter a valid email address");
-        } else {
-          setError(err);
-        }
-      } else if (successMessage) {
-        // Email confirmation is required - show success message without navigating
-        setSuccess(successMessage);
-        // Do not navigate - user needs to confirm email first
+        setError(err);
       } else {
-        // Account created and logged in automatically (email confirmation disabled)
-        setSuccess("Account created successfully!");
-        // Navigate to dashboard after successful signup
         const dest = pendingPrompt
           ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
           : nextPath;
@@ -112,14 +70,7 @@ export default function Login() {
       const { error: err } = await signIn(email, password);
       setLoading(false);
       if (err) {
-        // Improve error messages
-        if (err.includes("Invalid login credentials")) {
-          setError("Invalid email or password. Please try again.");
-        } else if (err.includes("Email not confirmed")) {
-          setError("Please verify your email before signing in. Check your inbox for the confirmation link.");
-        } else {
-          setError(err);
-        }
+        setError(err);
       } else {
         const dest = pendingPrompt
           ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
@@ -130,48 +81,47 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-8">
-      {/* Logo - Square, terminal style */}
+    <div className="min-h-screen bg-surface-0 flex flex-col items-center justify-center px-4 py-8">
+      {/* Logo */}
       <Link
         to="/"
-        className="flex items-center gap-2 text-content-primary text-sm mb-8 sm:mb-12 hover:opacity-70 transition-opacity"
+        className="flex items-center gap-2 text-white font-mono text-sm font-bold uppercase tracking-wider mb-8 sm:mb-12 hover:opacity-70 transition-opacity"
       >
-        <Terminal className="w-7 h-7 text-accent-primary stroke-[2.5]" />
-        <span className="font-bold uppercase tracking-wider">Nanowork</span>
+        <Terminal className="w-4 h-4 sm:w-5 sm:h-5" />
+        Nanowork
       </Link>
 
-      {/* Login Card - Sharp edges, hard borders */}
+      {/* Terminal Login Card */}
       <div className="w-full max-w-md">
-        <div className="bg-background-elevated border-2 border-border-DEFAULT">
-          {/* Header - Terminal style */}
-          <div className="border-b-2 border-border-DEFAULT px-4 sm:px-6 py-3 sm:py-4 bg-background-subtle">
+        <div className="card-lg rounded-none border border-white/10">
+          {/* Header */}
+          <div className="border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4 bg-surface-1">
             <div className="flex items-center gap-2 sm:gap-3">
-              <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-content-tertiary" />
-              <span className="text-xs sm:text-sm font-bold text-content-secondary uppercase tracking-wider font-mono">
-                AUTH_REQUIRED
+              <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/60" />
+              <span className="text-[10px] sm:text-xs font-mono font-bold text-white/60 uppercase tracking-wider">
+                Authentication Required
               </span>
               <div className="flex-1" />
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 bg-accent-success" />
-                <span className="text-[10px] sm:text-xs text-content-tertiary font-mono uppercase">SECURE</span>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-400" />
+                <span className="text-[10px] sm:text-xs font-mono text-white/40">SECURE</span>
               </div>
             </div>
           </div>
 
           <div className="p-4 sm:p-6">
-            {/* Tab Switcher - Sharp edges */}
-            <div className="flex gap-0 mb-4 sm:mb-6 border-2 border-border-DEFAULT">
+            {/* Tab Switcher */}
+            <div className="flex gap-0 mb-4 sm:mb-6 border border-white/10">
               <button
                 type="button"
                 onClick={() => {
                   setTab("signin");
                   setError("");
-                  setSuccess("");
                 }}
-                className={`flex-1 py-2.5 sm:py-3 text-xs font-bold uppercase tracking-wider transition-colors font-mono ${
+                className={`flex-1 py-2.5 sm:py-3 text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider transition-colors ${
                   tab === "signin"
-                    ? "bg-accent-primary text-white"
-                    : "bg-background-subtle text-content-secondary hover:bg-background-muted border-r-2 border-border-DEFAULT"
+                    ? "bg-white text-black"
+                    : "bg-transparent text-white/60 hover:text-white hover:bg-white/5"
                 }`}
               >
                 Sign In
@@ -181,12 +131,11 @@ export default function Login() {
                 onClick={() => {
                   setTab("signup");
                   setError("");
-                  setSuccess("");
                 }}
-                className={`flex-1 py-2.5 sm:py-3 text-xs font-bold uppercase tracking-wider transition-colors font-mono ${
+                className={`flex-1 py-2.5 sm:py-3 text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider transition-colors border-l border-white/10 ${
                   tab === "signup"
-                    ? "bg-accent-primary text-white"
-                    : "bg-background-subtle text-content-secondary hover:bg-background-muted"
+                    ? "bg-white text-black"
+                    : "bg-transparent text-white/60 hover:text-white hover:bg-white/5"
                 }`}
               >
                 Sign Up
@@ -197,16 +146,16 @@ export default function Login() {
               {tab === "signup" && (
                 <div>
                   <label
-                    className="block text-xs font-bold text-content-secondary mb-2 uppercase tracking-wider font-mono"
+                    className="block text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-2"
                     htmlFor="login-name"
                   >
                     Name
                   </label>
                   <input
                     id="login-name"
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background-subtle border-2 border-border-DEFAULT focus:border-accent-primary text-content-primary placeholder-content-muted text-sm outline-none transition-colors"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-xs sm:text-sm font-mono outline-none transition-colors"
                     type="text"
-                    placeholder="Enter your full name"
+                    placeholder="FULL NAME"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     autoComplete="name"
@@ -216,16 +165,16 @@ export default function Login() {
 
               <div>
                 <label
-                  className="block text-xs font-bold text-content-secondary mb-2 uppercase tracking-wider font-mono"
+                  className="block text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-2"
                   htmlFor="login-email"
                 >
                   Email Address
                 </label>
                 <input
                   id="login-email"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background-subtle border-2 border-border-DEFAULT focus:border-accent-primary text-content-primary placeholder-content-muted text-sm outline-none transition-colors"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-xs sm:text-sm font-mono outline-none transition-colors"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder="USER@DOMAIN.COM"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   autoFocus
@@ -237,38 +186,37 @@ export default function Login() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label
-                    className="block text-xs font-bold text-content-secondary uppercase tracking-wider font-mono"
+                    className="block text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider"
                     htmlFor="login-password"
                   >
-                    Password {tab === "signup" && <span className="text-content-tertiary font-normal lowercase">(min. 6 chars)</span>}
+                    Password
                   </label>
                   {tab === "signin" && (
                     <Link
                       to="/forgot-password"
-                      className="text-xs text-accent-primary hover:text-accent-primary/80 transition-colors font-bold uppercase tracking-wider font-mono"
+                      className="text-[10px] sm:text-xs font-mono text-white/50 hover:text-white transition-colors uppercase tracking-wider"
                     >
-                      Reset?
+                      Forgot?
                     </Link>
                   )}
                 </div>
                 <input
                   id="login-password"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-background-subtle border-2 border-border-DEFAULT focus:border-accent-primary text-content-primary placeholder-content-muted text-sm outline-none transition-colors"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-xs sm:text-sm font-mono outline-none transition-colors"
                   type="password"
-                  placeholder={tab === "signup" ? "Create a secure password" : "Enter your password"}
+                  placeholder="••••••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   autoComplete={tab === "signup" ? "new-password" : "current-password"}
                   required
-                  minLength={tab === "signup" ? 6 : undefined}
                 />
               </div>
 
               {success && (
-                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-accent-success bg-accent-success/5">
+                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-green-400/20 bg-green-400/5">
                   <div className="flex items-start gap-2">
-                    <span className="text-xs sm:text-sm font-bold text-accent-success uppercase tracking-wider font-mono">Success:</span>
-                    <p className="text-xs sm:text-sm text-accent-success leading-relaxed flex-1">
+                    <span className="text-[10px] sm:text-xs font-mono text-green-400 mt-0.5">SUCCESS:</span>
+                    <p className="text-[10px] sm:text-xs font-mono text-green-400 leading-relaxed flex-1">
                       {success}
                     </p>
                   </div>
@@ -276,10 +224,10 @@ export default function Login() {
               )}
 
               {error && (
-                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-accent-danger bg-accent-danger/5">
+                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-red-400/20 bg-red-400/5">
                   <div className="flex items-start gap-2">
-                    <span className="text-xs sm:text-sm font-bold text-accent-danger uppercase tracking-wider font-mono">Error:</span>
-                    <p className="text-xs sm:text-sm text-accent-danger leading-relaxed flex-1">
+                    <span className="text-[10px] sm:text-xs font-mono text-red-400 mt-0.5">ERROR:</span>
+                    <p className="text-[10px] sm:text-xs font-mono text-red-400 leading-relaxed flex-1">
                       {error}
                     </p>
                   </div>
@@ -289,37 +237,36 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 sm:py-3.5 bg-accent-primary hover:bg-accent-primary/90 disabled:opacity-30 disabled:cursor-not-allowed text-white text-xs font-bold uppercase tracking-wider transition-colors mt-2 border-2 border-accent-primary font-mono"
+                className="w-full py-3 sm:py-3.5 rounded-none bg-white hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed text-black font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors mt-2"
               >
                 {loading
                   ? tab === "signup"
-                    ? "Creating account..."
-                    : "Signing in..."
+                    ? "CREATING..."
+                    : "AUTHENTICATING..."
                   : tab === "signup"
                   ? "Create Account"
-                  : "Sign In"}
+                  : "Authenticate"}
               </button>
             </form>
           </div>
 
-          {/* Footer - Terminal style */}
-          <div className="border-t-2 border-border-DEFAULT px-4 sm:px-6 py-3 sm:py-4 bg-background-subtle">
-            <p className="text-[10px] sm:text-xs text-content-tertiary text-center font-mono uppercase tracking-wider">
-              Encrypted Connection • Enterprise Security
+          {/* Footer */}
+          <div className="border-t border-white/10 px-4 sm:px-6 py-3 sm:py-4 bg-surface-1">
+            <p className="text-[10px] sm:text-xs font-mono text-white/30 text-center leading-relaxed">
+              ENCRYPTED CONNECTION · ENTERPRISE SECURITY
             </p>
           </div>
         </div>
       </div>
 
-      {/* Legal footer - Terminal style */}
-      <p className="text-[10px] sm:text-xs text-content-tertiary mt-6 sm:mt-8 text-center px-4 font-mono">
-        By continuing you agree to{" "}
-        <a href="#" className="text-accent-primary hover:text-accent-primary/80 transition-colors uppercase font-bold">
-          Terms
+      <p className="text-[10px] sm:text-xs font-mono text-white/30 mt-6 sm:mt-8 text-center px-4 leading-relaxed">
+        BY CONTINUING YOU AGREE TO{" "}
+        <a href="#" className="text-white/50 hover:text-white transition-colors underline">
+          TERMS
         </a>{" "}
-        and{" "}
-        <a href="#" className="text-accent-primary hover:text-accent-primary/80 transition-colors uppercase font-bold">
-          Privacy Policy
+        AND{" "}
+        <a href="#" className="text-white/50 hover:text-white transition-colors underline">
+          PRIVACY POLICY
         </a>
       </p>
     </div>

@@ -109,10 +109,10 @@ export default function ResetPassword() {
   // Show loading state while validating session
   if (validatingSession) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-surface-0 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-[#2a2a2a] border-t-accent-primary animate-spin mx-auto mb-4" />
-          <p className="text-sm text-gray-400 font-mono">Validating reset link...</p>
+          <div className="w-8 h-8 border-2 border-zinc-600 border-t-white rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm text-zinc-500">Validating reset link...</p>
         </div>
       </div>
     );
@@ -126,35 +126,37 @@ export default function ResetPassword() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-4">
-            <Terminal className="w-10 h-10 text-accent-primary stroke-[2.5]" />
-            <span className="font-mono font-bold text-white text-xl tracking-tight">
+            <div className="w-10 h-10 rounded-none bg-white flex items-center justify-center">
+              <Terminal className="w-6 h-6 text-black" />
+            </div>
+            <span className="font-mono font-bold text-white text-xl uppercase tracking-wider">
               Nanowork
             </span>
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Set New Password</h1>
-          <p className="text-sm text-gray-400 font-mono">
+          <p className="text-sm text-zinc-500">
             Choose a strong password for your account
           </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-[#1a1a1a] border-2 border-[#2a2a2a] p-6 mb-6">
+        <form onSubmit={handleSubmit} className="card rounded-2xl p-6 mb-6">
           <div className="space-y-4">
             {/* Error Message */}
             {error && (
-              <div className="px-4 py-3 bg-red-500/10 border-2 border-red-500/20 text-red-400 text-sm font-mono">
+              <div className="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
                 {error}
               </div>
             )}
 
             {/* New Password Input */}
             <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-gray-300 mb-2 font-mono">
+              <label htmlFor="newPassword" className="block text-xs font-medium text-zinc-400 mb-2">
                 New Password
               </label>
               <div className="relative">
@@ -165,13 +167,13 @@ export default function ResetPassword() {
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter new password"
                   disabled={loading}
-                  className="w-full px-4 py-3 pr-12 bg-[#0a0a0a] border-2 border-[#2a2a2a] focus:border-accent-primary focus:ring-0 text-sm text-white placeholder-gray-600 outline-none transition-colors disabled:opacity-50 disabled:bg-[#0a0a0a] font-mono"
+                  className="w-full px-4 py-3 pr-12 rounded-xl bg-surface-2 border border-white/10 focus:border-white/20 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors disabled:opacity-50"
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-zinc-500 hover:text-zinc-300 transition-colors"
                   tabIndex={-1}
                 >
                   {showPassword ? (
@@ -185,23 +187,23 @@ export default function ResetPassword() {
 
             {/* Password Requirements */}
             {newPassword && (
-              <div className="bg-[#0a0a0a] border-2 border-[#2a2a2a] p-3">
-                <p className="text-xs font-medium text-gray-300 mb-2 font-mono">Password requirements:</p>
+              <div className="rounded-xl bg-surface-2 border border-white/5 p-3">
+                <p className="text-xs font-medium text-zinc-400 mb-2">Password requirements:</p>
                 <div className="space-y-1">
                   {passwordValidations.map((validation) => (
                     <div key={validation.label} className="flex items-center gap-2">
                       <div
-                        className={`w-3.5 h-3.5 flex items-center justify-center border-2 transition-colors ${
+                        className={`w-3.5 h-3.5 rounded-full flex items-center justify-center transition-colors ${
                           validation.valid
-                            ? "bg-green-500/10 border-green-500/20 text-green-500"
-                            : "bg-transparent border-[#2a2a2a] text-gray-600"
+                            ? "bg-green-500/20 text-green-400"
+                            : "bg-white/5 text-zinc-600"
                         }`}
                       >
                         {validation.valid && <Check className="w-2.5 h-2.5" />}
                       </div>
                       <span
-                        className={`text-xs transition-colors font-mono ${
-                          validation.valid ? "text-gray-300" : "text-gray-500"
+                        className={`text-xs transition-colors ${
+                          validation.valid ? "text-zinc-400" : "text-zinc-600"
                         }`}
                       >
                         {validation.label}
@@ -214,7 +216,7 @@ export default function ResetPassword() {
 
             {/* Confirm Password Input */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2 font-mono">
+              <label htmlFor="confirmPassword" className="block text-xs font-medium text-zinc-400 mb-2">
                 Confirm Password
               </label>
               <div className="relative">
@@ -225,12 +227,12 @@ export default function ResetPassword() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
                   disabled={loading}
-                  className="w-full px-4 py-3 pr-12 bg-[#0a0a0a] border-2 border-[#2a2a2a] focus:border-accent-primary focus:ring-0 text-sm text-white placeholder-gray-600 outline-none transition-colors disabled:opacity-50 disabled:bg-[#0a0a0a] font-mono"
+                  className="w-full px-4 py-3 pr-12 rounded-xl bg-surface-2 border border-white/10 focus:border-white/20 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors disabled:opacity-50"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-zinc-500 hover:text-zinc-300 transition-colors"
                   tabIndex={-1}
                 >
                   {showConfirmPassword ? (
@@ -241,7 +243,7 @@ export default function ResetPassword() {
                 </button>
               </div>
               {confirmPassword && newPassword !== confirmPassword && (
-                <p className="text-xs text-red-400 mt-1.5 font-mono">Passwords do not match</p>
+                <p className="text-xs text-red-400 mt-1.5">Passwords do not match</p>
               )}
             </div>
 
@@ -255,10 +257,10 @@ export default function ResetPassword() {
                 newPassword !== confirmPassword ||
                 passwordValidations.some((v) => !v.valid)
               }
-              className="w-full px-4 py-3 bg-accent-primary hover:bg-accent-primary/90 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2 font-mono border-2 border-transparent hover:border-accent-primary/50"
+              className="w-full px-4 py-3 rounded-xl bg-white hover:bg-white/90 disabled:opacity-40 disabled:cursor-not-allowed text-black font-semibold text-sm transition-colors flex items-center justify-center gap-2"
             >
               {loading && (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white animate-spin" />
+                <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
               )}
               {loading ? "Updating Password..." : "Update Password"}
             </button>
@@ -266,10 +268,10 @@ export default function ResetPassword() {
         </form>
 
         {/* Security Notice */}
-        <div className="bg-[#1a1a1a] border-2 border-[#2a2a2a] p-4 text-xs text-gray-400">
+        <div className="rounded-xl bg-surface-2 border border-white/5 p-4 text-xs text-zinc-500">
           <div className="flex items-start gap-2">
-            <Lock className="w-4 h-4 text-gray-500 flex-shrink-0 mt-0.5" />
-            <p className="leading-relaxed font-mono">
+            <Lock className="w-4 h-4 text-zinc-600 flex-shrink-0 mt-0.5" />
+            <p className="leading-relaxed">
               After updating your password, you'll be signed out and redirected to the login page.
               Use your new password to sign in.
             </p>

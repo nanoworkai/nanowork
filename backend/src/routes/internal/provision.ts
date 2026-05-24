@@ -10,8 +10,7 @@ function agentEmailAddress(slug: string): string {
   const domain = process.env.AGENT_EMAIL_DOMAIN;
 
   if (!domain) {
-    // Fallback for when agent email functionality is not yet enabled
-    return `agent-${slug}@placeholder.local`;
+    throw new Error('AGENT_EMAIL_DOMAIN must be configured');
   }
 
   return `a-${slug}@${domain}`;

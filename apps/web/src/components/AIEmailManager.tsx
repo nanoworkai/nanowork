@@ -37,7 +37,7 @@ export default function AIEmailManager() {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL ?? '';
+      const apiUrl = import.meta.env.VITE_API_URL || '';
       const response = await fetch(`${apiUrl}/api/email/status`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -63,7 +63,7 @@ export default function AIEmailManager() {
     setAssignError(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL ?? '';
+      const apiUrl = import.meta.env.VITE_API_URL || '';
       const response = await fetch(`${apiUrl}/api/email/assign`, {
         method: 'POST',
         headers: {
@@ -97,7 +97,7 @@ export default function AIEmailManager() {
     setSendSuccess(false);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL ?? '';
+      const apiUrl = import.meta.env.VITE_API_URL || '';
       const response = await fetch(`${apiUrl}/api/email/send`, {
         method: 'POST',
         headers: {
@@ -131,9 +131,9 @@ export default function AIEmailManager() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="card rounded-none border border-white/10 p-6">
         <div className="flex items-center justify-center py-8">
-          <div className="w-6 h-6 border-2 border-gray-200 border-t-blue-600 rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -142,30 +142,30 @@ export default function AIEmailManager() {
   return (
     <div className="space-y-6">
       {/* AI Email Status */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="card rounded-none border border-white/10 p-6">
         <div className="flex items-center gap-3 mb-4">
-          <Mail className="w-5 h-5 text-gray-600" />
-          <h2 className="text-lg font-semibold text-gray-900">AI Email Address</h2>
+          <Mail className="w-5 h-5 text-white/60" />
+          <h2 className="text-lg font-mono font-bold text-white">AI Email Address</h2>
         </div>
 
         {hasAIEmail && aiEmail ? (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="bg-surface-2 border border-white/10 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Check className="w-4 h-4 text-green-600" />
-              <span className="text-sm font-medium text-gray-700">Your AI Email:</span>
+              <Check className="w-4 h-4 text-green-400" />
+              <span className="text-sm font-mono text-white/60">Your AI Email:</span>
             </div>
-            <div className="text-lg font-semibold text-gray-900">{aiEmail}</div>
+            <div className="text-lg font-mono text-white">{aiEmail}</div>
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-white/60">
               Assign an AI email address to send emails from your AI agent.
             </p>
 
             {assignError && (
-              <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-                <span className="text-sm text-red-700">{assignError}</span>
+              <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+                <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-red-400">{assignError}</span>
               </div>
             )}
 
@@ -176,12 +176,12 @@ export default function AIEmailManager() {
                 onChange={(e) => setAgentName(e.target.value)}
                 placeholder="e.g., nova, atlas, sage"
                 disabled={assigning}
-                className="flex-1 px-3 py-2 rounded-lg bg-white border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm text-gray-900 outline-none transition-all disabled:opacity-50 disabled:bg-gray-50"
+                className="flex-1 px-3 py-2 rounded-lg bg-surface-2 border border-white/10 focus:border-white/20 text-sm text-white outline-none transition-colors disabled:opacity-50"
               />
               <button
                 onClick={handleAssignEmail}
                 disabled={!agentName.trim() || assigning}
-                className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow"
+                className="px-4 py-2 rounded-lg bg-white text-black font-mono text-sm font-bold uppercase hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {assigning ? "Assigning…" : "Assign"}
               </button>
@@ -192,71 +192,71 @@ export default function AIEmailManager() {
 
       {/* Send Email Form (only show if AI email is assigned) */}
       {hasAIEmail && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <div className="card rounded-none border border-white/10 p-6">
           <div className="flex items-center gap-3 mb-4">
-            <Send className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Send Email</h2>
+            <Send className="w-5 h-5 text-white/60" />
+            <h2 className="text-lg font-mono font-bold text-white">Send Email</h2>
           </div>
 
           {sendSuccess && (
-            <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg mb-4">
-              <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-              <span className="text-sm text-green-700 font-medium">Email sent successfully!</span>
+            <div className="flex items-start gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded-lg mb-4">
+              <Check className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+              <span className="text-sm text-green-400">Email sent successfully!</span>
             </div>
           )}
 
           {sendError && (
-            <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
-              <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-              <span className="text-sm text-red-700">{sendError}</span>
+            <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg mb-4">
+              <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+              <span className="text-sm text-red-400">{sendError}</span>
             </div>
           )}
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">To</label>
+              <label className="block text-xs font-mono text-white/60 mb-2">To</label>
               <input
                 type="email"
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
                 placeholder="recipient@example.com"
                 disabled={sending}
-                className="w-full px-3 py-2 rounded-lg bg-white border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm text-gray-900 outline-none transition-all disabled:opacity-50 disabled:bg-gray-50"
+                className="w-full px-3 py-2 rounded-lg bg-surface-2 border border-white/10 focus:border-white/20 text-sm text-white outline-none transition-colors disabled:opacity-50"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+              <label className="block text-xs font-mono text-white/60 mb-2">Subject</label>
               <input
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Email subject"
                 disabled={sending}
-                className="w-full px-3 py-2 rounded-lg bg-white border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm text-gray-900 outline-none transition-all disabled:opacity-50 disabled:bg-gray-50"
+                className="w-full px-3 py-2 rounded-lg bg-surface-2 border border-white/10 focus:border-white/20 text-sm text-white outline-none transition-colors disabled:opacity-50"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+              <label className="block text-xs font-mono text-white/60 mb-2">Message</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Your message..."
                 disabled={sending}
                 rows={6}
-                className="w-full px-3 py-2 rounded-lg bg-white border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm text-gray-900 outline-none transition-all disabled:opacity-50 disabled:bg-gray-50 resize-none"
+                className="w-full px-3 py-2 rounded-lg bg-surface-2 border border-white/10 focus:border-white/20 text-sm text-white outline-none transition-colors disabled:opacity-50 resize-none"
               />
             </div>
 
             <button
               onClick={handleSendEmail}
               disabled={!to.trim() || !subject.trim() || !message.trim() || sending}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-white text-black font-mono text-sm font-bold uppercase hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {sending ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-blue-200 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                   Sending…
                 </>
               ) : (

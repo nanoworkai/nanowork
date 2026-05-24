@@ -60,7 +60,6 @@ export interface UserProfile {
 interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
-  authError: string | null;
   user: User | null;
   session: Session | null;
   profile: UserProfile | null;
@@ -74,7 +73,7 @@ interface AuthContextValue {
 
   // Auth methods
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, name?: string) => Promise<{ error: string | null; message?: string }>;
+  signUp: (email: string, password: string, name?: string) => Promise<{ error: string | null }>;
   requestOtp: (phone: string) => Promise<{ error: string | null }>;
   verifyOtp: (phone: string, token: string) => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
@@ -84,15 +83,11 @@ interface AuthContextValue {
 
   // Credits management
   deductCredits: (amount: number, description: string, usageType: string, companyId?: string) => Promise<boolean>;
-
-  // Retry mechanism
-  retryAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
   isAuthenticated: false,
   isLoading: true,
-  authError: null,
   user: null,
   session: null,
   profile: null,
@@ -102,13 +97,12 @@ const AuthContext = createContext<AuthContextValue>({
   refreshCompanies: async () => {},
   canCreateCompany: () => false,
   signIn: async () => ({ error: null }),
-  signUp: async () => ({ error: null, message: undefined }),
+  signUp: async () => ({ error: null }),
   requestOtp: async () => ({ error: null }),
   verifyOtp: async () => ({ error: null }),
   logout: async () => {},
   updateProfile: async () => {},
   deductCredits: async () => false,
-  retryAuth: async () => {},
 });
 
 // Legacy phone-based subdomain generator (unused with email auth)
@@ -124,118 +118,78 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [authError, setAuthError] = useState<string | null>(null);
 
   const activeCompany = companies.find(c => c.id === activeCompanyId) || companies[0] || null;
 
   const loadProfile = useCallback(async (u: User) => {
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", u.id)
-        .maybeSingle();
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", u.id)
+      .maybeSingle();
 
-      if (error) {
-        console.error("[AuthContext] Failed to load profile:", error);
-        setAuthError("Failed to load user profile. Some features may be unavailable.");
-        // Allow dashboard to load without profile - user will see a warning
-        setProfile(null);
-        return;
-      }
-
-      if (data) {
-        // Map database fields (snake_case) to UserProfile (camelCase)
-        const mappedProfile: UserProfile = {
-          id: data.id,
-          phone: data.phone || "",
-          email: data.email || undefined,
-          name: data.name || undefined,
-          aiEmail: data.ai_email || undefined,
-          status: data.status || "active",
-          phoneVerified: data.phone_verified || false,
-          plan: data.plan || "free",
-          creditsBalance: data.credits_balance || 0,
-          monthlyCompanyLimit: data.monthly_company_limit || 1,
-          totalCompaniesCreated: data.total_companies_created || 0,
-          timezone: data.timezone || "UTC",
-          notificationPreferences: data.notification_preferences || {
-            sms: true,
-            activity: true,
-            billing: true,
-          },
-          createdAt: data.created_at || new Date().toISOString(),
-          updatedAt: data.updated_at || new Date().toISOString(),
-        };
-        setProfile(mappedProfile);
-        setAuthError(null);
-      } else {
-        console.warn("[AuthContext] Profile not found for user - trigger should have created it");
-        setAuthError("User profile not found. Please contact support if this persists.");
-        // Allow dashboard to load without profile
-        setProfile(null);
-      }
-    } catch (err) {
-      console.error("[AuthContext] Exception loading profile:", err);
-      setAuthError("An unexpected error occurred loading your profile.");
-      // Continue with null profile to allow dashboard to load
-      setProfile(null);
+    if (data) {
+      // Map database fields (snake_case) to UserProfile (camelCase)
+      const mappedProfile: UserProfile = {
+        id: data.id,
+        phone: data.phone || "",
+        email: data.email || undefined,
+        name: data.name || undefined,
+        aiEmail: data.ai_email || undefined,
+        status: data.status || "active",
+        phoneVerified: data.phone_verified || false,
+        plan: data.plan || "free",
+        creditsBalance: data.credits_balance || 0,
+        monthlyCompanyLimit: data.monthly_company_limit || 1,
+        totalCompaniesCreated: data.total_companies_created || 0,
+        timezone: data.timezone || "UTC",
+        notificationPreferences: data.notification_preferences || {
+          sms: true,
+          activity: true,
+          billing: true,
+        },
+        createdAt: data.created_at || new Date().toISOString(),
+        updatedAt: data.updated_at || new Date().toISOString(),
+      };
+      setProfile(mappedProfile);
+    } else {
+      console.warn("[AuthContext] Profile not found for user - trigger should have created it");
     }
   }, []);
 
   const loadCompanies = useCallback(async (userId: string) => {
-    try {
-      // Get companies owned by user
-      const { data: ownedCompanies } = await supabase
-        .from("companies")
-        .select("*")
-        .eq("user_id", userId)
-        .is("deleted_at", null)
-        .order("created_at", { ascending: false });
+    // Get companies owned by user
+    const { data: ownedCompanies } = await supabase
+      .from("companies")
+      .select("*")
+      .eq("user_id", userId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: false });
 
-      // Get companies where user is a member (if company_members table exists)
-      const { data: memberCompanies } = await supabase
-        .from("company_members")
-        .select(`
-          company_id,
-          companies (*)
-        `)
-        .eq("user_id", userId);
+    // Get companies where user is a member (if company_members table exists)
+    const { data: memberCompanies } = await supabase
+      .from("company_members")
+      .select(`
+        company_id,
+        companies (*)
+      `)
+      .eq("user_id", userId);
 
-      const allCompanies = [
-        ...(ownedCompanies || []),
-        ...(memberCompanies?.map((m: any) => m.companies).flat().filter(Boolean) || []),
-      ] as Company[];
+    const allCompanies = [
+      ...(ownedCompanies || []),
+      ...(memberCompanies?.map((m: any) => m.companies).flat().filter(Boolean) || []),
+    ] as Company[];
 
-      setCompanies(allCompanies);
+    setCompanies(allCompanies);
 
-      // Set active company from localStorage or first company
-      const savedCompanyId = localStorage.getItem("activeCompanyId");
-      if (savedCompanyId && allCompanies.some(c => c.id === savedCompanyId)) {
-        setActiveCompanyId(savedCompanyId);
-      } else if (allCompanies.length > 0) {
-        setActiveCompanyId(allCompanies[0].id);
-      }
-    } catch (err) {
-      console.error("[AuthContext] Exception loading companies:", err);
-      // Companies table might not exist yet - that's okay
+    // Set active company from localStorage or first company
+    const savedCompanyId = localStorage.getItem("activeCompanyId");
+    if (savedCompanyId && allCompanies.some(c => c.id === savedCompanyId)) {
+      setActiveCompanyId(savedCompanyId);
+    } else if (allCompanies.length > 0) {
+      setActiveCompanyId(allCompanies[0].id);
     }
   }, []);
-
-  // Safety timeout: if loading takes more than 10 seconds, force stop loading
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (isLoading) {
-        console.error("[AuthContext] Authentication timeout after 10 seconds");
-        setAuthError(
-          "Authentication is taking longer than expected. Please refresh the page or try again later."
-        );
-        setIsLoading(false);
-      }
-    }, 10000); // 10 seconds
-
-    return () => clearTimeout(timeoutId);
-  }, [isLoading]);
 
   useEffect(() => {
     // If Supabase is not configured, skip auth entirely
@@ -246,74 +200,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     supabase.auth.getSession().then(async ({ data: { session: s } }) => {
-      try {
-        setSession(s);
-        setUser(s?.user ?? null);
-        if (s?.user) {
-          // Wrap loadProfile in try-catch to ensure setIsLoading always executes
-          await loadProfile(s.user).catch((err) => {
-            console.error("[AuthContext] loadProfile failed in getSession:", err);
-            setAuthError("Failed to load user profile.");
-          });
-
-          await loadCompanies(s.user.id).catch((err) => {
-            console.error("[AuthContext] loadCompanies failed in getSession:", err);
-            // Companies table might not exist yet - that's okay
-          });
-
-          // Update last login (fire and forget)
-          void (async () => {
-            try {
-              await supabase
-                .from("profiles")
-                .update({ updated_at: new Date().toISOString() })
-                .eq("id", s.user.id);
-            } catch {
-              // Ignore errors - column may not exist
-            }
-          })();
-        }
-      } catch (err) {
-        console.error("[AuthContext] Unexpected error in getSession:", err);
-        setAuthError("Failed to initialize authentication.");
-      } finally {
-        // Always clear loading state
-        setIsLoading(false);
+      setSession(s);
+      setUser(s?.user ?? null);
+      if (s?.user) {
+        await loadProfile(s.user);
+        await loadCompanies(s.user.id).catch(() => {
+          // Companies table might not exist yet - that's okay
+        });
+        // Update last login (fire and forget)
+        void (async () => {
+          try {
+            await supabase
+              .from("profiles")
+              .update({ updated_at: new Date().toISOString() })
+              .eq("id", s.user.id);
+          } catch {
+            // Ignore errors - column may not exist
+          }
+        })();
       }
+      setIsLoading(false);
     }).catch((err) => {
       console.error("[AuthContext] Failed to get session:", err);
-      setAuthError(`Failed to initialize authentication: ${err.message || "Unknown error"}`);
       setIsLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, s) => {
-        try {
-          setSession(s);
-          setUser(s?.user ?? null);
-          if (s?.user) {
-            // Wrap loadProfile in try-catch to ensure setIsLoading always executes
-            await loadProfile(s.user).catch((err) => {
-              console.error("[AuthContext] loadProfile failed in onAuthStateChange:", err);
-              setAuthError("Failed to load user profile.");
-            });
-
-            await loadCompanies(s.user.id).catch((err) => {
-              console.error("[AuthContext] loadCompanies failed in onAuthStateChange:", err);
-            });
-          } else {
-            setProfile(null);
-            setCompanies([]);
-            setActiveCompanyId(null);
-            setAuthError(null);
-          }
-        } catch (err) {
-          console.error("[AuthContext] Unexpected error in onAuthStateChange:", err);
-          setAuthError("An unexpected authentication error occurred.");
-        } finally {
-          // Always clear loading state
-          setIsLoading(false);
+        setSession(s);
+        setUser(s?.user ?? null);
+        if (s?.user) {
+          await loadProfile(s.user);
+          await loadCompanies(s.user.id).catch(() => {});
+        } else {
+          setProfile(null);
+          setCompanies([]);
+          setActiveCompanyId(null);
         }
+        setIsLoading(false);
       }
     );
 
@@ -326,26 +250,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, name?: string) => {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { name },
-        emailRedirectTo: `${import.meta.env.VITE_SITE_URL ?? ''}/dashboard`,
+        emailRedirectTo: `${import.meta.env.VITE_SITE_URL}/dashboard`,
       },
     });
 
     if (error) return { error: error.message };
-
-    // Check if email confirmation is required
-    // If user is null but session exists, email confirmation is disabled
-    // If user exists but session is null, email confirmation is required
-    if (data.user && !data.session) {
-      return {
-        error: null,
-        message: "Account created successfully! Please check your email to confirm your account before signing in."
-      };
-    }
 
     // Profile is automatically created by database trigger
     return { error: null };
@@ -371,7 +285,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       setCompanies([]);
       setActiveCompanyId(null);
-      setAuthError(null);
       localStorage.removeItem("activeCompanyId");
     } catch (error) {
       console.error("Logout error:", error);
@@ -381,7 +294,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       setCompanies([]);
       setActiveCompanyId(null);
-      setAuthError(null);
       localStorage.removeItem("activeCompanyId");
     }
   }, []);
@@ -443,7 +355,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Insert transaction (this will trigger auto-update of balance via DB function)
     const { error } = await supabase.from("credits_transactions").insert({
       user_id: user.id,
-      type: "spend",
+      type: "usage",
       amount: -amount,
       balance_after: newBalance,
       company_id: companyId || null,
@@ -465,39 +377,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return true;
   }, [user, profile]);
 
-  const retryAuth = useCallback(async () => {
-    setIsLoading(true);
-    setAuthError(null);
-
-    try {
-      const { data: { session: s } } = await supabase.auth.getSession();
-      setSession(s);
-      setUser(s?.user ?? null);
-
-      if (s?.user) {
-        await loadProfile(s.user).catch((err) => {
-          console.error("[AuthContext] loadProfile failed in retryAuth:", err);
-          setAuthError("Failed to load user profile.");
-        });
-
-        await loadCompanies(s.user.id).catch((err) => {
-          console.error("[AuthContext] loadCompanies failed in retryAuth:", err);
-        });
-      }
-    } catch (err) {
-      console.error("[AuthContext] Retry auth failed:", err);
-      setAuthError("Failed to retry authentication. Please refresh the page.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [loadProfile, loadCompanies]);
-
   return (
     <AuthContext.Provider
       value={{
         isAuthenticated: !!session,
         isLoading,
-        authError,
         user,
         session,
         profile,
@@ -513,7 +397,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshCompanies,
         canCreateCompany,
         deductCredits,
-        retryAuth,
       }}
     >
       {children}

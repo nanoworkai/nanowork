@@ -1,47 +1,8 @@
-services:
-  - type: web
-    name: nanowork-web
-    runtime: node
-    branch: main
-    region: oregon
-    plan: free
-    healthCheckPath: /health
-    buildCommand: cd apps/web && npm install && npm run build && cd ../.. && rm -rf backend/public && mkdir -p backend/public && cp -r apps/web/dist/. backend/public/ && cd backend && npm install && npm run build
-    startCommand: cd backend && node dist/index.js
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        sync: false
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_SERVICE_KEY
-        sync: false
-      - key: SUPABASE_ANON_KEY
-        sync: false
-      - key: ANTHROPIC_API_KEY
-        sync: false
-      - key: STRIPE_SECRET_KEY
-        sync: false
-      - key: STRIPE_WEBHOOK_SECRET
-        sync: false
-      - key: INTERNAL_TOKEN
-        sync: false
-      - key: CF_ACCOUNT_ID
-        sync: false
-      - key: CLOUDFLARE_API_TOKEN
-        sync: false
-      - key: CORS_ORIGIN
-        value: https://www.nanowork.ai
-      - key: FRONTEND_URL
-        value: https://www.nanowork.ai
-      - key: VITE_API_URL
-        value: https://www.nanowork.ai
-      - key: VITE_SITE_URL
-        value: https://www.nanowork.ai
-      - key: VITE_SUPABASE_URL
-        sync: false
-      - key: VITE_SUPABASE_ANON_KEY
-        sync: false
-      - key: VITE_STRIPE_PUBLISHABLE_KEY
-        sync: false
+# DEPRECATED: This file is kept for reference only.
+# Deploy frontend and backend separately using their respective render.yaml files:
+# - Frontend: apps/web/render.yaml
+# - Backend: backend/render.yaml
+#
+# To deploy:
+# 1. Create a new Web Service on Render for the backend, pointing to backend/render.yaml
+# 2. Create a new Web Service on Render for the frontend, pointing to apps/web/render.yaml

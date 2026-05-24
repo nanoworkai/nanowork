@@ -17,10 +17,10 @@ export default function UserAppLayout() {
     <div className="user-app">
       <aside className="user-app__sidebar" aria-label="App navigation">
         <div className="user-app__brand">
-          <span className="user-app__brand-mark" aria-hidden="true" />
+          <span className="user-app__brand-mark" aria-hidden />
           <div>
             <p className="user-app__brand-name">{app.name}</p>
-            <p className="user-app__brand-sub">{app.slug}.app.run</p>
+            <p className="user-app__brand-sub mono">{app.slug}.app.run</p>
           </div>
         </div>
         <nav className="user-app__nav">
@@ -30,28 +30,28 @@ export default function UserAppLayout() {
               to={item.to}
               end={"end" in item && item.end === true}
               className={({ isActive }) =>
-                `user-app__nav-item${isActive ? " user-app__nav-item--active" : ""}`
+                `user-app__nav-item${isActive ? " is-active" : ""}`
               }
             >
               {item.label}
             </NavLink>
           ))}
         </nav>
-        <div className="user-app__sidebar-footer">
-          <Link to="/app/redeem" className="user-app__footer-link user-app__footer-link--primary">
-            Redeem and deploy
+        <div className="user-app__sidebar-foot">
+          <Link to="/app/redeem" className="user-app__redeem-link">
+            Redeem &amp; deploy
           </Link>
-          <Link to={isAuthenticated ? "/dashboard" : "/login?next=%2Fdashboard"} className="user-app__footer-link">
-            {isAuthenticated ? "Your Nanowork account" : "Sign in to Nanowork"}
+          <Link to={isAuthenticated ? "/dashboard" : "/login?next=%2Fdashboard"} className="user-app__nw-link">
+            {isAuthenticated ? "Nanowork account" : "Log in to Nanowork"}
           </Link>
-          <a href="https://nanowork.ai" className="user-app__footer-link" target="_blank" rel="noreferrer">
-            Learn more about Nanowork
+          <a href="https://nanowork.ai" className="user-app__nw-link" target="_blank" rel="noreferrer">
+            nanowork.ai
           </a>
         </div>
       </aside>
       <div className="user-app__main">
-        <header className="user-app__header">
-          <span className="user-app__badge user-app__badge--preview">Preview</span>
+        <header className="user-app__top">
+          <span className="user-app__env">Preview</span>
         </header>
         <main className="user-app__content">
           <Outlet />
