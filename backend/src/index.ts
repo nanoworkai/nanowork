@@ -164,19 +164,23 @@ if (fs.existsSync(publicPath)) {
     }
   }));
 
-  // SPA catchall - only for non-API routes
-  // Don't exclude /assets/ - if express.static didn't find it, we want it to 404, not serve index.html
+  // SPA catchall - only for non-API/asset routes
   app.use((req, res, next) => {
-    // Let API, webhook, health, and internal routes pass through to 404/error
+    // Let API, webhook, health, internal, and ASSET routes pass through to 404
     if (req.path.startsWith('/api/') ||
         req.path.startsWith('/internal/') ||
         req.path.startsWith('/webhooks/') ||
+        req.path.startsWith('/assets/') ||
         req.path === '/health') {
       return next();
     }
-    // All other routes get the SPA (including /assets/* if the file wasn't found)
-    // This is intentional - Vite generates hashed filenames, so missing assets = old deployment
-    res.sendFile(path.join(publicPath, 'index.html'));
+    // Everything else gets the SPA
+    res.sendFile(path.join(publicPath, 'index.html'), (err) => {
+      if (err) {
+        console.error('[SPA] Failed to send index.html:', err);
+        next(err);
+      }
+    });
   });
 }
 
