@@ -25,32 +25,6 @@ export default function Inbox() {
   const [selectedEmail, setSelectedEmail] = useState<EmailMessage | null>(null);
   const [filter, setFilter] = useState<'all' | 'inbound' | 'outbound'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [agentEmail, setAgentEmail] = useState<string>('');
-
-  // Fetch agent email address
-  useEffect(() => {
-    const fetchAgentEmail = async () => {
-      if (!session?.access_token) return;
-
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL || '';
-        const res = await fetch(`${apiUrl}/agents/me`, {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-        });
-
-        if (res.ok) {
-          const agent = await res.json();
-          setAgentEmail(agent.email || '');
-        }
-      } catch (error) {
-        console.error('Failed to fetch agent email:', error);
-      }
-    };
-
-    fetchAgentEmail();
-  }, [session?.access_token]);
 
   const fetchEmails = async () => {
     if (!profile?.id) return;
@@ -132,7 +106,7 @@ export default function Inbox() {
         <h1 className="text-2xl font-bold text-white mb-1">Inbox</h1>
         <p className="text-sm text-white/60">
           Messages sent to and from your AI agent at{" "}
-          <span className="font-mono text-white/80">{agentEmail || 'loading...'}</span>
+          <span className="font-mono text-white/80">{profile?.aiEmail || 'generating...'}</span>
         </p>
       </div>
 

@@ -53,7 +53,18 @@ export async function requireUserAuth(
           metadata: {},
         });
 
-        console.log(`Auto-created agent ${agent.id} for user ${user.id}`);
+        // Update user profile with agent email
+        try {
+          await supabase
+            .from('profiles')
+            .update({ ai_email: email })
+            .eq('id', user.id);
+        } catch (profileError) {
+          console.error('Failed to update profile with agent email:', profileError);
+          // Non-blocking - agent is already created
+        }
+
+        console.log(`Auto-created agent ${agent.id} for user ${user.id} with email ${email}`);
       } catch (error) {
         console.error('Failed to auto-create agent:', error);
         res.status(500).json({ error: 'Failed to provision agent' });

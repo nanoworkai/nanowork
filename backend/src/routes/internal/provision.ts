@@ -67,6 +67,23 @@ router.post('/provision-agent', requireInternalToken, async (req: Request, res: 
       metadata: {},
     });
 
+    // Update user profile with agent email
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_KEY!
+      );
+
+      await supabase
+        .from('profiles')
+        .update({ ai_email: email })
+        .eq('id', user_id);
+    } catch (profileError) {
+      console.error('Failed to update profile with agent email:', profileError);
+      // Non-blocking - agent is already created
+    }
+
     res.json({ agent, created: true });
   } catch (error) {
     console.error('Provision agent error:', error);
