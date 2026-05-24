@@ -1,8 +1,61 @@
-# DEPRECATED: This file is kept for reference only.
-# Deploy frontend and backend separately using their respective render.yaml files:
-# - Frontend: apps/web/render.yaml
-# - Backend: backend/render.yaml
-#
-# To deploy:
-# 1. Create a new Web Service on Render for the backend, pointing to backend/render.yaml
-# 2. Create a new Web Service on Render for the frontend, pointing to apps/web/render.yaml
+services:
+  # Frontend static site
+  - type: static
+    name: nanowork-web
+    branch: main
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://nanowork-api.onrender.com
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+      - key: VITE_STRIPE_PUBLISHABLE_KEY
+        sync: false
+
+  # Backend API service
+  - type: web
+    name: nanowork-api
+    runtime: node
+    branch: main
+    region: oregon
+    plan: free
+    rootDir: backend
+    healthCheckPath: /health
+    buildCommand: npm install && npm run build
+    startCommand: node dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: INTERNAL_TOKEN
+        sync: false
+      - key: FRONTEND_URL
+        value: https://nanowork-web.onrender.com
+      - key: CORS_ORIGIN
+        value: https://nanowork-web.onrender.com,https://nanowork.app
+      - key: CF_ACCOUNT_ID
+        sync: false
+      - key: CLOUDFLARE_API_TOKEN
+        sync: false
