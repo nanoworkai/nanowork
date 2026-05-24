@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 1200px;
+      height: 630px;
+      background: #000000;
+      font-family: 'Merriweather', Georgia, serif;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 48px;
+    }
+
+    .logo-box {
+      width: 140px;
+      height: 140px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-icon {
+      width: 70px;
+      height: 70px;
+    }
+
+    .company-name {
+      font-size: 82px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 12px;
+      color: white;
+      font-family: 'Merriweather', Georgia, serif;
+    }
+
+    .tagline {
+      font-size: 24px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.85);
+      font-family: 'Merriweather', Georgia, serif;
+      font-style: italic;
+      letter-spacing: 1px;
+      margin-top: -20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-box">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 20L20 4M20 4H8M20 4V16" stroke="black" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>
+      </svg>
+    </div>
+    <div class="company-name">NANOWORK</div>
+    <div class="tagline">Turn Your Idea Into a Company</div>
+  </div>
+</body>
+</html>
