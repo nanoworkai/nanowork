@@ -7,6 +7,12 @@ const PING_INTERVAL = 14 * 60 * 1000; // 14 minutes in milliseconds
 const HEALTH_ENDPOINT = '/health';
 
 export function startKeepAlive(): () => void {
+  // Render spin-down prevention — same-origin /health in production only.
+  // Dev uses Vite proxy; pinging before the API is up spams proxy errors.
+  if (!import.meta.env.PROD) {
+    return () => {};
+  }
+
   // Ping immediately on start
   pingHealth();
 
