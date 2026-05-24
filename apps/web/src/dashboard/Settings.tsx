@@ -561,14 +561,14 @@ function PlanSection() {
 
   return (
     <>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid md:grid-cols-2 gap-6">
         {PLANS.map((plan) => {
           const isCurrent = profile?.plan === plan.tier;
           const isRecommended = plan.tier === "starter";
           return (
             <div
               key={plan.tier}
-              className={`relative p-5 rounded-2xl border flex flex-col transition-all ${
+              className={`relative p-6 rounded-2xl border flex flex-col transition-all ${
                 isCurrent
                   ? "border-white/20 bg-white/10"
                   : isRecommended
@@ -577,27 +577,27 @@ function PlanSection() {
               }`}
             >
               {isRecommended && !isCurrent && (
-                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-white text-black px-2.5 py-0.5 rounded-full">
+                <span className="absolute -top-3 left-6 text-xs font-semibold bg-white text-black px-3 py-1 rounded-full">
                   Popular
                 </span>
               )}
               {isCurrent && (
-                <span className="absolute -top-2.5 left-4 text-xs font-semibold bg-green-500 text-white px-2.5 py-0.5 rounded-full">
+                <span className="absolute -top-3 left-6 text-xs font-semibold bg-green-500 text-white px-3 py-1 rounded-full">
                   Current
                 </span>
               )}
 
-              <h3 className="text-base font-bold text-white">{plan.name}</h3>
-              <div className="flex items-baseline gap-1 mt-1 mb-2">
-                <span className="text-2xl font-bold text-white">${plan.price}</span>
-                <span className="text-xs text-zinc-500">/mo</span>
+              <h3 className="text-lg font-bold text-white mb-1">{plan.name}</h3>
+              <div className="flex items-baseline gap-1 mb-3">
+                <span className="text-3xl font-bold text-white">${plan.price}</span>
+                <span className="text-sm text-white/40">/mo</span>
               </div>
-              <p className="text-xs text-zinc-500 mb-4">{plan.desc}</p>
+              <p className="text-sm text-white/60 mb-5 leading-relaxed">{plan.desc}</p>
 
-              <ul className="flex-1 flex flex-col gap-1.5 mb-5">
+              <ul className="flex-1 flex flex-col gap-2.5 mb-6">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-1.5 text-xs text-zinc-400">
-                    <svg className="flex-shrink-0 mt-0.5 text-green-400" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <li key={f} className="flex items-start gap-2 text-sm text-white/80">
+                    <svg className="flex-shrink-0 mt-0.5 text-green-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     {f}
@@ -606,14 +606,14 @@ function PlanSection() {
               </ul>
 
               {isCurrent ? (
-                <button disabled className="w-full py-2 rounded-lg text-xs font-semibold bg-surface-3 text-zinc-600 cursor-default">
+                <button disabled className="w-full py-3 rounded-lg text-sm font-semibold bg-surface-3 text-zinc-600 cursor-default">
                   Current plan
                 </button>
               ) : (
                 <button
                   onClick={() => setConfirm(plan.tier)}
-                  className={`w-full py-2 rounded-lg text-xs font-semibold transition-colors ${
-                    isRecommended ? "bg-white hover:bg-zinc-100 text-black" : "bg-surface-2 hover:bg-surface-3 border border-white/10 text-zinc-300 hover:text-white"
+                  className={`w-full py-3 rounded-lg text-sm font-semibold transition-colors ${
+                    isRecommended ? "bg-white hover:bg-zinc-100 text-black" : "bg-surface-2 hover:bg-surface-3 border border-white/10 text-white/80 hover:text-white"
                   }`}
                 >
                   Switch to {plan.name}
