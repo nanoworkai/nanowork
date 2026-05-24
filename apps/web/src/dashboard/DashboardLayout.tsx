@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Terminal, LogOut, Menu, Settings, CreditCard, HelpCircle, ChevronDown } from "lucide-react";
 
 const NAV_ITEMS = [
-  { to: "/dashboard", label: "OVERVIEW", end: true, code: "00" },
+  { to: "/dashboard", label: "CREATE", end: true, code: "00" },
   { to: "/dashboard/inbox", label: "INBOX", end: false, code: "01" },
   { to: "/dashboard/wallet", label: "WALLET", end: false, code: "02" },
   { to: "/dashboard/settings", label: "SETTINGS", end: false, code: "03" },

@@ -935,7 +935,7 @@ export default function Settings() {
               className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab.id
                   ? "text-white border-white"
-                  : "text-zinc-500 border-transparent hover:text-zinc-300"
+                  : "text-white/60 border-transparent hover:text-white"
               }`}
             >
               <Icon className="w-4 h-4" />
