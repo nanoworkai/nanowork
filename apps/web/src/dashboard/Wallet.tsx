@@ -37,7 +37,7 @@ export default function Wallet() {
     if (!session?.access_token) return;
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL ?? '';
 
       // Fetch balance
       const balanceRes = await fetch(`${apiUrl}/api/wallet/balance`, {
@@ -71,7 +71,7 @@ export default function Wallet() {
 
   const fetchBundles = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL ?? '';
       const res = await fetch(`${apiUrl}/api/wallet/bundles`);
 
       if (res.ok) {
@@ -90,7 +90,7 @@ export default function Wallet() {
     setError(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL ?? '';
 
       // Create payment intent
       const res = await fetch(`${apiUrl}/api/wallet/topup`, {

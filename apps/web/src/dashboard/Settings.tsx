@@ -96,7 +96,7 @@ function BillingSection() {
     setError(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL ?? '';
       const res = await fetch(`${apiUrl}/api/billing/portal`, {
         method: "POST",
         headers: {
@@ -251,7 +251,7 @@ function DeleteSection() {
 
     try {
       // Call backend API to delete user and all related data
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL ?? '';
       const response = await fetch(`${apiUrl}/api/user`, {
         method: 'DELETE',
         headers: {

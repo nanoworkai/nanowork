@@ -19,7 +19,7 @@ export default function Bookings() {
   async function fetchBookings() {
     setLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL ?? '';
       const res = await fetch(`${apiUrl}/api/rent/bookings?limit=50`, {
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
@@ -204,7 +204,7 @@ export default function Bookings() {
                         <button
                           onClick={async () => {
                             try {
-                              const apiUrl = import.meta.env.VITE_API_URL || '';
+                              const apiUrl = import.meta.env.VITE_API_URL ?? '';
                               const res = await fetch(
                                 `${apiUrl}/api/rent/bookings/${booking.id}/credentials`,
                                 {
@@ -235,7 +235,7 @@ export default function Bookings() {
                                 return;
 
                               try {
-                                const apiUrl = import.meta.env.VITE_API_URL || '';
+                                const apiUrl = import.meta.env.VITE_API_URL ?? '';
                                 await fetch(`${apiUrl}/api/rent/bookings/${booking.id}`, {
                                   method: "DELETE",
                                   headers: {

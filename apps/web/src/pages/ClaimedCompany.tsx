@@ -50,7 +50,7 @@ export default function ClaimedCompany() {
     try {
       // TODO: Replace with actual API call
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || ""}/api/claimed-company/${companyId}`
+        `${import.meta.env.VITE_API_URL ?? ""}/api/claimed-company/${companyId}`
       );
 
       if (!response.ok) {

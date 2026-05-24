@@ -37,7 +37,7 @@ export default function AIEmailManager() {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL ?? '';
       const response = await fetch(`${apiUrl}/api/email/status`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -63,7 +63,7 @@ export default function AIEmailManager() {
     setAssignError(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL ?? '';
       const response = await fetch(`${apiUrl}/api/email/assign`, {
         method: 'POST',
         headers: {
@@ -97,7 +97,7 @@ export default function AIEmailManager() {
     setSendSuccess(false);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const apiUrl = import.meta.env.VITE_API_URL ?? '';
       const response = await fetch(`${apiUrl}/api/email/send`, {
         method: 'POST',
         headers: {
