@@ -10,6 +10,7 @@ import PreviewPage from "./pages/PreviewPage";
 import Pricing from "./pages/Pricing";
 import DashboardLayout from "./dashboard/DashboardLayout";
 import Create from "./dashboard/Create";
+import History from "./dashboard/History";
 import Overview from "./dashboard/OverviewNew";
 import Settings from "./dashboard/Settings";
 import BuildView from "./dashboard/BuildView";
@@ -56,6 +57,7 @@ export default function App() {
         }
       >
         <Route index element={<Create />} />
+        <Route path="history" element={<History />} />
         <Route path="builds/:buildId" element={<Overview />} />
         <Route path="inbox" element={<Inbox />} />
         <Route path="wallet" element={<Wallet />} />
