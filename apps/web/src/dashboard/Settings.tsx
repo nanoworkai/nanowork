@@ -740,6 +740,19 @@ function DomainsSection() {
         desc="Connect your own domain."
       >
         <div className="space-y-4">
+          {/* Pricing notice */}
+          <div className="flex items-center justify-between p-4 rounded-lg bg-blue-500/5 border border-blue-500/20">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-500/10">
+                <span className="text-lg">💎</span>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-blue-400">Premium Feature</p>
+                <p className="text-xs text-white/60 mt-0.5">Custom domains cost $100/month per domain</p>
+              </div>
+            </div>
+          </div>
+
           <div className="flex justify-end">
             <button
               onClick={() => setShowAdd(!showAdd)}
