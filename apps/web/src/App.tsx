@@ -9,6 +9,7 @@ import Swipe from "./pages/Swipe";
 import PreviewPage from "./pages/PreviewPage";
 import Pricing from "./pages/Pricing";
 import DashboardLayout from "./dashboard/DashboardLayout";
+import Create from "./dashboard/Create";
 import Overview from "./dashboard/OverviewNew";
 import Settings from "./dashboard/Settings";
 import BuildView from "./dashboard/BuildView";
@@ -54,7 +55,7 @@ export default function App() {
           </RequireAuth>
         }
       >
-        <Route index element={<Overview />} />
+        <Route index element={<Create />} />
         <Route path="builds/:buildId" element={<Overview />} />
         <Route path="inbox" element={<Inbox />} />
         <Route path="wallet" element={<Wallet />} />
