@@ -6,6 +6,7 @@
 
 export interface CellFormat {
   numberFormat?: string; // 'general', 'number', 'currency', 'percent', 'date', 'time', 'custom'
+  dateFormat?: 'MM/DD/YYYY' | 'DD-MMM-YYYY' | 'YYYY-MM-DD' | 'MMM D, YYYY' | 'D MMM YYYY';
   decimals?: number;
   currencySymbol?: string;
   thousandsSeparator?: boolean;
@@ -22,6 +23,7 @@ export interface CellFormat {
   borderRight?: string;
   borderBottom?: string;
   borderLeft?: string;
+  borderAll?: string;
 }
 
 /**
@@ -45,7 +47,7 @@ export function formatCellValue(value: unknown, format: CellFormat = {}): string
       return formatPercent(value, format);
 
     case 'date':
-      return formatDate(value);
+      return formatDate(value, format);
 
     case 'time':
       return formatTime(value);
@@ -113,17 +115,36 @@ function formatPercent(value: unknown, format: CellFormat): string {
 }
 
 /**
- * Format as date
+ * Format as date with support for multiple formats
  */
-function formatDate(value: unknown): string {
+function formatDate(value: unknown, format?: CellFormat): string {
   const date = new Date(String(value));
   if (isNaN(date.getTime())) return String(value);
 
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+  const dateFormat = format?.dateFormat || 'MM/DD/YYYY';
+  const month = date.getMonth();
+  const day = date.getDate();
+  const year = date.getFullYear();
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  switch (dateFormat) {
+    case 'MM/DD/YYYY':
+      return `${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}/${year}`;
+    case 'DD-MMM-YYYY':
+      return `${String(day).padStart(2, '0')}-${monthNames[month]}-${year}`;
+    case 'YYYY-MM-DD':
+      return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    case 'MMM D, YYYY':
+      return `${monthNames[month]} ${day}, ${year}`;
+    case 'D MMM YYYY':
+      return `${day} ${monthNames[month]} ${year}`;
+    default:
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+  }
 }
 
 /**
@@ -176,7 +197,7 @@ export function parseFormattedValue(formatted: string, format: CellFormat = {}):
  * Get CSS styles from cell format
  */
 export function getCellStyles(format: CellFormat = {}): React.CSSProperties {
-  return {
+  const styles: React.CSSProperties = {
     fontFamily: format.fontFamily || 'SF Mono, Monaco, monospace',
     fontSize: format.fontSize ? `${format.fontSize}px` : '12px',
     fontWeight: format.fontWeight || 'normal',
@@ -186,11 +207,19 @@ export function getCellStyles(format: CellFormat = {}): React.CSSProperties {
     verticalAlign: format.verticalAlign || 'middle',
     color: format.color || '#ffffff',
     backgroundColor: format.backgroundColor || 'transparent',
-    borderTop: format.borderTop || undefined,
-    borderRight: format.borderRight || undefined,
-    borderBottom: format.borderBottom || undefined,
-    borderLeft: format.borderLeft || undefined,
   };
+
+  // Apply individual borders or all borders
+  if (format.borderAll) {
+    styles.border = format.borderAll;
+  } else {
+    if (format.borderTop) styles.borderTop = format.borderTop;
+    if (format.borderRight) styles.borderRight = format.borderRight;
+    if (format.borderBottom) styles.borderBottom = format.borderBottom;
+    if (format.borderLeft) styles.borderLeft = format.borderLeft;
+  }
+
+  return styles;
 }
 
 /**
@@ -278,6 +307,11 @@ export const FORMAT_PRESETS: Record<string, CellFormat> = {
     decimals: 2,
     thousandsSeparator: true,
   },
+  numberComma: {
+    numberFormat: 'number',
+    decimals: 0,
+    thousandsSeparator: true,
+  },
   currency: {
     numberFormat: 'currency',
     decimals: 2,
@@ -290,6 +324,19 @@ export const FORMAT_PRESETS: Record<string, CellFormat> = {
   },
   date: {
     numberFormat: 'date',
+    dateFormat: 'MM/DD/YYYY',
+  },
+  dateShort: {
+    numberFormat: 'date',
+    dateFormat: 'DD-MMM-YYYY',
+  },
+  dateISO: {
+    numberFormat: 'date',
+    dateFormat: 'YYYY-MM-DD',
+  },
+  dateLong: {
+    numberFormat: 'date',
+    dateFormat: 'MMM D, YYYY',
   },
   header: {
     numberFormat: 'general',
@@ -304,5 +351,14 @@ export const FORMAT_PRESETS: Record<string, CellFormat> = {
     thousandsSeparator: true,
     fontWeight: 'bold',
     borderTop: '2px solid #ffffff',
+  },
+  bold: {
+    fontWeight: 'bold',
+  },
+  italic: {
+    fontStyle: 'italic',
+  },
+  underline: {
+    textDecoration: 'underline',
   },
 };

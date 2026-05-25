@@ -315,6 +315,14 @@ const FUNCTIONS: Record<string, (args: CellValue[]) => FormulaResult> = {
     return text.substring(text.length - numChars);
   },
 
+  MID: (args) => {
+    if (args.length < 2) return createError('VALUE', 'MID requires at least 2 arguments');
+    const text = String(args[0] ?? '');
+    const startPos = toNumber(args[1]) - 1; // Convert to 0-based index
+    const numChars = args[2] !== undefined ? toNumber(args[2]) : text.length;
+    return text.substring(startPos, startPos + numChars);
+  },
+
   LEN: (args) => {
     if (args.length !== 1) return createError('VALUE', 'LEN requires exactly 1 argument');
     return String(args[0] ?? '').length;
@@ -330,6 +338,11 @@ const FUNCTIONS: Record<string, (args: CellValue[]) => FormulaResult> = {
     return String(args[0] ?? '').toLowerCase();
   },
 
+  TRIM: (args) => {
+    if (args.length !== 1) return createError('VALUE', 'TRIM requires exactly 1 argument');
+    return String(args[0] ?? '').trim();
+  },
+
   // ─── Date Functions ─────────────────────────────────────────────────────
 
   TODAY: () => {
@@ -338,6 +351,16 @@ const FUNCTIONS: Record<string, (args: CellValue[]) => FormulaResult> = {
 
   NOW: () => {
     return new Date().toISOString();
+  },
+
+  DATE: (args) => {
+    if (args.length !== 3) return createError('VALUE', 'DATE requires exactly 3 arguments');
+    const year = toNumber(args[0]);
+    const month = toNumber(args[1]) - 1; // JS months are 0-based
+    const day = toNumber(args[2]);
+    const date = new Date(year, month, day);
+    if (isNaN(date.getTime())) return createError('VALUE', 'Invalid date');
+    return date.toISOString().split('T')[0];
   },
 
   YEAR: (args) => {
@@ -359,6 +382,110 @@ const FUNCTIONS: Record<string, (args: CellValue[]) => FormulaResult> = {
     const date = new Date(String(args[0]));
     if (isNaN(date.getTime())) return createError('VALUE', 'Invalid date');
     return date.getDate();
+  },
+
+  // ─── Statistical Functions ──────────────────────────────────────────────
+
+  MEDIAN: (args) => {
+    if (args.length === 0) return createError('VALUE', 'MEDIAN requires at least one argument');
+    const numbers = args.map(toNumber).filter(n => !isNaN(n)).sort((a, b) => a - b);
+    if (numbers.length === 0) return createError('VALUE', 'No valid numbers for MEDIAN');
+    const mid = Math.floor(numbers.length / 2);
+    return numbers.length % 2 === 0 ? (numbers[mid - 1] + numbers[mid]) / 2 : numbers[mid];
+  },
+
+  // ─── Math Functions (Extended) ──────────────────────────────────────────
+
+  ROUNDUP: (args) => {
+    if (args.length < 1) return createError('VALUE', 'ROUNDUP requires at least 1 argument');
+    const num = toNumber(args[0]);
+    const decimals = args[1] !== undefined ? toNumber(args[1]) : 0;
+    const factor = Math.pow(10, decimals);
+    return Math.ceil(num * factor) / factor;
+  },
+
+  ROUNDDOWN: (args) => {
+    if (args.length < 1) return createError('VALUE', 'ROUNDDOWN requires at least 1 argument');
+    const num = toNumber(args[0]);
+    const decimals = args[1] !== undefined ? toNumber(args[1]) : 0;
+    const factor = Math.pow(10, decimals);
+    return Math.floor(num * factor) / factor;
+  },
+
+  CEILING: (args) => {
+    if (args.length < 1) return createError('VALUE', 'CEILING requires at least 1 argument');
+    const num = toNumber(args[0]);
+    const significance = args[1] !== undefined ? toNumber(args[1]) : 1;
+    if (significance === 0) return 0;
+    return Math.ceil(num / significance) * significance;
+  },
+
+  FLOOR: (args) => {
+    if (args.length < 1) return createError('VALUE', 'FLOOR requires at least 1 argument');
+    const num = toNumber(args[0]);
+    const significance = args[1] !== undefined ? toNumber(args[1]) : 1;
+    if (significance === 0) return 0;
+    return Math.floor(num / significance) * significance;
+  },
+
+  // ─── Logical Functions (Extended) ───────────────────────────────────────
+
+  IFERROR: (args) => {
+    if (args.length < 2) return createError('VALUE', 'IFERROR requires at least 2 arguments');
+    const value = args[0];
+    const valueIfError = args[1];
+    return isError(value) ? valueIfError : value;
+  },
+
+  // ─── Lookup Functions ───────────────────────────────────────────────────
+
+  INDEX: (args) => {
+    // INDEX(array, row_num, [col_num])
+    // Simplified: returns the value at the specified position
+    if (args.length < 2) return createError('VALUE', 'INDEX requires at least 2 arguments');
+    // For single-column ranges, just return the nth item
+    const rowNum = toNumber(args[1]) - 1; // Convert to 0-based
+    if (rowNum < 0 || rowNum >= args.length) {
+      return createError('REF', 'INDEX out of range');
+    }
+    return args[rowNum];
+  },
+
+  MATCH: (args) => {
+    // MATCH(lookup_value, lookup_array, [match_type])
+    // Returns position of value in array (1-based)
+    if (args.length < 2) return createError('VALUE', 'MATCH requires at least 2 arguments');
+    const lookupValue = args[0];
+    const matchType = args.length > 2 ? toNumber(args[2]) : 1;
+
+    // Search through the remaining args (the array)
+    for (let i = 1; i < args.length; i++) {
+      if (String(args[i]) === String(lookupValue)) {
+        return i; // Return 1-based position
+      }
+    }
+    return createError('NA', 'Value not found');
+  },
+
+  VLOOKUP: (args) => {
+    // VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])
+    // Simplified: searches first column for value, returns value from specified column
+    if (args.length < 3) return createError('VALUE', 'VLOOKUP requires at least 3 arguments');
+
+    const lookupValue = String(args[0]);
+    const colIndex = toNumber(args[2]) - 1; // Convert to 0-based
+
+    // This is a simplified implementation
+    // In a real implementation, you'd need to handle the table array properly
+    return createError('NA', 'VLOOKUP not fully implemented - use simpler cell references');
+  },
+
+  HLOOKUP: (args) => {
+    // HLOOKUP(lookup_value, table_array, row_index_num, [range_lookup])
+    // Similar to VLOOKUP but searches horizontally
+    if (args.length < 3) return createError('VALUE', 'HLOOKUP requires at least 3 arguments');
+
+    return createError('NA', 'HLOOKUP not fully implemented - use simpler cell references');
   },
 };
 

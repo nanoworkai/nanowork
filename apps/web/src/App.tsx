@@ -23,6 +23,9 @@ import Inbox from "./dashboard/Inbox";
 import Wallet from "./dashboard/Wallet";
 import PitchDeck from "./dashboard/PitchDeck";
 import Spreadsheets from "./dashboard/Spreadsheets";
+import Documents from "./dashboard/Documents";
+import Presentations from "./dashboard/Presentations";
+import Files from "./dashboard/Files";
 import UserAppEntry from "./pages/user-app/UserAppEntry";
 import UserAppLayout from "./pages/user-app/UserAppLayout";
 import UserAppHome from "./pages/user-app/UserAppHome";
@@ -75,6 +78,9 @@ export default function App() {
         <Route path="wallet" element={<Wallet />} />
         <Route path="pitch-deck" element={<PitchDeck />} />
         <Route path="spreadsheets" element={<Spreadsheets />} />
+        <Route path="documents" element={<Documents />} />
+        <Route path="presentations" element={<Presentations />} />
+        <Route path="files" element={<Files />} />
         <Route path="settings" element={<Settings />} />
         <Route path="build-view/:buildId" element={<BuildView />} />
       </Route>

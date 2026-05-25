@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState, useEffect, useRef } from "react";
 import { Terminal, LogOut, Menu, Settings, CreditCard, HelpCircle, ChevronDown } from "lucide-react";
+import AppSwitcher from "../components/AppSwitcher";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "CREATE", end: true, code: "00" },
@@ -65,13 +66,16 @@ export default function DashboardLayout() {
       >
         {/* Header */}
         <div className="border-b border-white/10 p-4 bg-surface-0">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-7 h-7 rounded-none bg-white flex items-center justify-center">
-              <Terminal className="w-4 h-4 text-black" />
+          <div className="flex items-center justify-between gap-2.5 mb-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-none bg-white flex items-center justify-center">
+                <Terminal className="w-4 h-4 text-black" />
+              </div>
+              <span className="font-mono font-bold text-white text-sm uppercase tracking-wider">
+                Nanowork
+              </span>
             </div>
-            <span className="font-mono font-bold text-white text-sm uppercase tracking-wider">
-              Nanowork
-            </span>
+            <AppSwitcher />
           </div>
 
           {/* Live clock */}
