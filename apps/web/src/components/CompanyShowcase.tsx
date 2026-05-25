@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ArrowRight, TrendingUp, Building2, Zap, Globe, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { showcaseCompanies, categories, getShowcaseStats } from "../data/showcaseCompanies";
+import type { AICompany } from "../data/showcaseCompanies";
 
 /**
  * AI-GENERATED COMPANY SHOWCASE
@@ -11,136 +13,8 @@ import { useNavigate } from "react-router-dom";
  * Design: Bloomberg terminal aesthetic - dense data, monospace typography, dark surfaces
  */
 
-// ──────────────────────────────────────────────────────────────────────────────
-// TYPES
-// ──────────────────────────────────────────────────────────────────────────────
-
-export interface AICompany {
-  id: string;
-  name: string;
-  tagline: string;
-  industry: string;
-  category: "saas" | "marketplace" | "ecommerce" | "fintech" | "ai" | "social";
-  arrPotential: number; // Annual Recurring Revenue estimate
-  claimPrice: number; // One-time price to claim
-  features: string[];
-  status: "available" | "claimed" | "building";
-  icon: string; // Emoji or icon identifier
-  color: string; // Accent color for visual differentiation
-  buildProgress?: number; // 0-100 if status is "building"
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
-// SAMPLE DATA - AI-Generated Company Catalog
-// ──────────────────────────────────────────────────────────────────────────────
-
-const SAMPLE_COMPANIES: AICompany[] = [
-  {
-    id: "comp_001",
-    name: "FlowFinance",
-    tagline: "Invoice automation for B2B companies",
-    industry: "FinTech",
-    category: "fintech",
-    arrPotential: 250000,
-    claimPrice: 4999,
-    features: ["Automated invoicing", "Payment tracking", "Stripe integration", "Client portal"],
-    status: "available",
-    icon: "💳",
-    color: "#10b981",
-  },
-  {
-    id: "comp_002",
-    name: "CreatorStack",
-    tagline: "Content monetization platform for creators",
-    industry: "SaaS",
-    category: "saas",
-    arrPotential: 500000,
-    claimPrice: 7999,
-    features: ["Subscription management", "Digital products", "Member dashboard", "Analytics"],
-    status: "available",
-    icon: "🎨",
-    color: "#8b5cf6",
-  },
-  {
-    id: "comp_003",
-    name: "LocalEats",
-    tagline: "Delivery marketplace for regional restaurants",
-    industry: "Marketplace",
-    category: "marketplace",
-    arrPotential: 1200000,
-    claimPrice: 12999,
-    features: ["Restaurant admin", "Order management", "Delivery tracking", "Customer app"],
-    status: "building",
-    icon: "🍕",
-    color: "#f59e0b",
-    buildProgress: 68,
-  },
-  {
-    id: "comp_004",
-    name: "CodeMentor AI",
-    tagline: "AI-powered code review and mentorship",
-    industry: "AI/ML",
-    category: "ai",
-    arrPotential: 800000,
-    claimPrice: 9999,
-    features: ["Real-time code review", "Learning paths", "Team analytics", "IDE integration"],
-    status: "available",
-    icon: "🤖",
-    color: "#06b6d4",
-  },
-  {
-    id: "comp_005",
-    name: "FitTrack Pro",
-    tagline: "Personal training app with AI coach",
-    industry: "Health & Fitness",
-    category: "saas",
-    arrPotential: 350000,
-    claimPrice: 5999,
-    features: ["Workout plans", "Progress tracking", "Nutrition logging", "Video library"],
-    status: "available",
-    icon: "💪",
-    color: "#ef4444",
-  },
-  {
-    id: "comp_006",
-    name: "PropConnect",
-    tagline: "B2B property management platform",
-    industry: "Real Estate",
-    category: "saas",
-    arrPotential: 600000,
-    claimPrice: 8999,
-    features: ["Tenant portal", "Maintenance requests", "Payment processing", "Lease management"],
-    status: "claimed",
-    icon: "🏢",
-    color: "#3b82f6",
-  },
-  {
-    id: "comp_007",
-    name: "SustainShop",
-    tagline: "Eco-friendly products marketplace",
-    industry: "E-commerce",
-    category: "ecommerce",
-    arrPotential: 450000,
-    claimPrice: 6999,
-    features: ["Vendor onboarding", "Carbon tracking", "Subscription boxes", "Mobile app"],
-    status: "available",
-    icon: "🌱",
-    color: "#22c55e",
-  },
-  {
-    id: "comp_008",
-    name: "TeamSync",
-    tagline: "Async collaboration for remote teams",
-    industry: "Productivity",
-    category: "saas",
-    arrPotential: 900000,
-    claimPrice: 11999,
-    features: ["Video messages", "Screen recording", "Team spaces", "Integrations"],
-    status: "available",
-    icon: "🎯",
-    color: "#a855f7",
-  },
-];
+// Re-export type for convenience
+export type { AICompany };
 
 // ──────────────────────────────────────────────────────────────────────────────
 // COMPANY CARD COMPONENT
@@ -294,15 +168,6 @@ interface FilterBarProps {
 }
 
 function FilterBar({ selectedCategory, onCategoryChange }: FilterBarProps) {
-  const categories = [
-    { id: "all", label: "All Companies" },
-    { id: "saas", label: "SaaS" },
-    { id: "marketplace", label: "Marketplace" },
-    { id: "ecommerce", label: "E-commerce" },
-    { id: "fintech", label: "FinTech" },
-    { id: "ai", label: "AI/ML" },
-  ];
-
   return (
     <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
       {categories.map((cat) => (
@@ -332,12 +197,11 @@ export default function CompanyShowcase() {
 
   // Filter companies by category
   const filteredCompanies = selectedCategory === "all"
-    ? SAMPLE_COMPANIES
-    : SAMPLE_COMPANIES.filter(c => c.category === selectedCategory);
+    ? showcaseCompanies
+    : showcaseCompanies.filter(c => c.category === selectedCategory);
 
   // Stats
-  const availableCount = SAMPLE_COMPANIES.filter(c => c.status === "available").length;
-  const totalARR = SAMPLE_COMPANIES.reduce((sum, c) => sum + c.arrPotential, 0);
+  const stats = getShowcaseStats();
 
   const handleClaim = (companyId: string) => {
     // Navigate to claim flow or open modal
@@ -368,13 +232,13 @@ export default function CompanyShowcase() {
           {/* Stats */}
           <div className="hidden lg:flex items-center gap-4">
             <div className="text-right">
-              <div className="text-2xl font-mono font-bold text-white tabular-nums">{availableCount}</div>
+              <div className="text-2xl font-mono font-bold text-white tabular-nums">{stats.available}</div>
               <div className="text-xs font-mono text-white/40 uppercase">Available</div>
             </div>
             <div className="w-px h-10 bg-white/10" />
             <div className="text-right">
               <div className="text-2xl font-mono font-bold text-green-400 tabular-nums">
-                ${(totalARR / 1000000).toFixed(1)}M
+                ${(stats.totalARR / 1000000).toFixed(1)}M
               </div>
               <div className="text-xs font-mono text-white/40 uppercase">Total ARR</div>
             </div>

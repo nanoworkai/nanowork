@@ -1,7 +1,7 @@
 import { X, CheckCircle2, TrendingUp, DollarSign, Calendar } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import type { AICompany } from "./CompanyShowcase";
+import type { AICompany } from "../data/showcaseCompanies";
 
 /**
  * CLAIM COMPANY MODAL
