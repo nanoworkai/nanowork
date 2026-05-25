@@ -1,0 +1,1 @@
+As our subagents go through the codebase, its easy for design changes to not stay on track. When this command is invovked you will fan out a set of subagents that will create a prompt in a .md under .claude/prompts

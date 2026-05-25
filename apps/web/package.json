@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "bun run --watch dev-server.ts",
+    "build": "bun run build.ts",
     "start": "serve -s dist -l 3000",
-    "preview": "vite preview",
-    "generate-og": "node generate-og-image.js"
+    "preview": "bun run --watch dev-server.ts",
+    "generate-og": "bun scripts/generate-og-image.js",
+    "typecheck": "tsc -b"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^6.4.0",
@@ -27,12 +28,11 @@
     "tailwindcss": "^3.4.19"
   },
   "devDependencies": {
+    "@types/bun": "^1.3.14",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^4.3.4",
     "lint-staged": "^16.4.0",
     "simple-git-hooks": "^2.13.1",
-    "typescript": "~5.7.2",
-    "vite": "^6.0.3"
+    "typescript": "~5.7.2"
   }
 }
