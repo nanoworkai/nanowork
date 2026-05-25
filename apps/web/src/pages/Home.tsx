@@ -368,77 +368,64 @@ export default function Home() {
         <BusinessShowcase />
 
 
-        {/* CTA - Terminal command style */}
+        {/* Two-Path CTA */}
         <section className="py-8 sm:py-12 lg:py-16">
-          <div className="card-lg rounded-none border border-white/10 p-6 sm:p-8 lg:p-12 text-center">
-            <div className="text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-3 sm:mb-4">
-              Ready to Build
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-2">
+              Two Ways to Start
             </div>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-mono font-bold text-white uppercase mb-3 sm:mb-4 tracking-tight">
-              Start Building Today
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-mono font-bold text-white uppercase tracking-tight">
+              Choose Your Path
             </h2>
-            <p className="text-xs sm:text-sm font-mono text-white/60 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
-              From zero to revenue in days. From revenue to scale with agents that never stop working.
-            </p>
-            <Link
-              to="/login"
-              className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
-            >
-              Get Started
-              <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Build Custom */}
+            <div className="card-lg rounded-none border border-white/10 p-6 sm:p-8 lg:p-10 hover:border-white/20 transition-all group">
+              <div className="text-[10px] sm:text-xs font-mono text-blue-400 uppercase tracking-wider mb-3">
+                Option 1
+              </div>
+              <h3 className="text-lg sm:text-xl font-mono font-bold text-white uppercase mb-3">
+                Build from Scratch
+              </h3>
+              <p className="text-xs sm:text-sm font-mono text-white/60 mb-6 leading-relaxed">
+                Describe your idea and AI generates a complete company. Full tech stack, payment processing, and deployment ready in days.
+              </p>
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-zinc-100 transition-colors"
+              >
+                Start Building
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+
+            {/* Claim Pre-Built */}
+            <div className="card-lg rounded-none border border-white/10 p-6 sm:p-8 lg:p-10 hover:border-white/20 transition-all group">
+              <div className="text-[10px] sm:text-xs font-mono text-green-400 uppercase tracking-wider mb-3">
+                Option 2
+              </div>
+              <h3 className="text-lg sm:text-xl font-mono font-bold text-white uppercase mb-3">
+                Claim Pre-Built Business
+              </h3>
+              <p className="text-xs sm:text-sm font-mono text-white/60 mb-6 leading-relaxed">
+                Browse 20 ready-made businesses with proven revenue potential. Customize and launch immediately. No building required.
+              </p>
+              <Link
+                to="/marketplace"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-zinc-100 transition-colors"
+              >
+                Browse Businesses
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
           </div>
         </section>
       </main>
 
-      {/* Footer - Professional with competitors section */}
+      {/* Footer - Clean and simple */}
       <footer className="border-t border-white/10 mt-8 sm:mt-12 lg:mt-16">
         <div className="max-w-[1800px] mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          {/* Competitors Section */}
-          <div className="mb-8 sm:mb-12 pb-8 sm:pb-12 border-b border-white/10">
-            <div className="text-center mb-6 sm:mb-8">
-              <div className="text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-2">
-                Compare
-              </div>
-              <h3 className="text-lg sm:text-xl font-mono font-bold text-white uppercase tracking-tight">
-                Why Nanowork
-              </h3>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-5xl mx-auto mb-6 sm:mb-8">
-              {/* Polis */}
-              <div className="card rounded-none border border-white/10 p-4 sm:p-6 hover:bg-surface-1 transition-colors">
-                <h4 className="text-sm font-mono font-bold text-white mb-2">Nano vs Polis</h4>
-                <p className="text-xs text-white/60 leading-relaxed">
-                  Polis focuses on community governance and coordination. Nanowork handles the full company stack—legal, finance, sales, and operations—not just collaboration tools.
-                </p>
-              </div>
-
-              {/* Nanocorp */}
-              <div className="card rounded-none border border-white/10 p-4 sm:p-6 hover:bg-surface-1 transition-colors">
-                <h4 className="text-sm font-mono font-bold text-white mb-2">Nano vs Nanocorp</h4>
-                <p className="text-xs text-white/60 leading-relaxed">
-                  Nanocorp offers agent templates for specific tasks. Nanowork provides seven full departments that coordinate autonomously and scale with your business from day one.
-                </p>
-              </div>
-
-              {/* Nanoagents */}
-              <div className="card rounded-none border border-white/10 p-4 sm:p-6 hover:bg-surface-1 transition-colors">
-                <h4 className="text-sm font-mono font-bold text-white mb-2">Nano vs Nanoagents</h4>
-                <p className="text-xs text-white/60 leading-relaxed">
-                  Nanoagents specializes in single-function automation. Nanowork orchestrates cross-functional teams that execute complex, multi-step business operations in parallel.
-                </p>
-              </div>
-
-              {/* Openclaw */}
-              <div className="card rounded-none border border-white/10 p-4 sm:p-6 hover:bg-surface-1 transition-colors">
-                <h4 className="text-sm font-mono font-bold text-white mb-2">Nano vs Openclaw</h4>
-                <p className="text-xs text-white/60 leading-relaxed">
-                  Openclaw is an open-source framework for building agents. Nanowork is a production platform with managed infrastructure, compliance, and departments ready to work.
-                </p>
-              </div>
-            </div>
-          </div>
 
           {/* Main Footer Content */}
           <div className="grid grid-cols-1 lg:grid-cols-[1fr,2fr,1fr] gap-8 sm:gap-12 items-start">
@@ -453,7 +440,7 @@ export default function Home() {
                 </span>
               </Link>
               <p className="text-xs font-mono text-white/40 leading-relaxed max-w-xs">
-                AI agents that build companies. Seven departments, one prompt.
+                Build custom or claim pre-built. Your business, automated.
               </p>
             </div>
 
@@ -462,8 +449,8 @@ export default function Home() {
               <div>
                 <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Product</h3>
                 <ul className="space-y-2 text-xs font-mono text-white/40">
+                  <li><Link to="/marketplace" className="hover:text-white transition-colors">Marketplace</Link></li>
                   <li><Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
-                  <li><Link to="/revenue" className="hover:text-white transition-colors">Revenue</Link></li>
                   <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                   <li><a href="#docs" className="hover:text-white transition-colors">Docs</a></li>
                 </ul>
