@@ -79,8 +79,8 @@ export default function Create() {
         const { build } = await res.json();
         setPrompt('');
 
-        // Navigate to the build detail page
-        navigate(`/dashboard/builds/${build.id}`);
+        // Navigate to the builder view
+        navigate(`/dashboard/builder/${build.id}`);
       }
     } catch (err) {
       console.error('Failed to create build:', err);

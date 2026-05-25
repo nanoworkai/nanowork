@@ -15,8 +15,14 @@ import History from "./dashboard/History";
 import Overview from "./dashboard/OverviewNew";
 import Settings from "./dashboard/Settings";
 import BuildView from "./dashboard/BuildView";
+import BuilderView from "./dashboard/BuilderView";
+import BuildDocuments from "./dashboard/BuildDocuments";
+import BuildSpreadsheet from "./dashboard/BuildSpreadsheet";
+import BuildPitchDeck from "./dashboard/BuildPitchDeck";
 import Inbox from "./dashboard/Inbox";
 import Wallet from "./dashboard/Wallet";
+import PitchDeck from "./dashboard/PitchDeck";
+import Spreadsheets from "./dashboard/Spreadsheets";
 import UserAppEntry from "./pages/user-app/UserAppEntry";
 import UserAppLayout from "./pages/user-app/UserAppLayout";
 import UserAppHome from "./pages/user-app/UserAppHome";
@@ -61,8 +67,14 @@ export default function App() {
         <Route index element={<Create />} />
         <Route path="history" element={<History />} />
         <Route path="builds/:buildId" element={<Overview />} />
+        <Route path="builder/:buildId" element={<BuilderView />} />
+        <Route path="builds/:buildId/documents" element={<BuildDocuments />} />
+        <Route path="builds/:buildId/spreadsheet" element={<BuildSpreadsheet />} />
+        <Route path="builds/:buildId/pitch-deck" element={<BuildPitchDeck />} />
         <Route path="inbox" element={<Inbox />} />
         <Route path="wallet" element={<Wallet />} />
+        <Route path="pitch-deck" element={<PitchDeck />} />
+        <Route path="spreadsheets" element={<Spreadsheets />} />
         <Route path="settings" element={<Settings />} />
         <Route path="build-view/:buildId" element={<BuildView />} />
       </Route>

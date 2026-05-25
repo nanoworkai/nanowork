@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import http from 'http';
 
 // Import routes
 import provisionRouter from './routes/internal/provision';
@@ -20,6 +21,10 @@ import domainsRouter from './routes/domains';
 import billingRouter from './routes/billing';
 import walletRouter from './routes/wallet';
 import buildsRouter from './routes/builds';
+import agentOrchestratorRouter from './routes/agent-orchestrator';
+
+// Import WebSocket server
+import { initializeWebSocketServer } from './services/websocketServer';
 
 // Validate required environment variables
 const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY'];
@@ -104,6 +109,7 @@ app.use('/domains', domainsRouter);
 app.use('/billing', billingRouter);
 app.use('/wallet', walletRouter);
 app.use('/builds', buildsRouter);
+app.use('/agent-orchestrator', agentOrchestratorRouter);
 
 // 404 handler
 app.use((req, res) => {
@@ -119,10 +125,17 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   });
 });
 
+// Create HTTP server for WebSocket support
+const server = http.createServer(app);
+
+// Initialize WebSocket server
+initializeWebSocketServer(server);
+
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`   Health check: http://localhost:${PORT}/health`);
+  console.log(`   WebSocket: ws://localhost:${PORT}/ws`);
   console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
 
   // Log warnings for missing optional env vars

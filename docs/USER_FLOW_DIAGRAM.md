@@ -1,0 +1,594 @@
+# User Flow Diagram: Multi-Agent Business Builder
+
+**Visual representation of user journeys through the system**
+
+---
+
+## Flow 1: First-Time User → Complete Build
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         LANDING PAGE                                │
+│                     nanowork.ai homepage                            │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         │ [Sign Up / Login]
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│                    DASHBOARD (Empty State)                          │
+│                                                                     │
+│   ┌───────────────────────────────────────────────────────────┐   │
+│   │                                                             │   │
+│   │         Your Builds Will Appear Here                        │   │
+│   │                                                             │   │
+│   │    Start by describing your business idea.                  │   │
+│   │    Our 7 AI departments will handle the rest.               │   │
+│   │                                                             │   │
+│   │         ┌─────────────────────────────┐                     │   │
+│   │         │  CREATE YOUR FIRST BUILD    │ ← Click             │   │
+│   │         └─────────────────────────────┘                     │   │
+│   │                                                             │   │
+│   └───────────────────────────────────────────────────────────┘   │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         │ Click CTA
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│              BUILD DETAIL → OVERVIEW TAB (New Build)                │
+│                                                                     │
+│   ┌───────────────────────────────────────────────────────────┐   │
+│   │ $ ___________________________________________________      │   │
+│   │                                                             │   │
+│   │   Build a social network where creators own their content  │   │
+│   │   and earn directly from their audience...                 │   │
+│   │                                                             │   │
+│   │   [7 DEPARTMENTS | PARALLEL EXECUTION | AUTONOMOUS AGENTS] │   │
+│   │                                           [EXECUTE] ← Click │   │
+│   └───────────────────────────────────────────────────────────┘   │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         │ Submit prompt
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD DETAIL → OVERVIEW TAB (Agents Working)                │
+│                                                                     │
+│   CreatorConnect Social                                 [15% ●]    │
+│   "Empowering creators to own their audience"                      │
+│                                                                     │
+│   ┌──────────┬──────────┬──────────┬──────────┐                   │
+│   │ Legal    │ Brand    │ Web      │ Marketing│                   │
+│   │ ● Running│ ✓ Done   │ ⋯ Queued │ ⋯ Queued │                   │
+│   │          │          │          │          │                   │
+│   │ Drafting │ Logo     │          │          │                   │
+│   │ terms... │ complete │          │          │                   │
+│   └──────────┴──────────┴──────────┴──────────┘                   │
+│                                                                     │
+│   ┌─────────────── LIVE OUTPUT ──────────────┐                    │
+│   │ [Legal] Drafting privacy policy...        │                   │
+│   │ [Brand] Generating logo concepts...       │                   │
+│   │ [Legal] Completed terms of service        │                   │
+│   └───────────────────────────────────────────┘                   │
+│                                                                     │
+│   User can watch or navigate away → progress continues             │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         │ Wait 3-5 minutes (or come back later)
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD DETAIL → OVERVIEW TAB (Complete!)                     │
+│                                                                     │
+│   CreatorConnect Social                                [100% ✓]    │
+│   "Empowering creators to own their audience"                      │
+│                                                                     │
+│   ┌──────────┬──────────┬──────────┬──────────┐                   │
+│   │ Legal    │ Brand    │ Web      │ Marketing│                   │
+│   │ ✓ Done   │ ✓ Done   │ ✓ Done   │ ✓ Done   │                   │
+│   └──────────┴──────────┴──────────┴──────────┘                   │
+│                                                                     │
+│   ┌──────────┬──────────┬──────────┐                              │
+│   │ Sales    │ Finance  │ Ops      │                              │
+│   │ ✓ Done   │ ✓ Done   │ ✓ Done   │                              │
+│   └──────────┴──────────┴──────────┘                              │
+│                                                                     │
+│   🎉 All departments complete! Check out your deliverables:        │
+│                                                                     │
+│   TABS: [OVERVIEW] [SPREADSHEET ✓] [PITCH DECK ✓] [DOCS 7]        │
+│            ▲                ▲             ▲           ▲            │
+│         Current        Now unlocked   Now unlocked  Now unlocked   │
+└─────────────────────────────────────────────────────────────────────┘
+                         │
+                         │ Click "SPREADSHEET" tab
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD DETAIL → SPREADSHEET TAB                              │
+│                                                                     │
+│   Financial Model                         [Export CSV] [Export XLSX]│
+│                                                                     │
+│   ┌────────┬─────────┬─────────┬─────────┬─────────┬─────────┐   │
+│   │        │ Year 1  │ Year 2  │ Year 3  │ Year 4  │ Year 5  │   │
+│   ├────────┼─────────┼─────────┼─────────┼─────────┼─────────┤   │
+│   │ Users  │ 10K     │ 50K     │ 200K    │ 500K    │ 1M      │   │
+│   │ Revenue│ $50K    │ $250K   │ $1M     │ $2.5M   │ $5M     │   │
+│   │ Costs  │ $100K   │ $200K   │ $400K   │ $800K   │ $1.5M   │   │
+│   │ Profit │ -$50K   │ $50K    │ $600K   │ $1.7M   │ $3.5M   │   │
+│   └────────┴─────────┴─────────┴─────────┴─────────┴─────────┘   │
+│                                                                     │
+│   User can edit cells, formulas auto-calculate                     │
+│   Auto-saved 2 seconds ago                                         │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         │ Click "PITCH DECK" tab
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD DETAIL → PITCH DECK TAB                               │
+│                                                                     │
+│   Slide 1 of 12                            [+ Add] [Export PDF]    │
+│                                                                     │
+│   ┌─────────────────────────────────────────────────────────────┐ │
+│   │                                                               │ │
+│   │              CreatorConnect Social                            │ │
+│   │                                                               │ │
+│   │        Empowering creators to own their audience              │ │
+│   │                                                               │ │
+│   │                    [Your Logo]                                │ │
+│   │                                                               │ │
+│   └─────────────────────────────────────────────────────────────┘ │
+│                                                                     │
+│   Sidebar: [1▪ 2  3  4  5  6  7  8  9  10  11  12] ← Slide nav    │
+│                                                                     │
+│   User can edit text, add images, rearrange slides                 │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         │ Click "DOCUMENTS" tab
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD DETAIL → DOCUMENTS TAB                                │
+│                                                                     │
+│   Generated Documents                                               │
+│                                                                     │
+│   ┌────────────────────────┬────────────────────────┐             │
+│   │ 📄 Business Plan       │ 📄 Marketing Strategy   │             │
+│   │    Legal Dept          │    Marketing Dept       │             │
+│   │    [View] [Download]   │    [View] [Download]    │             │
+│   └────────────────────────┴────────────────────────┘             │
+│                                                                     │
+│   ┌────────────────────────┬────────────────────────┐             │
+│   │ 📄 Brand Guidelines    │ 📄 Go-to-Market Plan    │             │
+│   │    Brand Dept          │    Sales Dept           │             │
+│   │    [View] [Download]   │    [View] [Download]    │             │
+│   └────────────────────────┴────────────────────────┘             │
+│                                                                     │
+│   ... 3 more documents                                              │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         │ Ready to launch!
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD DETAIL → OVERVIEW TAB                                 │
+│                                                                     │
+│   [EXPORT ALL] ← Click to download ZIP with everything              │
+│                                                                     │
+│   Contents:                                                         │
+│   - Financial_Model.xlsx                                            │
+│   - Pitch_Deck.pdf                                                  │
+│   - Business_Plan.pdf                                               │
+│   - Marketing_Strategy.pdf                                          │
+│   - Brand_Guidelines.pdf                                            │
+│   - ... (all 7 documents)                                           │
+│                                                                     │
+│   ✓ Download complete → User has everything to start their business│
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Flow 2: Returning User → Multi-Build Management
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    DASHBOARD (Returning User)                       │
+│                                                                     │
+│   BUILDS                                              [+ New Build] │
+│                                                                     │
+│   ┌────────────────────────┬────────────────────────┐             │
+│   │ CreatorConnect Social  │ DogWalk Marketplace    │             │
+│   │ ✓ 100% COMPLETE        │ ● 62% COMPLETE         │             │
+│   │                        │                        │             │
+│   │ Last: 2 days ago       │ Last: 2 hours ago ← Active │         │
+│   │ [OPEN]                 │ [OPEN] ← Click         │             │
+│   └────────────────────────┴────────────────────────┘             │
+│                                                                     │
+│   ┌────────────────────────┬────────────────────────┐             │
+│   │ AI Writing Assistant   │ Crypto Bot             │             │
+│   │ ● 15% COMPLETE         │ [DRAFT]                │             │
+│   │                        │                        │             │
+│   │ Last: 5 hours ago      │ Created: 1 week ago    │             │
+│   │ [OPEN]                 │ [OPEN]                 │             │
+│   └────────────────────────┴────────────────────────┘             │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         │ Click "DogWalk" (most recent)
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD DETAIL → OVERVIEW TAB (DogWalk)                       │
+│                                                                     │
+│   ← Back to Builds    DogWalk Marketplace           [62% ●] [•••]  │
+│                                                                     │
+│   TABS: [OVERVIEW] [SPREADSHEET ✓] [PITCH DECK ...] [DOCS 4]       │
+│                                                                     │
+│   ┌──────────┬──────────┬──────────┬──────────┐                   │
+│   │ Legal    │ Brand    │ Web      │ Marketing│                   │
+│   │ ✓ Done   │ ✓ Done   │ ● Running│ ⋯ Queued │                   │
+│   └──────────┴──────────┴──────────┴──────────┘                   │
+│                                                                     │
+│   Note: User left while agents were working, came back later        │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         │ User wants to switch builds
+                         │ Click build name dropdown
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD SWITCHER DROPDOWN                                     │
+│                                                                     │
+│   ┌───────────────────────────────────────────────────────────┐   │
+│   │ ● DogWalk Marketplace (current)                            │   │
+│   │   62% complete • 2h ago                                    │   │
+│   ├───────────────────────────────────────────────────────────┤   │
+│   │   CreatorConnect Social                                    │   │
+│   │   100% complete • 2d ago                          [✎] [×]  │   │
+│   ├───────────────────────────────────────────────────────────┤   │
+│   │   AI Writing Assistant                                     │   │
+│   │   15% complete • 5h ago                           [✎] [×]  │   │
+│   ├───────────────────────────────────────────────────────────┤   │
+│   │   Crypto Bot                                               │   │
+│   │   Draft • 1w ago                                  [✎] [×]  │   │
+│   ├───────────────────────────────────────────────────────────┤   │
+│   │              [+ NEW BUILD] ← Click                         │   │
+│   └───────────────────────────────────────────────────────────┘   │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         │ Click "CreatorConnect" to switch
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD DETAIL → OVERVIEW TAB (CreatorConnect)                │
+│                                                                     │
+│   ← Back    CreatorConnect Social                   [100% ✓] [•••] │
+│                                                                     │
+│   TABS: [OVERVIEW] [SPREADSHEET ✓] [PITCH DECK ✓] [DOCS 7]        │
+│                                                                     │
+│   All agents complete! Access your deliverables above.              │
+│                                                                     │
+│   User seamlessly switched between builds                           │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Flow 3: Mobile User Journey
+
+```
+Mobile Screen (375px width)
+
+┌──────────────────────────┐
+│ ☰  Nanowork          ● ✓│ Header
+├──────────────────────────┤
+│ CreatorConnect Social    │ Title (truncated)
+│ [100% ✓]                 │
+├──────────────────────────┤
+│00 OVERVIEW│01 SHEET│...→│ Tabs (horizontal scroll)
+├──────────────────────────┤
+│                          │
+│  ┌────────────────────┐ │
+│  │ Legal    ✓ Done    │ │ Dept cards
+│  └────────────────────┘ │ (stacked)
+│                          │
+│  ┌────────────────────┐ │
+│  │ Brand    ✓ Done    │ │
+│  └────────────────────┘ │
+│                          │
+│  ┌────────────────────┐ │
+│  │ Web      ✓ Done    │ │
+│  └────────────────────┘ │
+│                          │
+│  ... scroll down for more│
+│                          │
+└──────────────────────────┘
+         │
+         │ Swipe left on tabs
+         ▼
+┌──────────────────────────┐
+│ ☰  Nanowork          ● ✓│
+├──────────────────────────┤
+│ CreatorConnect Social    │
+│ [100% ✓]                 │
+├──────────────────────────┤
+│...←│00 SHEET│02 DECK│...→│ Scrolled to Spreadsheet
+├──────────────────────────┤
+│                          │
+│  Financial Model         │
+│  [Export CSV]            │
+│  [Export XLSX]           │
+│                          │
+│  ┌──────────────────┐   │
+│  │ Spreadsheet      │   │ Zoomed out
+│  │ (pinch to zoom)  │   │ Swipe to scroll
+│  │                  │   │
+│  │ Touch any cell   │   │
+│  │ to edit          │   │
+│  └──────────────────┘   │
+│                          │
+└──────────────────────────┘
+         │
+         │ Swipe left again
+         ▼
+┌──────────────────────────┐
+│ ☰  Nanowork          ● ✓│
+├──────────────────────────┤
+│ CreatorConnect Social    │
+│ [100% ✓]                 │
+├──────────────────────────┤
+│...←│01 SHEET│02 DECK│03→│ Pitch Deck tab
+├──────────────────────────┤
+│                          │
+│  Slide 1 of 12           │
+│  [+ Add] [Export PDF]    │
+│                          │
+│  ┌──────────────────┐   │
+│  │                  │   │
+│  │  CreatorConnect  │   │
+│  │                  │   │
+│  │  Empowering...   │   │
+│  │                  │   │
+│  │  [Logo]          │   │
+│  │                  │   │
+│  └──────────────────┘   │
+│                          │
+│  ● ○ ○ ○ ○ ○ ...        │ Slide dots
+│  ← Swipe to next slide   │
+│                          │
+└──────────────────────────┘
+```
+
+---
+
+## Flow 4: Power User Workflow
+
+```
+Power User = Multiple builds, frequent switching, keyboard shortcuts
+
+┌─────────────────────────────────────────────────────────────────────┐
+│         DASHBOARD (Power User - 8 active builds)                    │
+│                                                                     │
+│   Keyboard: Press "K" to open command palette                       │
+│                         ↓                                           │
+│   ┌───────────────────────────────────────────────────────────┐   │
+│   │ Search builds, commands, navigate...              [⌘K]    │   │
+│   ├───────────────────────────────────────────────────────────┤   │
+│   │ > dogwalk_                                                 │   │
+│   ├───────────────────────────────────────────────────────────┤   │
+│   │ BUILDS                                                     │   │
+│   │   DogWalk Marketplace                              ⌘1      │   │
+│   │   CreatorConnect Social                            ⌘2      │   │
+│   │                                                            │   │
+│   │ ACTIONS                                                    │   │
+│   │   Create new build                                 ⌘N      │   │
+│   │   Export current build                             ⌘E      │   │
+│   │                                                            │   │
+│   │ TABS                                                       │   │
+│   │   Overview                                         1       │   │
+│   │   Spreadsheet                                      2       │   │
+│   │   Pitch Deck                                       3       │   │
+│   └───────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────┘
+                         │
+                         │ Press "1" (jump to Overview tab)
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD DETAIL → OVERVIEW TAB                                 │
+│                                                                     │
+│   Keyboard shortcuts visible:                                       │
+│   1-5: Switch tabs                                                  │
+│   ⌘K: Command palette                                               │
+│   ⌘E: Export                                                        │
+│   ⌘N: New build                                                     │
+│   ⌘B: Switch build                                                  │
+│                                                                     │
+│   Power user navigates entire app without touching mouse            │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Flow 5: Error Recovery
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD DETAIL → OVERVIEW TAB (Error State)                   │
+│                                                                     │
+│   CreatorConnect Social                                 [45% ●]    │
+│                                                                     │
+│   ┌──────────┬──────────┬──────────┬──────────┐                   │
+│   │ Legal    │ Brand    │ Web      │ Marketing│                   │
+│   │ ✓ Done   │ ✓ Done   │ × Error  │ ⋯ Queued │                   │
+│   │          │          │          │          │                   │
+│   │          │          │ API limit│          │                   │
+│   │          │          │ exceeded │          │                   │
+│   └──────────┴──────────┴──────────┴──────────┘                   │
+│                                                                     │
+│   ⚠️ Web department encountered an error                            │
+│                                                                     │
+│   [View Details] [Retry] [Contact Support]                         │
+│        │           │            │                                   │
+└────────┼───────────┼────────────┼───────────────────────────────────┘
+         │           │            │
+         │           │            └─→ Opens support chat
+         │           └─→ Re-runs Web department
+         └─→ Shows error logs
+
+┌─────────────────────────────────────────────────────────────────────┐
+│         ERROR DETAILS MODAL                                         │
+│                                                                     │
+│   Web Department Error                                         [×]  │
+│                                                                     │
+│   Time: 2:34 PM                                                     │
+│   Task: Generate landing page                                      │
+│                                                                     │
+│   Error: Rate limit exceeded (429)                                 │
+│   The API request limit was reached. Please wait 1 minute          │
+│   and retry, or upgrade to Pro for higher limits.                  │
+│                                                                     │
+│   Stack trace:                                                      │
+│   └─ api.anthropic.com/v1/messages (429)                           │
+│      └─ Retry after: 60 seconds                                    │
+│                                                                     │
+│   [Retry Now]  [Upgrade to Pro]  [Close]                           │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Flow 6: Collaboration (Future)
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│         BUILD DETAIL → SPREADSHEET TAB (Collaborative)              │
+│                                                                     │
+│   DogWalk Marketplace                                  [Share]      │
+│                                                                     │
+│   👤 Jordan (you)  👤 Sarah  👤 Alex ← Avatars of active users      │
+│                                                                     │
+│   ┌────────┬─────────┬─────────┬─────────┬─────────┐             │
+│   │        │ Year 1  │ Year 2  │ Year 3  │ Year 4  │             │
+│   ├────────┼─────────┼─────────┼─────────┼─────────┤             │
+│   │ Revenue│ $50K    │ $250K   │ $1M     │ $2.5M   │             │
+│   │        │    ▲    │         │         │         │             │
+│   │        │    └── Sarah is editing this cell                    │
+│   │ Costs  │ $100K   │ $200K   │ $400K   │ $800K   │             │
+│   └────────┴─────────┴─────────┴─────────┴─────────┘             │
+│                                                                     │
+│   💬 Comments:                                                      │
+│   Sarah: Should we increase Year 1 revenue to $75K?                 │
+│   Alex: Let's check market size first                               │
+│   [Reply...]                                                        │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Decision Tree: Which Tab to Show First?
+
+```
+User opens build
+     │
+     ├─ Agents still running (< 100%)
+     │     → Show OVERVIEW tab (watch progress)
+     │
+     ├─ Agents complete, never opened other tabs
+     │     → Show OVERVIEW tab with "Check out your deliverables!" CTA
+     │
+     ├─ Agents complete, user previously opened Spreadsheet
+     │     → Show SPREADSHEET tab (continue where they left off)
+     │
+     └─ Agents complete, all tabs visited
+           → Show OVERVIEW tab (default home)
+```
+
+---
+
+## State Transitions: Build Progress
+
+```
+DRAFT (0%)
+    ↓ User submits prompt
+GENERATING (1-99%)
+    ↓ All agents complete
+READY (100%)
+    ↓ User exports all assets
+COMPLETE (archived)
+    ↓ User clicks "Archive"
+ARCHIVED (hidden from main list)
+```
+
+---
+
+## Navigation Patterns Summary
+
+### Horizontal Navigation (Tabs)
+- Used within a single build
+- Linear workflow: Overview → Spreadsheet → Deck → Docs
+- Each tab = different tool/view of same build
+
+### Vertical Navigation (Sidebar)
+- Used across different sections of app
+- Global context: Builds, History, Inbox, Wallet
+- Each item = different feature area
+
+### Breadcrumbs (Context)
+- Shows hierarchical position
+- Always visible at top
+- Clickable for quick navigation up
+
+### Command Palette (Search)
+- Keyboard-driven (⌘K)
+- Fuzzy search across everything
+- Power user feature
+
+---
+
+## Mobile Navigation Adaptations
+
+```
+Desktop: Sidebar (always visible) + Tabs (below header)
+                    ↓
+Mobile:  Hamburger menu (collapsible) + Horizontal scroll tabs
+```
+
+```
+Desktop: Spreadsheet in full view with toolbar
+                    ↓
+Mobile:  Zoomed-out spreadsheet with pinch-to-zoom
+```
+
+```
+Desktop: Pitch deck sidebar + main editor
+                    ↓
+Mobile:  Swipeable slides (no sidebar)
+```
+
+---
+
+## Key Insights from User Flows
+
+1. **First impression matters** - Empty state must be inviting and clear
+2. **Progress visibility** - Users should always know what's happening
+3. **Quick wins** - Show partial results as agents work (don't wait for 100%)
+4. **Non-linear access** - Tabs unlock as content becomes available
+5. **Mobile-first spreadsheet** - Most challenging responsive element
+6. **Build switching** - Critical for power users, should be fast (⌘K)
+7. **Error recovery** - Must be clear and actionable, not dead-end
+
+---
+
+## Next: Implementation Priority
+
+**Phase 1: Core Navigation (Week 1)**
+- Build detail layout with tabs
+- Tab routing
+- Progress indicators
+
+**Phase 2: Tab Content (Week 2-3)**
+- Overview (refactor existing)
+- Spreadsheet editor
+- Pitch deck builder
+- Documents grid
+
+**Phase 3: Polish (Week 4)**
+- Empty states
+- Loading states
+- Mobile adaptations
+- Keyboard shortcuts
+
+**Phase 4: Advanced (Week 5+)**
+- Command palette
+- Collaboration features
+- Advanced error handling
