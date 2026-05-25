@@ -72,22 +72,33 @@ if (existsSync(publicDir)) {
   cpSync(publicDir, distDir, { recursive: true });
 }
 
-// Find the built JS file
+// Find built assets
 const distFiles = readdirSync(distDir);
 const jsFile = distFiles.find(f => f.startsWith('main-') && f.endsWith('.js'));
+const cssFile = distFiles.find(f => f.startsWith('main-') && f.endsWith('.css'));
 
 if (!jsFile) {
   console.error('❌ Could not find built JavaScript file');
   process.exit(1);
 }
 
-// Generate index.html
+if (!cssFile) {
+  console.error('❌ Could not find built CSS file');
+  process.exit(1);
+}
+
+// Generate index.html with updated asset references
 console.log('📝 Generating index.html...');
 const indexTemplate = await Bun.file(indexHtmlPath).text();
-const updatedIndex = indexTemplate.replace(
-  '<script type="module" src="/src/main.tsx"></script>',
-  `<script type="module" src="/${jsFile}"></script>`
-);
+const updatedIndex = indexTemplate
+  .replace(
+    '<script type="module" src="/src/main.tsx"></script>',
+    `<script type="module" src="/${jsFile}"></script>`
+  )
+  .replace(
+    '<link rel="stylesheet" href="/src/index.css" />',
+    `<link rel="stylesheet" href="/${cssFile}" />`
+  );
 
 writeFileSync(join(distDir, 'index.html'), updatedIndex);
 
