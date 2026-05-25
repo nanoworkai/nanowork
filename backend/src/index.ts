@@ -22,6 +22,7 @@ import billingRouter from './routes/billing';
 import walletRouter from './routes/wallet';
 import buildsRouter from './routes/builds';
 import agentOrchestratorRouter from './routes/agent-orchestrator';
+import spreadsheetsRouter from './routes/spreadsheets';
 
 // Import WebSocket server
 import { initializeWebSocketServer } from './services/websocketServer';
@@ -110,6 +111,7 @@ app.use('/billing', billingRouter);
 app.use('/wallet', walletRouter);
 app.use('/builds', buildsRouter);
 app.use('/agent-orchestrator', agentOrchestratorRouter);
+app.use('/api/spreadsheets', spreadsheetsRouter);
 
 // 404 handler
 app.use((req, res) => {
