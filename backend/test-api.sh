@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Test script for the Agent Platform Backend
+# Test script for the Agent Platform Backend (Express Server)
+# NOTE: This tests the optional Express backend deployed to Render,
+# NOT the primary Cloudflare Worker API. Use this to test the Render deployment path.
 # This tests all endpoints using curl
 
 set -e

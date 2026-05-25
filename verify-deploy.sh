@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Nanowork Deployment Verification Script
+# NOTE: This validates the optional Render deployment configuration (Express backend),
+# NOT the primary Cloudflare deployment (Worker + Pages). Use this to verify Render setup.
 
 echo "🔍 Verifying Nanowork Deployment Configuration"
 echo "=============================================="
