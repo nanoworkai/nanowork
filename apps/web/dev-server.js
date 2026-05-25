@@ -1,13 +1,47 @@
 #!/usr/bin/env bun
 import { join } from 'path';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { spawn } from 'child_process';
 const PORT = 5173;
 const WORKER_URL = 'http://127.0.0.1:8787';
+// Load environment variables
+const envPath = join(import.meta.dir, '../../.env-backup/.env');
+if (existsSync(envPath)) {
+    const envContent = readFileSync(envPath, 'utf-8');
+    envContent.split('\n').forEach(line => {
+        const match = line.match(/^([^=]+)=(.*)$/);
+        if (match) {
+            const [, key, value] = match;
+            if (!process.env[key]) {
+                process.env[key] = value;
+            }
+        }
+    });
+}
+// Create import.meta.env object for Vite compatibility
+const importMetaEnv = {
+    MODE: 'development',
+    DEV: 'true',
+    PROD: 'false',
+    SSR: 'false',
+};
+// Add all VITE_ prefixed env vars
+Object.entries(process.env).forEach(([key, value]) => {
+    if (key.startsWith('VITE_')) {
+        importMetaEnv[key] = value || '';
+    }
+});
+// Add Supabase vars with VITE_ prefix
+if (process.env.SUPABASE_URL) {
+    importMetaEnv['VITE_SUPABASE_URL'] = process.env.SUPABASE_URL;
+}
+if (process.env.SUPABASE_ANON_KEY) {
+    importMetaEnv['VITE_SUPABASE_ANON_KEY'] = process.env.SUPABASE_ANON_KEY;
+}
 console.log(`🚀 Starting Bun dev server on port ${PORT}...`);
-// Read index.html template
+console.log(`🔧 Loaded ${Object.keys(importMetaEnv).length} environment variables`);
+// Path to index.html (will be read on each request for dev hot-reload)
 const indexHtmlPath = join(import.meta.dir, 'index.html');
-const indexHtml = readFileSync(indexHtmlPath, 'utf-8');
 const server = Bun.serve({
     port: PORT,
     async fetch(req) {
@@ -42,6 +76,14 @@ const server = Bun.serve({
                             format: 'esm',
                             minify: false,
                             sourcemap: 'inline',
+                            define: {
+                                // Inject import.meta.env values as string literals
+                                ...Object.entries(importMetaEnv).reduce((acc, [key, value]) => {
+                                    acc[`import.meta.env.${key}`] = JSON.stringify(value);
+                                    return acc;
+                                }, {}),
+                                'import.meta.env': JSON.stringify(importMetaEnv),
+                            },
                         });
                         if (transpiled.outputs[0]) {
                             const jsCode = await transpiled.outputs[0].text();
@@ -61,16 +103,19 @@ const server = Bun.serve({
                         });
                     }
                 }
-                // For CSS files, process with PostCSS/Tailwind if needed
+                // For CSS files with Tailwind directives, process with Tailwind CLI
                 if (url.pathname.endsWith('.css')) {
-                    try {
-                        const content = await file.text();
-                        // Check if CSS needs PostCSS processing (has @tailwind directives)
-                        if (content.includes('@tailwind') || content.includes('@apply')) {
-                            // Use Bun to process CSS with PostCSS
-                            const proc = spawn('bunx', ['postcss', filePath], {
+                    const content = await file.text();
+                    // Check if CSS needs Tailwind processing
+                    if (content.includes('@tailwind') || content.includes('@apply')) {
+                        try {
+                            // Use Tailwind CLI to process CSS
+                            const proc = spawn('tailwindcss', [
+                                '-i', filePath,
+                                '--config', join(import.meta.dir, 'tailwind.config.js'),
+                                '--minify'
+                            ], {
                                 cwd: import.meta.dir,
-                                stdio: ['pipe', 'pipe', 'pipe'],
                             });
                             const chunks = [];
                             const errorChunks = [];
@@ -83,10 +128,14 @@ const server = Bun.serve({
                                     }
                                     else {
                                         const error = Buffer.concat(errorChunks).toString('utf-8');
-                                        console.error('PostCSS error:', error);
                                         reject(new Error(error));
                                     }
                                 });
+                                // Timeout after 10 seconds
+                                setTimeout(() => {
+                                    proc.kill();
+                                    reject(new Error('Tailwind processing timeout'));
+                                }, 10000);
                             });
                             return new Response(processedCss, {
                                 headers: {
@@ -95,21 +144,24 @@ const server = Bun.serve({
                                 },
                             });
                         }
-                        // Return raw CSS if no processing needed
-                        return new Response(content, {
-                            headers: {
-                                'Content-Type': 'text/css',
-                                'Cache-Control': 'no-cache',
-                            },
-                        });
+                        catch (error) {
+                            console.error(`Tailwind processing error for ${url.pathname}:`, error);
+                            // Return error but don't crash
+                            return new Response(`/* Tailwind processing error: ${error} */\n${content}`, {
+                                headers: {
+                                    'Content-Type': 'text/css',
+                                    'Cache-Control': 'no-cache',
+                                },
+                            });
+                        }
                     }
-                    catch (error) {
-                        console.error(`CSS processing error for ${url.pathname}:`, error);
-                        return new Response(`/* CSS processing error: ${error} */`, {
-                            status: 500,
-                            headers: { 'Content-Type': 'text/css' },
-                        });
-                    }
+                    // Return raw CSS if no Tailwind directives
+                    return new Response(content, {
+                        headers: {
+                            'Content-Type': 'text/css',
+                            'Cache-Control': 'no-cache',
+                        },
+                    });
                 }
                 // For other files, serve as-is
                 const content = await file.text();
@@ -130,9 +182,12 @@ const server = Bun.serve({
             }
         }
         // Serve index.html for all other routes (SPA)
+        // Read fresh HTML on each request for dev hot-reload
+        const indexHtml = readFileSync(indexHtmlPath, 'utf-8');
         return new Response(indexHtml, {
             headers: {
                 'Content-Type': 'text/html',
+                'Cache-Control': 'no-cache',
             },
         });
     },

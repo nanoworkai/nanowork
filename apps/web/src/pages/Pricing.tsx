@@ -302,7 +302,7 @@ export default function Pricing() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <a
-                href="mailto:enterprise@nanowork.app"
+                href="mailto:sales@example.com" // TODO: Configure sales email
                 className="inline-flex items-center gap-3 px-8 py-4 rounded-none bg-surface-2 border border-white/10 text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-surface-3 transition-colors"
               >
                 Contact Sales

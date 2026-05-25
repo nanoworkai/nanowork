@@ -1,0 +1,19 @@
+# Cloudflare Pages Configuration
+name = "nanowork-web"
+compatibility_date = "2025-05-01"
+
+# Pages configuration
+pages_build_output_dir = "dist"
+
+# Environment variables for build (set in Cloudflare dashboard)
+# These will be available at build time via import.meta.env
+[env.production.vars]
+NODE_ENV = "production"
+
+# Build command will inject VITE_* variables from Cloudflare Pages environment
+# Configure these in Cloudflare Pages dashboard:
+# - VITE_SUPABASE_URL
+# - VITE_SUPABASE_ANON_KEY
+# - VITE_STRIPE_PUBLISHABLE_KEY
+# - VITE_API_URL (will be auto-set to worker URL)
+# - VITE_SITE_URL (will be auto-set to pages URL)

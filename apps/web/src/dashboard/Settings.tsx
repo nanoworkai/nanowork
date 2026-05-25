@@ -907,7 +907,7 @@ function PlanSection() {
 
 /* ── Domains section ──────────────────────────────────────── */
 
-const PLATFORM_HOST = "nanowork.app";
+const PLATFORM_HOST = ""; // TODO: Configure production domain
 
 function normalizeSubdomain(raw: string): string {
   return raw.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/, "").slice(0, 40);
@@ -1055,10 +1055,10 @@ function DomainsSection() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-zinc-500 mb-0.5">Value</p>
-                        <p className="text-sm font-mono text-zinc-200">nanowork.app</p>
+                        <p className="text-sm font-mono text-zinc-200">{PLATFORM_HOST || 'your-domain.com'}</p>
                       </div>
                       <button
-                        onClick={() => copyToClipboard(`${newDomain} CNAME nanowork.app`)}
+                        onClick={() => copyToClipboard(`${newDomain} CNAME ${PLATFORM_HOST || 'your-domain.com'}`)}
                         className="p-2 hover:bg-white/5 rounded transition-colors"
                         title="Copy DNS record"
                       >

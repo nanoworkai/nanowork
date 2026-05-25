@@ -215,7 +215,7 @@ cd backend && npm run deploy
 cd apps/web && npm run deploy
 
 # 4. Verify deployment
-curl https://api.nanowork.app/health
+curl https://api.example.com/health  # TODO: Configure production URL
 ```
 
 ### Post-Deployment

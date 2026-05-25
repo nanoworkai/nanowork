@@ -15,6 +15,23 @@ mkdirSync(distDir, { recursive: true });
 
 console.log('🏗️  Building with Bun...');
 
+// Create import.meta.env object from environment variables
+const importMetaEnv: Record<string, string> = {
+  MODE: process.env.NODE_ENV || 'production',
+  DEV: 'false',
+  PROD: 'true',
+  SSR: 'false',
+};
+
+// Add all VITE_ prefixed env vars from process.env
+Object.entries(process.env).forEach(([key, value]) => {
+  if (key.startsWith('VITE_')) {
+    importMetaEnv[key] = value || '';
+  }
+});
+
+console.log(`📝 Injecting ${Object.keys(importMetaEnv).length} environment variables into build`);
+
 // Build the application
 const result = await Bun.build({
   entrypoints: ['./src/main.tsx'],
@@ -29,6 +46,14 @@ const result = await Bun.build({
     asset: 'assets/[name]-[hash].[ext]',
   },
   external: [],
+  define: {
+    // Inject import.meta.env values as string literals at build time
+    ...Object.entries(importMetaEnv).reduce((acc, [key, value]) => {
+      acc[`import.meta.env.${key}`] = JSON.stringify(value);
+      return acc;
+    }, {} as Record<string, string>),
+    'import.meta.env': JSON.stringify(importMetaEnv),
+  },
 });
 
 if (!result.success) {

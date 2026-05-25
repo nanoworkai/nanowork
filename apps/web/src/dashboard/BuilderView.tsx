@@ -152,7 +152,6 @@ export default function BuilderView() {
     const ws = new WebSocket(`${wsUrl}/ws`);
 
     ws.onopen = () => {
-      console.log('WebSocket connected');
       ws.send(JSON.stringify({
         type: 'subscribe',
         buildId,
@@ -173,7 +172,6 @@ export default function BuilderView() {
     };
 
     ws.onclose = () => {
-      console.log('WebSocket disconnected');
       // Attempt to reconnect after 3 seconds
       setTimeout(() => {
         if (buildId) {
@@ -186,8 +184,6 @@ export default function BuilderView() {
   }
 
   function handleWebSocketMessage(message: any) {
-    console.log('WebSocket message:', message);
-
     switch (message.type) {
       case 'initial_state':
         const agentMap = new Map<AgentType, AgentTask>();

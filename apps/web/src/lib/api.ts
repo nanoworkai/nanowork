@@ -2,7 +2,7 @@
  * API Client for Nanowork
  *
  * In development: proxied through Vite to Cloudflare Worker (port 8787)
- * In production: api.nanowork.app (Cloudflare Worker)
+ * In production: Configured via VITE_API_URL (Cloudflare Worker)
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';

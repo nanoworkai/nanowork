@@ -114,7 +114,7 @@ export default function BuildView() {
             )}
 
             <a
-              href={`https://${app.slug}.nanowork.app`}
+              href={`#`} // TODO: Configure production domain
               target="_blank"
               rel="noopener noreferrer"
               className="px-4 py-2 bg-white text-black hover:bg-white/90 font-mono text-xs font-bold rounded-none flex items-center gap-2"

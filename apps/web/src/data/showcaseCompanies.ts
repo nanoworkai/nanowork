@@ -350,8 +350,7 @@ const saasCompanies = getCompaniesByCategory("saas");
 
 // Get stats
 const stats = getShowcaseStats();
-console.log(stats.available); // Number of available companies
-console.log(stats.totalARR);  // Total ARR across all companies
+// Showcase stats available via getShowcaseStats()
 
 // Search
 const results = searchCompanies("AI");

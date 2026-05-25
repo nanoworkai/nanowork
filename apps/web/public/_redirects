@@ -1,3 +1,11 @@
-/api/*  https://nanowork-backend.onrender.com/:splat  200
+# Proxy API requests to Cloudflare Worker
+# Note: In production, Cloudflare Pages should be configured to use a Worker binding
+# This fallback redirects to the worker at api.nanowork.app
+/api/*  https://nanowork-api.jordan-plows422.workers.dev/:splat  200
+/health  https://nanowork-api.jordan-plows422.workers.dev/health  200
+
+# Serve static assets
 /assets/*  /assets/:splat  200
+
+# SPA fallback - serve index.html for all other routes
 /*  /index.html  200

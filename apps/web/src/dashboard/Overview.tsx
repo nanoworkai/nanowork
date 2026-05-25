@@ -530,7 +530,7 @@ export default function Overview() {
 
                 <div className="flex items-center gap-2 mt-4">
                   <a
-                    href={`https://${app.slug}.nanowork.app`}
+                    href={`#`} // TODO: Configure production domain
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 px-3 py-2 bg-white hover:bg-white/90 text-black text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"

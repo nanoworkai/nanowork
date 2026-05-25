@@ -20,7 +20,7 @@ export default function UserAppLayout() {
           <span className="user-app__brand-mark" aria-hidden />
           <div>
             <p className="user-app__brand-name">{app.name}</p>
-            <p className="user-app__brand-sub mono">{app.slug}.app.run</p>
+            <p className="user-app__brand-sub mono">{app.slug}</p>
           </div>
         </div>
         <nav className="user-app__nav">

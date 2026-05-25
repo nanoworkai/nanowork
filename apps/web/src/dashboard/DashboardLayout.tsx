@@ -177,7 +177,7 @@ export default function DashboardLayout() {
                   BILLING
                 </button>
                 <a
-                  href="https://docs.nanowork.app"
+                  href="#" // TODO: Configure docs URL
                   target="_blank"
                   rel="noreferrer"
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-none text-xs font-mono text-white/60 hover:text-white hover:bg-white/5 transition-colors"
