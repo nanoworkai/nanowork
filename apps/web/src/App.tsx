@@ -8,6 +8,7 @@ import Revenue from "./pages/Revenue";
 import Swipe from "./pages/Swipe";
 import PreviewPage from "./pages/PreviewPage";
 import Pricing from "./pages/Pricing";
+import Marketplace from "./pages/Marketplace";
 import DashboardLayout from "./dashboard/DashboardLayout";
 import Create from "./dashboard/Create";
 import History from "./dashboard/History";
@@ -45,6 +46,7 @@ export default function App() {
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/revenue" element={<Revenue />} />
       <Route path="/swipe" element={<Swipe />} />
+      <Route path="/marketplace" element={<Marketplace />} />
       <Route path="/preview/:buildId" element={<PreviewPage />} />
 
       {/* Dashboard routes - authenticated */}
