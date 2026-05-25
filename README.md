@@ -25,7 +25,7 @@ AI-powered company builder with autonomous agents. One prompt to launch your bus
 **Key Features:**
 - Separate frontend and backend deployments on Render
 - Backend: Express/Node API
-- Frontend: React (Vite) SPA
+- Frontend: React SPA (built with Bun, styled with Tailwind CSS)
 - Supabase for authentication & database
 - Stripe for payments
 - Anthropic Claude for AI features
@@ -81,6 +81,7 @@ npm start            # Start production backend
 cd apps/web
 npm run dev          # Start frontend dev server (port 5173)
 npm run build        # Build frontend for production
+npm run verify-build # Build and verify CSS processing
 npm start            # Serve production build
 ```
 
@@ -96,8 +97,11 @@ nanowork-web/
 │       │   │   └── supabase.ts
 │       │   ├── pages/       # Route pages
 │       │   ├── components/  # Reusable components
+│       │   ├── index.css    # Tailwind CSS (processed via CLI)
 │       │   └── App.tsx
-│       ├── vite.config.ts
+│       ├── build.ts         # Production build script (Bun)
+│       ├── dev-server.ts    # Dev server with Tailwind processing
+│       ├── BUILD.md         # Build system documentation
 │       ├── render.yaml      # Frontend deployment config
 │       └── package.json
 │
