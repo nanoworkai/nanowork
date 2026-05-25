@@ -255,7 +255,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         data: { name },
-        emailRedirectTo: `${import.meta.env.VITE_SITE_URL}/dashboard`,
+        emailRedirectTo: `${import.meta.env?.VITE_SITE_URL || window.location.origin}/dashboard`,
       },
     });
 

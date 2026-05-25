@@ -30,7 +30,7 @@ export function ShowcaseSection() {
 
   async function fetchShowcaseCompanies() {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/showcase/companies`);
+      const response = await fetch(`${import.meta.env?.VITE_API_URL || ''}/api/showcase/companies`);
       if (!response.ok) throw new Error('Failed to fetch');
       const data = await response.json();
       setShowcaseCompanies(data);

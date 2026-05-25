@@ -38,7 +38,7 @@ export function ClaimBusinessModal({ isOpen, company, onClose }: ClaimBusinessMo
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/showcase/checkout`, {
+      const response = await fetch(`${import.meta.env?.VITE_API_URL || ''}/api/showcase/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

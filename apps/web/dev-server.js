@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 import { join } from 'path';
 import { readFileSync } from 'fs';
+import { spawn } from 'child_process';
 const PORT = 5173;
 const WORKER_URL = 'http://127.0.0.1:8787';
 console.log(`🚀 Starting Bun dev server on port ${PORT}...`);
@@ -27,19 +28,95 @@ const server = Bun.serve({
                 return new Response('Proxy error', { status: 502 });
             }
         }
-        // Serve source files directly for development (TypeScript/JSX)
+        // Serve source files with transpilation for development (TypeScript/JSX)
         if (url.pathname.startsWith('/src/')) {
             const filePath = join(import.meta.dir, url.pathname.slice(1));
             const file = Bun.file(filePath);
             if (await file.exists()) {
+                // For TypeScript/JSX files, transpile them
+                if (url.pathname.endsWith('.tsx') || url.pathname.endsWith('.ts') || url.pathname.endsWith('.jsx')) {
+                    try {
+                        const transpiled = await Bun.build({
+                            entrypoints: [filePath],
+                            target: 'browser',
+                            format: 'esm',
+                            minify: false,
+                            sourcemap: 'inline',
+                        });
+                        if (transpiled.outputs[0]) {
+                            const jsCode = await transpiled.outputs[0].text();
+                            return new Response(jsCode, {
+                                headers: {
+                                    'Content-Type': 'application/javascript',
+                                    'Cache-Control': 'no-cache',
+                                },
+                            });
+                        }
+                    }
+                    catch (error) {
+                        console.error(`Transpilation error for ${url.pathname}:`, error);
+                        return new Response(`// Transpilation error: ${error}`, {
+                            status: 500,
+                            headers: { 'Content-Type': 'application/javascript' },
+                        });
+                    }
+                }
+                // For CSS files, process with PostCSS/Tailwind if needed
+                if (url.pathname.endsWith('.css')) {
+                    try {
+                        const content = await file.text();
+                        // Check if CSS needs PostCSS processing (has @tailwind directives)
+                        if (content.includes('@tailwind') || content.includes('@apply')) {
+                            // Use Bun to process CSS with PostCSS
+                            const proc = spawn('bunx', ['postcss', filePath], {
+                                cwd: import.meta.dir,
+                                stdio: ['pipe', 'pipe', 'pipe'],
+                            });
+                            const chunks = [];
+                            const errorChunks = [];
+                            proc.stdout.on('data', (chunk) => chunks.push(chunk));
+                            proc.stderr.on('data', (chunk) => errorChunks.push(chunk));
+                            const processedCss = await new Promise((resolve, reject) => {
+                                proc.on('close', (code) => {
+                                    if (code === 0) {
+                                        resolve(Buffer.concat(chunks).toString('utf-8'));
+                                    }
+                                    else {
+                                        const error = Buffer.concat(errorChunks).toString('utf-8');
+                                        console.error('PostCSS error:', error);
+                                        reject(new Error(error));
+                                    }
+                                });
+                            });
+                            return new Response(processedCss, {
+                                headers: {
+                                    'Content-Type': 'text/css',
+                                    'Cache-Control': 'no-cache',
+                                },
+                            });
+                        }
+                        // Return raw CSS if no processing needed
+                        return new Response(content, {
+                            headers: {
+                                'Content-Type': 'text/css',
+                                'Cache-Control': 'no-cache',
+                            },
+                        });
+                    }
+                    catch (error) {
+                        console.error(`CSS processing error for ${url.pathname}:`, error);
+                        return new Response(`/* CSS processing error: ${error} */`, {
+                            status: 500,
+                            headers: { 'Content-Type': 'text/css' },
+                        });
+                    }
+                }
+                // For other files, serve as-is
                 const content = await file.text();
                 return new Response(content, {
                     headers: {
-                        'Content-Type': url.pathname.endsWith('.tsx') || url.pathname.endsWith('.ts')
-                            ? 'application/javascript'
-                            : url.pathname.endsWith('.css')
-                                ? 'text/css'
-                                : 'application/javascript',
+                        'Content-Type': 'application/javascript',
+                        'Cache-Control': 'no-cache',
                     },
                 });
             }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, TrendingUp, Building2, Zap, Globe, DollarSign } from "lucide-react";
+import { ArrowRight, TrendingUp, Building2, Globe, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { showcaseCompanies, categories, getShowcaseStats } from "../data/showcaseCompanies";
 import type { AICompany } from "../data/showcaseCompanies";

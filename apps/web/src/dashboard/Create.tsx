@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { ArrowRight, Loader2, Building2, CheckCircle2, Zap, Code } from "lucide-react";
+import { ArrowRight, Loader2, Building2, Sparkles, Settings2, Users, Package, Gauge } from "lucide-react";
 import WelcomeBanner from "./components/WelcomeBanner";
 import QuickStart from "./components/QuickStart";
+import IndustrialSlider from "./components/IndustrialSlider";
 
 export default function Create() {
   const { session, profile } = useAuth();
@@ -11,6 +12,11 @@ export default function Create() {
   const [prompt, setPrompt] = useState("");
   const [creating, setCreating] = useState(false);
   const [hasBuilds, setHasBuilds] = useState(false);
+
+  // Configuration sliders for industrial design
+  const [complexity, setComplexity] = useState(50);
+  const [userCount, setUserCount] = useState(3);
+  const [features, setFeatures] = useState(5);
 
   const apiUrl = import.meta.env.VITE_API_URL || '';
 
@@ -107,8 +113,15 @@ export default function Create() {
   // Check if profile has business name for completion status
   const profileComplete = !!(profile?.businessName && profile?.name);
 
+  // Get complexity label
+  const getComplexityLabel = (val: number) => {
+    if (val < 33) return "Simple";
+    if (val < 66) return "Standard";
+    return "Enterprise";
+  };
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Welcome Banner - Only shows for first-time users */}
       <WelcomeBanner
         userName={profile?.name || profile?.businessName}
@@ -120,65 +133,130 @@ export default function Create() {
         profileComplete={profileComplete}
       />
 
-      {/* Header */}
-      <div className="mb-10">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-white/5 border border-white/10">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-white">
-            Start Your Business
-          </h1>
-        </div>
-        <p className="text-white/60 text-base">
-          Describe your business application and we'll build it for you. Be specific about your requirements, target users, and key features.
-        </p>
-      </div>
-
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Main Form - Takes 2 columns on large screens */}
-        <div className="lg:col-span-2">
-          <form onSubmit={handleCreateBuild} className="space-y-6">
-            {/* Business Description */}
-            <div className="space-y-3">
-              <label htmlFor="business-description" className="block text-sm font-semibold text-white">
-                Describe your application
-              </label>
-              <div className="relative">
-                <textarea
-                  id="business-description"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  placeholder="Example: I'm building a property management platform for real estate companies. Need landlord and tenant portals, lease management, maintenance request tracking, automated rent collection, and financial reporting. The system should handle multiple properties and support role-based access for property managers, landlords, and tenants."
-                  className="w-full h-56 px-5 py-4 rounded-xl bg-surface-2 border border-white/10 focus:border-white/30 text-white placeholder-white/40 text-base leading-relaxed outline-none resize-none transition-all"
-                  disabled={creating}
-                  autoFocus
-                />
-                <div className="absolute bottom-3 right-3 text-xs text-white/30">
-                  {prompt.length} characters
-                </div>
-              </div>
-              <p className="text-sm text-white/50">
-                Include your target users, core features, integrations, and any compliance requirements.
+      {/* Compact Header */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-white/10 to-white/5 border border-white/10 flex items-center justify-center">
+              <Building2 className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white tracking-tight">
+                Configure Build
+              </h1>
+              <p className="text-xs text-white/50 mt-0.5">
+                Precision-engineered application generation
               </p>
             </div>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-xs font-mono text-white/70">AI-POWERED</span>
+          </div>
+        </div>
+      </div>
 
-            {/* Submit Button */}
+      <div className="grid lg:grid-cols-5 gap-6">
+        {/* Main Configuration - Takes 3 columns */}
+        <div className="lg:col-span-3 space-y-6">
+          <form onSubmit={handleCreateBuild} className="space-y-6">
+            {/* Application Brief - Compact */}
+            <div className="p-5 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-white/10 shadow-2xl">
+              <div className="flex items-center gap-2 mb-3">
+                <Package className="w-4 h-4 text-white/70" />
+                <label htmlFor="business-description" className="text-xs font-bold text-white uppercase tracking-wider">
+                  Application Brief
+                </label>
+              </div>
+              <textarea
+                id="business-description"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Describe your application in technical detail: architecture, user workflows, integrations, compliance requirements..."
+                className="w-full h-32 px-4 py-3 rounded-lg bg-black/40 border border-white/10 focus:border-emerald-500/50 text-white placeholder-white/30 text-sm leading-relaxed outline-none resize-none transition-all font-mono"
+                disabled={creating}
+                autoFocus
+              />
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-[10px] text-white/40 uppercase tracking-wider">Spec Document</span>
+                <span className="text-[10px] font-mono text-white/40">{prompt.length} chars</span>
+              </div>
+            </div>
+
+            {/* Configuration Matrix - Industrial Sliders */}
+            <div className="p-5 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-white/10 shadow-2xl">
+              <div className="flex items-center gap-2 mb-4">
+                <Settings2 className="w-4 h-4 text-white/70" />
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                  Build Parameters
+                </h3>
+              </div>
+
+              <div className="space-y-5">
+                <IndustrialSlider
+                  label="Complexity"
+                  value={complexity}
+                  min={0}
+                  max={100}
+                  onChange={setComplexity}
+                  disabled={creating}
+                  icon={Gauge}
+                  color="emerald"
+                  displayValue={getComplexityLabel(complexity)}
+                  minLabel="Simple"
+                  maxLabel="Enterprise"
+                />
+
+                <IndustrialSlider
+                  label="User Roles"
+                  value={userCount}
+                  min={1}
+                  max={10}
+                  onChange={setUserCount}
+                  disabled={creating}
+                  icon={Users}
+                  color="blue"
+                  displayValue={`${userCount} ${userCount === 1 ? 'Role' : 'Roles'}`}
+                  minLabel="Solo"
+                  maxLabel="Multi-Tenant"
+                />
+
+                <IndustrialSlider
+                  label="Core Features"
+                  value={features}
+                  min={1}
+                  max={15}
+                  onChange={setFeatures}
+                  disabled={creating}
+                  icon={Package}
+                  color="purple"
+                  displayValue={`${features} Modules`}
+                  minLabel="Minimal"
+                  maxLabel="Full Suite"
+                />
+              </div>
+            </div>
+
+            {/* Launch Button - Industrial */}
             <button
               type="submit"
               disabled={!prompt.trim() || creating}
-              className="group w-full px-6 py-4 rounded-xl bg-white hover:bg-zinc-100 disabled:bg-white/10 disabled:cursor-not-allowed text-black disabled:text-white/30 font-semibold text-base transition-all shadow-lg hover:shadow-xl disabled:shadow-none"
+              className="group relative w-full px-6 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 disabled:from-white/5 disabled:to-white/5 disabled:cursor-not-allowed text-white disabled:text-white/30 font-bold text-sm tracking-wide transition-all shadow-2xl shadow-emerald-500/20 hover:shadow-emerald-500/40 disabled:shadow-none overflow-hidden"
             >
-              <span className="flex items-center justify-center gap-2.5">
+              {/* Animated background effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+
+              <span className="relative flex items-center justify-center gap-2.5">
                 {creating ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Generating your application...
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="uppercase text-xs tracking-widest">Initializing Build...</span>
                   </>
                 ) : (
                   <>
-                    Start Building
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    <Sparkles className="w-4 h-4" />
+                    <span className="uppercase text-xs tracking-widest">Deploy Build</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </>
                 )}
               </span>
@@ -186,63 +264,25 @@ export default function Create() {
           </form>
         </div>
 
-        {/* Sidebar - Information & Examples */}
-        <div className="space-y-6">
-          {/* What Happens Next */}
-          <div className="p-6 rounded-xl bg-surface-2 border border-white/10">
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              What happens next
+        {/* Compact Sidebar - Takes 2 columns */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Quick Examples - More compact */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-white/10">
+            <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-widest mb-3">
+              Quick Start Templates
             </h3>
-            <div className="space-y-4">
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                  <span className="text-xs font-semibold text-white/60">1</span>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-white/90">AI Architecture</p>
-                  <p className="text-xs text-white/50 mt-0.5">System design and data model</p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                  <span className="text-xs font-semibold text-white/60">2</span>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-white/90">Code Generation</p>
-                  <p className="text-xs text-white/50 mt-0.5">Full-stack application build</p>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                  <span className="text-xs font-semibold text-white/60">3</span>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-white/90">Deploy & Launch</p>
-                  <p className="text-xs text-white/50 mt-0.5">Production-ready in minutes</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Examples */}
-          <div className="p-6 rounded-xl bg-surface-2 border border-white/10">
-            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-              <Code className="w-4 h-4" />
-              Example applications
-            </h3>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {examples.map((example, index) => (
                 <button
                   key={index}
                   onClick={() => setPrompt(example.description)}
                   disabled={creating}
-                  className="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                  className="w-full text-left p-2.5 rounded-lg bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
-                  <p className="text-sm font-medium text-white/90 mb-1 group-hover:text-white">
+                  <p className="text-xs font-semibold text-white/90 group-hover:text-emerald-400 transition-colors">
                     {example.title}
                   </p>
-                  <p className="text-xs text-white/50 leading-relaxed">
+                  <p className="text-[10px] text-white/40 leading-tight mt-0.5 line-clamp-2">
                     {example.description}
                   </p>
                 </button>
@@ -250,27 +290,69 @@ export default function Create() {
             </div>
           </div>
 
-          {/* Feature Highlights */}
-          <div className="p-6 rounded-xl bg-surface-2 border border-white/10">
-            <h3 className="text-sm font-semibold text-white mb-4">
-              Included with every build
+          {/* Build Specs - More industrial */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-white/10">
+            <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-widest mb-3">
+              Standard Specifications
             </h3>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-white/5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="text-[10px] text-white/70 font-mono">Production-grade infrastructure</span>
+              </div>
+              <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-white/5">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                <span className="text-[10px] text-white/70 font-mono">Secure authentication layer</span>
+              </div>
+              <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-white/5">
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                <span className="text-[10px] text-white/70 font-mono">Responsive UI framework</span>
+              </div>
+              <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-white/5">
+                <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
+                <span className="text-[10px] text-white/70 font-mono">Auto-scaling deployment</span>
+              </div>
+            </div>
+          </div>
+
+          {/* System Status */}
+          <div className="p-4 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-emerald-500/20">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-widest">
+                Build Pipeline
+              </h3>
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[9px] font-mono text-emerald-400">ONLINE</span>
+              </div>
+            </div>
             <div className="space-y-2.5">
-              <div className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                <span className="text-xs text-white/70">Production-ready code</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-5 h-5 rounded bg-white/5 border border-white/10 flex items-center justify-center text-[9px] font-mono text-white/60">
+                  01
+                </div>
+                <div className="flex-1">
+                  <p className="text-[10px] font-semibold text-white/80">Architecture Generation</p>
+                  <p className="text-[9px] text-white/40 font-mono">~30s avg</p>
+                </div>
               </div>
-              <div className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                <span className="text-xs text-white/70">Database & authentication</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-5 h-5 rounded bg-white/5 border border-white/10 flex items-center justify-center text-[9px] font-mono text-white/60">
+                  02
+                </div>
+                <div className="flex-1">
+                  <p className="text-[10px] font-semibold text-white/80">Code Synthesis</p>
+                  <p className="text-[9px] text-white/40 font-mono">~90s avg</p>
+                </div>
               </div>
-              <div className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                <span className="text-xs text-white/70">Responsive design</span>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                <span className="text-xs text-white/70">Deployment configuration</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-5 h-5 rounded bg-white/5 border border-white/10 flex items-center justify-center text-[9px] font-mono text-white/60">
+                  03
+                </div>
+                <div className="flex-1">
+                  <p className="text-[10px] font-semibold text-white/80">Deployment</p>
+                  <p className="text-[9px] text-white/40 font-mono">~45s avg</p>
+                </div>
               </div>
             </div>
           </div>

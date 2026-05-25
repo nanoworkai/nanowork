@@ -1,22 +1,25 @@
 import { createClient } from '@supabase/supabase-js'
 
-const url     = import.meta.env.VITE_SUPABASE_URL     as string
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
+// Use environment variables with safe fallbacks for development
+const url     = import.meta.env?.VITE_SUPABASE_URL     || 'https://placeholder.supabase.co'
+const anonKey = import.meta.env?.VITE_SUPABASE_ANON_KEY || 'placeholder-anon-key'
 
-// Debug: verify env vars are loading
-console.log('[supabase] VITE_SUPABASE_URL:', url)
-console.log('[supabase] Key configured:', !!anonKey)
-
-export const isSupabaseConfigured = !!(url && anonKey)
-
-export const supabase = createClient(
-  url     || 'https://placeholder.supabase.co',
-  anonKey || 'placeholder-anon-key',
-  {
-    auth: {
-      persistSession:     true,
-      autoRefreshToken:   true,
-      detectSessionInUrl: true,
-    },
-  }
+// Check if Supabase is properly configured (not using placeholders)
+export const isSupabaseConfigured = !!(
+  url &&
+  anonKey &&
+  url !== 'https://placeholder.supabase.co' &&
+  anonKey !== 'placeholder-anon-key'
 )
+
+if (!isSupabaseConfigured && typeof window !== 'undefined') {
+  console.warn('[supabase] Not configured - using placeholder values. Authentication will not work.')
+}
+
+export const supabase = createClient(url, anonKey, {
+  auth: {
+    persistSession:     true,
+    autoRefreshToken:   true,
+    detectSessionInUrl: true,
+  },
+})

@@ -28,6 +28,20 @@ import {
   AlignCenter,
   AlignRight,
   Sparkles,
+  Scissors,
+  Copy,
+  Clipboard,
+  Trash2,
+  ArrowDownToLine,
+  ArrowRightToLine,
+  Settings,
+  MessageSquare,
+  Link,
+  EyeOff,
+  Eye,
+  Maximize,
+  Minimize,
+  Edit2,
 } from 'lucide-react';
 import {
   evaluateFormula,
@@ -52,7 +66,7 @@ import ContextMenu from './office-ui/ContextMenu';
 // ───────────────────────────────────────────────────────────────────────────
 
 interface Cell {
-  value: string | number | null;
+  value: string | number | boolean | null;
   formula?: string;
   format?: CellFormat;
   dataType?: string;
@@ -113,8 +127,8 @@ interface SpreadsheetEditorProps {
 }
 
 export default function SpreadsheetEditor({
-  workbookId,
-  buildId,
+  workbookId: _workbookId,
+  buildId: _buildId,
   onSave,
   onClose,
 }: SpreadsheetEditorProps) {
@@ -139,9 +153,23 @@ export default function SpreadsheetEditor({
   const [editingCell, setEditingCell] = useState<CellPosition | null>(null);
   const [editValue, setEditValue] = useState('');
   const [formulaBarValue, setFormulaBarValue] = useState('');
-  const [isFormatMenuOpen, setIsFormatMenuOpen] = useState(false);
+  const [_isFormatMenuOpen, _setIsFormatMenuOpen] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Context menus
+  const [cellContextMenu, setCellContextMenu] = useState<{ x: number; y: number; row: number; col: number } | null>(null);
+  const [rowContextMenu, setRowContextMenu] = useState<{ x: number; y: number; row: number } | null>(null);
+  const [columnContextMenu, setColumnContextMenu] = useState<{ x: number; y: number; col: number } | null>(null);
+  const [sheetContextMenu, setSheetContextMenu] = useState<{ x: number; y: number; sheetIndex: number } | null>(null);
+
+  // Clipboard for cut/copy/paste
+  const [clipboard, setClipboard] = useState<Map<string, Cell> | null>(null);
+  const [clipboardRange, setClipboardRange] = useState<CellRange | null>(null);
+
+  // Sheet renaming (for future use)
+  const [_renamingSheetIndex, _setRenamingSheetIndex] = useState<number | null>(null);
+  const [_renameValue, _setRenameValue] = useState('');
 
   // Undo/Redo history
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -206,7 +234,7 @@ export default function SpreadsheetEditor({
   // ─── Formula Evaluation ──────────────────────────────────────────────────
 
   const evaluateCellFormula = useCallback(
-    (row: number, col: number): string | number | null => {
+    (row: number, col: number): string | number | boolean | null => {
       const cell = getCell(row, col);
       if (!cell?.formula) return cell?.value ?? null;
 
@@ -615,7 +643,7 @@ export default function SpreadsheetEditor({
   const applyFormat = (format: Partial<CellFormat>) => {
     if (!selectedCell) return;
     const { row, col } = selectedCell;
-    const cell = getCell(row, col) || {};
+    const cell = getCell(row, col) || { value: null };
     const currentFormat = cell.format || {};
 
     setCell(row, col, {
@@ -657,7 +685,7 @@ export default function SpreadsheetEditor({
     setIsDirty(true);
   };
 
-  const renameSheet = (index: number, newName: string) => {
+  const _renameSheet = (index: number, newName: string) => {
     const sheets = [...workbook.sheets];
     sheets[index] = { ...sheets[index], name: newName };
     setWorkbook({ ...workbook, sheets });

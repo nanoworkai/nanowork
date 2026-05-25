@@ -1,10 +1,10 @@
 // Stripe client-side utilities for Nanowork
 
-const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string;
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.nanowork.app';
+const STRIPE_PUBLISHABLE_KEY = import.meta.env?.VITE_STRIPE_PUBLISHABLE_KEY || '';
+const API_BASE_URL = import.meta.env?.VITE_API_URL || 'https://api.nanowork.app';
 
-if (!STRIPE_PUBLISHABLE_KEY) {
-  console.warn('[stripe] VITE_STRIPE_PUBLISHABLE_KEY not set');
+if (!STRIPE_PUBLISHABLE_KEY && typeof window !== 'undefined') {
+  console.warn('[stripe] VITE_STRIPE_PUBLISHABLE_KEY not set - Stripe features will be disabled');
 }
 
 // Price IDs (update these with your actual Stripe price IDs)
