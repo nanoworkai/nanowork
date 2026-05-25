@@ -97,18 +97,61 @@ export default function History() {
         </div>
       ) : builds.length === 0 ? (
         <div className="flex items-center justify-center py-20">
-          <div className="text-center">
-            <HistoryIcon className="w-20 h-20 text-white/10 mx-auto mb-6" />
-            <h3 className="text-xl font-semibold text-white/80 mb-2">No builds yet</h3>
-            <p className="text-white/50 mb-6 max-w-md">
-              Create your first build to get started
+          <div className="max-w-md text-center">
+            {/* Empty State Illustration */}
+            <div className="relative w-24 h-24 mx-auto mb-8">
+              <div className="absolute inset-0 bg-white/5 rounded-2xl border border-white/10" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <HistoryIcon className="w-12 h-12 text-white/40" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-white/10 rounded-lg border border-white/20 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-white/60" />
+              </div>
+            </div>
+
+            {/* Content */}
+            <h3 className="text-2xl font-bold text-white mb-3">
+              Your Build History Will Appear Here
+            </h3>
+            <p className="text-white/60 leading-relaxed mb-8">
+              Once you create your first build, you'll be able to track its progress,
+              access deployment details, and manage all your applications from this dashboard.
             </p>
+
+            {/* Action Button */}
             <button
               onClick={() => navigate('/dashboard')}
-              className="px-6 py-3 rounded-lg bg-white hover:bg-zinc-100 text-black font-semibold text-sm transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white hover:bg-zinc-100 text-black font-semibold text-base transition-all shadow-lg hover:shadow-xl group"
             >
-              Create Build
+              <CheckCircle2 className="w-5 h-5" />
+              Create Your First Build
+              <Clock className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
+
+            {/* What to Expect */}
+            <div className="mt-10 pt-8 border-t border-white/10">
+              <p className="text-sm font-semibold text-white/80 mb-4">
+                What you'll see here:
+              </p>
+              <div className="grid grid-cols-2 gap-4 text-left">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs text-white/60">Build status & progress</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs text-white/60">Deployment details</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs text-white/60">Activity timeline</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs text-white/60">Quick actions</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
