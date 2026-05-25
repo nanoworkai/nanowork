@@ -23,9 +23,11 @@ import walletRouter from './routes/wallet';
 import buildsRouter from './routes/builds';
 import agentOrchestratorRouter from './routes/agent-orchestrator';
 import spreadsheetsRouter from './routes/spreadsheets';
+import slashCommandsRouter from './routes/slash-commands';
 
 // Import WebSocket server
 import { initializeWebSocketServer } from './services/websocketServer';
+import { initializeSlashCommandSDK } from './services/slashCommandSDK';
 
 // Validate required environment variables
 const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY'];
@@ -112,6 +114,7 @@ app.use('/api/wallet', walletRouter);
 app.use('/api/builds', buildsRouter);
 app.use('/api/agent-orchestrator', agentOrchestratorRouter);
 app.use('/api/spreadsheets', spreadsheetsRouter);
+app.use('/api/slash-commands', slashCommandsRouter);
 
 // 404 handler
 app.use((req, res) => {
@@ -132,6 +135,11 @@ const server = http.createServer(app);
 
 // Initialize WebSocket server
 initializeWebSocketServer(server);
+
+// Initialize Slash Command SDK
+initializeSlashCommandSDK()
+  .then(() => console.log('✅ Slash Command SDK initialized'))
+  .catch(err => console.error('⚠️  Failed to initialize Slash Command SDK:', err));
 
 // Start server
 server.listen(PORT, () => {
