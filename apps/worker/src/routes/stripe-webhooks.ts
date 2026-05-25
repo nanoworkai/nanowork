@@ -314,6 +314,69 @@ async function handleInvoicePaymentFailed(
   console.log('Invoice payment failed:', invoice.id, 'for user:', profile.email)
 }
 
+// Handle payment intent succeeded (for wallet top-ups)
+async function handlePaymentIntentSucceeded(
+  paymentIntent: Stripe.PaymentIntent,
+  env: Env
+) {
+  const sb = getSupabase(env)
+
+  const metadata = paymentIntent.metadata
+  const userId = metadata?.userId
+  const creditAmount = metadata?.creditAmount
+
+  if (!userId || !creditAmount) {
+    console.log('Payment intent without credit metadata (not a credit top-up)')
+    return
+  }
+
+  console.log('Credit top-up payment succeeded:', paymentIntent.id, 'user:', userId, 'credits:', creditAmount)
+
+  try {
+    // Get current balance
+    const { data: profile, error: profileError } = await sb
+      .from('profiles')
+      .select('credits')
+      .eq('id', userId)
+      .single()
+
+    if (profileError || !profile) {
+      console.error('Failed to get user profile:', profileError)
+      throw new Error(`Failed to get user profile: ${profileError?.message || 'user not found'}`)
+    }
+
+    const currentBalance = profile.credits || 0
+    const creditsToAdd = parseInt(creditAmount, 10)
+    const newBalance = currentBalance + creditsToAdd
+
+    // Update balance
+    const { error: updateError } = await sb
+      .from('profiles')
+      .update({ credits: newBalance })
+      .eq('id', userId)
+
+    if (updateError) {
+      console.error('Failed to update credits:', updateError)
+      throw new Error(`Failed to add credits: ${updateError.message}`)
+    }
+
+    // Log the transaction
+    await sb.from('credit_transactions').insert({
+      user_id: userId,
+      amount: creditsToAdd,
+      balance_after: newBalance,
+      type: 'topup',
+      description: 'Credit top-up via Stripe',
+      stripe_payment_intent_id: paymentIntent.id,
+    })
+
+    console.log('Added credits to user:', userId, 'new balance:', newBalance)
+  } catch (error) {
+    console.error('Failed to add credits:', error)
+    throw error
+  }
+}
+
 // Handle checkout session completed
 async function handleCheckoutSessionCompleted(
   session: Stripe.Checkout.Session,
@@ -446,6 +509,10 @@ app.post('/', async (c) => {
 
   try {
     switch (event.type) {
+      case 'payment_intent.succeeded':
+        await handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent, c.env)
+        break
+
       case 'customer.subscription.created':
         await handleSubscriptionCreated(event.data.object as Stripe.Subscription, c.env)
         break

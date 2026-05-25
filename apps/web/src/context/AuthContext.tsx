@@ -312,6 +312,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (partial.notificationPreferences !== undefined) {
       dbUpdate.notification_preferences = partial.notificationPreferences;
     }
+    if (partial.plan !== undefined) dbUpdate.plan = partial.plan;
+    if (partial.subdomain !== undefined) dbUpdate.subdomain = partial.subdomain;
+    if (partial.customDomain !== undefined) dbUpdate.custom_domain = partial.customDomain;
 
     await supabase.from("profiles").update(dbUpdate).eq("id", user.id);
 

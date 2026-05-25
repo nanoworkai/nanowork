@@ -42,12 +42,24 @@ router.post('/', async (req: Request, res: Response) => {
         await handlePaymentIntentSucceeded(event.data.object);
         break;
 
+      case 'customer.subscription.created':
+        await handleSubscriptionCreated(event.data.object);
+        break;
+
       case 'customer.subscription.deleted':
         await handleSubscriptionDeleted(event.data.object);
         break;
 
       case 'customer.subscription.updated':
         await handleSubscriptionUpdated(event.data.object);
+        break;
+
+      case 'invoice.payment_succeeded':
+        await handleInvoicePaymentSucceeded(event.data.object);
+        break;
+
+      case 'invoice.payment_failed':
+        await handleInvoicePaymentFailed(event.data.object);
         break;
 
       default:
@@ -175,6 +187,115 @@ async function handleSubscriptionDeleted(subscription: any) {
 }
 
 /**
+ * Helper: Map Stripe price ID to plan name
+ */
+function getPlanFromPriceId(priceId: string): string {
+  const planMapping: Record<string, string> = {
+    [process.env.STRIPE_PRICE_STARTER || '']: 'starter',
+    [process.env.STRIPE_PRICE_GROWTH || '']: 'growth',
+    [process.env.STRIPE_PRICE_SCALE || '']: 'scale',
+    [process.env.STRIPE_PRICE_ENTERPRISE || '']: 'enterprise',
+  };
+  return planMapping[priceId] || 'free';
+}
+
+/**
+ * Handle subscription.created event
+ * - Sync new subscription to database
+ */
+async function handleSubscriptionCreated(subscription: any) {
+  console.log('Subscription created:', subscription.id);
+  await syncSubscriptionToDatabase(subscription);
+}
+
+/**
+ * Helper: Sync subscription data from Stripe to database
+ */
+async function syncSubscriptionToDatabase(subscription: any): Promise<void> {
+  const supabase = getSupabase();
+  const subscriptionId = subscription.id;
+  const customerId = subscription.customer;
+  const status = subscription.status;
+  const items = subscription.items?.data || [];
+  const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+
+  if (items.length === 0) {
+    console.warn('Subscription has no items:', subscriptionId);
+    return;
+  }
+
+  const priceId = items[0].price.id;
+  const plan = getPlanFromPriceId(priceId);
+
+  // Find user by stripe_customer_id
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('stripe_customer_id', customerId)
+    .single();
+
+  if (!profile || profileError) {
+    console.error(`No profile found for Stripe customer ${customerId}`);
+    return;
+  }
+
+  // Update profile with subscription info
+  await supabase
+    .from('profiles')
+    .update({
+      subscription_status: status,
+      subscription_id: subscriptionId,
+      subscription_ends_at: currentPeriodEnd,
+      plan: status === 'active' || status === 'trialing' ? plan : 'free',
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', profile.id);
+
+  // Create/update record in subscriptions table
+  const { data: existingSub } = await supabase
+    .from('subscriptions')
+    .select('id')
+    .eq('stripe_subscription_id', subscriptionId)
+    .single();
+
+  const subscriptionData = {
+    user_id: profile.id,
+    stripe_subscription_id: subscriptionId,
+    stripe_customer_id: customerId,
+    stripe_price_id: priceId,
+    plan,
+    status,
+    billing_cycle: items[0].price.recurring?.interval === 'year' ? 'yearly' : 'monthly',
+    amount: (items[0].price.unit_amount || 0) / 100,
+    currency: subscription.currency.toUpperCase(),
+    current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
+    current_period_end: currentPeriodEnd,
+    trial_start: subscription.trial_start ? new Date(subscription.trial_start * 1000).toISOString() : null,
+    trial_end: subscription.trial_end ? new Date(subscription.trial_end * 1000).toISOString() : null,
+    canceled_at: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
+    cancel_at_period_end: subscription.cancel_at_period_end,
+    metadata: subscription.metadata,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (existingSub) {
+    await supabase
+      .from('subscriptions')
+      .update(subscriptionData)
+      .eq('id', existingSub.id);
+  } else {
+    await supabase
+      .from('subscriptions')
+      .insert({
+        ...subscriptionData,
+        created_at: new Date().toISOString(),
+      });
+  }
+
+  console.log(`✅ Synced subscription ${subscriptionId} for user ${profile.id} (plan: ${plan}, status: ${status})`);
+}
+
+/**
  * Handle subscription.updated event
  * - Update deployment status based on subscription status
  * - Sync user plan and subscription status
@@ -187,43 +308,10 @@ async function handleSubscriptionUpdated(subscription: any) {
 
   console.log('Subscription updated:', subscriptionId, 'status:', status);
 
+  // Sync subscription data to database
+  await syncSubscriptionToDatabase(subscription);
+
   const supabase = getSupabase();
-
-  // Update user profile subscription status
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('id, plan')
-    .eq('stripe_customer_id', customerId)
-    .single();
-
-  if (profile && !profileError) {
-    // Determine plan from subscription items (first price ID)
-    let newPlan = profile.plan;
-    if (items.length > 0) {
-      const priceId = items[0].price.id;
-      // Map Stripe price IDs to plan names
-      const planMapping: Record<string, string> = {
-        [process.env.STRIPE_PRICE_STARTER || '']: 'starter',
-        [process.env.STRIPE_PRICE_GROWTH || '']: 'growth',
-        [process.env.STRIPE_PRICE_SCALE || '']: 'scale',
-        [process.env.STRIPE_PRICE_ENTERPRISE || '']: 'enterprise',
-      };
-      newPlan = planMapping[priceId] || profile.plan;
-    }
-
-    // Update profile with subscription info
-    await supabase
-      .from('profiles')
-      .update({
-        plan: status === 'active' || status === 'trialing' ? newPlan : 'free',
-        subscription_status: status,
-        subscription_id: subscriptionId,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', profile.id);
-
-    console.log('Updated user subscription:', profile.id, 'plan:', newPlan, 'status:', status);
-  }
 
   // Find deployment (for domain subscriptions)
   const { data: deployment, error: findError } = await supabase
@@ -257,6 +345,97 @@ async function handleSubscriptionUpdated(subscription: any) {
 
     console.log('Updated deployment status:', deployment.id, newDomainStatus);
   }
+}
+
+/**
+ * Handle invoice.payment_succeeded event
+ * - Record successful payment
+ * - Add credits if credit purchase
+ */
+async function handleInvoicePaymentSucceeded(invoice: any) {
+  const customerId = invoice.customer;
+  const metadata = invoice.metadata || {};
+
+  console.log('Invoice payment succeeded:', invoice.id);
+
+  const supabase = getSupabase();
+
+  // Find user by stripe_customer_id
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id, credits_balance')
+    .eq('stripe_customer_id', customerId)
+    .single();
+
+  if (!profile) {
+    console.error(`No profile found for Stripe customer ${customerId}`);
+    return;
+  }
+
+  // If this is a credit top-up (has metadata.creditAmount), add credits
+  if (metadata.creditAmount) {
+    const creditAmount = parseInt(metadata.creditAmount, 10);
+
+    try {
+      await addCredits(profile.id, creditAmount, invoice.id);
+      console.log(`✅ Added ${creditAmount} credits for user ${profile.id}`);
+    } catch (error) {
+      console.error('Failed to add credits:', error);
+    }
+  }
+
+  // For subscription payments, just log
+  if (invoice.subscription) {
+    console.log(`✅ Successful subscription payment for ${invoice.subscription}`);
+  }
+}
+
+/**
+ * Handle invoice.payment_failed event
+ * - Mark subscription as past_due
+ * - Send notification (TODO)
+ */
+async function handleInvoicePaymentFailed(invoice: any) {
+  const customerId = invoice.customer;
+
+  console.log('Invoice payment failed:', invoice.id);
+
+  const supabase = getSupabase();
+
+  // Find user by stripe_customer_id
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id, email')
+    .eq('stripe_customer_id', customerId)
+    .single();
+
+  if (!profile) {
+    console.error(`No profile found for Stripe customer ${customerId}`);
+    return;
+  }
+
+  // Update subscription status to past_due if applicable
+  if (invoice.subscription) {
+    await supabase
+      .from('profiles')
+      .update({
+        subscription_status: 'past_due',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', profile.id);
+
+    await supabase
+      .from('subscriptions')
+      .update({
+        status: 'past_due',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('stripe_subscription_id', invoice.subscription);
+
+    console.log(`⚠️ Payment failed for subscription ${invoice.subscription}, user ${profile.id} marked as past_due`);
+  }
+
+  // TODO: Send notification email to user about failed payment
 }
 
 export default router;

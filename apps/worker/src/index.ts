@@ -19,6 +19,7 @@ import user from './routes/user'
 import email from './routes/email'
 import emailInbound from './routes/email-inbound'
 import pitchDeck from './routes/pitch-deck'
+import wallet from './routes/wallet'
 
 export type Env = {
   ENVIRONMENT: string
@@ -66,6 +67,7 @@ app.route('/api/stripe', stripe)
 app.route('/api/stripe/webhooks', stripeWebhooks)
 app.route('/api/scraper', scraper)
 app.route('/api/pitch-deck', pitchDeck)
+app.route('/api/wallet', wallet)
 
 app.get('/health', (c) => c.json({
   status: 'ok',

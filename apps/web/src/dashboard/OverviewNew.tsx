@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Terminal, ChevronDown, Edit2, Trash2 } from "lucide-react";
+import { Terminal, ChevronDown, Edit2, Trash2, FileText, Table, Presentation } from "lucide-react";
 
 /**
  * Terminal-style dashboard matching homepage aesthetic
@@ -804,18 +804,52 @@ export default function Overview() {
                   <p className="text-sm font-mono text-white/60 mb-3">"{meta.tagline}"</p>
                 )}
 
-                <div className="flex items-center gap-3">
-                  {done ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-green-400" />
-                      <span className="text-xs font-mono text-green-400 uppercase">All departments complete</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                      <span className="text-xs font-mono text-white/60 uppercase">
-                        {totalDone} of 7 departments complete
-                      </span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {done ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-green-400" />
+                        <span className="text-xs font-mono text-green-400 uppercase">All departments complete</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                        <span className="text-xs font-mono text-white/60 uppercase">
+                          {totalDone} of 7 departments complete
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {done && (
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => navigate(`/dashboard/builds/${activeBuild.id}/documents`)}
+                        className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-mono text-xs rounded-lg flex items-center gap-2 transition-colors"
+                      >
+                        <FileText className="w-4 h-4" />
+                        DOCUMENTS
+                      </button>
+                      <button
+                        onClick={() => navigate(`/dashboard/builds/${activeBuild.id}/spreadsheet`)}
+                        className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-mono text-xs rounded-lg flex items-center gap-2 transition-colors"
+                      >
+                        <Table className="w-4 h-4" />
+                        SPREADSHEETS
+                      </button>
+                      <button
+                        onClick={() => navigate(`/dashboard/builds/${activeBuild.id}/pitch-deck`)}
+                        className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-mono text-xs rounded-lg flex items-center gap-2 transition-colors"
+                      >
+                        <Presentation className="w-4 h-4" />
+                        PITCH DECK
+                      </button>
+                      <button
+                        onClick={() => navigate(`/dashboard/builder/${activeBuild.id}`)}
+                        className="px-4 py-2 bg-white hover:bg-white/90 text-black font-mono text-xs rounded-lg flex items-center gap-2 transition-colors font-bold"
+                      >
+                        VIEW FULL RESULTS
+                      </button>
                     </div>
                   )}
                 </div>

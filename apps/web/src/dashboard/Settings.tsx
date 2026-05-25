@@ -4,6 +4,10 @@ import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { LogOut, CreditCard, Globe, User, Mail, Copy, Check, Inbox, ExternalLink, AlertCircle } from "lucide-react";
 import type { UserProfile } from "../context/AuthContext";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
 /* ── Section wrapper ─────────────────────────────────────── */
 
@@ -516,6 +520,14 @@ function AIEmailSection() {
 
 type PlanTier = UserProfile["plan"];
 
+// Map plan tiers to Stripe price IDs (these should match your Stripe dashboard)
+const PRICE_IDS: Record<string, string> = {
+  starter: import.meta.env.VITE_STRIPE_PRICE_STARTER || 'price_starter',
+  growth: import.meta.env.VITE_STRIPE_PRICE_GROWTH || 'price_growth',
+  scale: import.meta.env.VITE_STRIPE_PRICE_SCALE || 'price_scale',
+  enterprise: import.meta.env.VITE_STRIPE_PRICE_ENTERPRISE || 'price_enterprise',
+};
+
 const PLANS: { tier: PlanTier; name: string; price: number; desc: string; features: string[] }[] = [
   {
     tier: "free",
@@ -547,20 +559,241 @@ const PLANS: { tier: PlanTier; name: string; price: number; desc: string; featur
   },
 ];
 
+interface PaymentModalProps {
+  plan: PlanTier;
+  clientSecret: string;
+  onSuccess: () => void;
+  onCancel: () => void;
+  onError: (error: string) => void;
+}
+
+function PaymentModal({ plan, clientSecret, onSuccess, onCancel, onError }: PaymentModalProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [processing, setProcessing] = useState(false);
+
+  const planDetails = PLANS.find(p => p.tier === plan);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements || !planDetails) {
+      return;
+    }
+
+    setProcessing(true);
+
+    try {
+      const cardElement = elements.getElement(CardElement);
+
+      if (!cardElement) {
+        throw new Error('Card element not found');
+      }
+
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardElement,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (paymentIntent.status === 'succeeded') {
+        onSuccess();
+      }
+    } catch (err) {
+      console.error('Payment error:', err);
+      onError(err instanceof Error ? err.message : 'Payment failed');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4" onClick={onCancel}>
+      <div className="w-full max-w-md bg-surface-1 border border-white/10 rounded-2xl p-6" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-lg font-bold text-white mb-2">Complete your subscription</h3>
+        <p className="text-sm text-zinc-400 mb-6">
+          You're upgrading to <span className="text-white font-semibold">{planDetails?.name}</span> for ${planDetails?.price}/month
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-2">
+              Card details
+            </label>
+            <div className="p-4 rounded-xl border border-white/10 bg-surface-2">
+              <CardElement
+                options={{
+                  style: {
+                    base: {
+                      fontSize: '16px',
+                      color: '#fff',
+                      '::placeholder': {
+                        color: '#52525b',
+                      },
+                    },
+                    invalid: {
+                      color: '#ef4444',
+                    },
+                  },
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={processing}
+              className="flex-1 py-2.5 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={!stripe || processing}
+              className="flex-1 py-2.5 rounded-xl bg-white hover:bg-zinc-100 disabled:opacity-50 text-black text-sm font-semibold transition-colors"
+            >
+              {processing ? "Processing..." : `Pay $${planDetails?.price}`}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function PlanSection() {
-  const { profile, updateProfile } = useAuth();
+  const { profile, session, updateProfile } = useAuth();
   const [confirm, setConfirm] = useState<PlanTier | null>(null);
   const [switching, setSwitching] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [pendingPlan, setPendingPlan] = useState<PlanTier | null>(null);
 
-  const handleSwitch = async (tier: PlanTier) => {
+  const handlePlanUpgrade = async (plan: PlanTier) => {
+    if (plan === "free") {
+      // Downgrading to free - show confirmation
+      setConfirm(plan);
+      return;
+    }
+
+    if (!session?.access_token) {
+      setError("You must be logged in to upgrade your plan");
+      return;
+    }
+
     setSwitching(true);
-    await updateProfile({ plan: tier });
-    setSwitching(false);
+    setError(null);
+
+    try {
+      const priceId = PRICE_IDS[plan];
+
+      if (!priceId) {
+        throw new Error(`No price ID configured for plan: ${plan}`);
+      }
+
+      // Create subscription
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const res = await fetch(`${apiUrl}/api/billing/subscriptions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ priceId, plan }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to create subscription");
+      }
+
+      const { subscriptionId, clientSecret: secret, status } = await res.json();
+
+      // If subscription is incomplete and needs payment
+      if (secret && status !== 'active') {
+        setClientSecret(secret);
+        setPendingPlan(plan);
+      } else {
+        // Subscription created successfully (might have default payment method)
+        await updateProfile({ plan });
+        setConfirm(null);
+      }
+    } catch (err) {
+      console.error("Plan upgrade error:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to upgrade plan. Please try again."
+      );
+    } finally {
+      setSwitching(false);
+    }
+  };
+
+  const handlePaymentSuccess = async () => {
+    // Payment successful, update profile
+    if (pendingPlan) {
+      await updateProfile({ plan: pendingPlan });
+    }
+    setClientSecret(null);
+    setPendingPlan(null);
     setConfirm(null);
+    setError(null);
+  };
+
+  const handlePaymentCancel = () => {
+    setClientSecret(null);
+    setPendingPlan(null);
+    setSwitching(false);
+  };
+
+  const handlePaymentError = (errorMessage: string) => {
+    setError(errorMessage);
+    setClientSecret(null);
+    setPendingPlan(null);
+    setSwitching(false);
+  };
+
+  const handleFreePlanSwitch = async () => {
+    // Handle downgrade to free (cancel subscription)
+    setSwitching(true);
+    setError(null);
+
+    try {
+      // TODO: Call API to cancel subscription
+      // For now, just update the profile
+      await updateProfile({ plan: "free" });
+      setConfirm(null);
+    } catch (err) {
+      console.error("Failed to downgrade:", err);
+      setError("Failed to downgrade plan. Please try again.");
+    } finally {
+      setSwitching(false);
+    }
+  };
+
+  const handleConfirmSwitch = async (tier: PlanTier) => {
+    if (tier === "free") {
+      await handleFreePlanSwitch();
+    } else {
+      await handlePlanUpgrade(tier);
+    }
   };
 
   return (
     <>
+      {error && (
+        <div className="mb-6 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          {error}
+        </div>
+      )}
+
       <div className="grid md:grid-cols-2 gap-6">
         {PLANS.map((plan) => {
           const isCurrent = profile?.plan === plan.tier;
@@ -612,11 +845,12 @@ function PlanSection() {
               ) : (
                 <button
                   onClick={() => setConfirm(plan.tier)}
-                  className={`w-full py-3 rounded-lg text-sm font-semibold transition-colors ${
+                  disabled={switching}
+                  className={`w-full py-3 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 ${
                     isRecommended ? "bg-white hover:bg-zinc-100 text-black" : "bg-surface-2 hover:bg-surface-3 border border-white/10 text-white/80 hover:text-white"
                   }`}
                 >
-                  Switch to {plan.name}
+                  {switching ? "Processing..." : `Switch to ${plan.name}`}
                 </button>
               )}
             </div>
@@ -625,30 +859,47 @@ function PlanSection() {
       </div>
 
       {/* Confirm modal */}
-      {confirm && (
+      {confirm && !clientSecret && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4" onClick={() => setConfirm(null)}>
           <div className="w-full max-w-sm bg-surface-1 border border-white/10 rounded-2xl p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-bold text-white mb-2">Switch plan</h3>
             <p className="text-sm text-zinc-400 mb-6">
-              Switch to the <span className="text-white font-semibold">{PLANS.find((p) => p.tier === confirm)?.name}</span> plan? Changes take effect immediately.
+              {confirm === "free"
+                ? "Downgrade to the Free plan? Your subscription will be canceled at the end of the current period."
+                : <>Switch to the <span className="text-white font-semibold">{PLANS.find((p) => p.tier === confirm)?.name}</span> plan? You'll be charged ${PLANS.find((p) => p.tier === confirm)?.price}/month.</>
+              }
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setConfirm(null)}
-                className="flex-1 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors"
+                disabled={switching}
+                className="flex-1 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
-                onClick={() => handleSwitch(confirm)}
+                onClick={() => handleConfirmSwitch(confirm)}
                 disabled={switching}
                 className="flex-1 py-2 rounded-xl bg-white hover:bg-zinc-100 disabled:opacity-50 text-black text-sm font-semibold transition-colors"
               >
-                {switching ? "Switching…" : "Confirm"}
+                {switching ? "Processing..." : "Confirm"}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Payment modal */}
+      {clientSecret && pendingPlan && (
+        <Elements stripe={stripePromise}>
+          <PaymentModal
+            plan={pendingPlan}
+            clientSecret={clientSecret}
+            onSuccess={handlePaymentSuccess}
+            onCancel={handlePaymentCancel}
+            onError={handlePaymentError}
+          />
+        </Elements>
       )}
     </>
   );
