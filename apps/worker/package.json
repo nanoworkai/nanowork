@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
+    "deploy": "npm run typecheck && wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "validate": "npm run typecheck && npm run lint",
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
@@ -15,7 +19,14 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250430.0",
+    "@eslint/js": "^9.17.0",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "eslint": "^9.17.0",
+    "eslint-import-resolver-typescript": "^3.7.0",
+    "eslint-plugin-import": "^2.31.0",
     "typescript": "~5.7.2",
+    "typescript-eslint": "^8.19.1",
     "wrangler": "^3.114.0"
   }
 }

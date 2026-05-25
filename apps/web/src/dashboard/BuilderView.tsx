@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, FileText, Table, Presentation, Sparkles } from "lucide-react";
-import AgentCard, { AgentType, AgentStatus } from "../components/AgentCard";
+import AgentCard, { type AgentType, type AgentStatus } from "../components/AgentCard";
 
 interface AgentTask {
   buildId: string;
