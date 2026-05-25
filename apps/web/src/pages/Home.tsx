@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { ArrowRight, Terminal, Building2, Shield } from "lucide-react";
+import BusinessShowcase from "../components/BusinessShowcase";
 
 /**
  * BLOOMBERG TERMINAL DESIGN PRINCIPLES:
@@ -356,27 +357,15 @@ export default function Home() {
               Turn Your Idea Into a Company
             </h1>
             <p className="text-xs sm:text-sm font-mono text-white/70 max-w-3xl leading-relaxed">
-              Seven AI departments work 24/7 to build your business. Legal, brand, web, marketing, sales, finance, and ops—all autonomous, all running in parallel. One prompt starts everything.
+              Describe your idea and AI builds a complete company. Or claim a pre-built business and start earning today. Full tech stack, payment processing, and deployment ready.
             </p>
           </div>
 
           <TerminalPrompt />
         </section>
 
-        {/* Department Grid */}
-        <section className="py-8 sm:py-12">
-          <div className="mb-4 sm:mb-6">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-[10px] sm:text-xs font-mono font-bold text-white/40 uppercase tracking-wider">
-                Your Autonomous Team
-              </span>
-              <div className="flex-1 h-px bg-white/10" />
-              <span className="text-[10px] sm:text-xs font-mono text-green-400 whitespace-nowrap">7 DEPARTMENTS</span>
-            </div>
-          </div>
-
-          <DepartmentGrid />
-        </section>
+        {/* Business Showcase */}
+        <BusinessShowcase />
 
         {/* Enterprise Section */}
         <section className="py-8 sm:py-12 lg:py-16">
