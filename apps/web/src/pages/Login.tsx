@@ -1,6 +1,7 @@
 import { useState, useEffect, type FormEvent } from "react";
 import { useNavigate, useSearchParams, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { supabase } from "../lib/supabase";
 import { Terminal, Lock } from "lucide-react";
 
 type Tab = "signin" | "signup";
@@ -18,14 +19,19 @@ export default function Login() {
   const [searchParams] = useSearchParams();
   const nextPath = safeNextPath(searchParams.get("redirect") ?? searchParams.get("next"));
   const pendingPrompt = searchParams.get("p");
+  const claimIntent = searchParams.get("intent") === "claim";
 
-  const [tab, setTab] = useState<Tab>("signin");
+  const [tab, setTab] = useState<Tab>(claimIntent ? "signup" : "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState<string>("");
+
+  // Get pending claim data from localStorage
+  const pendingClaim = localStorage.getItem('pending_claim');
+  const claimData = pendingClaim ? JSON.parse(pendingClaim) : null;
 
   // Handle success/error messages from location state
   useEffect(() => {
@@ -61,10 +67,42 @@ export default function Login() {
       if (err) {
         setError(err);
       } else {
-        const dest = pendingPrompt
-          ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
-          : nextPath;
-        navigate(dest);
+        // Check if there's a pending claim to process
+        const pendingClaim = localStorage.getItem('pending_claim');
+        if (pendingClaim) {
+          try {
+            const claim = JSON.parse(pendingClaim);
+            const { data: userData } = await supabase.auth.getUser();
+
+            if (userData.user) {
+              // Create the company with the claimed business data
+              await supabase.from('companies').insert({
+                owner_id: userData.user.id,
+                name: claim.businessData.name,
+                description: claim.businessData.description || claim.businessData.tagline || '',
+                slug: claim.businessData.slug,
+                industry: claim.businessData.category,
+                status: 'active',
+                claimed_at: new Date().toISOString(),
+                source: 'claimed',
+                settings: {
+                  originalBusinessData: claim.businessData
+                }
+              });
+            }
+          } catch (claimError) {
+            console.error('Failed to process claim:', claimError);
+            // Don't block signup if claim fails
+          } finally {
+            localStorage.removeItem('pending_claim');
+          }
+          navigate('/dashboard?claimed=true');
+        } else {
+          const dest = pendingPrompt
+            ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
+            : nextPath;
+          navigate(dest);
+        }
       }
     } else {
       const { error: err } = await signIn(email, password);
@@ -110,6 +148,26 @@ export default function Login() {
           </div>
 
           <div className="p-4 sm:p-6">
+            {/* Claim Banner */}
+            {claimData && (
+              <div className="mb-4 sm:mb-6 p-4 border border-green-400/20 bg-green-400/5">
+                <div className="flex items-start gap-3">
+                  <Terminal className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-xs font-mono font-bold text-green-400 uppercase tracking-wider mb-1">
+                      Claiming Business
+                    </p>
+                    <p className="text-sm font-mono text-white mb-1">
+                      <strong>{claimData.businessName}</strong>
+                    </p>
+                    <p className="text-xs font-mono text-white/60">
+                      Create your account to continue claiming this business
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Tab Switcher */}
             <div className="flex gap-0 mb-4 sm:mb-6 border border-white/10">
               <button

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { ArrowRight, Loader2, Building2, Sparkles, Package } from "lucide-react";
+import { ArrowRight, Loader2, Building2, Sparkles, Package, CheckCircle2 } from "lucide-react";
 import WelcomeBanner from "./components/WelcomeBanner";
 import QuickStart from "./components/QuickStart";
 import { apiFetch } from "../lib/apiFetch";
@@ -9,9 +9,11 @@ import { apiFetch } from "../lib/apiFetch";
 export default function Create() {
   const { session, profile } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [prompt, setPrompt] = useState("");
   const [creating, setCreating] = useState(false);
   const [hasBuilds, setHasBuilds] = useState(false);
+  const [showClaimedToast, setShowClaimedToast] = useState(false);
 
   // Check if user has any builds to determine first-time user status
   useEffect(() => {
@@ -32,6 +34,18 @@ export default function Create() {
 
     checkBuilds();
   }, [session]);
+
+  // Check for claimed business success
+  useEffect(() => {
+    if (searchParams.get('claimed') === 'true') {
+      setShowClaimedToast(true);
+      // Remove query param from URL
+      window.history.replaceState({}, '', '/dashboard');
+      // Auto-hide toast after 5 seconds
+      const timer = setTimeout(() => setShowClaimedToast(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   const handleCreateBuild = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,6 +110,32 @@ export default function Create() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
+      {/* Claimed Business Success Toast */}
+      {showClaimedToast && (
+        <div className="fixed top-4 right-4 z-50 max-w-md animate-in slide-in-from-top-5 duration-300">
+          <div className="p-4 border border-green-400/20 bg-green-400/10 backdrop-blur-sm rounded-lg">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-mono font-bold text-green-400 uppercase tracking-wider mb-1">
+                  Business Claimed Successfully!
+                </p>
+                <p className="text-xs font-mono text-white/80">
+                  Your business has been added to your dashboard. You can start managing it now.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowClaimedToast(false)}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <span className="sr-only">Close</span>
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Welcome Banner - Only shows for first-time users */}
       <WelcomeBanner
         userName={profile?.name || profile?.businessName}

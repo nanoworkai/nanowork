@@ -25,9 +25,13 @@ export function MarketplaceCard({ business, viewMode }: MarketplaceCardProps) {
   const [showDetailView, setShowDetailView] = useState(false);
 
   const handleClaimBusiness = () => {
-    // TODO: Integrate with actual claim flow
-    console.log("Claiming business:", business.slug);
-    alert(`Claiming ${business.name} - Integration pending`);
+    // Store business data in localStorage before redirecting to signup
+    localStorage.setItem('pending_claim', JSON.stringify({
+      businessId: business.slug,
+      businessName: business.name,
+      businessData: business
+    }));
+    window.location.href = '/login?intent=claim';
   };
 
   if (viewMode === "list") {

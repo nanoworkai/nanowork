@@ -29,10 +29,13 @@ export function ClaimBusinessModal({ isOpen, company, onClose }: ClaimBusinessMo
 
   async function handleClaim() {
     if (!isAuthenticated) {
-      // Redirect to login with return URL
-      window.location.href = `/login?redirect=${encodeURIComponent(
-        `/?claim=${company.id}`
-      )}`;
+      // Store company data in localStorage and redirect to signup
+      localStorage.setItem('pending_claim', JSON.stringify({
+        businessId: company.id,
+        businessName: company.name,
+        businessData: company
+      }));
+      window.location.href = '/login?intent=claim';
       return;
     }
 
