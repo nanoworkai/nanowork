@@ -143,10 +143,33 @@ export default function Create() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-5 gap-6">
-        {/* Main Configuration - Takes 3 columns */}
-        <div className="lg:col-span-3 space-y-6">
-          <form onSubmit={handleCreateBuild} className="space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Quick Start Templates - Moved above form */}
+        <div className="p-4 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-white/10">
+          <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-widest mb-3">
+            Quick Start Templates
+          </h3>
+          <div className="grid md:grid-cols-3 gap-2">
+            {examples.map((example, index) => (
+              <button
+                key={index}
+                onClick={() => setPrompt(example.description)}
+                disabled={creating}
+                className="w-full text-left p-2.5 rounded-lg bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+              >
+                <p className="text-xs font-semibold text-white/90 group-hover:text-emerald-400 transition-colors">
+                  {example.title}
+                </p>
+                <p className="text-[10px] text-white/40 leading-tight mt-0.5 line-clamp-2">
+                  {example.description}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Main Configuration Form */}
+        <form onSubmit={handleCreateBuild} className="space-y-6">
             {/* Application Brief - Compact */}
             <div className="p-5 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-white/10 shadow-2xl">
               <div className="flex items-center gap-2 mb-3">
@@ -249,101 +272,6 @@ export default function Create() {
               </span>
             </button>
           </form>
-        </div>
-
-        {/* Compact Sidebar - Takes 2 columns */}
-        <div className="lg:col-span-2 space-y-4">
-          {/* Quick Examples - More compact */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-white/10">
-            <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-widest mb-3">
-              Quick Start Templates
-            </h3>
-            <div className="space-y-2">
-              {examples.map((example, index) => (
-                <button
-                  key={index}
-                  onClick={() => setPrompt(example.description)}
-                  disabled={creating}
-                  className="w-full text-left p-2.5 rounded-lg bg-white/5 hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
-                >
-                  <p className="text-xs font-semibold text-white/90 group-hover:text-emerald-400 transition-colors">
-                    {example.title}
-                  </p>
-                  <p className="text-[10px] text-white/40 leading-tight mt-0.5 line-clamp-2">
-                    {example.description}
-                  </p>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Build Specs - More industrial */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-white/10">
-            <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-widest mb-3">
-              Standard Specifications
-            </h3>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-white/5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                <span className="text-[10px] text-white/70 font-mono">Production-grade infrastructure</span>
-              </div>
-              <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-white/5">
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-                <span className="text-[10px] text-white/70 font-mono">Secure authentication layer</span>
-              </div>
-              <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-white/5">
-                <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-                <span className="text-[10px] text-white/70 font-mono">Responsive UI framework</span>
-              </div>
-              <div className="flex items-center gap-2 px-2 py-1.5 rounded bg-white/5">
-                <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
-                <span className="text-[10px] text-white/70 font-mono">Auto-scaling deployment</span>
-              </div>
-            </div>
-          </div>
-
-          {/* System Status */}
-          <div className="p-4 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-emerald-500/20">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-widest">
-                Build Pipeline
-              </h3>
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[9px] font-mono text-emerald-400">ONLINE</span>
-              </div>
-            </div>
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded bg-white/5 border border-white/10 flex items-center justify-center text-[9px] font-mono text-white/60">
-                  01
-                </div>
-                <div className="flex-1">
-                  <p className="text-[10px] font-semibold text-white/80">Architecture Generation</p>
-                  <p className="text-[9px] text-white/40 font-mono">~30s avg</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded bg-white/5 border border-white/10 flex items-center justify-center text-[9px] font-mono text-white/60">
-                  02
-                </div>
-                <div className="flex-1">
-                  <p className="text-[10px] font-semibold text-white/80">Code Synthesis</p>
-                  <p className="text-[9px] text-white/40 font-mono">~90s avg</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-5 h-5 rounded bg-white/5 border border-white/10 flex items-center justify-center text-[9px] font-mono text-white/60">
-                  03
-                </div>
-                <div className="flex-1">
-                  <p className="text-[10px] font-semibold text-white/80">Deployment</p>
-                  <p className="text-[9px] text-white/40 font-mono">~45s avg</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
