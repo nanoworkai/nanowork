@@ -246,6 +246,6 @@ export type NewCreditTransaction = Omit<CreditTransaction, 'id' | 'created_at'>;
 import { Request } from 'express';
 
 export interface AuthenticatedRequest extends Request {
-  user?: { id: string; email: string };
-  agent?: Agent;
+  user: { id: string; email: string };
+  agent: Agent;
 }
