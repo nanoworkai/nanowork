@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { ArrowRight, Loader2, Building2, Sparkles, Settings2, Users, Package, Gauge } from "lucide-react";
+import { ArrowRight, Loader2, Building2, Sparkles, Package } from "lucide-react";
 import WelcomeBanner from "./components/WelcomeBanner";
 import QuickStart from "./components/QuickStart";
-import IndustrialSlider from "./components/IndustrialSlider";
 import { apiFetch } from "../lib/apiFetch";
 
 export default function Create() {
@@ -13,11 +12,6 @@ export default function Create() {
   const [prompt, setPrompt] = useState("");
   const [creating, setCreating] = useState(false);
   const [hasBuilds, setHasBuilds] = useState(false);
-
-  // Configuration sliders for industrial design
-  const [complexity, setComplexity] = useState(50);
-  const [userCount, setUserCount] = useState(3);
-  const [features, setFeatures] = useState(5);
 
   // Check if user has any builds to determine first-time user status
   useEffect(() => {
@@ -99,13 +93,6 @@ export default function Create() {
 
   // Check if profile has business name for completion status
   const profileComplete = !!(profile?.businessName && profile?.name);
-
-  // Get complexity label
-  const getComplexityLabel = (val: number) => {
-    if (val < 33) return "Simple";
-    if (val < 66) return "Standard";
-    return "Enterprise";
-  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
@@ -190,60 +177,6 @@ export default function Create() {
               <div className="flex items-center justify-between mt-2">
                 <span className="text-[10px] text-white/40 uppercase tracking-wider">Spec Document</span>
                 <span className="text-[10px] font-mono text-white/40">{prompt.length} chars</span>
-              </div>
-            </div>
-
-            {/* Configuration Matrix - Industrial Sliders */}
-            <div className="p-5 rounded-xl bg-gradient-to-br from-zinc-900 to-black border border-white/10 shadow-2xl">
-              <div className="flex items-center gap-2 mb-4">
-                <Settings2 className="w-4 h-4 text-white/70" />
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                  Build Parameters
-                </h3>
-              </div>
-
-              <div className="space-y-5">
-                <IndustrialSlider
-                  label="Complexity"
-                  value={complexity}
-                  min={0}
-                  max={100}
-                  onChange={setComplexity}
-                  disabled={creating}
-                  icon={Gauge}
-                  color="emerald"
-                  displayValue={getComplexityLabel(complexity)}
-                  minLabel="Simple"
-                  maxLabel="Enterprise"
-                />
-
-                <IndustrialSlider
-                  label="User Roles"
-                  value={userCount}
-                  min={1}
-                  max={10}
-                  onChange={setUserCount}
-                  disabled={creating}
-                  icon={Users}
-                  color="blue"
-                  displayValue={`${userCount} ${userCount === 1 ? 'Role' : 'Roles'}`}
-                  minLabel="Solo"
-                  maxLabel="Multi-Tenant"
-                />
-
-                <IndustrialSlider
-                  label="Core Features"
-                  value={features}
-                  min={1}
-                  max={15}
-                  onChange={setFeatures}
-                  disabled={creating}
-                  icon={Package}
-                  color="purple"
-                  displayValue={`${features} Modules`}
-                  minLabel="Minimal"
-                  maxLabel="Full Suite"
-                />
               </div>
             </div>
 
