@@ -3,7 +3,7 @@ import { join } from 'path';
 import { readFileSync, existsSync } from 'fs';
 import { spawn } from 'child_process';
 const PORT = 5173;
-const WORKER_URL = 'http://127.0.0.1:8787';
+const API_BACKEND_URL = 'http://127.0.0.1:3001';
 // Load environment variables
 const envPath = join(import.meta.dir, '../../.env-backup/.env');
 if (existsSync(envPath)) {
@@ -46,11 +46,11 @@ const server = Bun.serve({
     port: PORT,
     async fetch(req) {
         const url = new URL(req.url);
-        // Proxy API and health endpoints to worker
-        if (url.pathname.startsWith('/api') || url.pathname === '/health') {
+        // Proxy API endpoints to backend
+        if (url.pathname.startsWith('/api')) {
             try {
-                const workerUrl = `${WORKER_URL}${url.pathname}${url.search}`;
-                const response = await fetch(workerUrl, {
+                const backendUrl = `${API_BACKEND_URL}${url.pathname}${url.search}`;
+                const response = await fetch(backendUrl, {
                     method: req.method,
                     headers: req.headers,
                     body: req.body,
@@ -58,8 +58,11 @@ const server = Bun.serve({
                 return response;
             }
             catch (error) {
-                console.error('Proxy error:', error);
-                return new Response('Proxy error', { status: 502 });
+                console.error('API Proxy error:', error);
+                return new Response(JSON.stringify({ error: 'Backend unavailable' }), {
+                    status: 502,
+                    headers: { 'Content-Type': 'application/json' }
+                });
             }
         }
         // Serve source files with transpilation for development (TypeScript/JSX)
@@ -193,5 +196,5 @@ const server = Bun.serve({
     },
 });
 console.log(`✅ Dev server running at http://localhost:${PORT}`);
-console.log(`🔄 Proxying /api and /health to ${WORKER_URL}`);
-console.log(`\n📝 Note: Run your worker separately with: npm run dev:worker`);
+console.log(`🔄 Proxying /api to ${API_BACKEND_URL}`);
+console.log(`\n📝 Note: Run backend separately with: cd backend && PORT=3001 node dist/index.js`);

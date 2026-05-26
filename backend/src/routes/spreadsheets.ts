@@ -5,8 +5,9 @@
  */
 
 import { Router } from 'express';
-import { authenticateUser } from '../middleware/auth';
-import { supabase } from '../lib/supabase';
+import { requireUserAuth } from '../middleware/auth';
+import { getSupabase } from '../services/supabase';
+import type { AuthenticatedRequest } from '../types';
 
 const router = Router();
 
@@ -18,9 +19,10 @@ const router = Router();
  * GET /api/spreadsheets/workbooks
  * List all workbooks for the authenticated user
  */
-router.get('/workbooks', authenticateUser, async (req, res) => {
+router.get('/workbooks', requireUserAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const userId = req.user!.id;
+    const userId = req.user.id;
+    const supabase = getSupabase();
 
     const { data: workbooks, error } = await supabase
       .from('workbooks')

@@ -97,10 +97,24 @@ if (existsSync(publicDir)) {
     console.log('📦 Copying public assets...');
     cpSync(publicDir, distDir, { recursive: true });
 }
-// Find built assets
-const distFiles = readdirSync(distDir);
-const jsFile = distFiles.find(f => f.startsWith('main-') && f.endsWith('.js'));
-const cssFile = distFiles.find(f => f.startsWith('processed-') && f.endsWith('.css'));
+// Find built assets (recursively since they may be in subdirectories)
+function findFile(dir, pattern) {
+    const files = readdirSync(dir, { withFileTypes: true });
+    for (const file of files) {
+        const fullPath = join(dir, file.name);
+        if (file.isDirectory()) {
+            const found = findFile(fullPath, pattern);
+            if (found)
+                return found;
+        }
+        else if (pattern.test(file.name)) {
+            return fullPath.replace(distDir + '/', '');
+        }
+    }
+    return undefined;
+}
+const jsFile = findFile(distDir, /main-.*\.js$/);
+const cssFile = findFile(distDir, /processed-.*\.css$/);
 if (!jsFile) {
     console.error('❌ Could not find built JavaScript file');
     process.exit(1);
