@@ -44,9 +44,10 @@ router.get('/workbooks', requireUserAuth, async (req: AuthenticatedRequest, res)
  * GET /api/spreadsheets/workbooks/:id
  * Get a specific workbook with all sheets and cells
  */
-router.get('/workbooks/:id', authenticateUser, async (req, res) => {
+router.get('/workbooks/:id', requireUserAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const userId = req.user!.id;
+    const supabase = getSupabase();
+    const userId = req.user.id;
     const { id } = req.params;
 
     // Get workbook
@@ -73,7 +74,7 @@ router.get('/workbooks/:id', authenticateUser, async (req, res) => {
     if (sheetsError) throw sheetsError;
 
     // Get cells for all sheets
-    const sheetIds = sheets?.map((s) => s.id) || [];
+    const sheetIds = sheets?.map((s: any) => s.id) || [];
     const { data: cells, error: cellsError } = await supabase
       .from('cells')
       .select('*')
@@ -82,9 +83,9 @@ router.get('/workbooks/:id', authenticateUser, async (req, res) => {
     if (cellsError) throw cellsError;
 
     // Organize cells by sheet
-    const sheetsWithCells = sheets?.map((sheet) => ({
+    const sheetsWithCells = sheets?.map((sheet: any) => ({
       ...sheet,
-      cells: cells?.filter((c) => c.sheet_id === sheet.id) || [],
+      cells: cells?.filter((c: any) => c.sheet_id === sheet.id) || [],
     })) || [];
 
     // Update last accessed time
@@ -107,9 +108,10 @@ router.get('/workbooks/:id', authenticateUser, async (req, res) => {
  * POST /api/spreadsheets/workbooks
  * Create a new workbook
  */
-router.post('/workbooks', authenticateUser, async (req, res) => {
+router.post('/workbooks', requireUserAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const userId = req.user!.id;
+    const supabase = getSupabase();
+    const userId = req.user.id;
     const {
       name = 'Untitled Workbook',
       description,
@@ -159,9 +161,10 @@ router.post('/workbooks', authenticateUser, async (req, res) => {
  * PATCH /api/spreadsheets/workbooks/:id
  * Update workbook metadata
  */
-router.patch('/workbooks/:id', authenticateUser, async (req, res) => {
+router.patch('/workbooks/:id', requireUserAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const userId = req.user!.id;
+    const supabase = getSupabase();
+    const userId = req.user.id;
     const { id } = req.params;
     const { name, description, settings, tags } = req.body;
 
@@ -197,9 +200,10 @@ router.patch('/workbooks/:id', authenticateUser, async (req, res) => {
  * DELETE /api/spreadsheets/workbooks/:id
  * Soft delete a workbook
  */
-router.delete('/workbooks/:id', authenticateUser, async (req, res) => {
+router.delete('/workbooks/:id', requireUserAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const userId = req.user!.id;
+    const supabase = getSupabase();
+    const userId = req.user.id;
     const { id } = req.params;
 
     const { error } = await supabase
@@ -225,9 +229,10 @@ router.delete('/workbooks/:id', authenticateUser, async (req, res) => {
  * POST /api/spreadsheets/sheets
  * Add a new sheet to a workbook
  */
-router.post('/sheets', authenticateUser, async (req, res) => {
+router.post('/sheets', requireUserAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const userId = req.user!.id;
+    const supabase = getSupabase();
+    const userId = req.user.id;
     const { workbook_id, name, position } = req.body;
 
     // Verify workbook ownership
@@ -266,9 +271,10 @@ router.post('/sheets', authenticateUser, async (req, res) => {
  * PATCH /api/spreadsheets/sheets/:id
  * Update sheet properties
  */
-router.patch('/sheets/:id', authenticateUser, async (req, res) => {
+router.patch('/sheets/:id', requireUserAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const userId = req.user!.id;
+    const supabase = getSupabase();
+    const userId = req.user.id;
     const { id } = req.params;
     const { name, position, visible, settings } = req.body;
 
@@ -324,9 +330,10 @@ router.patch('/sheets/:id', authenticateUser, async (req, res) => {
  * DELETE /api/spreadsheets/sheets/:id
  * Delete a sheet
  */
-router.delete('/sheets/:id', authenticateUser, async (req, res) => {
+router.delete('/sheets/:id', requireUserAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const userId = req.user!.id;
+    const supabase = getSupabase();
+    const userId = req.user.id;
     const { id } = req.params;
 
     // Verify ownership
@@ -374,9 +381,10 @@ router.delete('/sheets/:id', authenticateUser, async (req, res) => {
  * POST /api/spreadsheets/cells/batch
  * Batch update/insert cells (for auto-save)
  */
-router.post('/cells/batch', authenticateUser, async (req, res) => {
+router.post('/cells/batch', requireUserAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const userId = req.user!.id;
+    const supabase = getSupabase();
+    const userId = req.user.id;
     const { sheet_id, cells } = req.body;
 
     if (!Array.isArray(cells)) {
@@ -406,7 +414,7 @@ router.post('/cells/batch', authenticateUser, async (req, res) => {
     }
 
     // Upsert cells
-    const cellsToUpsert = cells.map((cell) => ({
+    const cellsToUpsert = cells.map((cell: any) => ({
       sheet_id,
       row_index: cell.row_index,
       column_index: cell.column_index,
@@ -442,9 +450,10 @@ router.post('/cells/batch', authenticateUser, async (req, res) => {
  * DELETE /api/spreadsheets/cells/batch
  * Batch delete cells
  */
-router.delete('/cells/batch', authenticateUser, async (req, res) => {
+router.delete('/cells/batch', requireUserAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const userId = req.user!.id;
+    const supabase = getSupabase();
+    const userId = req.user.id;
     const { sheet_id, cells } = req.body;
 
     if (!Array.isArray(cells)) {
@@ -474,7 +483,7 @@ router.delete('/cells/batch', authenticateUser, async (req, res) => {
     }
 
     // Delete cells
-    for (const cell of cells) {
+    for (const cell of cells as any[]) {
       await supabase
         .from('cells')
         .delete()
@@ -498,9 +507,10 @@ router.delete('/cells/batch', authenticateUser, async (req, res) => {
  * POST /api/spreadsheets/workbooks/from-template
  * Create workbook from template
  */
-router.post('/workbooks/from-template', authenticateUser, async (req, res) => {
+router.post('/workbooks/from-template', requireUserAuth, async (req: AuthenticatedRequest, res) => {
   try {
-    const userId = req.user!.id;
+    const supabase = getSupabase();
+    const userId = req.user.id;
     const { template_id, name, build_id } = req.body;
 
     if (!template_id) {
@@ -531,9 +541,9 @@ router.post('/workbooks/from-template', authenticateUser, async (req, res) => {
     if (workbookError) throw workbookError;
 
     // Create sheets with cells
-    const createdSheets = [];
+    const createdSheets: any[] = [];
 
-    for (const sheetData of template_data.sheets) {
+    for (const sheetData of template_data.sheets as any[]) {
       const { data: sheet, error: sheetError } = await supabase
         .from('sheets')
         .insert({
