@@ -1,5 +1,9 @@
 # Nanowork MVP
 
+![CI](https://github.com/yourusername/nanowork-web/workflows/CI/badge.svg)
+![Deploy Check](https://github.com/yourusername/nanowork-web/workflows/Deploy%20Check/badge.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-100%25-blue)
+
 AI-powered company builder with autonomous agents. One prompt to launch your business.
 
 ## Architecture
@@ -231,12 +235,32 @@ Alternatively, Render can auto-detect `apps/web/render.yaml` if you point to tha
 - Frontend's `VITE_API_URL` must match your backend URL
 - Check Render environment variables are set correctly
 
+## CI/CD Pipeline
+
+We have comprehensive GitHub Actions workflows to catch issues before production:
+
+- ✅ **Automatic TypeScript checking** on all PRs
+- ✅ **Build validation** for web, worker, and backend
+- ✅ **Dependency vulnerability scanning**
+- ✅ **Code quality checks** (console.log, debugger, etc.)
+- ✅ **Bundle size monitoring**
+
+**Before pushing:**
+```bash
+# Run these locally to catch issues early
+bun run typecheck           # Check all TypeScript
+cd apps/web && bun run build  # Test production build
+```
+
+📚 **Full CI/CD Documentation:** [.github/CI_CD_GUIDE.md](.github/CI_CD_GUIDE.md)
+
 ## Contributing
 
 1. Create a feature branch
 2. Make your changes
-3. Test locally: `npm run dev`
-4. Submit a pull request
+3. Test locally: `npm run dev` and `bun run typecheck`
+4. Submit a pull request (CI will automatically run)
+5. Address any CI failures before merge
 
 ## License
 

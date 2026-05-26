@@ -1,0 +1,188 @@
+name: PR Lint & Quality
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # ============================================================================
+  # PR METADATA CHECKS
+  # ============================================================================
+  pr-title-check:
+    name: PR Title Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR title format
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo "PR Title: $PR_TITLE"
+
+          # Check if title follows conventional commits format
+          if [[ "$PR_TITLE" =~ ^(feat|fix|docs|style|refactor|perf|test|chore|build|ci)(\(.+\))?: .{1,} ]]; then
+            echo "✅ PR title follows conventional commits format"
+          else
+            echo "⚠️  PR title doesn't follow conventional commits"
+            echo ""
+            echo "Recommended format:"
+            echo "  feat: Add new feature"
+            echo "  fix: Fix bug in component"
+            echo "  refactor: Improve code structure"
+            echo "  docs: Update documentation"
+            echo ""
+            echo "Not blocking PR, but please consider updating the title"
+          fi
+
+  changed-files-check:
+    name: Changed Files Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        run: |
+          # Get list of changed files
+          git diff --name-only origin/${{ github.base_ref }}...HEAD > changed_files.txt
+
+          echo "📝 Changed files:"
+          cat changed_files.txt
+
+          # Categorize changes
+          WEB_CHANGES=$(grep "^apps/web/" changed_files.txt | wc -l || echo 0)
+          WORKER_CHANGES=$(grep "^apps/worker/" changed_files.txt | wc -l || echo 0)
+          BACKEND_CHANGES=$(grep "^backend/" changed_files.txt | wc -l || echo 0)
+
+          echo ""
+          echo "📊 Change summary:"
+          echo "  Web:     $WEB_CHANGES files"
+          echo "  Worker:  $WORKER_CHANGES files"
+          echo "  Backend: $BACKEND_CHANGES files"
+
+          # Check for package.json changes
+          if grep -q "package.json" changed_files.txt; then
+            echo ""
+            echo "⚠️  package.json modified - remember to update lockfiles"
+          fi
+
+          # Check for .env changes
+          if grep -q ".env" changed_files.txt; then
+            echo ""
+            echo "⚠️  .env file modified - ensure no secrets are committed"
+          fi
+
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for console.log
+        run: |
+          echo "🔍 Checking for console.log statements..."
+
+          CONSOLE_LOGS=$(git diff origin/${{ github.base_ref }}...HEAD | \
+            grep "^+.*console\.log" || true)
+
+          if [ ! -z "$CONSOLE_LOGS" ]; then
+            echo "⚠️  Found new console.log statements:"
+            echo "$CONSOLE_LOGS"
+            echo ""
+            echo "Consider removing console.log before production"
+          else
+            echo "✅ No new console.log statements"
+          fi
+
+      - name: Check for debugger statements
+        run: |
+          echo "🔍 Checking for debugger statements..."
+
+          DEBUGGERS=$(git diff origin/${{ github.base_ref }}...HEAD | \
+            grep "^+.*debugger" || true)
+
+          if [ ! -z "$DEBUGGERS" ]; then
+            echo "❌ Found debugger statements - must be removed!"
+            echo "$DEBUGGERS"
+            exit 1
+          else
+            echo "✅ No debugger statements found"
+          fi
+
+      - name: Check for TODO comments
+        run: |
+          echo "📝 Checking for new TODO comments..."
+
+          NEW_TODOS=$(git diff origin/${{ github.base_ref }}...HEAD | \
+            grep "^+.*TODO" || true)
+
+          if [ ! -z "$NEW_TODOS" ]; then
+            echo "📌 New TODO comments found:"
+            echo "$NEW_TODOS"
+            echo ""
+            echo "Make sure these are tracked or resolved"
+          else
+            echo "✅ No new TODO comments"
+          fi
+
+      - name: Check file sizes
+        run: |
+          echo "📏 Checking for large files..."
+
+          # Find files larger than 100KB in git diff
+          LARGE_FILES=$(git diff origin/${{ github.base_ref }}...HEAD --name-only | \
+            xargs -I {} sh -c 'test -f "{}" && stat -f%z "{}" | awk "{if (\$1 > 102400) print \"{}\"}"' 2>/dev/null || true)
+
+          if [ ! -z "$LARGE_FILES" ]; then
+            echo "⚠️  Large files detected (>100KB):"
+            echo "$LARGE_FILES"
+            echo ""
+            echo "Consider if these should be committed to git"
+          else
+            echo "✅ No large files detected"
+          fi
+
+  # ============================================================================
+  # TYPE SAFETY CHECKS
+  # ============================================================================
+  type-coverage:
+    name: TypeScript Coverage Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for 'any' types
+        run: |
+          echo "🔍 Checking for 'any' types in new code..."
+
+          ANY_TYPES=$(git diff origin/${{ github.base_ref }}...HEAD | \
+            grep "^+.*: any" | \
+            grep -v "// allow any" || true)
+
+          if [ ! -z "$ANY_TYPES" ]; then
+            echo "⚠️  Found 'any' types in new code:"
+            echo "$ANY_TYPES"
+            echo ""
+            echo "Consider using specific types for better type safety"
+          else
+            echo "✅ No new 'any' types found"
+          fi
+
+      - name: Check for ts-ignore comments
+        run: |
+          echo "🔍 Checking for @ts-ignore comments..."
+
+          TS_IGNORES=$(git diff origin/${{ github.base_ref }}...HEAD | \
+            grep "^+.*@ts-ignore" || true)
+
+          if [ ! -z "$TS_IGNORES" ]; then
+            echo "⚠️  Found @ts-ignore comments:"
+            echo "$TS_IGNORES"
+            echo ""
+            echo "Try to fix the underlying issue instead of ignoring"
+          else
+            echo "✅ No @ts-ignore comments found"
+          fi

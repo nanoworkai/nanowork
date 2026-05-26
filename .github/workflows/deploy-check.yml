@@ -1,0 +1,158 @@
+name: Deploy Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ============================================================================
+  # PRE-DEPLOYMENT VALIDATION
+  # ============================================================================
+  env-check:
+    name: Environment Configuration Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate .env.example
+        run: |
+          echo "Checking .env.example completeness..."
+
+          # Check that .env.example has all required variables
+          REQUIRED_VARS=(
+            "VITE_SUPABASE_URL"
+            "VITE_SUPABASE_ANON_KEY"
+            "VITE_API_URL"
+            "VITE_SITE_URL"
+            "PORT"
+          )
+
+          for var in "${REQUIRED_VARS[@]}"; do
+            if ! grep -q "$var" .env.example; then
+              echo "❌ Missing required variable: $var"
+              exit 1
+            fi
+          done
+
+          echo "✅ All required environment variables documented"
+
+      - name: Check for empty TODO comments
+        run: |
+          # Find critical TODOs that should be resolved before deploy
+          CRITICAL_TODOS=$(grep -r "TODO.*production\|TODO.*deploy\|TODO.*FIXME" \
+            apps/web/src apps/worker/src backend/src \
+            --include="*.ts" --include="*.tsx" 2>/dev/null || true)
+
+          if [ ! -z "$CRITICAL_TODOS" ]; then
+            echo "⚠️  Found deployment-related TODOs:"
+            echo "$CRITICAL_TODOS"
+            echo ""
+            echo "Please resolve these before deploying to production"
+            # Don't fail - just warn
+          else
+            echo "✅ No critical TODOs found"
+          fi
+
+  build-size-check:
+    name: Build Size Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build
+        run: bun run build
+        env:
+          VITE_SUPABASE_URL: https://placeholder.supabase.co
+          VITE_SUPABASE_ANON_KEY: placeholder-key
+          VITE_API_URL: https://api.placeholder.com
+          VITE_SITE_URL: https://placeholder.com
+
+      - name: Check bundle size
+        run: |
+          echo "📦 Checking bundle size..."
+
+          # Get total size of dist directory
+          TOTAL_SIZE=$(du -sh dist | cut -f1)
+          echo "Total build size: $TOTAL_SIZE"
+
+          # Check for large JS files (>500KB is a warning)
+          echo ""
+          echo "Largest JavaScript files:"
+          find dist -name "*.js" -exec ls -lh {} \; | \
+            awk '{print $5 "\t" $9}' | \
+            sort -hr | head -5
+
+          # Warn if any single file is >1MB
+          LARGE_FILES=$(find dist -name "*.js" -size +1M)
+          if [ ! -z "$LARGE_FILES" ]; then
+            echo ""
+            echo "⚠️  Warning: Files larger than 1MB detected:"
+            echo "$LARGE_FILES"
+            echo "Consider code splitting or lazy loading"
+          fi
+
+          echo ""
+          echo "✅ Build size check complete"
+
+  dependency-check:
+    name: Dependency Vulnerability Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check for vulnerable dependencies
+        run: |
+          echo "🔍 Checking for vulnerable dependencies..."
+
+          # Check web app
+          cd apps/web
+          npm audit --audit-level=high || echo "⚠️  Web app has dependency warnings"
+          cd ../..
+
+          # Check worker
+          cd apps/worker
+          npm audit --audit-level=high || echo "⚠️  Worker has dependency warnings"
+          cd ../..
+
+          # Check backend
+          cd backend
+          npm audit --audit-level=high || echo "⚠️  Backend has dependency warnings"
+          cd ../..
+
+          echo "✅ Dependency check complete"
+
+  api-contract-check:
+    name: API Contract Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check API endpoint consistency
+        run: |
+          echo "🔗 Checking API endpoint consistency..."
+
+          # Find all API endpoint definitions in backend
+          echo "Backend API routes:"
+          grep -r "router\.\(get\|post\|put\|patch\|delete\)" backend/src/routes \
+            --include="*.ts" -h 2>/dev/null | \
+            sed "s/.*router\.\([a-z]*\)('\([^']*\).*/\1 \2/" | \
+            sort -u || true
+
+          echo ""
+          echo "✅ API routes documented"

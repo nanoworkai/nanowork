@@ -1,0 +1,69 @@
+name: Status Check
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  health-check:
+    name: Production Health Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check production API health
+        run: |
+          echo "🏥 Checking production health endpoints..."
+
+          # Check frontend
+          if curl -f -s https://nanowork.ai > /dev/null 2>&1; then
+            echo "✅ Frontend: https://nanowork.ai is UP"
+          else
+            echo "❌ Frontend: https://nanowork.ai is DOWN"
+            exit 1
+          fi
+
+          # Check API (if publicly accessible)
+          # Uncomment when API is deployed
+          # if curl -f -s https://api.nanowork.app/health > /dev/null 2>&1; then
+          #   echo "✅ API: https://api.nanowork.app is UP"
+          # else
+          #   echo "❌ API: https://api.nanowork.app is DOWN"
+          #   exit 1
+          # fi
+
+          echo "✅ All health checks passed"
+
+  dependency-updates:
+    name: Check for Dependency Updates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check outdated packages
+        run: |
+          echo "📦 Checking for outdated dependencies..."
+
+          # Web app
+          echo ""
+          echo "=== Web App ==="
+          cd apps/web
+          npm outdated || echo "Some packages are outdated"
+          cd ../..
+
+          # Worker
+          echo ""
+          echo "=== Worker ==="
+          cd apps/worker
+          npm outdated || echo "Some packages are outdated"
+          cd ../..
+
+          # Backend
+          echo ""
+          echo "=== Backend ==="
+          cd backend
+          npm outdated || echo "Some packages are outdated"
+          cd ../..
+
+          echo ""
+          echo "💡 Consider updating dependencies regularly"

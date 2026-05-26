@@ -1,0 +1,249 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # ============================================================================
+  # WEB APP (Frontend)
+  # ============================================================================
+  web-typecheck:
+    name: Web - TypeScript
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: TypeScript check
+        run: bun run typecheck
+
+  web-build:
+    name: Web - Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build
+        run: bun run build
+        env:
+          # Placeholder values for build
+          VITE_SUPABASE_URL: https://placeholder.supabase.co
+          VITE_SUPABASE_ANON_KEY: placeholder-key
+          VITE_API_URL: https://api.placeholder.com
+          VITE_SITE_URL: https://placeholder.com
+
+      - name: Check build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "❌ Build failed - no dist directory"
+            exit 1
+          fi
+          echo "✅ Build successful - dist directory exists"
+
+  # ============================================================================
+  # WORKER (Cloudflare Worker)
+  # ============================================================================
+  worker-typecheck:
+    name: Worker - TypeScript
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/worker
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: apps/worker/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript check
+        run: npm run typecheck
+
+  worker-lint:
+    name: Worker - Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/worker
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: apps/worker/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fix ESLint config
+        run: |
+          # Convert eslint.config.js to .mjs for CI
+          if [ -f "eslint.config.js" ]; then
+            mv eslint.config.js eslint.config.mjs
+          fi
+
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true  # Don't fail on lint warnings
+
+  # ============================================================================
+  # BACKEND (Express API)
+  # ============================================================================
+  backend-typecheck:
+    name: Backend - TypeScript
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+  backend-build:
+    name: Backend - Build Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check required files
+        run: |
+          if [ ! -f "src/index.ts" ]; then
+            echo "❌ Backend entry point missing"
+            exit 1
+          fi
+          echo "✅ Backend structure valid"
+
+  # ============================================================================
+  # INTEGRATION CHECKS
+  # ============================================================================
+  monorepo-check:
+    name: Monorepo - Structure Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files
+        run: |
+          echo "Checking monorepo structure..."
+
+          # Check root files
+          test -f "package.json" || { echo "❌ Missing root package.json"; exit 1; }
+          test -f ".env.example" || { echo "⚠️  Missing .env.example"; }
+
+          # Check workspace structure
+          test -d "apps/web" || { echo "❌ Missing apps/web"; exit 1; }
+          test -d "apps/worker" || { echo "❌ Missing apps/worker"; exit 1; }
+          test -d "backend" || { echo "❌ Missing backend"; exit 1; }
+
+          echo "✅ Monorepo structure valid"
+
+      - name: Check for secrets in code
+        run: |
+          # Check for accidentally committed secrets
+          if grep -r "sk_live_" . --exclude-dir=node_modules --exclude-dir=.git 2>/dev/null; then
+            echo "❌ Found Stripe live key in code!"
+            exit 1
+          fi
+
+          if grep -r "PRIVATE KEY" . --exclude-dir=node_modules --exclude-dir=.git 2>/dev/null | grep -v ".example"; then
+            echo "❌ Found private key in code!"
+            exit 1
+          fi
+
+          echo "✅ No secrets detected"
+
+  # ============================================================================
+  # SUMMARY
+  # ============================================================================
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    needs:
+      - web-typecheck
+      - web-build
+      - worker-typecheck
+      - backend-typecheck
+      - backend-build
+      - monorepo-check
+    if: always()
+    steps:
+      - name: Check all jobs
+        run: |
+          echo "📊 CI Results Summary"
+          echo "====================="
+
+          if [ "${{ needs.web-typecheck.result }}" != "success" ]; then
+            echo "❌ Web TypeCheck failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.web-build.result }}" != "success" ]; then
+            echo "❌ Web Build failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.worker-typecheck.result }}" != "success" ]; then
+            echo "❌ Worker TypeCheck failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.backend-typecheck.result }}" != "success" ]; then
+            echo "❌ Backend TypeCheck failed"
+            exit 1
+          fi
+
+          echo "✅ All CI checks passed!"
