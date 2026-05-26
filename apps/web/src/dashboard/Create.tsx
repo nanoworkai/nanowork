@@ -37,13 +37,21 @@ export default function Create() {
 
   // Check for claimed business success
   useEffect(() => {
-    if (searchParams.get('claimed') === 'true') {
-      setShowClaimedToast(true);
-      // Remove query param from URL
-      window.history.replaceState({}, '', '/dashboard');
+    if (searchParams.get('claim_pending') === 'true') {
+      // Give time for the claim to be processed by AuthContext
+      const timer = setTimeout(() => {
+        setShowClaimedToast(true);
+        // Remove query param from URL
+        window.history.replaceState({}, '', '/dashboard');
+      }, 1000);
+
       // Auto-hide toast after 5 seconds
-      const timer = setTimeout(() => setShowClaimedToast(false), 5000);
-      return () => clearTimeout(timer);
+      const hideTimer = setTimeout(() => setShowClaimedToast(false), 6000);
+
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(hideTimer);
+      };
     }
   }, [searchParams]);
 

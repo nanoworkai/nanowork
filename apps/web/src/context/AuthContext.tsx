@@ -158,11 +158,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const loadCompanies = useCallback(async (userId: string) => {
+    // Check for pending claim and process it first
+    const pendingClaim = localStorage.getItem('pending_claim');
+    if (pendingClaim) {
+      try {
+        const claim = JSON.parse(pendingClaim);
+        const { error: insertError } = await supabase.from('companies').insert({
+          owner_id: userId,
+          name: claim.businessData.name,
+          description: claim.businessData.description || claim.businessData.tagline || '',
+          slug: claim.businessData.slug,
+          industry: claim.businessData.category,
+          status: 'active',
+          claimed_at: new Date().toISOString(),
+          source: 'claimed',
+          settings: {
+            originalBusinessData: claim.businessData
+          }
+        });
+
+        if (insertError) {
+          console.error('Failed to create claimed company:', insertError);
+        }
+      } catch (claimError) {
+        console.error('Failed to process pending claim:', claimError);
+      } finally {
+        // Always remove the pending claim, even if it failed
+        localStorage.removeItem('pending_claim');
+      }
+    }
+
     // Get companies owned by user
     const { data: ownedCompanies } = await supabase
       .from("companies")
       .select("*")
-      .eq("user_id", userId)
+      .eq("owner_id", userId)
       .is("deleted_at", null)
       .order("created_at", { ascending: false });
 

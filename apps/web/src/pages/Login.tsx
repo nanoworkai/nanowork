@@ -67,36 +67,11 @@ export default function Login() {
       if (err) {
         setError(err);
       } else {
-        // Check if there's a pending claim to process
+        // Don't process claim here - let AuthContext handle it after session is established
+        // Just redirect with the claim intent, localStorage will be checked by AuthContext
         const pendingClaim = localStorage.getItem('pending_claim');
         if (pendingClaim) {
-          try {
-            const claim = JSON.parse(pendingClaim);
-            const { data: userData } = await supabase.auth.getUser();
-
-            if (userData.user) {
-              // Create the company with the claimed business data
-              await supabase.from('companies').insert({
-                owner_id: userData.user.id,
-                name: claim.businessData.name,
-                description: claim.businessData.description || claim.businessData.tagline || '',
-                slug: claim.businessData.slug,
-                industry: claim.businessData.category,
-                status: 'active',
-                claimed_at: new Date().toISOString(),
-                source: 'claimed',
-                settings: {
-                  originalBusinessData: claim.businessData
-                }
-              });
-            }
-          } catch (claimError) {
-            console.error('Failed to process claim:', claimError);
-            // Don't block signup if claim fails
-          } finally {
-            localStorage.removeItem('pending_claim');
-          }
-          navigate('/dashboard?claimed=true');
+          navigate('/dashboard?claim_pending=true');
         } else {
           const dest = pendingPrompt
             ? `${nextPath}?p=${encodeURIComponent(pendingPrompt)}`
