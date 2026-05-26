@@ -57,7 +57,7 @@ export default function PitchDeckEditor({
   const [deck, setDeck] = useState<PitchDeck | null>(null);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isSaving] = useState(false); // setIsSaving available for future use
+  const [_isSaving] = useState(false); // setIsSaving available for future use
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<"edit" | "preview">("edit");

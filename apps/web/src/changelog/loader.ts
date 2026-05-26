@@ -91,7 +91,7 @@ function parseItems(body: string): ChangelogEntry["items"] {
   return items;
 }
 
-function parseEntry(raw: string, path: string): ChangelogEntry | null {
+function _parseEntry(raw: string, path: string): ChangelogEntry | null {
   const { meta, body } = parseFrontmatter(raw);
 
   if (!meta.date || !meta.title) {

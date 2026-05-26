@@ -16,9 +16,6 @@ import {
   Download,
   Sparkles,
   TrendingUp,
-  DollarSign,
-  Calendar,
-  Users,
 } from 'lucide-react';
 import { TEMPLATES, type Template } from '../lib/spreadsheet/templates';
 import SpreadsheetEditor from '../components/SpreadsheetEditor';
@@ -44,7 +41,7 @@ interface Workbook {
 
 export default function Spreadsheets() {
   const { session } = useAuth();
-  const navigate = useNavigate();
+  const _navigate = useNavigate();
 
   const [view, setView] = useState<'list' | 'templates' | 'editor'>('list');
   const [workbooks, setWorkbooks] = useState<Workbook[]>([]);

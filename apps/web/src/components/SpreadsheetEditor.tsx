@@ -1428,8 +1428,8 @@ export default function SpreadsheetEditor({
               label: 'Rename Sheet',
               icon: <Edit2 className="w-3 h-3" />,
               onClick: () => {
-                setRenamingSheetIndex(sheetContextMenu.sheetIndex);
-                setRenameValue(workbook.sheets[sheetContextMenu.sheetIndex].name);
+                _setRenamingSheetIndex(sheetContextMenu.sheetIndex);
+                _setRenameValue(workbook.sheets[sheetContextMenu.sheetIndex].name);
               },
             },
             { label: '', separator: true, onClick: () => {} },

@@ -147,12 +147,12 @@ const FUNCTIONS: Record<string, (args: CellValue[]) => FormulaResult> = {
   // ─── Math Functions ─────────────────────────────────────────────────────
 
   SUM: (args) => {
-    return args.reduce((sum, val) => sum + toNumber(val), 0);
+    return args.reduce((sum: number, val) => sum + toNumber(val), 0);
   },
 
   AVERAGE: (args) => {
     if (args.length === 0) return createError('VALUE', 'AVERAGE requires at least one argument');
-    const sum = args.reduce((sum, val) => sum + toNumber(val), 0);
+    const sum = args.reduce((sum: number, val) => sum + toNumber(val), 0);
     return sum / args.length;
   },
 
@@ -227,7 +227,7 @@ const FUNCTIONS: Record<string, (args: CellValue[]) => FormulaResult> = {
     const rate = toNumber(args[0]);
     const values = args.slice(1);
 
-    return values.reduce((npv, value, index) => {
+    return values.reduce((npv: number, value, index) => {
       return npv + toNumber(value) / Math.pow(1 + rate, index + 1);
     }, 0);
   },
@@ -455,12 +455,12 @@ const FUNCTIONS: Record<string, (args: CellValue[]) => FormulaResult> = {
     // MATCH(lookup_value, lookup_array, [match_type])
     // Returns position of value in array (1-based)
     if (args.length < 2) return createError('VALUE', 'MATCH requires at least 2 arguments');
-    const lookupValue = args[0];
-    const matchType = args.length > 2 ? toNumber(args[2]) : 1;
+    const _lookupValue = args[0];
+    const _matchType = args.length > 2 ? toNumber(args[2]) : 1;
 
     // Search through the remaining args (the array)
     for (let i = 1; i < args.length; i++) {
-      if (String(args[i]) === String(lookupValue)) {
+      if (String(args[i]) === String(_lookupValue)) {
         return i; // Return 1-based position
       }
     }
@@ -472,8 +472,8 @@ const FUNCTIONS: Record<string, (args: CellValue[]) => FormulaResult> = {
     // Simplified: searches first column for value, returns value from specified column
     if (args.length < 3) return createError('VALUE', 'VLOOKUP requires at least 3 arguments');
 
-    const lookupValue = String(args[0]);
-    const colIndex = toNumber(args[2]) - 1; // Convert to 0-based
+    const _lookupValue = String(args[0]);
+    const _colIndex = toNumber(args[2]) - 1; // Convert to 0-based
 
     // This is a simplified implementation
     // In a real implementation, you'd need to handle the table array properly
@@ -669,7 +669,7 @@ function parseArguments(
         }
       } else {
         const result = evaluateExpression(arg, cellGetter, currentSheet, visited);
-        args.push(result);
+        args.push(isError(result) ? null : result);
       }
 
       current = '';
@@ -696,7 +696,7 @@ function parseArguments(
       }
     } else {
       const result = evaluateExpression(arg, cellGetter, currentSheet, visited);
-      args.push(result);
+      args.push(isError(result) ? null : result);
     }
   }
 

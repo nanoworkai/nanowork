@@ -12,7 +12,7 @@ async function verifyStripeWebhook(
   secret: string
 ): Promise<Stripe.Event | null> {
   try {
-    const stripe = new Stripe(secret, { apiVersion: '2024-11-20.acacia' })
+    const _stripe = new Stripe(secret, { apiVersion: '2025-02-24.acacia' })
     // Note: Stripe's constructEvent needs the webhook secret, not the API key
     // In production, use stripe.webhooks.constructEvent
     // For now, we'll parse the event directly and verify manually

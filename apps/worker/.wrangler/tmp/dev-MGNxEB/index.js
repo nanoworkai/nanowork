@@ -39316,7 +39316,7 @@ var app13 = new Hono2();
 app13.post("/create-checkout", async (c) => {
   try {
     const stripe2 = new stripe_esm_worker_default(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2024-11-20.acacia"
+      apiVersion: "2025-02-24.acacia"
     });
     const body = await c.req.json();
     const { priceId, userId, successUrl, cancelUrl, mode, metadata } = body;
@@ -39360,7 +39360,7 @@ app13.post("/create-checkout", async (c) => {
 app13.post("/create-portal", async (c) => {
   try {
     const stripe2 = new stripe_esm_worker_default(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2024-11-20.acacia"
+      apiVersion: "2025-02-24.acacia"
     });
     const body = await c.req.json();
     const { customerId, returnUrl } = body;
@@ -39383,7 +39383,7 @@ app13.post("/create-portal", async (c) => {
 app13.get("/subscription/:subscriptionId", async (c) => {
   try {
     const stripe2 = new stripe_esm_worker_default(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2024-11-20.acacia"
+      apiVersion: "2025-02-24.acacia"
     });
     const subscriptionId = c.req.param("subscriptionId");
     const subscription = await stripe2.subscriptions.retrieve(subscriptionId);
@@ -39406,7 +39406,7 @@ app13.get("/subscription/:subscriptionId", async (c) => {
 app13.post("/subscription/:subscriptionId/cancel", async (c) => {
   try {
     const stripe2 = new stripe_esm_worker_default(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2024-11-20.acacia"
+      apiVersion: "2025-02-24.acacia"
     });
     const subscriptionId = c.req.param("subscriptionId");
     const subscription = await stripe2.subscriptions.update(subscriptionId, {
@@ -39427,7 +39427,7 @@ app13.post("/subscription/:subscriptionId/cancel", async (c) => {
 app13.post("/subscription/:subscriptionId/resume", async (c) => {
   try {
     const stripe2 = new stripe_esm_worker_default(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2024-11-20.acacia"
+      apiVersion: "2025-02-24.acacia"
     });
     const subscriptionId = c.req.param("subscriptionId");
     await stripe2.subscriptions.update(subscriptionId, {
@@ -39453,7 +39453,7 @@ init_performance2();
 var app14 = new Hono2();
 async function verifyStripeWebhook(payload, signature, secret) {
   try {
-    const stripe2 = new stripe_esm_worker_default(secret, { apiVersion: "2024-11-20.acacia" });
+    const _stripe = new stripe_esm_worker_default(secret, { apiVersion: "2025-02-24.acacia" });
     const event = JSON.parse(payload);
     return event;
   } catch (err) {
@@ -40668,7 +40668,7 @@ app20.post("/topup", async (c) => {
       }, 400);
     }
     const stripe2 = new stripe_esm_worker_default(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2024-11-20.acacia"
+      apiVersion: "2025-02-24.acacia"
     });
     const selectedBundle = CREDIT_BUNDLES[bundle];
     const paymentIntent = await stripe2.paymentIntents.create({

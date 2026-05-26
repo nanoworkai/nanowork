@@ -200,7 +200,7 @@ function getTemplateStyles(template: string) {
   return templates[template] || templates.yc;
 }
 
-function renderSlide(slide: SlideContent, index: number, templateStyles: any): string {
+function renderSlide(slide: SlideContent, index: number, _templateStyles: any): string {
   if (slide.type === 'cover') {
     return `
       <div class="cover">

@@ -13,7 +13,6 @@ import {
 import { toast } from 'sonner';
 import {
   spreadsheetApi,
-  type WorkbookData,
   type CellUpdate,
   type BatchCellUpdateRequest,
 } from './api';

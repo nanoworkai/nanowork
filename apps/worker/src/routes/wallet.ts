@@ -131,7 +131,7 @@ app.post('/topup', async (c) => {
     }
 
     const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-11-20.acacia',
+      apiVersion: '2025-02-24.acacia',
     });
 
     const selectedBundle = CREDIT_BUNDLES[bundle as keyof typeof CREDIT_BUNDLES];

@@ -9,7 +9,7 @@ import {
   Activity,
   BarChart3,
 } from "lucide-react";
-import { BUSINESSES, type Business, type BusinessStatus } from "../data/businesses";
+import { BUSINESSES, type Business } from "../data/businesses";
 
 /**
  * Marketplace Statistics Dashboard
@@ -387,9 +387,9 @@ interface MarketplaceStatsProps {
   onFilterByCategory?: (category: string) => void;
 }
 
-export default function MarketplaceStats({ variant = "full", onFilterByCategory }: MarketplaceStatsProps) {
+export default function MarketplaceStats({ variant = "full", onFilterByCategory: _onFilterByCategory }: MarketplaceStatsProps) {
   const [metrics, setMetrics] = useState<MarketplaceMetrics | null>(null);
-  const [liveUpdate, setLiveUpdate] = useState(0);
+  const [_liveUpdate, setLiveUpdate] = useState(0);
 
   useEffect(() => {
     // Calculate initial metrics

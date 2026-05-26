@@ -243,7 +243,7 @@ function TerminalPrompt() {
 // DATA GRID - Infrastructure specs
 // ──────────────────────────────────────────────────────────────────────────────
 
-function DepartmentGrid() {
+function _DepartmentGrid() {
   const departments = [
     {
       name: "Legal",

@@ -369,7 +369,7 @@ export default function BuildPitchDeck() {
 
         {/* Slide Thumbnails */}
         <div className="flex items-center gap-2 overflow-x-auto max-w-2xl px-2">
-          {slides.map((s, index) => (
+          {slides.map((_s, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
@@ -552,7 +552,7 @@ function renderContentByLayout(content: any, layout: string, isFullScreen = fals
   );
 }
 
-function renderSimpleContent(content: any, textSize: string): React.ReactNode {
+function renderSimpleContent(content: any, _textSize: string): React.ReactNode {
   if (typeof content === 'string') {
     return <span>{content}</span>;
   }

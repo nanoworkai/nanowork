@@ -90,14 +90,14 @@ export async function sendAsAgent(
     });
 
     if (!resendResponse.ok) {
-      const errorData = await resendResponse.json().catch(() => ({}));
+      const errorData = await resendResponse.json().catch(() => ({})) as { message?: string };
       return {
         success: false,
         error: `Resend API error: ${errorData.message || resendResponse.statusText}`,
       };
     }
 
-    const resendData = await resendResponse.json();
+    const resendData = await resendResponse.json() as { id?: string };
 
     return {
       success: true,
@@ -145,14 +145,14 @@ export async function sendSystemEmail(
     });
 
     if (!resendResponse.ok) {
-      const errorData = await resendResponse.json().catch(() => ({}));
+      const errorData = await resendResponse.json().catch(() => ({})) as { message?: string };
       return {
         success: false,
         error: `Resend API error: ${errorData.message || resendResponse.statusText}`,
       };
     }
 
-    const resendData = await resendResponse.json();
+    const resendData = await resendResponse.json() as { id?: string };
 
     return {
       success: true,

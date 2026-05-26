@@ -57,13 +57,13 @@ export async function* query(options: {
   prompt: string;
   options?: QueryOptions;
 }): AsyncGenerator<Message, void, unknown> {
-  const { prompt, options: queryOptions = {} } = options;
+  const { prompt, options: _queryOptions = {} } = options;
 
   // Check if it's a slash command
   if (prompt.trim().startsWith('/')) {
     const parsed = await parseSlashCommand(prompt);
 
-    if (parsed.isSlashCommand) {
+    if (parsed.isSlashCommand && parsed.command) {
       // Execute the command
       const result = await executeCommand(parsed.command, parsed.args);
       yield result;
@@ -84,7 +84,7 @@ export async function getAvailableCommands(): Promise<SlashCommand[]> {
   try {
     const response = await fetch('/api/slash-commands', {
       headers: {
-        'Authorization': `Bearer ${apiClient.getToken()}`,
+        'Authorization': `Bearer ${apiClient.getToken() ?? ''}`,
         'Content-Type': 'application/json',
       },
     });
@@ -108,7 +108,7 @@ export async function getInitMessage(): Promise<SystemMessage> {
   try {
     const response = await fetch('/api/slash-commands/init', {
       headers: {
-        'Authorization': `Bearer ${apiClient.getToken()}`,
+        'Authorization': `Bearer ${apiClient.getToken() ?? ''}`,
         'Content-Type': 'application/json',
       },
     });
@@ -136,7 +136,7 @@ export async function getCommand(name: string): Promise<SlashCommand | null> {
   try {
     const response = await fetch(`/api/slash-commands/${name}`, {
       headers: {
-        'Authorization': `Bearer ${apiClient.getToken()}`,
+        'Authorization': `Bearer ${apiClient.getToken() ?? ''}`,
         'Content-Type': 'application/json',
       },
     });
@@ -168,7 +168,7 @@ export async function parseSlashCommand(input: string): Promise<{
     const response = await fetch('/api/slash-commands/parse', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiClient.getToken()}`,
+        'Authorization': `Bearer ${apiClient.getToken() ?? ''}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ input }),
@@ -199,7 +199,7 @@ export async function executeCommand(
     const response = await fetch('/api/slash-commands/execute', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiClient.getToken()}`,
+        'Authorization': `Bearer ${apiClient.getToken() ?? ''}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ command, args }),

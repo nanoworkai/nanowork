@@ -19,7 +19,7 @@ interface EmailMessage {
 }
 
 export default function Inbox() {
-  const { profile, session } = useAuth();
+  const { profile, session: _session } = useAuth();
   const [emails, setEmails] = useState<EmailMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmail, setSelectedEmail] = useState<EmailMessage | null>(null);

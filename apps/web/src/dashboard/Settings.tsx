@@ -699,7 +699,7 @@ function PlanSection() {
         throw new Error(data.error || "Failed to create subscription");
       }
 
-      const { subscriptionId, clientSecret: secret, status } = await res.json();
+      const { subscriptionId: _subscriptionId, clientSecret: secret, status } = await res.json();
 
       // If subscription is incomplete and needs payment
       if (secret && status !== 'active') {

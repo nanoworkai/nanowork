@@ -8,7 +8,7 @@ const app = new Hono<{ Bindings: Env }>()
 app.post('/create-checkout', async (c) => {
   try {
     const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-11-20.acacia',
+      apiVersion: '2025-02-24.acacia',
     })
 
     const body = await c.req.json<{
@@ -70,7 +70,7 @@ app.post('/create-checkout', async (c) => {
 app.post('/create-portal', async (c) => {
   try {
     const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-11-20.acacia',
+      apiVersion: '2025-02-24.acacia',
     })
 
     const body = await c.req.json<{
@@ -104,7 +104,7 @@ app.post('/create-portal', async (c) => {
 app.get('/subscription/:subscriptionId', async (c) => {
   try {
     const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-11-20.acacia',
+      apiVersion: '2025-02-24.acacia',
     })
 
     const subscriptionId = c.req.param('subscriptionId')
@@ -132,7 +132,7 @@ app.get('/subscription/:subscriptionId', async (c) => {
 app.post('/subscription/:subscriptionId/cancel', async (c) => {
   try {
     const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-11-20.acacia',
+      apiVersion: '2025-02-24.acacia',
     })
 
     const subscriptionId = c.req.param('subscriptionId')
@@ -159,7 +159,7 @@ app.post('/subscription/:subscriptionId/cancel', async (c) => {
 app.post('/subscription/:subscriptionId/resume', async (c) => {
   try {
     const stripe = new Stripe(c.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-11-20.acacia',
+      apiVersion: '2025-02-24.acacia',
     })
 
     const subscriptionId = c.req.param('subscriptionId')

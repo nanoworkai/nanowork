@@ -1,0 +1,25 @@
+/* HomeOld.tsx styles */
+.promptWrapper {
+  width: 100%;
+}
+
+.promptContainer {
+  position: relative;
+}
+
+.promptTextarea {
+  width: 100%;
+}
+
+.promptPlaceholder {
+  position: absolute;
+}
+
+.cursor {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
