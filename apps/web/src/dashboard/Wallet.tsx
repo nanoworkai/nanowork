@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Coins, TrendingUp, TrendingDown, AlertCircle, X, CreditCard } from "lucide-react";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+// import { loadStripe } from "@stripe/stripe-js";
+// import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { apiFetch } from "../lib/apiFetch";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+// const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
 interface CreditTransaction {
   id: string;
@@ -33,45 +33,14 @@ interface PaymentFormProps {
 }
 
 function PaymentForm({ clientSecret, amount, credits, onSuccess, onCancel, onError }: PaymentFormProps) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [processing, setProcessing] = useState(false);
+  // const stripe = useStripe();
+  // const elements = useElements();
+  const [_processing, setProcessing] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
-
-    setProcessing(true);
-
-    try {
-      const cardElement = elements.getElement(CardElement);
-
-      if (!cardElement) {
-        throw new Error('Card element not found');
-      }
-
-      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement,
-        },
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (paymentIntent.status === 'succeeded') {
-        onSuccess();
-      }
-    } catch (err) {
-      console.error('Payment error:', err);
-      onError(err instanceof Error ? err.message : 'Payment failed');
-    } finally {
-      setProcessing(false);
-    }
+    // Stripe payment disabled
+    onError('Payment processing is temporarily disabled');
   };
 
   return (
@@ -90,56 +59,18 @@ function PaymentForm({ clientSecret, amount, credits, onSuccess, onCancel, onErr
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-zinc-300 mb-2">
-          Card details
-        </label>
         <div className="p-4 rounded-xl border border-white/10 bg-surface-2">
-          <CardElement
-            options={{
-              style: {
-                base: {
-                  fontSize: '16px',
-                  color: '#ffffff',
-                  '::placeholder': {
-                    color: '#71717a',
-                  },
-                  iconColor: '#71717a',
-                },
-                invalid: {
-                  color: '#f87171',
-                  iconColor: '#f87171',
-                },
-              },
-            }}
-          />
+          <p className="text-zinc-400 text-sm">Payment processing is temporarily disabled</p>
         </div>
-        <p className="mt-2 text-xs text-zinc-500">
-          Test card: 4242 4242 4242 4242 (any future date, any CVC)
-        </p>
       </div>
 
       <div className="flex gap-3">
         <button
           type="button"
           onClick={onCancel}
-          disabled={processing}
-          className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold bg-surface-2 text-white hover:bg-surface-3 border border-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold bg-surface-2 text-white hover:bg-surface-3 border border-white/10 transition-all"
         >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={!stripe || processing}
-          className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold bg-white text-black hover:bg-zinc-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {processing ? (
-            <div className="flex items-center justify-center gap-2">
-              <div className="w-4 h-4 border-2 border-zinc-600 border-t-black rounded-full animate-spin" />
-              <span>Processing...</span>
-            </div>
-          ) : (
-            `Pay $${amount}`
-          )}
+          Close
         </button>
       </div>
     </form>
@@ -446,16 +377,14 @@ export default function Wallet() {
               </button>
             </div>
 
-            <Elements stripe={stripePromise}>
-              <PaymentForm
-                clientSecret={paymentModal.clientSecret}
-                amount={paymentModal.amount}
-                credits={paymentModal.credits}
-                onSuccess={handlePaymentSuccess}
-                onCancel={handlePaymentCancel}
-                onError={handlePaymentError}
-              />
-            </Elements>
+            <PaymentForm
+              clientSecret={paymentModal.clientSecret}
+              amount={paymentModal.amount}
+              credits={paymentModal.credits}
+              onSuccess={handlePaymentSuccess}
+              onCancel={handlePaymentCancel}
+              onError={handlePaymentError}
+            />
           </div>
         </div>
       )}

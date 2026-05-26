@@ -4,11 +4,11 @@ import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { LogOut, CreditCard, Globe, User, Mail, Copy, Check, Inbox, ExternalLink, AlertCircle } from "lucide-react";
 import type { UserProfile } from "../context/AuthContext";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+// import { loadStripe } from "@stripe/stripe-js";
+// import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { apiFetch } from "../lib/apiFetch";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+// const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
 /* ── Section wrapper ─────────────────────────────────────── */
 
@@ -559,47 +559,16 @@ interface PaymentModalProps {
 }
 
 function PaymentModal({ plan, clientSecret, onSuccess, onCancel, onError }: PaymentModalProps) {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [processing, setProcessing] = useState(false);
+  // const stripe = useStripe();
+  // const elements = useElements();
+  const [_processing, setProcessing] = useState(false);
 
   const planDetails = PLANS.find(p => p.tier === plan);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!stripe || !elements || !planDetails) {
-      return;
-    }
-
-    setProcessing(true);
-
-    try {
-      const cardElement = elements.getElement(CardElement);
-
-      if (!cardElement) {
-        throw new Error('Card element not found');
-      }
-
-      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement,
-        },
-      });
-
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      if (paymentIntent.status === 'succeeded') {
-        onSuccess();
-      }
-    } catch (err) {
-      console.error('Payment error:', err);
-      onError(err instanceof Error ? err.message : 'Payment failed');
-    } finally {
-      setProcessing(false);
-    }
+    // Stripe payment disabled
+    onError('Payment processing is temporarily disabled');
   };
 
   return (
@@ -613,25 +582,10 @@ function PaymentModal({ plan, clientSecret, onSuccess, onCancel, onError }: Paym
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-zinc-300 mb-2">
-              Card details
+              Payment Status
             </label>
             <div className="p-4 rounded-xl border border-white/10 bg-surface-2">
-              <CardElement
-                options={{
-                  style: {
-                    base: {
-                      fontSize: '16px',
-                      color: '#fff',
-                      '::placeholder': {
-                        color: '#52525b',
-                      },
-                    },
-                    invalid: {
-                      color: '#ef4444',
-                    },
-                  },
-                }}
-              />
+              <p className="text-zinc-400 text-sm">Payment processing is temporarily disabled</p>
             </div>
           </div>
 
@@ -639,17 +593,9 @@ function PaymentModal({ plan, clientSecret, onSuccess, onCancel, onError }: Paym
             <button
               type="button"
               onClick={onCancel}
-              disabled={processing}
-              className="flex-1 py-2.5 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors disabled:opacity-50"
+              className="flex-1 py-2.5 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors"
             >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!stripe || processing}
-              className="flex-1 py-2.5 rounded-xl bg-white hover:bg-zinc-100 disabled:opacity-50 text-black text-sm font-semibold transition-colors"
-            >
-              {processing ? "Processing..." : `Pay $${planDetails?.price}`}
+              Close
             </button>
           </div>
         </form>
@@ -877,15 +823,13 @@ function PlanSection() {
 
       {/* Payment modal */}
       {clientSecret && pendingPlan && (
-        <Elements stripe={stripePromise}>
-          <PaymentModal
-            plan={pendingPlan}
-            clientSecret={clientSecret}
-            onSuccess={handlePaymentSuccess}
-            onCancel={handlePaymentCancel}
-            onError={handlePaymentError}
-          />
-        </Elements>
+        <PaymentModal
+          plan={pendingPlan}
+          clientSecret={clientSecret}
+          onSuccess={handlePaymentSuccess}
+          onCancel={handlePaymentCancel}
+          onError={handlePaymentError}
+        />
       )}
     </>
   );
