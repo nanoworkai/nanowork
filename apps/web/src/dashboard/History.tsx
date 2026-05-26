@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Clock, CheckCircle2, AlertCircle, Loader2, History as HistoryIcon } from "lucide-react";
+import { apiFetch } from "../lib/apiFetch";
 
 interface Build {
   id: string;
@@ -18,8 +19,6 @@ export default function History() {
   const [builds, setBuilds] = useState<Build[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const apiUrl = import.meta.env.VITE_API_URL || '';
-
   useEffect(() => {
     loadBuilds();
   }, [session]);
@@ -29,11 +28,7 @@ export default function History() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${apiUrl}/api/builds`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
+      const res = await apiFetch('/api/builds');
 
       if (res.ok) {
         const { builds: loadedBuilds } = await res.json();

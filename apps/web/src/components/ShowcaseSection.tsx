@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Building2 } from 'lucide-react';
 import { ShowcaseCard } from './ShowcaseCard';
 import { ClaimBusinessModal } from './ClaimBusinessModal';
+import { apiFetch } from '../lib/apiFetch';
 
 interface ShowcaseCompany {
   id: string;
@@ -30,7 +31,7 @@ export function ShowcaseSection() {
 
   async function fetchShowcaseCompanies() {
     try {
-      const response = await fetch(`${import.meta.env?.VITE_API_URL || ''}/api/showcase/companies`);
+      const response = await apiFetch('/api/showcase/companies');
       if (!response.ok) throw new Error('Failed to fetch');
       const data = await response.json();
       setShowcaseCompanies(data);

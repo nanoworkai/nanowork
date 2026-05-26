@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../lib/apiFetch";
 import { Terminal, ChevronDown, Edit2, Trash2, FileText, Table, Presentation } from "lucide-react";
 
 /**
@@ -576,18 +577,12 @@ export default function Overview() {
     buildEnabled
   );
 
-  const apiUrl = import.meta.env.VITE_API_URL || '';
-
   // Load builds
   const loadBuilds = async () => {
     if (!session?.access_token) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/builds`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
+      const res = await apiFetch('/api/builds');
 
       if (res.ok) {
         const { builds: loadedBuilds } = await res.json();
@@ -622,10 +617,9 @@ export default function Overview() {
     if (!session?.access_token) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/builds`, {
+      const res = await apiFetch('/api/builds', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ name: 'New Build' }),
@@ -647,10 +641,9 @@ export default function Overview() {
 
     try {
       // Generate AI name for the build
-      const nameRes = await fetch(`${apiUrl}/api/builds/generate-name`, {
+      const nameRes = await apiFetch('/api/builds/generate-name', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ prompt }),
@@ -663,10 +656,9 @@ export default function Overview() {
       }
 
       // Update build with name and prompt
-      await fetch(`${apiUrl}/api/builds/${activeBuild.id}`, {
+      await apiFetch(`/api/builds/${activeBuild.id}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -697,10 +689,9 @@ export default function Overview() {
     if (!session?.access_token) return;
 
     try {
-      await fetch(`${apiUrl}/api/builds/${id}`, {
+      await apiFetch(`/api/builds/${id}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ name }),
@@ -720,11 +711,8 @@ export default function Overview() {
     if (!session?.access_token) return;
 
     try {
-      await fetch(`${apiUrl}/api/builds/${id}`, {
+      await apiFetch(`/api/builds/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
       });
 
       const remainingBuilds = builds.filter((b) => b.id !== id);

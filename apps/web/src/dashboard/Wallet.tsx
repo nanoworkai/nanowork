@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { Coins, TrendingUp, TrendingDown, AlertCircle, X, CreditCard } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { apiFetch } from "../lib/apiFetch";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
@@ -168,14 +169,8 @@ export default function Wallet() {
     if (!session?.access_token) return;
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-
       // Fetch balance
-      const balanceRes = await fetch(`${apiUrl}/api/wallet/balance`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
+      const balanceRes = await apiFetch('/api/wallet/balance');
 
       if (balanceRes.ok) {
         const { balance: bal } = await balanceRes.json();
@@ -183,11 +178,7 @@ export default function Wallet() {
       }
 
       // Fetch transactions
-      const transactionsRes = await fetch(`${apiUrl}/api/wallet/transactions?limit=20`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
+      const transactionsRes = await apiFetch('/api/wallet/transactions?limit=20');
 
       if (transactionsRes.ok) {
         const { transactions: txns } = await transactionsRes.json();
@@ -202,8 +193,7 @@ export default function Wallet() {
 
   const fetchBundles = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const res = await fetch(`${apiUrl}/api/wallet/bundles`);
+      const res = await apiFetch('/api/wallet/bundles');
 
       if (res.ok) {
         const { bundles: bundleData } = await res.json();
@@ -221,13 +211,10 @@ export default function Wallet() {
     setError(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-
       // Create payment intent
-      const res = await fetch(`${apiUrl}/api/wallet/topup`, {
+      const res = await apiFetch('/api/wallet/topup', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ bundle: bundleId }),

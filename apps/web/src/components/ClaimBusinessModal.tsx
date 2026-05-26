@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { X, Check, Building2, TrendingUp, Zap } from 'lucide-react';
+import { apiFetch } from '../lib/apiFetch';
 
 interface ClaimBusinessModalProps {
   isOpen: boolean;
@@ -38,11 +39,8 @@ export function ClaimBusinessModal({ isOpen, company, onClose }: ClaimBusinessMo
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env?.VITE_API_URL || ''}/api/showcase/checkout`, {
+      const response = await apiFetch('/api/showcase/checkout', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           companyId: company.id,
           userId: user!.id,

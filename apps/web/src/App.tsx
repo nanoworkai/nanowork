@@ -21,6 +21,7 @@ import BuildSpreadsheet from "./dashboard/BuildSpreadsheet";
 import BuildPitchDeck from "./dashboard/BuildPitchDeck";
 import Inbox from "./dashboard/Inbox";
 import Wallet from "./dashboard/Wallet";
+import Financials from "./dashboard/Financials";
 import PitchDeck from "./dashboard/PitchDeck";
 import Spreadsheets from "./dashboard/Spreadsheets";
 import Documents from "./dashboard/Documents";
@@ -68,6 +69,7 @@ export default function App() {
         }
       >
         <Route index element={<Create />} />
+        <Route path="financials" element={<Financials />} />
         <Route path="history" element={<History />} />
         <Route path="builds/:buildId" element={<Overview />} />
         <Route path="builder/:buildId" element={<BuilderView />} />

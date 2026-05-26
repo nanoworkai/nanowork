@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import type { UserProfile } from "../context/AuthContext";
+import { apiFetch } from "../lib/apiFetch";
 
 type PlanTier = UserProfile["plan"];
 
@@ -49,9 +50,8 @@ export default function Plan() {
 
   const openBillingPortal = async () => {
     try {
-      const res = await fetch("/api/billing/portal", {
+      const res = await apiFetch("/api/billing/portal", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ return_url: window.location.href }),
       });
       const { url } = await res.json();

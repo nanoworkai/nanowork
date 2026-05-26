@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Mail, Send, Check, AlertCircle } from "lucide-react";
+import { apiFetch } from "../lib/apiFetch";
 
 /**
  * AI Email Manager Component
@@ -37,12 +38,7 @@ export default function AIEmailManager() {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await fetch(`${apiUrl}/api/email/status`, {
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-        },
-      });
+      const response = await apiFetch('/api/email/status');
 
       if (response.ok) {
         const data = await response.json();
@@ -63,13 +59,8 @@ export default function AIEmailManager() {
     setAssignError(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await fetch(`${apiUrl}/api/email/assign`, {
+      const response = await apiFetch('/api/email/assign', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ agentName: agentName.trim() }),
       });
 
@@ -97,13 +88,8 @@ export default function AIEmailManager() {
     setSendSuccess(false);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await fetch(`${apiUrl}/api/email/send`, {
+      const response = await apiFetch('/api/email/send', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           to: to.trim(),
           subject: subject.trim(),

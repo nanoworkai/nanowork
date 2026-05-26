@@ -14,6 +14,7 @@ import {
   FileCode,
 } from "lucide-react";
 import { exportToPDF, downloadJSON, downloadMarkdown } from "../lib/pdfExport";
+import { apiFetch } from "../lib/apiFetch";
 
 interface SlideContent {
   type: string;
@@ -51,7 +52,6 @@ export default function PitchDeckEditor({
   onClose,
 }: PitchDeckEditorProps) {
   const { session } = useAuth();
-  const apiUrl = import.meta.env.VITE_API_URL || "";
 
   // State
   const [deck, setDeck] = useState<PitchDeck | null>(null);
@@ -85,12 +85,8 @@ export default function PitchDeckEditor({
     setError(null);
 
     try {
-      const response = await fetch(`${apiUrl}/api/pitch-deck/generate`, {
+      const response = await apiFetch("/api/pitch-deck/generate", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           businessDescription,
           companyName: companyName || undefined,
@@ -129,12 +125,8 @@ export default function PitchDeckEditor({
     setError(null);
 
     try {
-      const response = await fetch(`${apiUrl}/api/pitch-deck/improve-slide`, {
+      const response = await apiFetch("/api/pitch-deck/improve-slide", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           slideContent: currentSlide,
           instruction: aiInstruction,

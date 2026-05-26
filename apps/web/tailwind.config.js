@@ -6,10 +6,10 @@ export default {
       colors: {
         // Monochromatic base - dark but not pure black for better readability
         surface: {
-          0: "#0d0d0d",     // Main background - dark charcoal
-          1: "#161616",     // Slightly lifted surface
+          0: "#111111",     // Main background - lighter dark
+          1: "#1a1a1a",     // Slightly lifted surface
           2: "#1e1e1e",     // Card background
-          3: "#262626",     // Elevated card
+          3: "#2a2a2a",     // Elevated card
           4: "#303030",     // Hover state
         },
         // Minimal accent - used only for active states and CTAs

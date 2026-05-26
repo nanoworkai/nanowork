@@ -280,22 +280,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
-    try {
-      await supabase.auth.signOut();
-      setProfile(null);
-      setCompanies([]);
-      setActiveCompanyId(null);
-      localStorage.removeItem("activeCompanyId");
-    } catch (error) {
-      console.error("Logout error:", error);
-      // Clear local state even if signOut fails
-      setSession(null);
-      setUser(null);
-      setProfile(null);
-      setCompanies([]);
-      setActiveCompanyId(null);
-      localStorage.removeItem("activeCompanyId");
-    }
+    await supabase.auth.signOut();
+    window.location.href = '/login';
   }, []);
 
   const updateProfile = useCallback(async (partial: Partial<UserProfile>) => {

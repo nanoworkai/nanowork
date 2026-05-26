@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { TEMPLATES, type Template } from '../lib/spreadsheet/templates';
 import SpreadsheetEditor from '../components/SpreadsheetEditor';
+import { apiFetch } from '../lib/apiFetch';
 
 // ───────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -53,19 +54,13 @@ export default function Spreadsheets() {
   const [selectedWorkbookId, setSelectedWorkbookId] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Template['category'] | 'all'>('all');
 
-  const apiUrl = import.meta.env.VITE_API_URL || '';
-
   // ─── Load Workbooks ──────────────────────────────────────────────────────
 
   const loadWorkbooks = async () => {
     if (!session?.access_token) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/spreadsheets/workbooks`, {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
+      const res = await apiFetch('/api/spreadsheets/workbooks');
 
       if (res.ok) {
         const { workbooks: data } = await res.json();
@@ -106,10 +101,9 @@ export default function Spreadsheets() {
     if (!session?.access_token) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/spreadsheets/workbooks`, {
+      const res = await apiFetch('/api/spreadsheets/workbooks', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -131,10 +125,9 @@ export default function Spreadsheets() {
     if (!session?.access_token) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/spreadsheets/workbooks/from-template`, {
+      const res = await apiFetch('/api/spreadsheets/workbooks/from-template', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -164,11 +157,8 @@ export default function Spreadsheets() {
     if (!confirm('Delete this workbook? This cannot be undone.')) return;
 
     try {
-      const res = await fetch(`${apiUrl}/api/spreadsheets/workbooks/${id}`, {
+      const res = await apiFetch(`/api/spreadsheets/workbooks/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
       });
 
       if (res.ok) {

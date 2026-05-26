@@ -6,6 +6,7 @@ import { LogOut, CreditCard, Globe, User, Mail, Copy, Check, Inbox, ExternalLink
 import type { UserProfile } from "../context/AuthContext";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { apiFetch } from "../lib/apiFetch";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
@@ -100,13 +101,8 @@ function BillingSection() {
     setError(null);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const res = await fetch(`${apiUrl}/api/billing/portal`, {
+      const res = await apiFetch('/api/billing/portal', {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.access_token}`,
-        },
       });
 
       if (!res.ok) {
@@ -255,13 +251,8 @@ function DeleteSection() {
 
     try {
       // Call backend API to delete user and all related data
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await fetch(`${apiUrl}/api/user`, {
+      const response = await apiFetch('/api/user', {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
       });
 
       if (!response.ok) {
@@ -698,13 +689,8 @@ function PlanSection() {
       }
 
       // Create subscription
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const res = await fetch(`${apiUrl}/api/billing/subscriptions`, {
+      const res = await apiFetch('/api/billing/subscriptions', {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.access_token}`,
-        },
         body: JSON.stringify({ priceId, plan }),
       });
 

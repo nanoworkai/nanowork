@@ -5,6 +5,7 @@ import { ArrowRight, Loader2, Building2, Sparkles, Settings2, Users, Package, Ga
 import WelcomeBanner from "./components/WelcomeBanner";
 import QuickStart from "./components/QuickStart";
 import IndustrialSlider from "./components/IndustrialSlider";
+import { apiFetch } from "../lib/apiFetch";
 
 export default function Create() {
   const { session, profile } = useAuth();
@@ -18,19 +19,13 @@ export default function Create() {
   const [userCount, setUserCount] = useState(3);
   const [features, setFeatures] = useState(5);
 
-  const apiUrl = import.meta.env.VITE_API_URL || '';
-
   // Check if user has any builds to determine first-time user status
   useEffect(() => {
     const checkBuilds = async () => {
       if (!session?.access_token) return;
 
       try {
-        const res = await fetch(`${apiUrl}/api/builds`, {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-        });
+        const res = await apiFetch('/api/builds');
 
         if (res.ok) {
           const { builds } = await res.json();
@@ -42,7 +37,7 @@ export default function Create() {
     };
 
     checkBuilds();
-  }, [session, apiUrl]);
+  }, [session]);
 
   const handleCreateBuild = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,12 +48,8 @@ export default function Create() {
 
     try {
       // Generate AI name for the build
-      const nameRes = await fetch(`${apiUrl}/api/builds/generate-name`, {
+      const nameRes = await apiFetch('/api/builds/generate-name', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ prompt }),
       });
 
@@ -69,12 +60,8 @@ export default function Create() {
       }
 
       // Create the build
-      const res = await fetch(`${apiUrl}/api/builds`, {
+      const res = await apiFetch('/api/builds', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           name: buildName,
           prompt: prompt.trim(),
