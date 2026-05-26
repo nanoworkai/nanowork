@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { apiUrl } from "../lib/apiBase";
+import { apiFetch } from "../lib/apiFetch";
 
 export type Region = {
   code: string;
@@ -106,7 +106,7 @@ export function PhoneProvider({ children }: { children: ReactNode }) {
     regionsLoadedRef.current = true;
     setState((s) => ({ ...s, status: "loading_regions", message: null }));
     try {
-      const res = await fetch(apiUrl("/api/phone"), { method: "GET" });
+      const res = await apiFetch("/api/phone", { method: "GET" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as { regions?: Region[] };
       const regions = Array.isArray(data.regions) ? data.regions : [];
@@ -165,9 +165,8 @@ export function PhoneProvider({ children }: { children: ReactNode }) {
       message: null,
     }));
     try {
-      const res = await fetch(apiUrl("/api/phone"), {
+      const res = await apiFetch("/api/phone", {
         method: "POST",
-        headers: { "content-type": "application/json" },
         body: JSON.stringify({ region: code }),
       });
       const data = (await res.json()) as {

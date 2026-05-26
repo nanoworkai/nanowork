@@ -13,6 +13,66 @@
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- ============================================================================
+-- COMPANIES TABLE
+-- ============================================================================
+-- Core company records - each user can own/be member of multiple companies
+
+CREATE TABLE IF NOT EXISTS companies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  slug TEXT UNIQUE,
+  industry TEXT,
+  logo_url TEXT,
+  status TEXT NOT NULL DEFAULT 'initializing' CHECK (status IN ('initializing', 'active', 'paused', 'archived', 'deleted')),
+  entity_type TEXT,
+  entity_state TEXT,
+  ein TEXT,
+  legal_entity_id TEXT,
+  brand_colors JSONB,
+  brand_guidelines_url TEXT,
+  subdomain TEXT UNIQUE,
+  custom_domain_id TEXT,
+  website_url TEXT,
+  website_status TEXT CHECK (website_status IN ('building', 'live', 'maintenance', 'offline')),
+  total_revenue DECIMAL(12,2) NOT NULL DEFAULT 0,
+  mrr DECIMAL(12,2) NOT NULL DEFAULT 0,
+  total_spend DECIMAL(12,2) NOT NULL DEFAULT 0,
+  settings JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  launched_at TIMESTAMPTZ,
+  archived_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_companies_owner_id ON companies(owner_id);
+CREATE INDEX IF NOT EXISTS idx_companies_slug ON companies(slug);
+CREATE INDEX IF NOT EXISTS idx_companies_subdomain ON companies(subdomain);
+CREATE INDEX IF NOT EXISTS idx_companies_status ON companies(status);
+CREATE INDEX IF NOT EXISTS idx_companies_deleted_at ON companies(deleted_at);
+
+-- ============================================================================
+-- COMPANY_MEMBERS TABLE
+-- ============================================================================
+-- Many-to-many relationship for company team members
+
+CREATE TABLE IF NOT EXISTS company_members (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('owner', 'admin', 'member', 'viewer')),
+  invited_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  invited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  joined_at TIMESTAMPTZ,
+  UNIQUE(company_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_company_members_company_id ON company_members(company_id);
+CREATE INDEX IF NOT EXISTS idx_company_members_user_id ON company_members(user_id);
+
+-- ============================================================================
 -- AGENTS TABLE
 -- ============================================================================
 -- Core agent records - one per department per company
@@ -181,12 +241,35 @@ CREATE INDEX IF NOT EXISTS idx_agent_documents_tags ON agent_documents USING gin
 -- ROW LEVEL SECURITY (RLS)
 -- ============================================================================
 
+ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE company_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agent_memories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agent_conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agent_emails ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agent_tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agent_documents ENABLE ROW LEVEL SECURITY;
+
+-- Users can see companies they own or are members of
+CREATE POLICY companies_user_policy ON companies
+  FOR ALL USING (
+    auth.uid() = owner_id
+    OR EXISTS (
+      SELECT 1 FROM company_members
+      WHERE company_members.company_id = companies.id
+      AND company_members.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY company_members_user_policy ON company_members
+  FOR ALL USING (
+    auth.uid() = user_id
+    OR EXISTS (
+      SELECT 1 FROM companies
+      WHERE companies.id = company_members.company_id
+      AND companies.owner_id = auth.uid()
+    )
+  );
 
 -- Users can only see their own agents and related data
 CREATE POLICY agents_user_policy ON agents
@@ -232,6 +315,9 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_companies_updated_at BEFORE UPDATE ON companies
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_agents_updated_at BEFORE UPDATE ON agents
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
