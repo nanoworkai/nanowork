@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Terminal, Target, Zap, Users } from "lucide-react";
+import Footer from "../components/Footer";
 
 export default function About() {
   return (
@@ -139,18 +140,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-fintech-border bg-surface-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-between text-sm text-fintech-slate">
-            <div className="flex items-center gap-3">
-              <Terminal className="w-4 h-4" />
-              <span className="font-semibold text-fintech-navy">Nanowork</span>
-            </div>
-            <div>© {new Date().getFullYear()} Nanowork Inc.</div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Terminal, Check, ArrowRight, Building2, Zap, Shield } from "lucide-react";
+import Footer from "../components/Footer";
 
 /**
  * PRICING PAGE - Enterprise fintech aesthetic
@@ -304,23 +305,7 @@ export default function Pricing() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-fintech-border bg-surface-0 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3 text-sm text-fintech-slate">
-              <Terminal className="w-4 h-4" />
-              <span className="font-semibold text-fintech-navy">Nanowork</span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-fintech-slate">
-              <Link to="/" className="hover:text-fintech-navy transition-colors">Home</Link>
-              <Link to="/pricing" className="hover:text-fintech-navy transition-colors">Pricing</Link>
-              <Link to="/privacy" className="hover:text-fintech-navy transition-colors">Privacy</Link>
-              <Link to="/terms" className="hover:text-fintech-navy transition-colors">Terms</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

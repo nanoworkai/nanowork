@@ -2,6 +2,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import { useNavigate, useSearchParams, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Terminal, AlertCircle, CheckCircle } from "lucide-react";
+import Footer from "../components/Footer";
 
 type Tab = "signin" | "signup";
 
@@ -282,6 +283,8 @@ export default function Login() {
           </p>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

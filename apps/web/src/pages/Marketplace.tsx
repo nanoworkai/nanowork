@@ -8,6 +8,7 @@ import {
   X,
   Terminal
 } from "lucide-react";
+import Footer from "../components/Footer";
 import { BUSINESSES } from "../data/businesses";
 import { MarketplaceCard } from "../components/MarketplaceCard";
 import MarketplaceFilters from "../components/MarketplaceFilters";
@@ -258,6 +259,8 @@ export default function Marketplace() {
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }
