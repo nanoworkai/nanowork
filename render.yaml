@@ -1,6 +1,6 @@
 services:
   # Frontend static site
-  - type: static
+  # - type: static
     name: nanowork-web
     branch: main
     region: oregon
