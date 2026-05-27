@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   * {
@@ -16,31 +16,31 @@
   }
 
   body {
-    @apply bg-surface-0 text-zinc-100 antialiased;
+    @apply bg-surface-0 text-fintech-navy antialiased;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    @apply bg-white/20 text-white;
+    @apply bg-accent-light text-accent;
   }
 
-  /* Premium scrollbar */
+  /* Modern light scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-surface-1;
+    @apply bg-surface-3;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-surface-4 rounded-full;
+    @apply bg-accent-muted/30 rounded-full;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #3a3a3c;
+    @apply bg-accent-muted/50;
   }
 }
 
@@ -49,33 +49,33 @@
     text-wrap: balance;
   }
 
-  /* Card surface with precise depth */
+  /* Card surface with modern elevation */
   .card {
     @apply bg-surface-2 shadow-card;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   .card-lg {
     @apply bg-surface-2 shadow-card-lg;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.06);
   }
 
   .card-xl {
     @apply bg-surface-2 shadow-card-xl;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
   }
 
-  /* Hover states - subtle lift */
+  /* Hover states - subtle lift and highlight */
   .card-hover:hover {
-    @apply bg-surface-3;
-    border-color: rgba(255, 255, 255, 0.12);
+    @apply bg-surface-1 shadow-card-lg;
+    border-color: rgba(0, 102, 255, 0.12);
     transform: translateY(-1px);
   }
 
   /* Separator line */
   .separator {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.08), transparent);
   }
 
   /* Stock ticker scroll animation */

@@ -4,18 +4,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Monochromatic base - dark but not pure black for better readability
+        // Bright, layered surface system - clean and inviting
         surface: {
-          0: "#111111",     // Main background - lighter dark
-          1: "#1a1a1a",     // Slightly lifted surface
-          2: "#1e1e1e",     // Card background
-          3: "#2a2a2a",     // Elevated card
-          4: "#303030",     // Hover state
+          0: "#FAFBFC",     // Main background - soft white with warmth
+          1: "#FFFFFF",     // Slightly lifted surface - pure white
+          2: "#FFFFFF",     // Card background - pure white
+          3: "#F5F7FA",     // Hover state - subtle gray
+          4: "#EEF2F6",     // Active/pressed state
         },
-        // Minimal accent - used only for active states and CTAs
+        // Professional fintech blue - trust and confidence
         accent: {
-          DEFAULT: "#ffffff", // Primary actions are white on black
-          muted: "#666666",   // Secondary elements
+          DEFAULT: "#0066FF", // Primary fintech blue
+          hover: "#0052CC",   // Darker on hover
+          light: "#E6F0FF",   // Light background tint
+          muted: "#6B7280",   // Secondary text
+        },
+        // Additional fintech colors
+        fintech: {
+          blue: "#0066FF",
+          green: "#00C853",   // Success, positive values
+          red: "#FF3B30",     // Errors, negative values
+          amber: "#FFB020",   // Warnings, alerts
+          navy: "#1E293B",    // Text and strong elements
         },
       },
       fontFamily: {
@@ -41,12 +51,12 @@ export default {
         xs: '2px',
       },
       boxShadow: {
-        // Depth through precise shadows - creates tactile card feeling
-        'card': '0 1px 2px 0 rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05)',
-        'card-lg': '0 4px 16px 0 rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.1)',
-        'card-xl': '0 8px 32px 0 rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.12)',
-        // Inner shadow for depth
-        'inner': 'inset 0 1px 0 0 rgba(255, 255, 255, 0.03)',
+        // Modern elevation shadows - subtle depth on light backgrounds
+        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06)',
+        'card-lg': '0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
+        'card-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
+        // Subtle inner shadow for inputs
+        'inner': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.04)',
       },
     },
   },
