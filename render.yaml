@@ -1,5 +1,6 @@
 services:
-  - type: static
+  - type: web
+    env: static
     name: nanowork-web
     branch: main
     region: oregon
