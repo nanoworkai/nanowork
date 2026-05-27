@@ -1,6 +1,5 @@
 services:
-  # Frontend static site
-  # - type: static
+  - type: static
     name: nanowork-web
     branch: main
     region: oregon
@@ -21,7 +20,6 @@ services:
       - key: VITE_STRIPE_PUBLISHABLE_KEY
         sync: false
 
-  # Backend API service
   - type: web
     name: nanowork-api
     runtime: node
