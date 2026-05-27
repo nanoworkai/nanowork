@@ -1,4 +1,4 @@
-import { TrendingUp, DollarSign, CheckCircle2, Clock } from "lucide-react";
+import { TrendingUp, DollarSign, CheckCircle2, Clock, ArrowRight } from "lucide-react";
 import { BUSINESSES, type Business } from "../data/businesses";
 
 /**
@@ -8,14 +8,14 @@ import { BUSINESSES, type Business } from "../data/businesses";
  */
 
 function getARRDisplay(mrr: string | undefined): { arr: string; tier: string; color: string } {
-  if (!mrr) return { arr: "TBD", tier: "Starter", color: "text-blue-400" };
+  if (!mrr) return { arr: "TBD", tier: "Starter", color: "text-accent" };
 
   const monthly = parseFloat(mrr.replace(/[^0-9.]/g, ''));
   const annual = monthly * 12;
 
-  if (annual >= 100000) return { arr: `$${(annual / 1000).toFixed(0)}K`, tier: "Scale", color: "text-emerald-400" };
-  if (annual >= 20000) return { arr: `$${(annual / 1000).toFixed(0)}K`, tier: "Growth", color: "text-green-400" };
-  return { arr: `$${(annual / 1000).toFixed(1)}K`, tier: "Starter", color: "text-blue-400" };
+  if (annual >= 100000) return { arr: `$${(annual / 1000).toFixed(0)}K`, tier: "Scale", color: "text-fintech-green" };
+  if (annual >= 20000) return { arr: `$${(annual / 1000).toFixed(0)}K`, tier: "Growth", color: "text-fintech-green" };
+  return { arr: `$${(annual / 1000).toFixed(1)}K`, tier: "Starter", color: "text-accent" };
 }
 
 function BusinessCard({ business }: { business: Business }) {
@@ -24,26 +24,26 @@ function BusinessCard({ business }: { business: Business }) {
 
   return (
     <div
-      className={`group relative border border-white/10 bg-surface-2 transition-all ${
-        isAvailable ? "hover:border-white/30 hover:bg-surface-3 cursor-pointer" : "opacity-60"
+      className={`group relative border border-fintech-border bg-surface-1 transition-colors ${
+        isAvailable ? "hover:border-fintech-navy cursor-pointer" : "opacity-40"
       }`}
     >
       {/* Status Badge */}
       <div className="absolute top-4 right-4 z-10">
         {business.status === "available" ? (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-green-500/10 border border-green-500/20">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs font-mono text-green-400 uppercase">Available</span>
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-fintech-green/10 border border-fintech-green/20">
+            <div className="w-1.5 h-1.5 bg-fintech-green" />
+            <span className="text-xs font-medium text-fintech-green">Available</span>
           </div>
         ) : business.status === "pending" ? (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20">
-            <Clock className="w-3 h-3 text-amber-400" />
-            <span className="text-xs font-mono text-amber-400 uppercase">Pending</span>
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-surface-0 border border-fintech-border">
+            <Clock className="w-3 h-3 text-fintech-slate" />
+            <span className="text-xs font-medium text-fintech-slate">Pending</span>
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/10 border border-white/20">
-            <CheckCircle2 className="w-3 h-3 text-white/60" />
-            <span className="text-xs font-mono text-white/60 uppercase">Claimed</span>
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-surface-0 border border-fintech-border">
+            <CheckCircle2 className="w-3 h-3 text-fintech-slate" />
+            <span className="text-xs font-medium text-fintech-slate">Claimed</span>
           </div>
         )}
       </div>
@@ -52,59 +52,51 @@ function BusinessCard({ business }: { business: Business }) {
       <div className="p-6">
         {/* Header */}
         <div className="mb-4">
-          <h3 className="text-lg font-mono font-bold text-white mb-1 group-hover:text-white/90 transition-colors">
+          <h3 className="text-lg font-semibold text-fintech-navy mb-1">
             {business.name}
           </h3>
-          <p className="text-xs font-mono text-white/40 uppercase tracking-wider">
+          <p className="text-xs text-fintech-slate">
             {business.category}
           </p>
         </div>
 
         {/* Tagline */}
-        <p className="text-sm text-white/70 mb-5 leading-relaxed">
+        <p className="text-sm text-fintech-slate mb-6 leading-relaxed">
           {business.tagline}
         </p>
 
         {/* Metrics */}
-        <div className="grid grid-cols-2 gap-4 mb-5 pb-5 border-b border-white/5">
+        <div className="grid grid-cols-2 gap-6 mb-6 pb-6 border-b border-fintech-divider">
           {/* ARR Potential */}
           <div>
-            <div className="flex items-center gap-1.5 mb-1">
-              <TrendingUp className="w-3.5 h-3.5 text-white/40" />
-              <span className="text-xs font-mono text-white/40 uppercase">Potential ARR</span>
+            <span className="text-xs text-fintech-slate/60 block mb-2">Potential ARR</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className={`text-xl font-semibold ${color}`}>{arr}</span>
+              <span className="text-xs text-fintech-slate/50">/yr</span>
             </div>
-            <div className="flex items-baseline gap-2">
-              <span className={`text-xl font-mono font-bold ${color}`}>{arr}</span>
-              <span className="text-xs font-mono text-white/30">/year</span>
-            </div>
-            <span className={`text-xs font-mono ${color}`}>{tier}</span>
           </div>
 
           {/* Price to Claim */}
           <div>
-            <div className="flex items-center gap-1.5 mb-1">
-              <DollarSign className="w-3.5 h-3.5 text-white/40" />
-              <span className="text-xs font-mono text-white/40 uppercase">Claim Price</span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl font-mono font-bold text-white">
+            <span className="text-xs text-fintech-slate/60 block mb-2">Claim price</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-xl font-semibold text-fintech-navy">
                 ${(business.price / 1000).toFixed(1)}K
               </span>
             </div>
-            <span className="text-xs font-mono text-white/30">one-time</span>
           </div>
         </div>
 
         {/* Tech Stack */}
-        <div className="mb-4">
-          <span className="text-xs font-mono text-white/40 uppercase tracking-wider block mb-2">
-            Tech Stack
+        <div className="mb-5">
+          <span className="text-xs text-fintech-slate/60 block mb-3">
+            Tech stack
           </span>
           <div className="flex flex-wrap gap-2">
             {business.stack.slice(0, 4).map((tech) => (
               <span
                 key={tech}
-                className="px-2 py-0.5 text-xs font-mono bg-white/5 border border-white/10 text-white/60"
+                className="px-2 py-1 text-xs bg-surface-0 border border-fintech-divider text-fintech-slate"
               >
                 {tech}
               </span>
@@ -114,8 +106,8 @@ function BusinessCard({ business }: { business: Business }) {
 
         {/* CTA Button */}
         {isAvailable && (
-          <button className="w-full py-3 bg-white hover:bg-zinc-100 text-black font-mono font-bold text-xs uppercase tracking-wider transition-colors">
-            Claim This Business
+          <button className="w-full py-2.5 bg-fintech-navy hover:bg-fintech-navy/90 text-white text-sm font-medium transition-colors">
+            Claim business
           </button>
         )}
       </div>
@@ -135,29 +127,24 @@ export default function BusinessShowcase() {
   }, 0);
 
   return (
-    <section className="py-12">
+    <section className="py-16 sm:py-20">
       {/* Section Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-xs font-mono font-bold text-white/40 uppercase tracking-wider">
-            AI-Generated Companies
-          </span>
-          <div className="flex-1 h-px bg-white/10" />
-          <span className="text-xs font-mono text-green-400 whitespace-nowrap">
-            ${(totalARR / 1000).toFixed(0)}K TOTAL ARR
+      <div className="mb-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-3xl font-semibold text-fintech-navy tracking-tight">
+            Pre-built businesses
+          </h2>
+          <span className="text-sm text-fintech-slate">
+            ${(totalARR / 1000).toFixed(0)}K total ARR
           </span>
         </div>
-
-        <h2 className="text-2xl sm:text-3xl font-mono font-bold text-white uppercase tracking-tight mb-3">
-          Ready-Made Businesses
-        </h2>
-        <p className="text-sm font-mono text-white/70 max-w-3xl leading-relaxed">
-          Pre-built companies with tech stack, customers, and revenue potential. Claim one, customize it, and start generating revenue immediately. Each business is fully configured with payment processing, authentication, and deployment ready.
+        <p className="text-lg text-fintech-slate max-w-3xl leading-relaxed">
+          Complete businesses with tech stack, payment processing, and deployment ready. Claim one and start generating revenue.
         </p>
       </div>
 
       {/* Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
         {showcaseBusinesses.map((business) => (
           <BusinessCard key={business.slug} business={business} />
         ))}
@@ -167,10 +154,10 @@ export default function BusinessShowcase() {
       <div className="flex justify-center">
         <a
           href="/marketplace"
-          className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 hover:border-white/40 bg-surface-2 hover:bg-surface-3 font-mono text-sm text-white uppercase tracking-wider transition-all group"
+          className="inline-flex items-center gap-2 px-6 py-2.5 border border-fintech-border hover:border-fintech-navy bg-surface-1 text-sm font-medium text-fintech-navy transition-colors"
         >
-          View All {BUSINESSES.length} Businesses
-          <TrendingUp className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          View all {BUSINESSES.length} businesses
+          <ArrowRight className="w-4 h-4" />
         </a>
       </div>
     </section>

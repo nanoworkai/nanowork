@@ -4,28 +4,33 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Bright, layered surface system - clean and inviting
+        // High-end fintech surface system
         surface: {
-          0: "#FAFBFC",     // Main background - soft white with warmth
-          1: "#FFFFFF",     // Slightly lifted surface - pure white
-          2: "#FFFFFF",     // Card background - pure white
-          3: "#F5F7FA",     // Hover state - subtle gray
-          4: "#EEF2F6",     // Active/pressed state
+          0: "#FAFAFA",     // Main background - near white
+          1: "#FFFFFF",     // Cards and elevated surfaces
+          2: "#FFFFFF",     // Pure white
+          3: "#F5F5F5",     // Hover state
+          4: "#E5E5E5",     // Active state
+          5: "#E0E0E0",     // Strong borders
         },
-        // Professional fintech blue - trust and confidence
+        // Enterprise fintech blue - trust and authority
         accent: {
-          DEFAULT: "#0066FF", // Primary fintech blue
-          hover: "#0052CC",   // Darker on hover
-          light: "#E6F0FF",   // Light background tint
-          muted: "#6B7280",   // Secondary text
+          DEFAULT: "#0055FF", // Strong primary blue
+          hover: "#0043CC",   // Darker on hover
+          light: "#F0F5FF",   // Subtle background tint
+          muted: "#71717A",   // Secondary text (zinc)
+          dark: "#002B80",    // Dark variant
         },
-        // Additional fintech colors
+        // Professional fintech colors
         fintech: {
-          blue: "#0066FF",
-          green: "#00C853",   // Success, positive values
-          red: "#FF3B30",     // Errors, negative values
-          amber: "#FFB020",   // Warnings, alerts
-          navy: "#1E293B",    // Text and strong elements
+          blue: "#0055FF",
+          green: "#059669",   // Success - more muted
+          red: "#DC2626",     // Errors - more serious
+          amber: "#D97706",   // Warnings
+          navy: "#18181B",    // Text - darker (zinc-900)
+          slate: "#52525B",   // Secondary text (zinc-600)
+          border: "#D4D4D8",  // Border color (zinc-300)
+          divider: "#E4E4E7", // Light dividers (zinc-200)
         },
       },
       fontFamily: {
@@ -51,12 +56,13 @@ export default {
         xs: '2px',
       },
       boxShadow: {
-        // Modern elevation shadows - subtle depth on light backgrounds
-        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06)',
-        'card-lg': '0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
-        'card-xl': '0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
+        // Sophisticated elevation shadows - crisp and minimal
+        'card': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        'card-lg': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        'card-xl': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'button': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
         // Subtle inner shadow for inputs
-        'inner': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.04)',
+        'inner': 'inset 0 1px 2px 0 rgba(0, 0, 0, 0.05)',
       },
     },
   },

@@ -9,14 +9,14 @@ interface MarketplaceCardProps {
 }
 
 function getARRDisplay(mrr: string | undefined): { arr: string; tier: string; color: string; raw: number } {
-  if (!mrr) return { arr: "TBD", tier: "Starter", color: "text-blue-400", raw: 0 };
+  if (!mrr) return { arr: "TBD", tier: "Starter", color: "text-accent", raw: 0 };
 
   const monthly = parseFloat(mrr.replace(/[^0-9.]/g, ''));
   const annual = monthly * 12;
 
-  if (annual >= 100000) return { arr: `$${(annual / 1000).toFixed(0)}K`, tier: "Scale", color: "text-emerald-400", raw: annual };
-  if (annual >= 20000) return { arr: `$${(annual / 1000).toFixed(0)}K`, tier: "Growth", color: "text-green-400", raw: annual };
-  return { arr: `$${(annual / 1000).toFixed(1)}K`, tier: "Starter", color: "text-blue-400", raw: annual };
+  if (annual >= 100000) return { arr: `$${(annual / 1000).toFixed(0)}K`, tier: "Scale", color: "text-fintech-green", raw: annual };
+  if (annual >= 20000) return { arr: `$${(annual / 1000).toFixed(0)}K`, tier: "Growth", color: "text-fintech-green", raw: annual };
+  return { arr: `$${(annual / 1000).toFixed(1)}K`, tier: "Starter", color: "text-accent", raw: annual };
 }
 
 export function MarketplaceCard({ business, viewMode }: MarketplaceCardProps) {
@@ -39,7 +39,7 @@ export function MarketplaceCard({ business, viewMode }: MarketplaceCardProps) {
       <>
       <div
         onClick={() => isAvailable && setShowDetailView(true)}
-        className={`group border border-white/10 bg-surface-2 hover:border-white/20 transition-all ${
+        className={`group border border-fintech-border bg-surface-1 hover:border-fintech-navy transition-all ${
           isAvailable ? "hover:bg-surface-3 cursor-pointer" : "opacity-70"
         }`}
       >
@@ -49,10 +49,10 @@ export function MarketplaceCard({ business, viewMode }: MarketplaceCardProps) {
             {/* Header with Status */}
             <div className="flex items-start justify-between gap-4 mb-3">
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-mono font-bold text-white mb-1 truncate group-hover:text-white/90 transition-colors">
+                <h3 className="text-lg font-semibold text-fintech-navy mb-1 truncate group-hover:opacity-80 transition-opacity">
                   {business.name}
                 </h3>
-                <p className="text-xs font-mono text-white/40 uppercase tracking-wider">
+                <p className="text-xs text-fintech-slate">
                   {business.category}
                 </p>
               </div>
@@ -60,26 +60,26 @@ export function MarketplaceCard({ business, viewMode }: MarketplaceCardProps) {
               {/* Status Badge */}
               <div className="flex-shrink-0">
                 {business.status === "available" ? (
-                  <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-green-500/10 border border-green-500/20">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                    <span className="text-xs font-mono text-green-400 uppercase">Available</span>
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-fintech-green/10 border border-fintech-green/20">
+                    <div className="w-1.5 h-1.5 bg-fintech-green animate-pulse" />
+                    <span className="text-xs font-medium text-fintech-green">Available</span>
                   </div>
                 ) : business.status === "pending" ? (
-                  <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20">
-                    <Clock className="w-3 h-3 text-amber-400" />
-                    <span className="text-xs font-mono text-amber-400 uppercase">Pending</span>
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-fintech-amber/10 border border-fintech-amber/20">
+                    <Clock className="w-3 h-3 text-fintech-amber" />
+                    <span className="text-xs font-medium text-fintech-amber">Pending</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/10 border border-white/20">
-                    <CheckCircle2 className="w-3 h-3 text-white/60" />
-                    <span className="text-xs font-mono text-white/60 uppercase">Claimed</span>
+                  <div className="flex items-center gap-1.5 px-2 py-1 bg-surface-0 border border-fintech-border">
+                    <CheckCircle2 className="w-3 h-3 text-fintech-slate" />
+                    <span className="text-xs font-medium text-fintech-slate">Claimed</span>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Tagline */}
-            <p className="text-sm text-white/70 mb-4 leading-relaxed line-clamp-2">
+            <p className="text-sm text-fintech-slate mb-4 leading-relaxed line-clamp-2">
               {business.tagline}
             </p>
 
@@ -88,13 +88,13 @@ export function MarketplaceCard({ business, viewMode }: MarketplaceCardProps) {
               {business.stack.slice(0, 5).map((tech) => (
                 <span
                   key={tech}
-                  className="px-2 py-0.5 text-xs font-mono bg-white/5 border border-white/10 text-white/60"
+                  className="px-2 py-0.5 text-xs bg-surface-0 border border-fintech-divider text-fintech-slate"
                 >
                   {tech}
                 </span>
               ))}
               {business.stack.length > 5 && (
-                <span className="px-2 py-0.5 text-xs font-mono text-white/40">
+                <span className="px-2 py-0.5 text-xs text-fintech-slate">
                   +{business.stack.length - 5} more
                 </span>
               )}
@@ -106,23 +106,23 @@ export function MarketplaceCard({ business, viewMode }: MarketplaceCardProps) {
             {/* ARR */}
             <div className="text-left lg:text-right">
               <div className="flex items-center gap-1.5 mb-1 justify-start lg:justify-end">
-                <TrendingUp className="w-3.5 h-3.5 text-white/40" />
-                <span className="text-xs font-mono text-white/40 uppercase">ARR</span>
+                <TrendingUp className="w-3.5 h-3.5 text-fintech-slate" />
+                <span className="text-xs text-fintech-slate/60">ARR</span>
               </div>
-              <div className={`text-xl font-mono font-bold ${color}`}>{arr}</div>
-              <span className={`text-xs font-mono ${color}`}>{tier}</span>
+              <div className={`text-xl font-semibold ${color}`}>{arr}</div>
+              <span className={`text-xs ${color}`}>{tier}</span>
             </div>
 
             {/* Price */}
             <div className="text-left lg:text-right">
               <div className="flex items-center gap-1.5 mb-1 justify-start lg:justify-end">
-                <DollarSign className="w-3.5 h-3.5 text-white/40" />
-                <span className="text-xs font-mono text-white/40 uppercase">Price</span>
+                <DollarSign className="w-3.5 h-3.5 text-fintech-slate" />
+                <span className="text-xs text-fintech-slate/60">Price</span>
               </div>
-              <div className="text-xl font-mono font-bold text-white">
+              <div className="text-xl font-semibold text-fintech-navy">
                 ${(business.price / 1000).toFixed(1)}K
               </div>
-              <span className="text-xs font-mono text-white/30">one-time</span>
+              <span className="text-xs text-fintech-slate">one-time</span>
             </div>
           </div>
         </div>
@@ -142,27 +142,27 @@ export function MarketplaceCard({ business, viewMode }: MarketplaceCardProps) {
     <>
     <div
       onClick={() => isAvailable && setShowDetailView(true)}
-      className={`group border border-white/10 bg-surface-2 flex flex-col h-full transition-all ${
-        isAvailable ? "hover:border-white/30 hover:bg-surface-3 cursor-pointer" : "opacity-60"
+      className={`group border border-fintech-border bg-surface-1 flex flex-col h-full transition-all ${
+        isAvailable ? "hover:border-fintech-navy hover:bg-surface-3 cursor-pointer" : "opacity-60"
       }`}
     >
       {/* Status Badge - Top Right */}
       <div className="relative p-6 pb-0">
         <div className="absolute top-4 right-4 z-10">
           {business.status === "available" ? (
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-green-500/10 border border-green-500/20">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs font-mono text-green-400 uppercase">Available</span>
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-fintech-green/10 border border-fintech-green/20">
+              <div className="w-1.5 h-1.5 bg-fintech-green animate-pulse" />
+              <span className="text-xs font-medium text-fintech-green">Available</span>
             </div>
           ) : business.status === "pending" ? (
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-amber-500/10 border border-amber-500/20">
-              <Clock className="w-3 h-3 text-amber-400" />
-              <span className="text-xs font-mono text-amber-400 uppercase">Pending</span>
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-fintech-amber/10 border border-fintech-amber/20">
+              <Clock className="w-3 h-3 text-fintech-amber" />
+              <span className="text-xs font-medium text-fintech-amber">Pending</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-white/10 border border-white/20">
-              <CheckCircle2 className="w-3 h-3 text-white/60" />
-              <span className="text-xs font-mono text-white/60 uppercase">Claimed</span>
+            <div className="flex items-center gap-1.5 px-2 py-1 bg-surface-0 border border-fintech-border">
+              <CheckCircle2 className="w-3 h-3 text-fintech-slate" />
+              <span className="text-xs font-medium text-fintech-slate">Claimed</span>
             </div>
           )}
         </div>
@@ -172,49 +172,49 @@ export function MarketplaceCard({ business, viewMode }: MarketplaceCardProps) {
       <div className="p-6 flex flex-col flex-1">
         {/* Header */}
         <div className="mb-4">
-          <h3 className="text-lg font-mono font-bold text-white mb-1 group-hover:text-white/90 transition-colors">
+          <h3 className="text-lg font-semibold text-fintech-navy mb-1 group-hover:opacity-80 transition-opacity">
             {business.name}
           </h3>
-          <p className="text-xs font-mono text-white/40 uppercase tracking-wider">
+          <p className="text-xs text-fintech-slate">
             {business.category}
           </p>
         </div>
 
         {/* Tagline */}
-        <p className="text-sm text-white/70 mb-4 leading-relaxed line-clamp-2 flex-1">
+        <p className="text-sm text-fintech-slate mb-4 leading-relaxed line-clamp-2 flex-1">
           {business.tagline}
         </p>
 
         {/* Metrics */}
-        <div className="grid grid-cols-2 gap-4 mb-4 pb-4 border-b border-white/5">
+        <div className="grid grid-cols-2 gap-4 mb-4 pb-4 border-b border-fintech-divider">
           {/* ARR Potential */}
           <div>
             <div className="flex items-center gap-1.5 mb-1">
-              <TrendingUp className="w-3.5 h-3.5 text-white/40" />
-              <span className="text-xs font-mono text-white/40 uppercase">ARR</span>
+              <TrendingUp className="w-3.5 h-3.5 text-fintech-slate" />
+              <span className="text-xs text-fintech-slate/60">ARR</span>
             </div>
-            <div className={`text-lg font-mono font-bold ${color}`}>{arr}</div>
-            <span className={`text-xs font-mono ${color}`}>{tier}</span>
+            <div className={`text-lg font-semibold ${color}`}>{arr}</div>
+            <span className={`text-xs ${color}`}>{tier}</span>
           </div>
 
           {/* Price to Claim */}
           <div>
             <div className="flex items-center gap-1.5 mb-1">
-              <DollarSign className="w-3.5 h-3.5 text-white/40" />
-              <span className="text-xs font-mono text-white/40 uppercase">Price</span>
+              <DollarSign className="w-3.5 h-3.5 text-fintech-slate" />
+              <span className="text-xs text-fintech-slate/60">Price</span>
             </div>
-            <div className="text-lg font-mono font-bold text-white">
+            <div className="text-lg font-semibold text-fintech-navy">
               ${(business.price / 1000).toFixed(1)}K
             </div>
-            <span className="text-xs font-mono text-white/30">one-time</span>
+            <span className="text-xs text-fintech-slate">one-time</span>
           </div>
         </div>
 
         {/* Tech Stack */}
         <div className="mb-4">
           <div className="flex items-center gap-1.5 mb-2">
-            <Package className="w-3.5 h-3.5 text-white/40" />
-            <span className="text-xs font-mono text-white/40 uppercase tracking-wider">
+            <Package className="w-3.5 h-3.5 text-fintech-slate" />
+            <span className="text-xs text-fintech-slate/60">
               Stack
             </span>
           </div>
@@ -222,13 +222,13 @@ export function MarketplaceCard({ business, viewMode }: MarketplaceCardProps) {
             {business.stack.slice(0, 3).map((tech) => (
               <span
                 key={tech}
-                className="px-2 py-0.5 text-xs font-mono bg-white/5 border border-white/10 text-white/60"
+                className="px-2 py-0.5 text-xs bg-surface-0 border border-fintech-divider text-fintech-slate"
               >
                 {tech}
               </span>
             ))}
             {business.stack.length > 3 && (
-              <span className="px-2 py-0.5 text-xs font-mono text-white/40">
+              <span className="px-2 py-0.5 text-xs text-fintech-slate">
                 +{business.stack.length - 3}
               </span>
             )}
@@ -237,7 +237,7 @@ export function MarketplaceCard({ business, viewMode }: MarketplaceCardProps) {
 
         {/* CTA Button */}
         {isAvailable && (
-          <button className="w-full py-2.5 bg-white hover:bg-zinc-100 text-black font-mono font-bold text-xs uppercase tracking-wider transition-colors mt-auto">
+          <button className="w-full py-2.5 bg-fintech-navy hover:bg-fintech-navy/90 text-white text-sm font-medium transition-colors mt-auto">
             View Details
           </button>
         )}

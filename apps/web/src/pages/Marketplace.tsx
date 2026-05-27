@@ -42,21 +42,27 @@ export default function Marketplace() {
   return (
     <div className="min-h-screen bg-surface-0">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-surface-0 border-b border-white/10">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-white hover:opacity-70 transition-opacity">
-            <div className="w-6 h-6 rounded-none bg-white flex items-center justify-center">
-              <Terminal className="w-3.5 h-3.5 text-black" />
+      <header className="sticky top-0 z-50 bg-surface-1/80 backdrop-blur-xl border-b border-fintech-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3 text-fintech-navy hover:opacity-80 transition-opacity">
+            <div className="w-8 h-8 bg-fintech-navy flex items-center justify-center">
+              <Terminal className="w-4 h-4 text-white" />
             </div>
-            <span className="text-sm font-mono font-bold uppercase tracking-wider">Nanowork</span>
+            <span className="text-lg font-semibold tracking-tight">Nanowork</span>
           </Link>
 
-          <nav className="flex items-center gap-1">
-            <Link
-              to="/"
-              className="px-5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-white/60 hover:text-white transition-colors"
-            >
+          <nav className="flex items-center gap-6">
+            <Link to="/" className="text-sm font-medium text-fintech-slate hover:text-fintech-navy transition-colors">
               Home
+            </Link>
+            <Link to="/pricing" className="text-sm font-medium text-fintech-slate hover:text-fintech-navy transition-colors">
+              Pricing
+            </Link>
+            <Link
+              to="/login"
+              className="px-5 py-2 bg-fintech-navy text-white text-sm font-medium hover:bg-fintech-navy/90 transition-colors"
+            >
+              Get started
             </Link>
           </nav>
         </div>
@@ -66,15 +72,8 @@ export default function Marketplace() {
       <main className="max-w-[1920px] mx-auto px-4 sm:px-6 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs font-mono font-bold text-white/40 uppercase tracking-wider">
-              Marketplace
-            </span>
-            <div className="flex-1 h-px bg-white/10" />
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl font-mono font-bold text-white uppercase tracking-tight mb-6">
-            All Businesses
+          <h1 className="text-3xl sm:text-4xl font-semibold text-fintech-navy tracking-tight mb-6">
+            Browse marketplace
           </h1>
 
           {/* Statistics Dashboard */}
@@ -86,18 +85,18 @@ export default function Marketplace() {
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Search Bar */}
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-fintech-slate" />
               <input
                 type="text"
                 placeholder="Search businesses, categories, tech stack..."
                 value={filters.search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-surface-2 border border-white/10 text-white placeholder-white/40 font-mono text-sm focus:outline-none focus:border-white/30 transition-colors"
+                className="w-full pl-12 pr-4 py-3 bg-surface-1 border border-fintech-border text-fintech-navy placeholder-fintech-slate/40 text-sm focus:outline-none focus:border-fintech-navy transition-colors"
               />
               {filters.search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-fintech-slate hover:text-fintech-navy transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -107,35 +106,35 @@ export default function Marketplace() {
             {/* Filter Toggle */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="relative px-4 py-3 bg-surface-2 border border-white/10 hover:border-white/30 text-white font-mono text-sm transition-colors flex items-center gap-2 justify-center"
+              className="relative px-4 py-3 bg-surface-1 border border-fintech-border hover:border-fintech-navy text-fintech-navy text-sm font-medium transition-colors flex items-center gap-2 justify-center"
             >
               <SlidersHorizontal className="w-4 h-4" />
               <span className="hidden sm:inline">Filters</span>
               {activeFilterCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-white text-black text-xs font-bold rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-fintech-navy text-white text-xs font-bold flex items-center justify-center">
                   {activeFilterCount}
                 </span>
               )}
             </button>
 
             {/* View Toggle */}
-            <div className="flex border border-white/10">
+            <div className="flex border border-fintech-border">
               <button
                 onClick={() => setViewMode("grid")}
                 className={`px-4 py-3 transition-colors ${
                   viewMode === "grid"
-                    ? "bg-white text-black"
-                    : "bg-surface-2 text-white/60 hover:text-white"
+                    ? "bg-fintech-navy text-white"
+                    : "bg-surface-1 text-fintech-slate hover:text-fintech-navy"
                 }`}
               >
                 <Grid3x3 className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`px-4 py-3 border-l border-white/10 transition-colors ${
+                className={`px-4 py-3 border-l border-fintech-border transition-colors ${
                   viewMode === "list"
-                    ? "bg-white text-black"
-                    : "bg-surface-2 text-white/60 hover:text-white"
+                    ? "bg-fintech-navy text-white"
+                    : "bg-surface-1 text-fintech-slate hover:text-fintech-navy"
                 }`}
               >
                 <List className="w-4 h-4" />
@@ -179,13 +178,13 @@ export default function Marketplace() {
 
           {/* Mobile Filters Overlay */}
           {showFilters && (
-            <div className="lg:hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm">
-              <div className="absolute inset-y-0 left-0 w-full max-w-sm bg-surface-1 border-r border-white/10 overflow-y-auto">
-                <div className="sticky top-0 bg-surface-1 border-b border-white/10 p-4 flex items-center justify-between">
-                  <span className="text-sm font-mono font-bold text-white uppercase">Filters</span>
+            <div className="lg:hidden fixed inset-0 z-40 bg-fintech-navy/80 backdrop-blur-sm">
+              <div className="absolute inset-y-0 left-0 w-full max-w-sm bg-surface-1 border-r border-fintech-border overflow-y-auto">
+                <div className="sticky top-0 bg-surface-1 border-b border-fintech-border p-4 flex items-center justify-between">
+                  <span className="text-sm font-semibold text-fintech-navy">Filters</span>
                   <button
                     onClick={() => setShowFilters(false)}
-                    className="text-white/60 hover:text-white transition-colors"
+                    className="text-fintech-slate hover:text-fintech-navy transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -211,11 +210,11 @@ export default function Marketplace() {
           {/* Business Grid/List */}
           <div className="flex-1 min-w-0">
             {results.length === 0 ? (
-              <div className="card rounded-none p-12 text-center">
-                <div className="text-white/40 font-mono text-sm mb-2">No businesses found</div>
+              <div className="border border-fintech-border bg-surface-1 p-12 text-center">
+                <div className="text-fintech-slate text-sm mb-2">No businesses found</div>
                 <button
                   onClick={clearAllFilters}
-                  className="text-white font-mono text-sm underline hover:no-underline"
+                  className="text-fintech-navy text-sm font-medium underline hover:no-underline"
                 >
                   Clear all filters
                 </button>
@@ -250,7 +249,7 @@ export default function Marketplace() {
 
                 {/* Results Count */}
                 <div className="mt-8 text-center">
-                  <span className="text-xs font-mono text-white/40">
+                  <span className="text-xs text-fintech-slate">
                     Showing {resultCount} of {BUSINESSES.length} businesses
                   </span>
                 </div>

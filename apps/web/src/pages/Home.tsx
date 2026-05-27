@@ -5,14 +5,14 @@ import { ArrowRight, Terminal } from "lucide-react";
 import BusinessShowcase from "../components/BusinessShowcase";
 
 /**
- * BLOOMBERG TERMINAL DESIGN PRINCIPLES:
+ * MODERN FINTECH DESIGN PRINCIPLES:
  *
- * 1. DATA DENSITY: Multiple information streams visible simultaneously
- * 2. MONOSPACE TYPOGRAPHY: Terminal aesthetic with fixed-width fonts
- * 3. GRID SYSTEM: Rigid 4-column layout like terminal windows
- * 4. STATUS INDICATORS: Live dots, ticker-style updates
- * 5. DARK THEME: Pure black with amber/white accents only
- * 6. NO DECORATION: All business, zero marketing fluff
+ * 1. CLARITY & TRUST: Clean hierarchy, professional typography
+ * 2. DATA VISUALIZATION: Real-time information with clear indicators
+ * 3. RESPONSIVE GRID: Flexible layout that scales beautifully
+ * 4. STATUS FEEDBACK: Subtle animations and state indicators
+ * 5. LIGHT THEME: Bright, accessible with strong blue accents
+ * 6. PURPOSEFUL DESIGN: Every element serves user understanding
  */
 
 const TYPING_EXAMPLES = [
@@ -64,28 +64,28 @@ function StockTicker() {
   }, []);
 
   return (
-    <div className="bg-surface-1 border-b border-white/10 overflow-hidden">
+    <div className="bg-surface-0 border-b border-fintech-divider overflow-hidden">
       <div className="flex animate-scroll">
         {[...stocks, ...stocks].map((stock, i) => (
           <div
             key={i}
-            className="flex items-center gap-2 sm:gap-3 px-3 sm:px-6 py-2.5 border-r border-white/5 whitespace-nowrap flex-shrink-0"
+            className="flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-2.5 border-r border-fintech-divider whitespace-nowrap flex-shrink-0"
           >
-            <span className="text-[10px] sm:text-xs font-mono font-bold text-white">{stock.symbol}</span>
-            <span className="text-[10px] sm:text-xs font-mono text-white tabular-nums">
+            <span className="text-xs font-mono font-semibold text-fintech-navy">{stock.symbol}</span>
+            <span className="text-xs font-mono text-fintech-slate tabular-nums">
               ${stock.price.toFixed(2)}
             </span>
             <span
-              className={`text-[10px] sm:text-xs font-mono tabular-nums ${
-                stock.change >= 0 ? "text-green-400" : "text-red-400"
+              className={`text-xs font-mono tabular-nums ${
+                stock.change >= 0 ? "text-fintech-green" : "text-fintech-red"
               }`}
             >
               {stock.change >= 0 ? "+" : ""}
               {stock.change.toFixed(2)}
             </span>
             <span
-              className={`text-[10px] sm:text-xs font-mono tabular-nums ${
-                stock.pct >= 0 ? "text-green-400" : "text-red-400"
+              className={`text-xs font-mono tabular-nums ${
+                stock.pct >= 0 ? "text-fintech-green" : "text-fintech-red"
               }`}
             >
               {stock.pct >= 0 ? "+" : ""}
@@ -170,130 +170,54 @@ function TerminalPrompt() {
   }
 
   return (
-    <div className="card-lg rounded-none border border-white/10">
-      <div className="border-b border-white/10 px-4 sm:px-6 py-3 bg-surface-1">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/60" />
-          <span className="text-[10px] sm:text-xs font-mono font-bold text-white/60 uppercase tracking-wider">
-            Build Command
+    <div className="border border-fintech-border bg-surface-1 shadow-card hover:shadow-card-lg transition-shadow">
+      <div className="border-b border-fintech-divider px-6 py-4 bg-surface-0">
+        <div className="flex items-center gap-3">
+          <Terminal className="w-4 h-4 text-fintech-slate" />
+          <span className="text-sm font-medium text-fintech-slate">
+            Describe your business idea
           </span>
-          <div className="flex-1" />
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-[10px] sm:text-xs font-mono text-white/40">READY</span>
-          </div>
         </div>
       </div>
 
-      <div className="p-4 sm:p-6">
-        <div className="relative mb-4">
-          <div className="flex items-start gap-2 sm:gap-3">
-            <span className="text-white/60 font-mono text-sm mt-1 select-none">$</span>
-            <div className="flex-1">
-              <textarea
-                ref={inputRef}
-                value={value}
-                onChange={e => setValue(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                onKeyDown={e => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    submit();
-                  }
-                }}
-                disabled={loading}
-                className="w-full min-h-[80px] max-h-[200px] bg-transparent border-none outline-none resize-none text-white placeholder-transparent font-mono text-xs sm:text-sm leading-relaxed"
-              />
-              {!value && (
-                <div className="absolute top-0 left-7 sm:left-9 right-0 pointer-events-none">
-                  <div className="font-mono text-xs sm:text-sm text-white/70 leading-relaxed flex">
-                    {placeholder}
-                    {!focused && <span className="inline-block w-2 h-5 bg-white/80 ml-1 animate-pulse" />}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+      <div className="p-6 sm:p-8">
+        <div className="relative mb-6">
+          <textarea
+            ref={inputRef}
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            onKeyDown={e => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                submit();
+              }
+            }}
+            disabled={loading}
+            placeholder={focused || value ? "" : placeholder}
+            className="w-full min-h-[120px] max-h-[240px] bg-transparent border-none outline-none resize-none text-fintech-navy placeholder:text-fintech-slate/40 text-base leading-relaxed"
+          />
         </div>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 pt-4 border-t border-white/5">
-          <div className="flex items-center gap-2 sm:gap-6 text-[10px] sm:text-xs font-mono text-white/40 flex-wrap">
-            <span>7 DEPARTMENTS</span>
-            <span className="hidden sm:inline">|</span>
-            <span>PARALLEL EXECUTION</span>
-            <span className="hidden sm:inline">|</span>
-            <span className="hidden md:inline">AUTONOMOUS AGENTS</span>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t border-fintech-divider">
+          <div className="flex items-center gap-6 text-xs text-fintech-slate/70">
+            <span>7 departments</span>
+            <span>•</span>
+            <span>AI-powered</span>
+            <span className="hidden sm:inline">•</span>
+            <span className="hidden sm:inline">Production ready</span>
           </div>
 
           <button
             onClick={submit}
             disabled={loading || !value.trim()}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2.5 rounded-none bg-white hover:bg-white/90 disabled:opacity-30 disabled:cursor-not-allowed text-black font-mono text-xs font-bold uppercase tracking-wider transition-colors"
+            className="w-full sm:w-auto px-6 py-2.5 bg-fintech-navy hover:bg-fintech-navy/90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium shadow-button transition-colors"
           >
-            {loading ? "EXECUTING..." : "EXECUTE"}
+            {loading ? "Building..." : "Start building"}
           </button>
         </div>
       </div>
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
-// DATA GRID - Infrastructure specs
-// ──────────────────────────────────────────────────────────────────────────────
-
-function _DepartmentGrid() {
-  const departments = [
-    {
-      name: "Legal",
-      description: "Sets up your company, writes terms and privacy policies, drafts contractor agreements, and keeps you compliant with regulations.",
-    },
-    {
-      name: "Brand",
-      description: "Designs your logo, builds brand guidelines, defines your voice and colors, and creates a visual identity people remember.",
-    },
-    {
-      name: "Web",
-      description: "Builds your website, sets up e-commerce and checkout, hosts everything, and ships updates that actually work in production.",
-    },
-    {
-      name: "Marketing",
-      description: "Plans content, writes for SEO, runs email campaigns, manages social media, and tracks what's actually driving growth.",
-    },
-    {
-      name: "Sales",
-      description: "Reaches out to prospects, manages your pipeline, qualifies leads, tracks deals, and turns conversations into customers.",
-    },
-    {
-      name: "Finance",
-      description: "Tracks revenue, manages expenses, sends invoices, processes payments, and keeps your books accurate and up to date.",
-    },
-    {
-      name: "Operations",
-      description: "Automates workflows, manages deployments, monitors uptime, coordinates vendors, and makes sure everything runs smoothly.",
-    },
-  ];
-
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-      {departments.map((dept, i) => (
-        <div key={i} className="card rounded-none border border-white/10 p-4 sm:p-6 hover:bg-surface-3 transition-colors">
-          <div className="flex items-start justify-between mb-3 sm:mb-4">
-            <h3 className="text-sm sm:text-base font-mono font-bold text-white">
-              {dept.name}
-            </h3>
-            <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-[10px] font-mono text-green-400">ACTIVE</span>
-            </div>
-          </div>
-
-          <p className="text-xs text-white/60 leading-relaxed">
-            {dept.description}
-          </p>
-        </div>
-      ))}
     </div>
   );
 }
@@ -307,21 +231,21 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-surface-0">
-      {/* Header - Terminal style */}
-      <header className="sticky top-0 z-50 bg-surface-0 border-b border-white/10">
-        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 h-12 sm:h-14 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 text-white hover:opacity-70 transition-opacity">
-            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-none bg-white flex items-center justify-center">
-              <Terminal className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-black" />
+      {/* Header - Enterprise fintech */}
+      <header className="sticky top-0 z-50 bg-surface-1/80 backdrop-blur-xl border-b border-fintech-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3 text-fintech-navy hover:opacity-80 transition-opacity">
+            <div className="w-8 h-8 bg-fintech-navy flex items-center justify-center">
+              <Terminal className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xs sm:text-sm font-mono font-bold uppercase tracking-wider">Nanowork</span>
+            <span className="text-lg font-semibold tracking-tight">Nanowork</span>
           </Link>
 
           <nav className="flex items-center gap-1">
             {isAuthenticated ? (
               <Link
                 to="/dashboard"
-                className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-none bg-white text-black text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
+                className="px-5 py-2 bg-fintech-navy text-white text-sm font-medium hover:bg-fintech-navy/90 transition-colors"
               >
                 Dashboard
               </Link>
@@ -329,15 +253,15 @@ export default function Home() {
               <>
                 <Link
                   to="/login"
-                  className="hidden sm:block px-5 py-2 text-xs font-mono font-bold uppercase tracking-wider text-white/60 hover:text-white transition-colors"
+                  className="hidden sm:block px-5 py-2 text-sm font-medium text-fintech-slate hover:text-fintech-navy transition-colors"
                 >
-                  Login
+                  Sign in
                 </Link>
                 <Link
                   to="/login"
-                  className="px-3 sm:px-5 py-1.5 sm:py-2 rounded-none bg-white text-black text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
+                  className="px-5 py-2 bg-fintech-navy text-white text-sm font-medium hover:bg-fintech-navy/90 transition-colors"
                 >
-                  Start
+                  Get started
                 </Link>
               </>
             )}
@@ -350,18 +274,20 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-[1800px] mx-auto px-4 sm:px-6">
-        {/* Hero Section - Dense, terminal-style */}
-        <section className="py-8 sm:py-12 lg:py-16">
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-mono font-bold text-white uppercase tracking-tight mb-3 sm:mb-4">
-              Turn Your Idea Into a Company
+        {/* Hero Section - Enterprise fintech */}
+        <section className="py-16 sm:py-20 lg:py-28">
+          <div className="mb-12 text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-fintech-navy tracking-tight mb-6 leading-tight">
+              Build your business with AI
             </h1>
-            <p className="text-xs sm:text-sm font-mono text-white/70 max-w-3xl leading-relaxed">
-              Describe your idea and AI builds a complete company. Or claim a pre-built business and start earning today. Full tech stack, payment processing, and deployment ready.
+            <p className="text-lg sm:text-xl text-fintech-slate max-w-2xl mx-auto leading-relaxed">
+              From idea to revenue in days
             </p>
           </div>
 
-          <TerminalPrompt />
+          <div className="max-w-3xl mx-auto">
+            <TerminalPrompt />
+          </div>
         </section>
 
         {/* Business Showcase */}
@@ -369,134 +295,104 @@ export default function Home() {
 
 
         {/* Two-Path CTA */}
-        <section className="py-8 sm:py-12 lg:py-16">
-          <div className="text-center mb-6 sm:mb-8">
-            <div className="text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-2">
-              Two Ways to Start
-            </div>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-mono font-bold text-white uppercase tracking-tight">
-              Choose Your Path
+        <section className="py-16 sm:py-20 lg:py-24">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-fintech-navy tracking-tight mb-4">
+              Two ways to get started
             </h2>
+            <p className="text-lg text-fintech-slate max-w-2xl mx-auto">
+              Build a custom business from scratch or claim a pre-built one
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Build Custom */}
-            <div className="card-lg rounded-none border border-white/10 p-6 sm:p-8 lg:p-10 hover:border-white/20 transition-all group">
-              <div className="text-[10px] sm:text-xs font-mono text-blue-400 uppercase tracking-wider mb-3">
-                Option 1
-              </div>
-              <h3 className="text-lg sm:text-xl font-mono font-bold text-white uppercase mb-3">
-                Build from Scratch
+            <div className="border border-fintech-border bg-surface-1 p-8 hover:border-fintech-navy transition-colors group">
+              <h3 className="text-xl font-semibold text-fintech-navy mb-3">
+                Build from scratch
               </h3>
-              <p className="text-xs sm:text-sm font-mono text-white/60 mb-6 leading-relaxed">
-                Describe your idea and AI generates a complete company. Full tech stack, payment processing, and deployment ready in days.
+              <p className="text-base text-fintech-slate mb-8 leading-relaxed">
+                Describe your vision and AI creates everything from brand identity to deployment. Full customization, zero limitations.
               </p>
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-zinc-100 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-fintech-navy text-white text-sm font-medium hover:bg-fintech-navy/90 transition-colors"
               >
-                Start Building
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                Start building
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
 
             {/* Claim Pre-Built */}
-            <div className="card-lg rounded-none border border-white/10 p-6 sm:p-8 lg:p-10 hover:border-white/20 transition-all group">
-              <div className="text-[10px] sm:text-xs font-mono text-green-400 uppercase tracking-wider mb-3">
-                Option 2
-              </div>
-              <h3 className="text-lg sm:text-xl font-mono font-bold text-white uppercase mb-3">
-                Claim Pre-Built Business
+            <div className="border border-fintech-border bg-surface-1 p-8 hover:border-fintech-navy transition-colors group">
+              <h3 className="text-xl font-semibold text-fintech-navy mb-3">
+                Claim pre-built business
               </h3>
-              <p className="text-xs sm:text-sm font-mono text-white/60 mb-6 leading-relaxed">
-                Browse 20 ready-made businesses with proven revenue potential. Customize and launch immediately. No building required.
+              <p className="text-base text-fintech-slate mb-8 leading-relaxed">
+                Browse proven business models ready to launch. Customize branding and settings, then go live in minutes.
               </p>
               <Link
                 to="/marketplace"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-none bg-white text-black font-mono text-xs font-bold uppercase tracking-wider hover:bg-zinc-100 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-fintech-navy text-white text-sm font-medium hover:bg-fintech-navy/90 transition-colors"
               >
-                Browse Businesses
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                Browse marketplace
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer - Clean and simple */}
-      <footer className="border-t border-white/10 mt-8 sm:mt-12 lg:mt-16">
-        <div className="max-w-[1800px] mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      {/* Footer - Enterprise style */}
+      <footer className="border-t border-fintech-border bg-surface-0 mt-16 sm:mt-20 lg:mt-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
           {/* Main Footer Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr,2fr,1fr] gap-8 sm:gap-12 items-start">
-            {/* Logo Section - Left */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div>
-              <Link to="/" className="inline-flex items-center gap-2 mb-3 sm:mb-4 hover:opacity-70 transition-opacity">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-none bg-white flex items-center justify-center">
-                  <Terminal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black" />
-                </div>
-                <span className="text-sm sm:text-base font-mono font-bold text-white uppercase tracking-wider">
-                  Nanowork
-                </span>
-              </Link>
-              <p className="text-xs font-mono text-white/40 leading-relaxed max-w-xs">
-                Build custom or claim pre-built. Your business, automated.
-              </p>
+              <h3 className="text-sm font-semibold text-fintech-navy mb-4">Product</h3>
+              <ul className="space-y-3 text-sm text-fintech-slate">
+                <li><Link to="/marketplace" className="hover:text-fintech-navy transition-colors">Marketplace</Link></li>
+                <li><Link to="/dashboard" className="hover:text-fintech-navy transition-colors">Dashboard</Link></li>
+                <li><Link to="/pricing" className="hover:text-fintech-navy transition-colors">Pricing</Link></li>
+                <li><a href="#docs" className="hover:text-fintech-navy transition-colors">Documentation</a></li>
+              </ul>
             </div>
-
-            {/* Links Section - Center */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8">
-              <div>
-                <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Product</h3>
-                <ul className="space-y-2 text-xs font-mono text-white/40">
-                  <li><Link to="/marketplace" className="hover:text-white transition-colors">Marketplace</Link></li>
-                  <li><Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
-                  <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                  <li><a href="#docs" className="hover:text-white transition-colors">Docs</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Company</h3>
-                <ul className="space-y-2 text-xs font-mono text-white/40">
-                  <li><a href="#about" className="hover:text-white transition-colors">About</a></li>
-                  <li><a href="#blog" className="hover:text-white transition-colors">Blog</a></li>
-                  <li><a href="#careers" className="hover:text-white transition-colors">Careers</a></li>
-                  <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider mb-3">Legal</h3>
-                <ul className="space-y-2 text-xs font-mono text-white/40">
-                  <li><a href="#privacy" className="hover:text-white transition-colors">Privacy</a></li>
-                  <li><a href="#terms" className="hover:text-white transition-colors">Terms</a></li>
-                  <li><a href="#security" className="hover:text-white transition-colors">Security</a></li>
-                </ul>
-              </div>
+            <div>
+              <h3 className="text-sm font-semibold text-fintech-navy mb-4">Company</h3>
+              <ul className="space-y-3 text-sm text-fintech-slate">
+                <li><Link to="/about" className="hover:text-fintech-navy transition-colors">About</Link></li>
+                <li><Link to="/contact" className="hover:text-fintech-navy transition-colors">Contact</Link></li>
+              </ul>
             </div>
-
-            {/* Social/Status - Right */}
-            <div className="flex flex-col items-start lg:items-end">
+            <div>
+              <h3 className="text-sm font-semibold text-fintech-navy mb-4">Legal</h3>
+              <ul className="space-y-3 text-sm text-fintech-slate">
+                <li><Link to="/privacy" className="hover:text-fintech-navy transition-colors">Privacy</Link></li>
+                <li><Link to="/terms" className="hover:text-fintech-navy transition-colors">Terms</Link></li>
+                <li><Link to="/security" className="hover:text-fintech-navy transition-colors">Security</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-fintech-navy mb-4">Status</h3>
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-xs font-mono text-green-400 uppercase tracking-wider">
-                  All Systems Operational
-                </span>
+                <div className="w-2 h-2 bg-fintech-green" />
+                <span className="text-sm text-fintech-slate">All systems operational</span>
               </div>
-              <p className="text-xs font-mono text-white/40 lg:text-right">
-                Built on Cloudflare
+              <p className="text-sm text-fintech-slate">
+                Enterprise infrastructure
               </p>
             </div>
           </div>
 
           {/* Bottom Bar */}
-          <div className="mt-8 sm:mt-12 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-[10px] sm:text-xs font-mono text-white/30">
-              © {new Date().getFullYear()} NANOWORK INC · ALL RIGHTS RESERVED
+          <div className="pt-8 border-t border-fintech-divider flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-fintech-slate">
+            <div className="flex items-center gap-3">
+              <Terminal className="w-4 h-4" />
+              <span className="font-semibold text-fintech-navy">Nanowork</span>
             </div>
-            <div className="flex items-center gap-4 text-[10px] sm:text-xs font-mono text-white/30">
-              <span>MADE IN SAN FRANCISCO</span>
-              <span>·</span>
-              <span>EST. 2026</span>
+            <div>
+              © {new Date().getFullYear()} Nanowork Inc.
             </div>
           </div>
         </div>

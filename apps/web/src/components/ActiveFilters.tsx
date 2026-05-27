@@ -14,21 +14,14 @@ type ActiveFiltersProps = {
   onRemoveTechStack: (tech: string) => void;
 };
 
-/**
- * Active Filters Display Component
- *
- * Shows currently active filters as removable chips
- * Displays result count and clear all functionality
- */
-
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
     <button
       onClick={onRemove}
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-surface-2 border border-white/20 hover:border-white/40 text-white text-xs font-mono rounded group transition-colors"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-surface-0 border border-fintech-border hover:border-fintech-navy text-fintech-navy text-xs font-medium group transition-colors"
     >
       <span>{label}</span>
-      <X className="w-3 h-3 text-white/40 group-hover:text-white" />
+      <X className="w-3 h-3 text-fintech-slate group-hover:text-fintech-navy" />
     </button>
   );
 }
@@ -56,25 +49,25 @@ export default function ActiveFilters({
 
   if (!hasActiveFilters) {
     return (
-      <div className="py-4 border-b border-white/10">
-        <p className="text-sm font-mono text-white/60">
-          Showing all <span className="text-white font-bold">{totalCount}</span> businesses
+      <div className="py-4 border-b border-fintech-divider">
+        <p className="text-sm text-fintech-slate">
+          Showing all <span className="text-fintech-navy font-semibold">{totalCount}</span> businesses
         </p>
       </div>
     );
   }
 
   return (
-    <div className="py-4 border-b border-white/10 space-y-4">
+    <div className="py-4 border-b border-fintech-divider space-y-4">
       {/* Result Count */}
       <div className="flex items-center justify-between">
-        <p className="text-sm font-mono text-white/60">
-          Found <span className="text-white font-bold">{resultCount}</span> of{" "}
-          <span className="text-white/60">{totalCount}</span> businesses
+        <p className="text-sm text-fintech-slate">
+          Found <span className="text-fintech-navy font-semibold">{resultCount}</span> of{" "}
+          <span className="text-fintech-slate">{totalCount}</span> businesses
         </p>
         <button
           onClick={onClearAll}
-          className="text-xs font-mono text-white/60 hover:text-white transition-colors flex items-center gap-1"
+          className="text-xs font-medium text-fintech-slate hover:text-fintech-navy transition-colors flex items-center gap-1"
         >
           <X className="w-3 h-3" />
           Clear all filters

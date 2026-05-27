@@ -9,6 +9,11 @@ import Swipe from "./pages/Swipe";
 import PreviewPage from "./pages/PreviewPage";
 import Pricing from "./pages/Pricing";
 import Marketplace from "./pages/Marketplace";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import About from "./pages/About";
+import Security from "./pages/Security";
+import Contact from "./pages/Contact";
 import DashboardLayout from "./dashboard/DashboardLayout";
 import Create from "./dashboard/Create";
 import History from "./dashboard/History";
@@ -58,6 +63,11 @@ export default function App() {
       <Route path="/swipe" element={<Swipe />} />
       <Route path="/marketplace" element={<Marketplace />} />
       <Route path="/preview/:buildId" element={<PreviewPage />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/security" element={<Security />} />
+      <Route path="/contact" element={<Contact />} />
 
       {/* Dashboard routes - authenticated */}
       <Route

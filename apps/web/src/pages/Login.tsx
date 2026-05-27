@@ -1,8 +1,7 @@
 import { useState, useEffect, type FormEvent } from "react";
 import { useNavigate, useSearchParams, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { supabase } from "../lib/supabase";
-import { Terminal, Lock } from "lucide-react";
+import { Terminal, AlertCircle, CheckCircle } from "lucide-react";
 
 type Tab = "signin" | "signup";
 
@@ -67,8 +66,6 @@ export default function Login() {
       if (err) {
         setError(err);
       } else {
-        // Don't process claim here - let AuthContext handle it after session is established
-        // Just redirect with the claim intent, localStorage will be checked by AuthContext
         const pendingClaim = localStorage.getItem('pending_claim');
         if (pendingClaim) {
           navigate('/dashboard?claim_pending=true');
@@ -94,214 +91,197 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-0 flex flex-col items-center justify-center px-4 py-8">
-      {/* Logo */}
-      <Link
-        to="/"
-        className="flex items-center gap-2 text-white font-mono text-sm font-bold uppercase tracking-wider mb-8 sm:mb-12 hover:opacity-70 transition-opacity"
-      >
-        <Terminal className="w-4 h-4 sm:w-5 sm:h-5" />
-        Nanowork
-      </Link>
-
-      {/* Terminal Login Card */}
-      <div className="w-full max-w-md">
-        <div className="card-lg rounded-none border border-white/10">
-          {/* Header */}
-          <div className="border-b border-white/10 px-4 sm:px-6 py-3 sm:py-4 bg-surface-1">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white/60" />
-              <span className="text-[10px] sm:text-xs font-mono font-bold text-white/60 uppercase tracking-wider">
-                Authentication Required
-              </span>
-              <div className="flex-1" />
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-400" />
-                <span className="text-[10px] sm:text-xs font-mono text-white/40">SECURE</span>
-              </div>
+    <div className="min-h-screen bg-surface-0 flex flex-col">
+      {/* Header */}
+      <header className="border-b border-fintech-border bg-surface-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
+          <Link to="/" className="flex items-center gap-3 text-fintech-navy hover:opacity-80 transition-opacity">
+            <div className="w-8 h-8 bg-fintech-navy flex items-center justify-center">
+              <Terminal className="w-4 h-4 text-white" />
             </div>
-          </div>
+            <span className="text-lg font-semibold tracking-tight">Nanowork</span>
+          </Link>
+        </div>
+      </header>
 
-          <div className="p-4 sm:p-6">
-            {/* Claim Banner */}
-            {claimData && (
-              <div className="mb-4 sm:mb-6 p-4 border border-green-400/20 bg-green-400/5">
-                <div className="flex items-start gap-3">
-                  <Terminal className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-xs font-mono font-bold text-green-400 uppercase tracking-wider mb-1">
-                      Claiming Business
-                    </p>
-                    <p className="text-sm font-mono text-white mb-1">
-                      <strong>{claimData.businessName}</strong>
-                    </p>
-                    <p className="text-xs font-mono text-white/60">
-                      Create your account to continue claiming this business
-                    </p>
-                  </div>
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          {/* Claim Banner */}
+          {claimData && (
+            <div className="mb-6 p-4 border border-fintech-green/20 bg-fintech-green/5">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-fintech-green flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-fintech-navy mb-1">
+                    Claiming business
+                  </p>
+                  <p className="text-base font-medium text-fintech-navy mb-1">
+                    {claimData.businessName}
+                  </p>
+                  <p className="text-sm text-fintech-slate">
+                    Create your account to continue
+                  </p>
                 </div>
               </div>
-            )}
-
-            {/* Tab Switcher */}
-            <div className="flex gap-0 mb-4 sm:mb-6 border border-white/10">
-              <button
-                type="button"
-                onClick={() => {
-                  setTab("signin");
-                  setError("");
-                }}
-                className={`flex-1 py-2.5 sm:py-3 text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider transition-colors ${
-                  tab === "signin"
-                    ? "bg-white text-black"
-                    : "bg-transparent text-white/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setTab("signup");
-                  setError("");
-                }}
-                className={`flex-1 py-2.5 sm:py-3 text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider transition-colors border-l border-white/10 ${
-                  tab === "signup"
-                    ? "bg-white text-black"
-                    : "bg-transparent text-white/60 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                Sign Up
-              </button>
             </div>
+          )}
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:gap-4">
-              {tab === "signup" && (
+          {/* Auth Card */}
+          <div className="border border-fintech-border bg-surface-1 shadow-card">
+            <div className="p-8">
+              <h1 className="text-2xl font-semibold text-fintech-navy mb-2">
+                {tab === "signin" ? "Sign in to your account" : "Create your account"}
+              </h1>
+              <p className="text-sm text-fintech-slate mb-8">
+                {tab === "signin"
+                  ? "Welcome back. Enter your credentials to continue."
+                  : "Get started with Nanowork. Build and launch your business."}
+              </p>
+
+              {/* Tab Switcher */}
+              <div className="flex gap-1 mb-6 p-1 bg-surface-0 border border-fintech-divider">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTab("signin");
+                    setError("");
+                  }}
+                  className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                    tab === "signin"
+                      ? "bg-surface-1 text-fintech-navy shadow-sm"
+                      : "text-fintech-slate hover:text-fintech-navy"
+                  }`}
+                >
+                  Sign in
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTab("signup");
+                    setError("");
+                  }}
+                  className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                    tab === "signup"
+                      ? "bg-surface-1 text-fintech-navy shadow-sm"
+                      : "text-fintech-slate hover:text-fintech-navy"
+                  }`}
+                >
+                  Sign up
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {tab === "signup" && (
+                  <div>
+                    <label className="block text-sm font-medium text-fintech-navy mb-2" htmlFor="login-name">
+                      Full name
+                    </label>
+                    <input
+                      id="login-name"
+                      className="w-full px-4 py-2.5 bg-surface-0 border border-fintech-border focus:border-fintech-navy focus:outline-none text-fintech-navy placeholder:text-fintech-slate/40 text-sm transition-colors"
+                      type="text"
+                      placeholder="Enter your full name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      autoComplete="name"
+                    />
+                  </div>
+                )}
+
                 <div>
-                  <label
-                    className="block text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-2"
-                    htmlFor="login-name"
-                  >
-                    Name
+                  <label className="block text-sm font-medium text-fintech-navy mb-2" htmlFor="login-email">
+                    Email address
                   </label>
                   <input
-                    id="login-name"
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-xs sm:text-sm font-mono outline-none transition-colors"
-                    type="text"
-                    placeholder="FULL NAME"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    autoComplete="name"
+                    id="login-email"
+                    className="w-full px-4 py-2.5 bg-surface-0 border border-fintech-border focus:border-fintech-navy focus:outline-none text-fintech-navy placeholder:text-fintech-slate/40 text-sm transition-colors"
+                    type="email"
+                    placeholder="you@company.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoFocus
+                    autoComplete="email"
+                    required
                   />
                 </div>
-              )}
 
-              <div>
-                <label
-                  className="block text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider mb-2"
-                  htmlFor="login-email"
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-fintech-navy" htmlFor="login-password">
+                      Password
+                    </label>
+                    {tab === "signin" && (
+                      <Link
+                        to="/forgot-password"
+                        className="text-sm text-fintech-slate hover:text-fintech-navy transition-colors"
+                      >
+                        Forgot password?
+                      </Link>
+                    )}
+                  </div>
+                  <input
+                    id="login-password"
+                    className="w-full px-4 py-2.5 bg-surface-0 border border-fintech-border focus:border-fintech-navy focus:outline-none text-fintech-navy placeholder:text-fintech-slate/40 text-sm transition-colors"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete={tab === "signup" ? "new-password" : "current-password"}
+                    required
+                  />
+                </div>
+
+                {success && (
+                  <div className="px-4 py-3 border border-fintech-green/20 bg-fintech-green/5">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-fintech-green flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-fintech-green">{success}</p>
+                    </div>
+                  </div>
+                )}
+
+                {error && (
+                  <div className="px-4 py-3 border border-fintech-red/20 bg-fintech-red/5">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 text-fintech-red flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-fintech-red">{error}</p>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 bg-fintech-navy hover:bg-fintech-navy/90 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium shadow-button transition-colors"
                 >
-                  Email Address
-                </label>
-                <input
-                  id="login-email"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-xs sm:text-sm font-mono outline-none transition-colors"
-                  type="email"
-                  placeholder="USER@DOMAIN.COM"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoFocus
-                  autoComplete="email"
-                  required
-                />
-              </div>
+                  {loading
+                    ? tab === "signup" ? "Creating account..." : "Signing in..."
+                    : tab === "signup" ? "Create account" : "Sign in"}
+                </button>
+              </form>
+            </div>
 
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label
-                    className="block text-[10px] sm:text-xs font-mono text-white/40 uppercase tracking-wider"
-                    htmlFor="login-password"
-                  >
-                    Password
-                  </label>
-                  {tab === "signin" && (
-                    <Link
-                      to="/forgot-password"
-                      className="text-[10px] sm:text-xs font-mono text-white/50 hover:text-white transition-colors uppercase tracking-wider"
-                    >
-                      Forgot?
-                    </Link>
-                  )}
-                </div>
-                <input
-                  id="login-password"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-none bg-surface-3 border border-white/10 focus:border-white/30 text-white placeholder-white/30 text-xs sm:text-sm font-mono outline-none transition-colors"
-                  type="password"
-                  placeholder="••••••••••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete={tab === "signup" ? "new-password" : "current-password"}
-                  required
-                />
-              </div>
-
-              {success && (
-                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-green-400/20 bg-green-400/5">
-                  <div className="flex items-start gap-2">
-                    <span className="text-[10px] sm:text-xs font-mono text-green-400 mt-0.5">SUCCESS:</span>
-                    <p className="text-[10px] sm:text-xs font-mono text-green-400 leading-relaxed flex-1">
-                      {success}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {error && (
-                <div className="px-3 sm:px-4 py-2.5 sm:py-3 border border-red-400/20 bg-red-400/5">
-                  <div className="flex items-start gap-2">
-                    <span className="text-[10px] sm:text-xs font-mono text-red-400 mt-0.5">ERROR:</span>
-                    <p className="text-[10px] sm:text-xs font-mono text-red-400 leading-relaxed flex-1">
-                      {error}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 sm:py-3.5 rounded-none bg-white hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed text-black font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-colors mt-2"
-              >
-                {loading
-                  ? tab === "signup"
-                    ? "CREATING..."
-                    : "AUTHENTICATING..."
-                  : tab === "signup"
-                  ? "Create Account"
-                  : "Authenticate"}
-              </button>
-            </form>
+            {/* Footer */}
+            <div className="border-t border-fintech-divider px-8 py-4 bg-surface-0">
+              <p className="text-xs text-fintech-slate text-center">
+                Secure authentication • Enterprise-grade encryption
+              </p>
+            </div>
           </div>
 
-          {/* Footer */}
-          <div className="border-t border-white/10 px-4 sm:px-6 py-3 sm:py-4 bg-surface-1">
-            <p className="text-[10px] sm:text-xs font-mono text-white/30 text-center leading-relaxed">
-              ENCRYPTED CONNECTION · ENTERPRISE SECURITY
-            </p>
-          </div>
+          <p className="text-sm text-fintech-slate text-center mt-6">
+            By continuing, you agree to our{" "}
+            <Link to="/terms" className="text-fintech-navy hover:underline">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link to="/privacy" className="text-fintech-navy hover:underline">
+              Privacy Policy
+            </Link>
+          </p>
         </div>
       </div>
-
-      <p className="text-[10px] sm:text-xs font-mono text-white/30 mt-6 sm:mt-8 text-center px-4 leading-relaxed">
-        BY CONTINUING YOU AGREE TO{" "}
-        <a href="#" className="text-white/50 hover:text-white transition-colors underline">
-          TERMS
-        </a>{" "}
-        AND{" "}
-        <a href="#" className="text-white/50 hover:text-white transition-colors underline">
-          PRIVACY POLICY
-        </a>
-      </p>
     </div>
   );
 }

@@ -52,19 +52,19 @@ function FilterSection({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-b border-white/5">
+    <div className="border-b border-fintech-divider">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 hover:bg-surface-2 transition-colors"
+        className="w-full flex items-center justify-between p-4 hover:bg-surface-3 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <div className="text-white/40">{icon}</div>
-          <span className="text-sm font-mono text-white uppercase tracking-wider">{title}</span>
+          <div className="text-fintech-slate">{icon}</div>
+          <span className="text-sm font-medium text-fintech-navy">{title}</span>
         </div>
         {isOpen ? (
-          <ChevronUp className="w-4 h-4 text-white/40" />
+          <ChevronUp className="w-4 h-4 text-fintech-slate" />
         ) : (
-          <ChevronDown className="w-4 h-4 text-white/40" />
+          <ChevronDown className="w-4 h-4 text-fintech-slate" />
         )}
       </button>
       {isOpen && <div className="p-4 pt-0">{children}</div>}
@@ -88,21 +88,21 @@ function CheckboxItem({
   onChange: () => void;
 }) {
   return (
-    <label className="flex items-center justify-between p-2 rounded hover:bg-surface-2 cursor-pointer group">
+    <label className="flex items-center justify-between p-2 hover:bg-surface-3 cursor-pointer group">
       <div className="flex items-center gap-2">
         <div
-          className={`w-4 h-4 border rounded flex items-center justify-center transition-colors ${
+          className={`w-4 h-4 border flex items-center justify-center transition-colors ${
             checked
-              ? "bg-white border-white"
-              : "border-white/20 group-hover:border-white/40"
+              ? "bg-fintech-navy border-fintech-navy"
+              : "border-fintech-border group-hover:border-fintech-navy"
           }`}
         >
-          {checked && <CheckCircle2 className="w-3 h-3 text-black" />}
+          {checked && <CheckCircle2 className="w-3 h-3 text-white" />}
         </div>
-        <span className="text-sm text-white/80 group-hover:text-white">{label}</span>
+        <span className="text-sm text-fintech-slate group-hover:text-fintech-navy">{label}</span>
       </div>
       {count !== undefined && (
-        <span className="text-xs font-mono text-white/40 tabular-nums">{count}</span>
+        <span className="text-xs text-fintech-slate/60 tabular-nums">{count}</span>
       )}
       <input type="checkbox" checked={checked} onChange={onChange} className="sr-only" />
     </label>
@@ -139,33 +139,33 @@ export default function MarketplaceFilters({
   };
 
   return (
-    <div className="w-full bg-surface-1 border border-white/10 flex flex-col">
+    <div className="w-full bg-surface-1 border border-fintech-border flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-white/10">
+      <div className="p-4 border-b border-fintech-divider">
         <div className="flex items-center gap-2 mb-1">
-          <SlidersHorizontal className="w-4 h-4 text-white/40" />
-          <h2 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
+          <SlidersHorizontal className="w-4 h-4 text-fintech-slate" />
+          <h2 className="text-sm font-semibold text-fintech-navy">
             Filters
           </h2>
         </div>
-        <p className="text-xs text-white/50 font-mono">Refine your search</p>
+        <p className="text-xs text-fintech-slate">Refine your search</p>
       </div>
 
       {/* Search */}
-      <div className="p-4 border-b border-white/5">
+      <div className="p-4 border-b border-fintech-divider">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fintech-slate" />
           <input
             type="text"
             value={filters.search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search businesses..."
-            className="w-full pl-10 pr-4 py-2 bg-surface-2 border border-white/10 text-white text-sm font-mono placeholder:text-white/40 focus:border-white/30 focus:outline-none rounded"
+            className="w-full pl-10 pr-4 py-2 bg-surface-0 border border-fintech-border text-fintech-navy text-sm placeholder:text-fintech-slate/40 focus:border-fintech-navy focus:outline-none"
           />
           {filters.search && (
             <button
               onClick={() => onSearchChange("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-fintech-slate hover:text-fintech-navy"
             >
               <X className="w-4 h-4" />
             </button>
@@ -174,14 +174,14 @@ export default function MarketplaceFilters({
       </div>
 
       {/* Sort */}
-      <div className="p-4 border-b border-white/5">
-        <label className="block text-xs font-mono text-white/40 uppercase tracking-wider mb-2">
+      <div className="p-4 border-b border-fintech-divider">
+        <label className="block text-xs font-medium text-fintech-slate mb-2">
           Sort by
         </label>
         <select
           value={filters.sortBy}
           onChange={(e) => onSetSortBy(e.target.value as SortOption)}
-          className="w-full px-3 py-2 bg-surface-2 border border-white/10 text-white text-sm font-mono focus:border-white/30 focus:outline-none rounded cursor-pointer"
+          className="w-full px-3 py-2 bg-surface-0 border border-fintech-border text-fintech-navy text-sm focus:border-fintech-navy focus:outline-none cursor-pointer"
         >
           <option value="recent">Recently Added</option>
           <option value="price-asc">Price: Low to High</option>
@@ -230,8 +230,8 @@ export default function MarketplaceFilters({
             </div>
 
             {/* Custom Range */}
-            <div className="pt-3 border-t border-white/5">
-              <label className="block text-xs font-mono text-white/40 uppercase tracking-wider mb-2">
+            <div className="pt-3 border-t border-fintech-divider">
+              <label className="block text-xs font-medium text-fintech-slate mb-2">
                 Custom Range
               </label>
               <div className="flex items-center gap-2">
@@ -240,20 +240,20 @@ export default function MarketplaceFilters({
                   placeholder="Min"
                   value={customMin}
                   onChange={(e) => setCustomMin(e.target.value)}
-                  className="flex-1 px-2 py-1.5 bg-surface-2 border border-white/10 text-white text-xs font-mono placeholder:text-white/40 focus:border-white/30 focus:outline-none rounded"
+                  className="flex-1 px-2 py-1.5 bg-surface-0 border border-fintech-border text-fintech-navy text-xs placeholder:text-fintech-slate/40 focus:border-fintech-navy focus:outline-none"
                 />
-                <span className="text-white/40">-</span>
+                <span className="text-fintech-slate">-</span>
                 <input
                   type="number"
                   placeholder="Max"
                   value={customMax}
                   onChange={(e) => setCustomMax(e.target.value)}
-                  className="flex-1 px-2 py-1.5 bg-surface-2 border border-white/10 text-white text-xs font-mono placeholder:text-white/40 focus:border-white/30 focus:outline-none rounded"
+                  className="flex-1 px-2 py-1.5 bg-surface-0 border border-fintech-border text-fintech-navy text-xs placeholder:text-fintech-slate/40 focus:border-fintech-navy focus:outline-none"
                 />
               </div>
               <button
                 onClick={handleCustomPriceApply}
-                className="mt-2 w-full px-3 py-1.5 bg-white text-black text-xs font-mono font-bold uppercase tracking-wider hover:bg-white/90 transition-colors"
+                className="mt-2 w-full px-3 py-1.5 bg-fintech-navy text-white text-xs font-medium hover:bg-fintech-navy/90 transition-colors"
               >
                 Apply
               </button>
