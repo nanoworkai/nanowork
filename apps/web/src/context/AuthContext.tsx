@@ -349,10 +349,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const canCreateCompany = useCallback(() => {
     if (!profile) return false;
-    const activeCompaniesCount = companies.filter(
-      c => c.status !== "archived" && c.status !== "deleted"
-    ).length;
-    return activeCompaniesCount < profile.monthlyCompanyLimit;
+    // Count all companies (no status filtering since companies table doesn't have status column)
+    return companies.length < profile.monthlyCompanyLimit;
   }, [profile, companies]);
 
   const deductCredits = useCallback(async (
