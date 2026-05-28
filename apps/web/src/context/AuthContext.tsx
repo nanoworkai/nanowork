@@ -193,7 +193,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .from("companies")
       .select("*")
       .eq("user_id", userId)
-      .is("deleted_at", null)
       .order("created_at", { ascending: false });
 
     // Get companies where user is a member (if company_members table exists)
