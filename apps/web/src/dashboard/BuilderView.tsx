@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, FileText, Table, Presentation, Sparkles } from "lucide-react";
 import AgentCard, { type AgentType, type AgentStatus } from "../components/AgentCard";
+import { apiFetch } from "../lib/apiFetch";
 
 interface AgentTask {
   buildId: string;
@@ -94,9 +95,7 @@ export default function BuilderView() {
   async function loadBuild() {
     try {
       // Load build details
-      const buildRes = await fetch(`${apiUrl}/builds/${buildId}`, {
-        credentials: 'include',
-      });
+      const buildRes = await apiFetch(`/api/builds/${buildId}`);
 
       if (!buildRes.ok) {
         throw new Error('Build not found');
@@ -106,9 +105,7 @@ export default function BuilderView() {
       setBuild(buildData);
 
       // Load agent status
-      const statusRes = await fetch(`${apiUrl}/agent-orchestrator/builds/${buildId}/status`, {
-        credentials: 'include',
-      });
+      const statusRes = await apiFetch(`/api/agent-orchestrator/builds/${buildId}/status`);
 
       if (statusRes.ok) {
         const { tasks } = await statusRes.json();
@@ -134,9 +131,7 @@ export default function BuilderView() {
 
   async function loadDocuments() {
     try {
-      const docsRes = await fetch(`${apiUrl}/agent-orchestrator/builds/${buildId}/documents`, {
-        credentials: 'include',
-      });
+      const docsRes = await apiFetch(`/api/agent-orchestrator/builds/${buildId}/documents`);
 
       if (docsRes.ok) {
         const { documents: docs } = await docsRes.json();
@@ -221,14 +216,16 @@ export default function BuilderView() {
 
   async function startBuild() {
     try {
-      const res = await fetch(`${apiUrl}/agent-orchestrator/builds/${buildId}/start`, {
+      const res = await apiFetch(`/api/agent-orchestrator/builds/${buildId}/start`, {
         method: 'POST',
-        credentials: 'include',
       });
 
       if (!res.ok) {
         throw new Error('Failed to start build');
       }
+
+      // Reload status after starting
+      await loadBuild();
     } catch (err) {
       console.error('Failed to start build:', err);
     }

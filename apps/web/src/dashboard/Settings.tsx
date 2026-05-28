@@ -24,10 +24,10 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`p-6 rounded-2xl border ${danger ? "border-red-500/20 bg-red-500/5" : "border-white/5 bg-surface-1"}`}>
+    <div className={`p-6 rounded-2xl border ${danger ? "border-red-500/20 bg-red-50" : "border-fintech-border bg-surface-1 shadow-card"}`}>
       <div className="mb-4">
-        <h2 className={`text-base font-semibold ${danger ? "text-red-400" : "text-white"}`}>{title}</h2>
-        <p className="text-sm text-zinc-500 mt-0.5">{desc}</p>
+        <h2 className={`text-base font-semibold ${danger ? "text-red-600" : "text-fintech-navy"}`}>{title}</h2>
+        <p className="text-sm text-fintech-slate mt-0.5">{desc}</p>
       </div>
       {children}
     </div>
@@ -67,13 +67,13 @@ function FieldInput({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-zinc-400 mb-1.5">{label}</label>
+      <label className="block text-xs font-medium text-fintech-slate mb-1.5">{label}</label>
       <input
         type={type}
         className={`w-full px-3 py-2 rounded-xl text-sm border outline-none transition-colors ${
           readOnly
-            ? "bg-surface-3 border-white/5 text-zinc-500 cursor-default font-mono"
-            : "bg-surface-2 border-white/10 focus:border-white/20/60 text-zinc-100 placeholder-zinc-600"
+            ? "bg-surface-3 border-fintech-border text-fintech-slate cursor-default font-mono"
+            : "bg-surface-0 border-fintech-border focus:border-accent text-fintech-navy placeholder-fintech-slate/40"
         }`}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
@@ -142,10 +142,10 @@ function BillingSection() {
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-zinc-300 font-medium capitalize mb-1">
+            <p className="text-sm text-fintech-slate300 font-medium capitalize mb-1">
               {profile?.plan ?? "free"} plan
             </p>
-            <p className="text-xs text-zinc-600">
+            <p className="text-xs text-fintech-slate600">
               {profile?.subscriptionStatus
                 ? `Status: ${profile.subscriptionStatus}`
                 : profile?.stripeCustomerId
@@ -156,7 +156,7 @@ function BillingSection() {
           <button
             onClick={openPortal}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm font-medium text-zinc-300 hover:text-white transition-all disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-0 hover:bg-surface-3 border border-fintech-border text-sm font-medium text-fintech-slate300 hover:text-fintech-navy transition-all disabled:opacity-50"
           >
             {loading && (
               <div className="w-3.5 h-3.5 border-2 border-zinc-600 border-t-white rounded-full animate-spin" />
@@ -173,21 +173,21 @@ function BillingSection() {
         </div>
 
         {/* Features List */}
-        <div className="rounded-xl bg-surface-2 border border-white/5 p-4">
-          <p className="text-xs font-medium text-zinc-400 mb-3">In the billing portal you can:</p>
+        <div className="rounded-xl bg-surface-0 border border-white/5 p-4">
+          <p className="text-xs font-medium text-fintech-slate400 mb-3">In the billing portal you can:</p>
           <div className="space-y-2">
-            <div className="flex items-start gap-2 text-xs text-zinc-500">
-              <CreditCard className="w-3.5 h-3.5 text-zinc-600 mt-0.5 flex-shrink-0" />
+            <div className="flex items-start gap-2 text-xs text-fintech-slate500">
+              <CreditCard className="w-3.5 h-3.5 text-fintech-slate600 mt-0.5 flex-shrink-0" />
               <span>Update your payment method</span>
             </div>
-            <div className="flex items-start gap-2 text-xs text-zinc-500">
-              <svg className="w-3.5 h-3.5 text-zinc-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <div className="flex items-start gap-2 text-xs text-fintech-slate500">
+              <svg className="w-3.5 h-3.5 text-fintech-slate600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               <span>View and download invoices</span>
             </div>
-            <div className="flex items-start gap-2 text-xs text-zinc-500">
-              <svg className="w-3.5 h-3.5 text-zinc-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <div className="flex items-start gap-2 text-xs text-fintech-slate500">
+              <svg className="w-3.5 h-3.5 text-fintech-slate600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
               <span>Change or cancel your subscription</span>
@@ -290,12 +290,12 @@ function DeleteSection() {
               {error}
             </div>
           )}
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-fintech-slate400">
             Type <span className="font-mono text-red-400">"{phrase}"</span> to confirm:
           </p>
           <input
             type="text"
-            className="w-full px-3 py-2 rounded-xl bg-surface-2 border border-red-500/30 focus:border-red-500/60 text-sm text-zinc-100 outline-none transition-colors"
+            className="w-full px-3 py-2 rounded-xl bg-surface-0 border border-red-500/30 focus:border-red-500/60 text-sm text-fintech-slate100 outline-none transition-colors"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder={phrase}
@@ -306,7 +306,7 @@ function DeleteSection() {
             <button
               onClick={handleDelete}
               disabled={confirm !== phrase || deleting}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed text-fintech-navy text-sm font-semibold transition-colors"
             >
               {deleting && (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -316,7 +316,7 @@ function DeleteSection() {
             <button
               onClick={() => { setShow(false); setConfirm(""); setError(null); }}
               disabled={deleting}
-              className="px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-zinc-400 hover:text-zinc-200 text-sm font-medium transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-surface-0 hover:bg-surface-3 border border-fintech-border text-fintech-slate400 hover:text-fintech-slate200 text-sm font-medium transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
@@ -399,12 +399,12 @@ function AIEmailSection() {
       <div className="space-y-4">
         {/* Email Display */}
         <div>
-          <label className="block text-xs font-medium text-zinc-400 mb-1.5">Agent Email Address</label>
+          <label className="block text-xs font-medium text-fintech-slate400 mb-1.5">Agent Email Address</label>
           <div className="flex items-center gap-2">
-            <div className="flex-1 px-3 py-2 rounded-xl bg-surface-2 border border-white/10 flex items-center justify-between group">
+            <div className="flex-1 px-3 py-2 rounded-xl bg-surface-0 border border-fintech-border flex items-center justify-between group">
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <Mail className="w-4 h-4 text-zinc-500 flex-shrink-0" />
-                <span className="text-sm font-mono text-zinc-200 truncate">{profile.aiEmail}</span>
+                <Mail className="w-4 h-4 text-fintech-slate500 flex-shrink-0" />
+                <span className="text-sm font-mono text-fintech-slate200 truncate">{profile.aiEmail}</span>
               </div>
               <button
                 onClick={copyToClipboard}
@@ -414,7 +414,7 @@ function AIEmailSection() {
                 {copied ? (
                   <Check className="w-4 h-4 text-green-400" />
                 ) : (
-                  <Copy className="w-4 h-4 text-zinc-400 group-hover:text-zinc-200" />
+                  <Copy className="w-4 h-4 text-fintech-slate400 group-hover:text-fintech-slate200" />
                 )}
               </button>
             </div>
@@ -422,9 +422,9 @@ function AIEmailSection() {
         </div>
 
         {/* Explanation */}
-        <div className="px-4 py-3 rounded-xl bg-surface-2 border border-white/5">
-          <p className="text-xs text-zinc-400 leading-relaxed">
-            <strong className="text-zinc-300">How it works:</strong> Contacts can email your AI agent directly at this address.
+        <div className="px-4 py-3 rounded-xl bg-surface-0 border border-white/5">
+          <p className="text-xs text-fintech-slate400 leading-relaxed">
+            <strong className="text-fintech-slate300">How it works:</strong> Contacts can email your AI agent directly at this address.
             Your agent will read, understand, and respond to messages automatically, handling inquiries 24/7.
           </p>
         </div>
@@ -432,17 +432,17 @@ function AIEmailSection() {
         {/* Inbox Toggle */}
         <div className="flex items-center justify-between pt-2">
           <div className="flex items-center gap-2">
-            <Inbox className="w-4 h-4 text-zinc-400" />
-            <span className="text-sm font-medium text-zinc-300">Recent Messages</span>
+            <Inbox className="w-4 h-4 text-fintech-slate400" />
+            <span className="text-sm font-medium text-fintech-slate300">Recent Messages</span>
             {emails.length > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-white/10 text-xs font-semibold text-zinc-400">
+              <span className="px-2 py-0.5 rounded-full bg-white/10 text-xs font-semibold text-fintech-slate400">
                 {emails.length}
               </span>
             )}
           </div>
           <button
             onClick={() => setShowInbox(!showInbox)}
-            className="text-xs font-semibold text-zinc-400 hover:text-white transition-colors"
+            className="text-xs font-semibold text-fintech-slate400 hover:text-fintech-navy transition-colors"
           >
             {showInbox ? 'Hide' : 'Show'}
           </button>
@@ -450,17 +450,17 @@ function AIEmailSection() {
 
         {/* Inbox View */}
         {showInbox && (
-          <div className="rounded-xl bg-surface-2 border border-white/5 overflow-hidden">
+          <div className="rounded-xl bg-surface-0 border border-white/5 overflow-hidden">
             {loading ? (
               <div className="p-6 text-center">
                 <div className="w-6 h-6 border-2 border-zinc-600 border-t-white rounded-full animate-spin mx-auto mb-2" />
-                <p className="text-xs text-zinc-500">Loading messages...</p>
+                <p className="text-xs text-fintech-slate500">Loading messages...</p>
               </div>
             ) : emails.length === 0 ? (
               <div className="p-6 text-center">
-                <Mail className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
-                <p className="text-sm text-zinc-500 mb-1">No messages yet</p>
-                <p className="text-xs text-zinc-600">
+                <Mail className="w-8 h-8 text-fintech-slate600 mx-auto mb-2" />
+                <p className="text-sm text-fintech-slate500 mb-1">No messages yet</p>
+                <p className="text-xs text-fintech-slate600">
                   When contacts email your agent, messages will appear here
                 </p>
               </div>
@@ -471,7 +471,7 @@ function AIEmailSection() {
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="text-sm font-semibold text-zinc-200 truncate">
+                          <p className="text-sm font-semibold text-fintech-slate200 truncate">
                             {email.from_name || email.from_address}
                           </p>
                           {email.status === 'processed' && (
@@ -480,19 +480,19 @@ function AIEmailSection() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-zinc-500 font-mono truncate">
+                        <p className="text-xs text-fintech-slate500 font-mono truncate">
                           {email.from_address}
                         </p>
                       </div>
-                      <span className="text-xs text-zinc-600 whitespace-nowrap">
+                      <span className="text-xs text-fintech-slate600 whitespace-nowrap">
                         {formatDate(email.received_at)}
                       </span>
                     </div>
-                    <p className="text-sm text-zinc-300 font-medium mb-1 truncate">
+                    <p className="text-sm text-fintech-slate300 font-medium mb-1 truncate">
                       {email.subject || '(No subject)'}
                     </p>
                     {email.body_text && (
-                      <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-fintech-slate500 line-clamp-2 leading-relaxed">
                         {email.body_text}
                       </p>
                     )}
@@ -573,19 +573,19 @@ function PaymentModal({ plan, clientSecret, onSuccess, onCancel, onError }: Paym
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4" onClick={onCancel}>
-      <div className="w-full max-w-md bg-surface-1 border border-white/10 rounded-2xl p-6" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-bold text-white mb-2">Complete your subscription</h3>
-        <p className="text-sm text-zinc-400 mb-6">
-          You're upgrading to <span className="text-white font-semibold">{planDetails?.name}</span> for ${planDetails?.price}/month
+      <div className="w-full max-w-md bg-surface-1 border border-fintech-border rounded-2xl p-6" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-lg font-bold text-fintech-navy mb-2">Complete your subscription</h3>
+        <p className="text-sm text-fintech-slate400 mb-6">
+          You're upgrading to <span className="text-fintech-navy font-semibold">{planDetails?.name}</span> for ${planDetails?.price}/month
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">
+            <label className="block text-sm font-medium text-fintech-slate300 mb-2">
               Payment Status
             </label>
-            <div className="p-4 rounded-xl border border-white/10 bg-surface-2">
-              <p className="text-zinc-400 text-sm">Payment processing is temporarily disabled</p>
+            <div className="p-4 rounded-xl border border-fintech-border bg-surface-0">
+              <p className="text-fintech-slate400 text-sm">Payment processing is temporarily disabled</p>
             </div>
           </div>
 
@@ -593,7 +593,7 @@ function PaymentModal({ plan, clientSecret, onSuccess, onCancel, onError }: Paym
             <button
               type="button"
               onClick={onCancel}
-              className="flex-1 py-2.5 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors"
+              className="flex-1 py-2.5 rounded-xl bg-surface-0 hover:bg-surface-3 border border-fintech-border text-sm text-fintech-slate400 hover:text-fintech-slate200 font-medium transition-colors"
             >
               Close
             </button>
@@ -747,21 +747,21 @@ function PlanSection() {
                 </span>
               )}
               {isCurrent && (
-                <span className="absolute -top-3 left-6 text-xs font-semibold bg-green-500 text-white px-3 py-1 rounded-full">
+                <span className="absolute -top-3 left-6 text-xs font-semibold bg-green-500 text-fintech-navy px-3 py-1 rounded-full">
                   Current
                 </span>
               )}
 
-              <h3 className="text-lg font-bold text-white mb-1">{plan.name}</h3>
+              <h3 className="text-lg font-bold text-fintech-navy mb-1">{plan.name}</h3>
               <div className="flex items-baseline gap-1 mb-3">
-                <span className="text-3xl font-bold text-white">${plan.price}</span>
-                <span className="text-sm text-white/40">/mo</span>
+                <span className="text-3xl font-bold text-fintech-navy">${plan.price}</span>
+                <span className="text-sm text-fintech-navy/40">/mo</span>
               </div>
-              <p className="text-sm text-white/60 mb-5 leading-relaxed">{plan.desc}</p>
+              <p className="text-sm text-fintech-navy/60 mb-5 leading-relaxed">{plan.desc}</p>
 
               <ul className="flex-1 flex flex-col gap-2.5 mb-6">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-white/80">
+                  <li key={f} className="flex items-start gap-2 text-sm text-fintech-navy/80">
                     <svg className="flex-shrink-0 mt-0.5 text-green-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
@@ -771,7 +771,7 @@ function PlanSection() {
               </ul>
 
               {isCurrent ? (
-                <button disabled className="w-full py-3 rounded-lg text-sm font-semibold bg-surface-3 text-zinc-600 cursor-default">
+                <button disabled className="w-full py-3 rounded-lg text-sm font-semibold bg-surface-3 text-fintech-slate600 cursor-default">
                   Current plan
                 </button>
               ) : (
@@ -779,7 +779,7 @@ function PlanSection() {
                   onClick={() => setConfirm(plan.tier)}
                   disabled={switching}
                   className={`w-full py-3 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 ${
-                    isRecommended ? "bg-white hover:bg-zinc-100 text-black" : "bg-surface-2 hover:bg-surface-3 border border-white/10 text-white/80 hover:text-white"
+                    isRecommended ? "bg-white hover:bg-zinc-100 text-black" : "bg-surface-0 hover:bg-surface-3 border border-fintech-border text-fintech-navy/80 hover:text-fintech-navy"
                   }`}
                 >
                   {switching ? "Processing..." : `Switch to ${plan.name}`}
@@ -793,19 +793,19 @@ function PlanSection() {
       {/* Confirm modal */}
       {confirm && !clientSecret && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4" onClick={() => setConfirm(null)}>
-          <div className="w-full max-w-sm bg-surface-1 border border-white/10 rounded-2xl p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-white mb-2">Switch plan</h3>
-            <p className="text-sm text-zinc-400 mb-6">
+          <div className="w-full max-w-sm bg-surface-1 border border-fintech-border rounded-2xl p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-fintech-navy mb-2">Switch plan</h3>
+            <p className="text-sm text-fintech-slate400 mb-6">
               {confirm === "free"
                 ? "Downgrade to the Free plan? Your subscription will be canceled at the end of the current period."
-                : <>Switch to the <span className="text-white font-semibold">{PLANS.find((p) => p.tier === confirm)?.name}</span> plan? You'll be charged ${PLANS.find((p) => p.tier === confirm)?.price}/month.</>
+                : <>Switch to the <span className="text-fintech-navy font-semibold">{PLANS.find((p) => p.tier === confirm)?.name}</span> plan? You'll be charged ${PLANS.find((p) => p.tier === confirm)?.price}/month.</>
               }
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setConfirm(null)}
                 disabled={switching}
-                className="flex-1 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm text-zinc-400 hover:text-zinc-200 font-medium transition-colors disabled:opacity-50"
+                className="flex-1 py-2 rounded-xl bg-surface-0 hover:bg-surface-3 border border-fintech-border text-sm text-fintech-slate400 hover:text-fintech-slate200 font-medium transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -886,22 +886,22 @@ function DomainsSection() {
         desc={`Your business is served at *.${PLATFORM_HOST}`}
       >
         <form onSubmit={handleSubdomainSave} className="flex flex-col gap-3">
-          <div className="flex items-center gap-1 px-3 py-2 rounded-xl bg-surface-2 border border-white/10 focus-within:border-white/20 transition-colors">
-            <span className="text-xs text-zinc-600">https://</span>
+          <div className="flex items-center gap-1 px-3 py-2 rounded-xl bg-surface-0 border border-fintech-border focus-within:border-white/20 transition-colors">
+            <span className="text-xs text-fintech-slate600">https://</span>
             <input
-              className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-600 outline-none min-w-0"
+              className="flex-1 bg-transparent text-sm text-fintech-slate100 placeholder-zinc-600 outline-none min-w-0"
               type="text"
               value={subdomain}
               onChange={(e) => setSubdomain(normalizeSubdomain(e.target.value))}
               placeholder="your-app"
             />
-            <span className="text-xs text-zinc-600 whitespace-nowrap">.{PLATFORM_HOST}</span>
+            <span className="text-xs text-fintech-slate600 whitespace-nowrap">.{PLATFORM_HOST}</span>
           </div>
           {subError && <p className="text-xs text-red-400">{subError}</p>}
           <div className="flex items-center gap-2">
             <a
               href={fullUrl}
-              className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors"
+              className="flex items-center gap-1.5 text-xs text-fintech-navy/60 hover:text-fintech-navy transition-colors"
               target="_blank"
               rel="noreferrer"
             >
@@ -929,7 +929,7 @@ function DomainsSection() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-blue-400">Premium Feature</p>
-                <p className="text-xs text-white/60 mt-0.5">Custom domains cost $100/month per domain</p>
+                <p className="text-xs text-fintech-navy/60 mt-0.5">Custom domains cost $100/month per domain</p>
               </div>
             </div>
           </div>
@@ -944,11 +944,11 @@ function DomainsSection() {
           </div>
 
           {showAdd && (
-            <div className="p-5 rounded-xl bg-surface-2 border border-white/5">
-              <label className="block text-xs font-medium text-zinc-400 mb-2">Domain name</label>
+            <div className="p-5 rounded-xl bg-surface-0 border border-white/5">
+              <label className="block text-xs font-medium text-fintech-slate400 mb-2">Domain name</label>
               <div className="flex gap-2 mb-4">
                 <input
-                  className="flex-1 px-3 py-2 rounded-lg bg-surface-3 border border-white/10 focus:border-white/20 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors"
+                  className="flex-1 px-3 py-2 rounded-lg bg-surface-3 border border-fintech-border focus:border-white/20 text-sm text-fintech-slate100 placeholder-zinc-600 outline-none transition-colors"
                   type="text"
                   placeholder="yourbrand.com"
                   value={newDomain}
@@ -970,22 +970,22 @@ function DomainsSection() {
                     <AlertCircle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
                     <div className="flex-1">
                       <p className="text-xs font-semibold text-amber-400 mb-1">DNS Configuration Required</p>
-                      <p className="text-xs text-zinc-500">Add this CNAME record at your DNS provider:</p>
+                      <p className="text-xs text-fintech-slate500">Add this CNAME record at your DNS provider:</p>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface-0/50 border border-white/5">
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-zinc-500 mb-0.5">Type</p>
-                        <p className="text-sm font-mono text-zinc-200">CNAME</p>
+                        <p className="text-xs text-fintech-slate500 mb-0.5">Type</p>
+                        <p className="text-sm font-mono text-fintech-slate200">CNAME</p>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-zinc-500 mb-0.5">Name</p>
-                        <p className="text-sm font-mono text-zinc-200 truncate">{newDomain}</p>
+                        <p className="text-xs text-fintech-slate500 mb-0.5">Name</p>
+                        <p className="text-sm font-mono text-fintech-slate200 truncate">{newDomain}</p>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs text-zinc-500 mb-0.5">Value</p>
-                        <p className="text-sm font-mono text-zinc-200">{PLATFORM_HOST || 'your-domain.com'}</p>
+                        <p className="text-xs text-fintech-slate500 mb-0.5">Value</p>
+                        <p className="text-sm font-mono text-fintech-slate200">{PLATFORM_HOST || 'your-domain.com'}</p>
                       </div>
                       <button
                         onClick={() => copyToClipboard(`${newDomain} CNAME ${PLATFORM_HOST || 'your-domain.com'}`)}
@@ -995,7 +995,7 @@ function DomainsSection() {
                         {copied ? (
                           <Check className="w-4 h-4 text-green-400" />
                         ) : (
-                          <Copy className="w-4 h-4 text-zinc-400" />
+                          <Copy className="w-4 h-4 text-fintech-slate400" />
                         )}
                       </button>
                     </div>
@@ -1006,22 +1006,22 @@ function DomainsSection() {
           )}
 
           {profile?.customDomain ? (
-            <div className="rounded-xl bg-surface-2 border border-white/5 p-4">
+            <div className="rounded-xl bg-surface-0 border border-white/5 p-4">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm text-zinc-200 font-medium">{profile.customDomain}</p>
+                    <p className="text-sm text-fintech-slate200 font-medium">{profile.customDomain}</p>
                     <span className="text-xs font-semibold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       Active
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-600 mt-0.5">Your custom domain is connected and live</p>
+                  <p className="text-xs text-fintech-slate600 mt-0.5">Your custom domain is connected and live</p>
                   <a
                     href={`https://${profile.customDomain}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors mt-2"
+                    className="flex items-center gap-1.5 text-xs text-fintech-navy/60 hover:text-fintech-navy transition-colors mt-2"
                   >
                     <span>Visit site</span>
                     <ExternalLink className="w-3 h-3" />
@@ -1033,7 +1033,7 @@ function DomainsSection() {
                       updateProfile({ customDomain: undefined });
                     }
                   }}
-                  className="p-2 rounded-lg hover:bg-red-500/10 text-zinc-600 hover:text-red-400 transition-colors"
+                  className="p-2 rounded-lg hover:bg-red-500/10 text-fintech-slate600 hover:text-red-400 transition-colors"
                   title="Remove domain"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -1043,10 +1043,10 @@ function DomainsSection() {
               </div>
             </div>
           ) : (
-            <div className="text-center py-8 text-zinc-600">
+            <div className="text-center py-8 text-fintech-slate600">
               <Globe className="w-8 h-8 mx-auto mb-3 opacity-40" />
               <p className="text-sm">No custom domain connected yet.</p>
-              <p className="text-xs text-zinc-700 mt-1">Click "Add domain" above to get started.</p>
+              <p className="text-xs text-fintech-slate700 mt-1">Click "Add domain" above to get started.</p>
             </div>
           )}
         </div>
@@ -1090,7 +1090,7 @@ function LogoutSection() {
         <button
           onClick={handleLogout}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-2 hover:bg-surface-3 border border-white/10 text-sm font-medium text-zinc-300 hover:text-white transition-all disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-0 hover:bg-surface-3 border border-fintech-border text-sm font-medium text-fintech-slate300 hover:text-fintech-navy transition-all disabled:opacity-50"
         >
           <LogOut className="w-4 h-4" />
           {loading ? "Signing out…" : "Sign out"}
@@ -1114,8 +1114,8 @@ export default function Settings() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-zinc-500 text-sm mt-1">Manage your account, billing, and domain configuration.</p>
+        <h1 className="text-2xl font-bold text-fintech-navy">Settings</h1>
+        <p className="text-fintech-slate500 text-sm mt-1">Manage your account, billing, and domain configuration.</p>
       </div>
 
       {/* Tab Navigation */}
@@ -1128,8 +1128,8 @@ export default function Settings() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab.id
-                  ? "text-white border-white"
-                  : "text-white/60 border-transparent hover:text-white"
+                  ? "text-fintech-navy border-white"
+                  : "text-fintech-navy/60 border-transparent hover:text-fintech-navy"
               }`}
             >
               <Icon className="w-4 h-4" />
