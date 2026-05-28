@@ -37,17 +37,26 @@ export default function Create() {
     setCreating(true);
 
     try {
+      console.log('[Create] Starting build creation...');
+
       const nameRes = await apiFetch('/api/builds/generate-name', {
         method: 'POST',
         body: JSON.stringify({ prompt }),
       });
 
+      console.log('[Create] Name generation response:', nameRes.status);
+
       let buildName = 'New Build';
       if (nameRes.ok) {
         const { name } = await nameRes.json();
         buildName = name;
+        console.log('[Create] Generated name:', buildName);
+      } else {
+        const errorText = await nameRes.text();
+        console.warn('[Create] Name generation failed:', errorText);
       }
 
+      console.log('[Create] Creating build with name:', buildName);
       const res = await apiFetch('/api/builds', {
         method: 'POST',
         body: JSON.stringify({
@@ -56,13 +65,21 @@ export default function Create() {
         }),
       });
 
+      console.log('[Create] Build creation response:', res.status);
+
       if (res.ok) {
         const { build } = await res.json();
+        console.log('[Create] Build created successfully:', build.id);
         setPrompt('');
         navigate(`/dashboard/builder/${build.id}`);
+      } else {
+        const errorText = await res.text();
+        console.error('[Create] Build creation failed:', errorText);
+        alert(`Failed to create build: ${errorText}`);
       }
     } catch (err) {
       console.error('Failed to create build:', err);
+      alert(`Error creating build: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setCreating(false);
     }
