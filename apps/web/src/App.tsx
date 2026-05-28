@@ -33,6 +33,7 @@ import Spreadsheets from "./dashboard/Spreadsheets";
 import Documents from "./dashboard/Documents";
 import Presentations from "./dashboard/Presentations";
 import Files from "./dashboard/Files";
+import DemoFlow from "./dashboard/DemoFlow";
 import UserAppEntry from "./pages/user-app/UserAppEntry";
 import UserAppLayout from "./pages/user-app/UserAppLayout";
 import UserAppHome from "./pages/user-app/UserAppHome";
@@ -81,6 +82,9 @@ export default function App() {
       <Route path="/about" element={<About />} />
       <Route path="/security" element={<Security />} />
       <Route path="/contact" element={<Contact />} />
+
+      {/* Demo route - public */}
+      <Route path="/demo" element={<DemoFlow />} />
 
       {/* Dashboard routes - authenticated */}
       <Route
