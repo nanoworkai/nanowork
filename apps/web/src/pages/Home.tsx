@@ -243,12 +243,6 @@ export default function Home() {
           </Link>
 
           <nav className="flex items-center gap-1">
-            <Link
-              to="/demo"
-              className="px-5 py-2 text-sm font-medium text-fintech-slate hover:text-fintech-navy transition-colors"
-            >
-              View demo
-            </Link>
             {isAuthenticated ? (
               <Link
                 to="/dashboard"
