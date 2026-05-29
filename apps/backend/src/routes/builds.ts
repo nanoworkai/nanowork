@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { requireUserAuth } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types';
 import { getSupabase } from '../services/supabase';
+import { CompanySpecExtractor } from '../services/companySpecExtractor.js';
 
 const router = Router();
 
@@ -90,8 +91,41 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
 });
 
 /**
+ * POST /builds/extract-spec
+ * Extract structured company specification from a prompt
+ */
+router.post('/extract-spec', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { prompt } = req.body;
+
+    if (!prompt) {
+      res.status(400).json({ error: 'Prompt is required' });
+      return;
+    }
+
+    const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
+    if (!anthropicApiKey) {
+      res.status(500).json({ error: 'Anthropic API not configured' });
+      return;
+    }
+
+    const extractor = new CompanySpecExtractor(anthropicApiKey);
+    const result = await extractor.extractSpec(prompt);
+
+    res.json(result);
+  } catch (error) {
+    console.error('Extract spec error:', error);
+    res.status(500).json({
+      error: 'Failed to extract company specification',
+      message: error instanceof Error ? error.message : 'unknown error',
+    });
+  }
+});
+
+/**
  * POST /builds
  * Create a new build for the authenticated user's agent
+ * Now includes CompanySpec extraction before creation
  */
 router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -102,6 +136,18 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
 
     const { name = 'New Build', prompt = '' } = req.body;
 
+    // Extract company spec if prompt is provided
+    let companySpec = null;
+    if (prompt && process.env.ANTHROPIC_API_KEY) {
+      try {
+        const extractor = new CompanySpecExtractor(process.env.ANTHROPIC_API_KEY);
+        const specResult = await extractor.extractSpec(prompt);
+        companySpec = specResult.spec;
+      } catch (error) {
+        console.warn('Failed to extract company spec, continuing without it:', error);
+      }
+    }
+
     const { data, error } = await getSupabase()
       .from('generated_apps')
       .insert({
@@ -111,6 +157,7 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
         status: 'generating',
         framework: 'react',
         tech_stack: [],
+        metadata: companySpec ? { companySpec } : {},
         last_activity_at: new Date().toISOString(),
       })
       .select()
@@ -120,7 +167,7 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
       throw new Error(`Failed to create build: ${error?.message || 'unknown error'}`);
     }
 
-    res.json({ build: data });
+    res.json({ build: data, companySpec });
   } catch (error) {
     console.error('Create build error:', error);
     res.status(500).json({

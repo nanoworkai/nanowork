@@ -2,21 +2,24 @@
   "name": "nanowork-mvp",
   "private": true,
   "workspaces": [
-    "apps/web"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"bun run dev:web\" \"bun run dev:worker\"",
+    "dev": "turbo dev",
     "dev:web": "cd apps/web && bun run dev",
     "dev:worker": "cd apps/worker && npx wrangler dev",
-    "build": "cd apps/web && bun run build",
+    "dev:backend": "cd apps/backend && npm run dev",
+    "build": "turbo build",
     "build:web": "cd apps/web && bun run build",
     "build:worker": "cd apps/worker && npm run build",
+    "build:backend": "cd apps/backend && npm run build",
     "start": "npm run start -w web",
     "deploy": "npm run deploy:worker",
     "deploy:worker": "cd apps/worker && npx wrangler deploy",
-    "typecheck": "cd apps/web && bun run typecheck && cd ../worker && npm run typecheck",
-    "lint": "npm run lint -w web && cd apps/worker && npm run lint",
-    "validate": "bun run typecheck && npm run lint",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "validate": "turbo typecheck && turbo lint",
     "prepare": "simple-git-hooks",
     "generate:og": "bun scripts/generate-og-image.js"
   },
@@ -27,7 +30,8 @@
     "concurrently": "^9.2.1",
     "lint-staged": "^15.2.11",
     "playwright": "^1.60.0",
-    "simple-git-hooks": "^2.12.1"
+    "simple-git-hooks": "^2.12.1",
+    "turbo": "^2.9.16"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"

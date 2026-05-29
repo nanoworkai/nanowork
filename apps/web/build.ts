@@ -87,9 +87,9 @@ const result = await Bun.build({
   splitting: true,
   target: 'browser',
   naming: {
-    entry: '[dir]/[name]-[hash].[ext]',
+    entry: '[name]-[hash].[ext]',
     chunk: '[name]-[hash].[ext]',
-    asset: 'assets/[name]-[hash].[ext]',
+    asset: '[name]-[hash].[ext]',
   },
   external: [],
   define: {
@@ -118,16 +118,12 @@ if (existsSync(publicDir)) {
   cpSync(publicDir, distDir, { recursive: true });
 }
 
-// Find built assets (recursively since they may be in subdirectories)
+// Find built assets (now in flat structure at root of dist)
 function findFile(dir: string, pattern: RegExp): string | undefined {
   const files = readdirSync(dir, { withFileTypes: true });
   for (const file of files) {
-    const fullPath = join(dir, file.name);
-    if (file.isDirectory()) {
-      const found = findFile(fullPath, pattern);
-      if (found) return found;
-    } else if (pattern.test(file.name)) {
-      return fullPath.replace(distDir + '/', '');
+    if (file.isFile() && pattern.test(file.name)) {
+      return file.name;
     }
   }
   return undefined;
