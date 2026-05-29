@@ -164,7 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const claim = JSON.parse(pendingClaim);
         const { error: insertError } = await supabase.from('companies').insert({
-          user_id: userId,
+          owner_id: userId,
           name: claim.businessData.name,
           description: claim.businessData.description || claim.businessData.tagline || '',
           slug: claim.businessData.slug,
@@ -192,7 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: ownedCompanies } = await supabase
       .from("companies")
       .select("*")
-      .eq("user_id", userId)
+      .eq("owner_id", userId)
       .order("created_at", { ascending: false });
 
     // Get companies where user is a member (if company_members table exists)

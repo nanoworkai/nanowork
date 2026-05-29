@@ -3,7 +3,7 @@ import { join } from 'path';
 import { readFileSync, existsSync } from 'fs';
 import { spawn } from 'child_process';
 const PORT = 5173;
-const API_BACKEND_URL = 'http://127.0.0.1:3001';
+const API_BACKEND_URL = 'http://127.0.0.1:8000';
 // Load environment variables
 const envPath = join(import.meta.dir, '../../.env-backup/.env');
 if (existsSync(envPath)) {

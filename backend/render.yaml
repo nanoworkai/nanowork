@@ -29,9 +29,9 @@ services:
       - key: INTERNAL_TOKEN
         sync: false
       - key: FRONTEND_URL
-        value: https://nanowork-frontend.onrender.com
+        value: https://nanowork-web.onrender.com
       - key: CORS_ORIGIN
-        value: https://nanowork-frontend.onrender.com
+        value: https://nanowork-web.onrender.com
       - key: CF_ACCOUNT_ID
         sync: false
       - key: CLOUDFLARE_API_TOKEN

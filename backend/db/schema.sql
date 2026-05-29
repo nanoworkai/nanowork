@@ -1,9 +1,9 @@
 -- ============================================================================
 -- Nanowork Agent Platform Schema
 -- ============================================================================
--- This schema creates the agent department system for AI-run companies
--- Each user gets 7 agents (Sales, Marketing, Ops, Finance, Product, HR, Support)
--- with email addresses, memory, conversations, tasks, and document storage
+-- This schema supports the multi-agent build orchestration system
+-- Each user gets a single agent that orchestrates specialized build agents
+-- for creating business plans, financial models, pitch decks, etc.
 
 -- ============================================================================
 -- EXTENSIONS
@@ -13,295 +13,327 @@
 CREATE EXTENSION IF NOT EXISTS vector;
 
 -- ============================================================================
--- COMPANIES TABLE
--- ============================================================================
--- Core company records - each user can own/be member of multiple companies
-
-CREATE TABLE IF NOT EXISTS companies (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  owner_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  description TEXT NOT NULL DEFAULT '',
-  slug TEXT UNIQUE,
-  industry TEXT,
-  logo_url TEXT,
-  status TEXT NOT NULL DEFAULT 'initializing' CHECK (status IN ('initializing', 'active', 'paused', 'archived', 'deleted')),
-  entity_type TEXT,
-  entity_state TEXT,
-  ein TEXT,
-  legal_entity_id TEXT,
-  brand_colors JSONB,
-  brand_guidelines_url TEXT,
-  subdomain TEXT UNIQUE,
-  custom_domain_id TEXT,
-  website_url TEXT,
-  website_status TEXT CHECK (website_status IN ('building', 'live', 'maintenance', 'offline')),
-  total_revenue DECIMAL(12,2) NOT NULL DEFAULT 0,
-  mrr DECIMAL(12,2) NOT NULL DEFAULT 0,
-  total_spend DECIMAL(12,2) NOT NULL DEFAULT 0,
-  settings JSONB NOT NULL DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  launched_at TIMESTAMPTZ,
-  archived_at TIMESTAMPTZ,
-  deleted_at TIMESTAMPTZ
-);
-
-CREATE INDEX IF NOT EXISTS idx_companies_owner_id ON companies(owner_id);
-CREATE INDEX IF NOT EXISTS idx_companies_slug ON companies(slug);
-CREATE INDEX IF NOT EXISTS idx_companies_subdomain ON companies(subdomain);
-CREATE INDEX IF NOT EXISTS idx_companies_status ON companies(status);
-CREATE INDEX IF NOT EXISTS idx_companies_deleted_at ON companies(deleted_at);
-
--- ============================================================================
--- COMPANY_MEMBERS TABLE
--- ============================================================================
--- Many-to-many relationship for company team members
-
-CREATE TABLE IF NOT EXISTS company_members (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  role TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('owner', 'admin', 'member', 'viewer')),
-  invited_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  invited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  joined_at TIMESTAMPTZ,
-  UNIQUE(company_id, user_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_company_members_company_id ON company_members(company_id);
-CREATE INDEX IF NOT EXISTS idx_company_members_user_id ON company_members(user_id);
-
--- ============================================================================
 -- AGENTS TABLE
 -- ============================================================================
--- Core agent records - one per department per company
+-- Core agent records - one agent per user
 
 CREATE TABLE IF NOT EXISTS agents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-  department TEXT NOT NULL CHECK (department IN (
-    'sales', 'marketing', 'operations', 'finance', 'product', 'hr', 'support'
-  )),
-  email_address TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'paused', 'archived')),
-  model TEXT NOT NULL DEFAULT 'claude-sonnet-4-6',
+  model TEXT NOT NULL DEFAULT 'claude-sonnet-4-20250514',
   system_prompt TEXT,
   metadata JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
-  -- Ensure one agent per department per company
-  UNIQUE(company_id, department)
+  -- One agent per user
+  UNIQUE(user_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_agents_user_id ON agents(user_id);
-CREATE INDEX IF NOT EXISTS idx_agents_company_id ON agents(company_id);
-CREATE INDEX IF NOT EXISTS idx_agents_email ON agents(email_address);
 CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status);
-CREATE INDEX IF NOT EXISTS idx_agents_department ON agents(department);
 
 -- ============================================================================
--- AGENT_MEMORIES TABLE
+-- GENERATED APPS TABLE
+-- ============================================================================
+-- Business ideas and apps generated by agents
+
+CREATE TABLE IF NOT EXISTS generated_apps (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  agent_id UUID REFERENCES agents(id) ON DELETE SET NULL,
+  app_name TEXT NOT NULL,
+  app_type TEXT NOT NULL,
+  description TEXT,
+  source_code TEXT,
+  config JSONB,
+  deployed_url TEXT,
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'building', 'completed', 'deployed', 'failed')),
+  completed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_generated_apps_user_id ON generated_apps(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_generated_apps_agent_id ON generated_apps(agent_id);
+CREATE INDEX IF NOT EXISTS idx_generated_apps_status ON generated_apps(status);
+
+-- ============================================================================
+-- AGENT EXECUTIONS TABLE
+-- ============================================================================
+-- Track specialized agent task execution for each build
+
+CREATE TABLE IF NOT EXISTS agent_executions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  build_id UUID NOT NULL REFERENCES generated_apps(id) ON DELETE CASCADE,
+  agent_type TEXT NOT NULL CHECK (agent_type IN (
+    'business_analyst',
+    'financial_planner',
+    'product_designer',
+    'marketing',
+    'legal',
+    'technical_architect',
+    'pitch'
+  )),
+
+  -- Execution status
+  status TEXT NOT NULL DEFAULT 'queued' CHECK (status IN ('queued', 'running', 'completed', 'error')),
+  progress INTEGER DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
+  current_activity TEXT,
+
+  -- Results
+  result JSONB,
+  error_message TEXT,
+
+  -- Timing
+  started_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+  UNIQUE(build_id, agent_type)
+);
+
+CREATE INDEX IF NOT EXISTS idx_agent_executions_build_id ON agent_executions(build_id);
+CREATE INDEX IF NOT EXISTS idx_agent_executions_agent_type ON agent_executions(agent_type);
+CREATE INDEX IF NOT EXISTS idx_agent_executions_status ON agent_executions(status);
+CREATE INDEX IF NOT EXISTS idx_agent_executions_created_at ON agent_executions(created_at DESC);
+
+-- ============================================================================
+-- BUILD DOCUMENTS TABLE
+-- ============================================================================
+-- Documents generated by specialized agents
+
+CREATE TABLE IF NOT EXISTS build_documents (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  build_id UUID NOT NULL REFERENCES generated_apps(id) ON DELETE CASCADE,
+
+  -- Document metadata
+  document_type TEXT NOT NULL, -- agent_type that generated it
+  title TEXT NOT NULL,
+  content JSONB NOT NULL,
+
+  -- Versioning
+  version INTEGER DEFAULT 1,
+
+  -- Timestamps
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_build_documents_build_id ON build_documents(build_id);
+CREATE INDEX IF NOT EXISTS idx_build_documents_document_type ON build_documents(document_type);
+CREATE INDEX IF NOT EXISTS idx_build_documents_created_at ON build_documents(created_at DESC);
+
+-- ============================================================================
+-- BUILD SPREADSHEETS TABLE
+-- ============================================================================
+-- Financial models and data generated by financial planner agent
+
+CREATE TABLE IF NOT EXISTS build_spreadsheets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  build_id UUID NOT NULL REFERENCES generated_apps(id) ON DELETE CASCADE,
+
+  -- Spreadsheet metadata
+  spreadsheet_type TEXT NOT NULL DEFAULT 'financial_model',
+  name TEXT,
+  data JSONB NOT NULL,
+
+  -- Timestamps
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_build_spreadsheets_build_id ON build_spreadsheets(build_id);
+CREATE INDEX IF NOT EXISTS idx_build_spreadsheets_created_at ON build_spreadsheets(created_at DESC);
+
+-- ============================================================================
+-- BUILD PITCH DECKS TABLE
+-- ============================================================================
+-- Investor pitch materials compiled from all agent outputs
+
+CREATE TABLE IF NOT EXISTS build_pitch_decks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  build_id UUID NOT NULL REFERENCES generated_apps(id) ON DELETE CASCADE,
+
+  -- Deck data compiled from all agents
+  deck_data JSONB NOT NULL,
+
+  -- Export formats
+  pdf_url TEXT,
+  pptx_url TEXT,
+
+  -- Timestamps
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_build_pitch_decks_build_id ON build_pitch_decks(build_id);
+CREATE INDEX IF NOT EXISTS idx_build_pitch_decks_created_at ON build_pitch_decks(created_at DESC);
+
+-- ============================================================================
+-- AGENT CONVERSATIONS TABLE
+-- ============================================================================
+-- Conversation threads with agents
+
+CREATE TABLE IF NOT EXISTS agent_conversations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  agent_id UUID NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT,
+  messages JSONB NOT NULL DEFAULT '[]',
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived', 'deleted')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_agent_conversations_agent_id ON agent_conversations(agent_id);
+CREATE INDEX IF NOT EXISTS idx_agent_conversations_user_id ON agent_conversations(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_agent_conversations_status ON agent_conversations(status);
+
+-- ============================================================================
+-- AGENT MEMORIES TABLE
 -- ============================================================================
 -- Vector-based memory storage for agents (RAG)
 
 CREATE TABLE IF NOT EXISTS agent_memories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   agent_id UUID NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
+  memory_type TEXT NOT NULL CHECK (memory_type IN ('fact', 'preference', 'context', 'goal')),
   content TEXT NOT NULL,
+  importance INTEGER NOT NULL DEFAULT 5 CHECK (importance BETWEEN 1 AND 10),
   embedding vector(1536),
-  source TEXT,
   metadata JSONB DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  accessed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_agent_memories_agent_id ON agent_memories(agent_id);
+CREATE INDEX IF NOT EXISTS idx_agent_memories_agent_id ON agent_memories(agent_id, importance DESC);
+CREATE INDEX IF NOT EXISTS idx_agent_memories_type ON agent_memories(memory_type);
 CREATE INDEX IF NOT EXISTS idx_agent_memories_embedding ON agent_memories USING ivfflat (embedding vector_cosine_ops);
 
 -- ============================================================================
--- AGENT_CONVERSATIONS TABLE
--- ============================================================================
--- Conversation threads (email threads, internal notes, etc.)
-
-CREATE TABLE IF NOT EXISTS agent_conversations (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agent_id UUID NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
-  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-  subject TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'closed', 'archived')),
-  participants TEXT[] DEFAULT ARRAY[]::TEXT[],
-  external_thread_id TEXT,
-  metadata JSONB DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_agent_conversations_agent_id ON agent_conversations(agent_id);
-CREATE INDEX IF NOT EXISTS idx_agent_conversations_company_id ON agent_conversations(company_id);
-CREATE INDEX IF NOT EXISTS idx_agent_conversations_status ON agent_conversations(status);
-CREATE INDEX IF NOT EXISTS idx_agent_conversations_external_thread_id ON agent_conversations(external_thread_id);
-
--- ============================================================================
--- AGENT_EMAILS TABLE
--- ============================================================================
--- Individual email messages sent/received by agents
-
-CREATE TABLE IF NOT EXISTS agent_emails (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  agent_id UUID NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
-  conversation_id UUID REFERENCES agent_conversations(id) ON DELETE SET NULL,
-  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-  direction TEXT NOT NULL CHECK (direction IN ('inbound', 'outbound')),
-  from_address TEXT NOT NULL,
-  to_addresses TEXT[] NOT NULL,
-  cc_addresses TEXT[] DEFAULT ARRAY[]::TEXT[],
-  subject TEXT NOT NULL,
-  body_text TEXT,
-  body_html TEXT,
-  headers JSONB DEFAULT '{}'::jsonb,
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN (
-    'pending', 'sent', 'delivered', 'bounced', 'failed', 'spam'
-  )),
-  external_message_id TEXT,
-  error_message TEXT,
-  metadata JSONB DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  processed_at TIMESTAMPTZ
-);
-
-CREATE INDEX IF NOT EXISTS idx_agent_emails_agent_id ON agent_emails(agent_id);
-CREATE INDEX IF NOT EXISTS idx_agent_emails_conversation_id ON agent_emails(conversation_id);
-CREATE INDEX IF NOT EXISTS idx_agent_emails_company_id ON agent_emails(company_id);
-CREATE INDEX IF NOT EXISTS idx_agent_emails_direction ON agent_emails(direction);
-CREATE INDEX IF NOT EXISTS idx_agent_emails_status ON agent_emails(status);
-CREATE INDEX IF NOT EXISTS idx_agent_emails_from_address ON agent_emails(from_address);
-CREATE INDEX IF NOT EXISTS idx_agent_emails_created_at ON agent_emails(created_at DESC);
-
--- ============================================================================
--- AGENT_TASKS TABLE
+-- AGENT TASKS TABLE
 -- ============================================================================
 -- Tasks assigned to or created by agents
 
 CREATE TABLE IF NOT EXISTS agent_tasks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   agent_id UUID NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
-  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  description TEXT,
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN (
-    'pending', 'in_progress', 'completed', 'blocked', 'cancelled'
-  )),
-  priority TEXT NOT NULL DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'urgent')),
-  due_date TIMESTAMPTZ,
-  assigned_by TEXT,
-  related_email_id UUID REFERENCES agent_emails(id) ON DELETE SET NULL,
-  metadata JSONB DEFAULT '{}'::jsonb,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  completed_at TIMESTAMPTZ
-);
-
-CREATE INDEX IF NOT EXISTS idx_agent_tasks_agent_id ON agent_tasks(agent_id);
-CREATE INDEX IF NOT EXISTS idx_agent_tasks_company_id ON agent_tasks(company_id);
-CREATE INDEX IF NOT EXISTS idx_agent_tasks_status ON agent_tasks(status);
-CREATE INDEX IF NOT EXISTS idx_agent_tasks_priority ON agent_tasks(priority);
-CREATE INDEX IF NOT EXISTS idx_agent_tasks_due_date ON agent_tasks(due_date);
-
--- ============================================================================
--- AGENT_DOCUMENTS TABLE
--- ============================================================================
--- Files and documents accessible to agents (contracts, reports, etc.)
-
-CREATE TABLE IF NOT EXISTS agent_documents (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  agent_id UUID REFERENCES agents(id) ON DELETE SET NULL,
-  name TEXT NOT NULL,
-  file_path TEXT NOT NULL,
-  file_type TEXT NOT NULL,
-  file_size INTEGER NOT NULL,
-  mime_type TEXT,
-  description TEXT,
-  tags TEXT[] DEFAULT ARRAY[]::TEXT[],
-  uploaded_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  metadata JSONB DEFAULT '{}'::jsonb,
+  task_type TEXT NOT NULL,
+  description TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'completed', 'failed', 'cancelled')),
+  priority INTEGER NOT NULL DEFAULT 5 CHECK (priority BETWEEN 1 AND 10),
+  input_data JSONB,
+  output_data JSONB,
+  error_message TEXT,
+  started_at TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  due_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_agent_documents_company_id ON agent_documents(company_id);
-CREATE INDEX IF NOT EXISTS idx_agent_documents_agent_id ON agent_documents(agent_id);
-CREATE INDEX IF NOT EXISTS idx_agent_documents_uploaded_by ON agent_documents(uploaded_by);
-CREATE INDEX IF NOT EXISTS idx_agent_documents_tags ON agent_documents USING gin(tags);
+CREATE INDEX IF NOT EXISTS idx_agent_tasks_agent_id ON agent_tasks(agent_id, status, priority DESC);
+CREATE INDEX IF NOT EXISTS idx_agent_tasks_status ON agent_tasks(status, due_at);
 
 -- ============================================================================
 -- ROW LEVEL SECURITY (RLS)
 -- ============================================================================
 
-ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
-ALTER TABLE company_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agents ENABLE ROW LEVEL SECURITY;
-ALTER TABLE agent_memories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE generated_apps ENABLE ROW LEVEL SECURITY;
+ALTER TABLE agent_executions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE build_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE build_spreadsheets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE build_pitch_decks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agent_conversations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE agent_emails ENABLE ROW LEVEL SECURITY;
+ALTER TABLE agent_memories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE agent_tasks ENABLE ROW LEVEL SECURITY;
-ALTER TABLE agent_documents ENABLE ROW LEVEL SECURITY;
 
--- Users can see companies they own or are members of
-CREATE POLICY companies_user_policy ON companies
-  FOR ALL USING (
-    auth.uid() = owner_id
-    OR EXISTS (
-      SELECT 1 FROM company_members
-      WHERE company_members.company_id = companies.id
-      AND company_members.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY company_members_user_policy ON company_members
-  FOR ALL USING (
-    auth.uid() = user_id
-    OR EXISTS (
-      SELECT 1 FROM companies
-      WHERE companies.id = company_members.company_id
-      AND companies.owner_id = auth.uid()
-    )
-  );
-
--- Users can only see their own agents and related data
+-- Users can only see their own agents
 CREATE POLICY agents_user_policy ON agents
   FOR ALL USING (auth.uid() = user_id);
 
+-- Users can manage their own generated apps
+CREATE POLICY generated_apps_user_policy ON generated_apps
+  FOR ALL USING (auth.uid() = user_id);
+
+-- Users can view agent executions for their builds
+CREATE POLICY agent_executions_user_policy ON agent_executions
+  FOR SELECT USING (
+    build_id IN (
+      SELECT id FROM generated_apps WHERE agent_id IN (
+        SELECT id FROM agents WHERE user_id = auth.uid()
+      )
+    )
+  );
+
+-- System can manage agent executions
+CREATE POLICY agent_executions_system_policy ON agent_executions
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY agent_executions_update_policy ON agent_executions
+  FOR UPDATE USING (true);
+
+-- Users can view documents for their builds
+CREATE POLICY build_documents_user_policy ON build_documents
+  FOR SELECT USING (
+    build_id IN (
+      SELECT id FROM generated_apps WHERE agent_id IN (
+        SELECT id FROM agents WHERE user_id = auth.uid()
+      )
+    )
+  );
+
+-- System can manage documents
+CREATE POLICY build_documents_system_policy ON build_documents
+  FOR ALL USING (true);
+
+-- Users can view spreadsheets for their builds
+CREATE POLICY build_spreadsheets_user_policy ON build_spreadsheets
+  FOR SELECT USING (
+    build_id IN (
+      SELECT id FROM generated_apps WHERE agent_id IN (
+        SELECT id FROM agents WHERE user_id = auth.uid()
+      )
+    )
+  );
+
+-- System can manage spreadsheets
+CREATE POLICY build_spreadsheets_system_policy ON build_spreadsheets
+  FOR ALL USING (true);
+
+-- Users can view pitch decks for their builds
+CREATE POLICY build_pitch_decks_user_policy ON build_pitch_decks
+  FOR SELECT USING (
+    build_id IN (
+      SELECT id FROM generated_apps WHERE agent_id IN (
+        SELECT id FROM agents WHERE user_id = auth.uid()
+      )
+    )
+  );
+
+-- System can manage pitch decks
+CREATE POLICY build_pitch_decks_system_policy ON build_pitch_decks
+  FOR ALL USING (true);
+
+-- Users can manage their own conversations
+CREATE POLICY agent_conversations_user_policy ON agent_conversations
+  FOR ALL USING (auth.uid() = user_id);
+
+-- Users can manage memories for their own agents
 CREATE POLICY agent_memories_user_policy ON agent_memories
   FOR ALL USING (
     EXISTS (SELECT 1 FROM agents WHERE agents.id = agent_memories.agent_id AND agents.user_id = auth.uid())
   );
 
-CREATE POLICY agent_conversations_user_policy ON agent_conversations
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM agents WHERE agents.id = agent_conversations.agent_id AND agents.user_id = auth.uid())
-  );
-
-CREATE POLICY agent_emails_user_policy ON agent_emails
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM agents WHERE agents.id = agent_emails.agent_id AND agents.user_id = auth.uid())
-  );
-
+-- Users can view tasks for their own agents
 CREATE POLICY agent_tasks_user_policy ON agent_tasks
-  FOR ALL USING (
+  FOR SELECT USING (
     EXISTS (SELECT 1 FROM agents WHERE agents.id = agent_tasks.agent_id AND agents.user_id = auth.uid())
-  );
-
-CREATE POLICY agent_documents_company_policy ON agent_documents
-  FOR ALL USING (
-    EXISTS (
-      SELECT 1 FROM company_members
-      WHERE company_members.company_id = agent_documents.company_id
-      AND company_members.user_id = auth.uid()
-    )
   );
 
 -- ============================================================================
@@ -316,10 +348,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_companies_updated_at BEFORE UPDATE ON companies
+CREATE TRIGGER update_agents_updated_at BEFORE UPDATE ON agents
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_agents_updated_at BEFORE UPDATE ON agents
+CREATE TRIGGER update_generated_apps_updated_at BEFORE UPDATE ON generated_apps
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_agent_executions_updated_at BEFORE UPDATE ON agent_executions
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_build_documents_updated_at BEFORE UPDATE ON build_documents
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_build_spreadsheets_updated_at BEFORE UPDATE ON build_spreadsheets
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_build_pitch_decks_updated_at BEFORE UPDATE ON build_pitch_decks
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_agent_conversations_updated_at BEFORE UPDATE ON agent_conversations
@@ -327,44 +371,3 @@ CREATE TRIGGER update_agent_conversations_updated_at BEFORE UPDATE ON agent_conv
 
 CREATE TRIGGER update_agent_tasks_updated_at BEFORE UPDATE ON agent_tasks
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_agent_documents_updated_at BEFORE UPDATE ON agent_documents
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- ============================================================================
--- SIGNUP TRIGGER
--- ============================================================================
--- Automatically call Edge Function when new user signs up
-
-CREATE OR REPLACE FUNCTION trigger_agent_provisioning()
-RETURNS TRIGGER AS $$
-DECLARE
-  edge_function_url TEXT;
-  service_key TEXT;
-BEGIN
-  -- Get config from database settings
-  SELECT current_setting('app.edge_function_url', true) INTO edge_function_url;
-  SELECT current_setting('app.supabase_service_key', true) INTO service_key;
-
-  -- Call Edge Function asynchronously (fire and forget)
-  -- Edge Function will call backend to provision agents
-  PERFORM net.http_post(
-    url := edge_function_url,
-    headers := jsonb_build_object(
-      'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || service_key
-    ),
-    body := jsonb_build_object(
-      'user_id', NEW.id,
-      'email', NEW.email
-    )
-  );
-
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER on_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION trigger_agent_provisioning();
