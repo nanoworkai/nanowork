@@ -10,7 +10,7 @@ const router = Router();
  * POST /payments/links
  * Create a payment link
  */
-router.post('/links', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/links', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { business_id, title, amount_cents, currency } = req.body;
 
@@ -63,13 +63,13 @@ router.post('/links', requireUserAuth, async (req: AuthenticatedRequest, res: Re
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /payments/transactions
  * List transactions for the agent
  */
-router.get('/transactions', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/transactions', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { business_id } = req.query;
 
@@ -86,6 +86,6 @@ router.get('/transactions', requireUserAuth, async (req: AuthenticatedRequest, r
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

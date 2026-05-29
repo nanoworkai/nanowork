@@ -94,7 +94,7 @@ router.post('/companies/:id/view', async (req, res: Response) => {
  * POST /showcase/checkout
  * Create Stripe checkout session for claiming a company
  */
-router.post('/checkout', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/checkout', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { companyId, successUrl, cancelUrl } = req.body;
     const userId = req.user!.id;
@@ -200,6 +200,6 @@ router.post('/checkout', requireUserAuth, async (req: AuthenticatedRequest, res:
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

@@ -9,7 +9,7 @@ const router = Router();
  * GET /deployments
  * List all deployments (optionally filter by business_id)
  */
-router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { business_id } = req.query;
 
@@ -27,6 +27,6 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

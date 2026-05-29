@@ -1,0 +1,20 @@
+
+> worker@0.0.0 build
+> wrangler deploy --dry-run
+
+
+ ⛅️ wrangler 3.114.17 (update available 4.95.0)
+-----------------------------------------------
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mThe version of Wrangler you are using is now out-of-date.[0m
+
+  Please update to the latest version to prevent critical errors.
+  Run `npm install --save-dev wrangler@4` to update to the latest version.
+  After installation, run Wrangler with `npx wrangler`.
+
+
+Total Upload: 1380.43 KiB / gzip: 255.30 KiB
+Your worker has access to the following bindings:
+- Vars:
+  - ENVIRONMENT: "production"
+--dry-run: exiting now.

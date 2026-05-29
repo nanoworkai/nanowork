@@ -10,7 +10,7 @@ const router = Router();
  * POST /documents
  * Upload/create a new document
  */
-router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { title, content, business_id } = req.body;
 
@@ -48,13 +48,13 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /documents
  * List documents for the agent
  */
-router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { business_id } = req.query;
 
@@ -71,6 +71,6 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

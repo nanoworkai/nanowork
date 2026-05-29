@@ -44,5 +44,6 @@
     "apps/web/src/**/*.{ts,tsx}": [
       "cd apps/web && tsc --noEmit"
     ]
-  }
+  },
+  "packageManager": "npm@10.8.2"
 }

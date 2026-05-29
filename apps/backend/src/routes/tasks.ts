@@ -9,7 +9,7 @@ const router = Router();
  * GET /tasks
  * List tasks for the agent
  */
-router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { status, business_id } = req.query;
 
@@ -27,6 +27,6 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

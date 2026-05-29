@@ -16,7 +16,7 @@ const router = Router();
  * GET /conversations
  * List conversations for the agent
  */
-router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { business_id } = req.query;
 
@@ -33,13 +33,13 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /conversations
  * Create or continue a conversation
  */
-router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { message, conversation_id, business_id } = req.body;
 
@@ -113,6 +113,6 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

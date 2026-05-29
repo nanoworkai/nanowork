@@ -17,7 +17,7 @@ const CREDIT_BUNDLES = {
  * GET /wallet/balance
  * Get the user's current credit balance
  */
-router.get('/balance', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/balance', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -33,13 +33,13 @@ router.get('/balance', requireUserAuth, async (req: AuthenticatedRequest, res: R
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /wallet/transactions
  * Get the user's transaction history
  */
-router.get('/transactions', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/transactions', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -56,13 +56,13 @@ router.get('/transactions', requireUserAuth, async (req: AuthenticatedRequest, r
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /wallet/topup
  * Create a Stripe Payment Intent for credit top-up
  */
-router.post('/topup', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/topup', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -86,7 +86,7 @@ router.post('/topup', requireUserAuth, async (req: AuthenticatedRequest, res: Re
     }
 
     const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: '2026-04-22.dahlia',
+      apiVersion: '2026-05-27.dahlia',
     });
 
     const selectedBundle = CREDIT_BUNDLES[bundle as keyof typeof CREDIT_BUNDLES];
@@ -115,7 +115,7 @@ router.post('/topup', requireUserAuth, async (req: AuthenticatedRequest, res: Re
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /wallet/bundles

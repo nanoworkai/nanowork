@@ -17,7 +17,7 @@ const router = Router();
  * POST /apps/generate
  * Generate a new app for a business
  */
-router.post('/generate', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/generate', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { business_id, prompt, framework, tech_stack } = req.body;
 
@@ -78,13 +78,13 @@ router.post('/generate', requireUserAuth, async (req: AuthenticatedRequest, res:
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /apps/:id
  * Get an app with all its files
  */
-router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/:id', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const app = await getGeneratedApp(req.params.id);
 
@@ -111,6 +111,6 @@ router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Respo
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

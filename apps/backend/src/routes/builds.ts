@@ -11,7 +11,7 @@ const router = Router();
  * POST /builds/generate-name
  * Generate an AI build name from a prompt
  */
-router.post('/generate-name', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/generate-name', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { prompt } = req.body;
 
@@ -57,13 +57,13 @@ Examples: "Dog Walking App", "Restaurant Booking System", "Fitness Tracker"`,
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /builds
  * Get all builds for the authenticated user's agent
  */
-router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.agent) {
       res.status(403).json({ error: 'No agent found for user' });
@@ -88,13 +88,13 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /builds/extract-spec
  * Extract structured company specification from a prompt
  */
-router.post('/extract-spec', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/extract-spec', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { prompt } = req.body;
 
@@ -120,14 +120,14 @@ router.post('/extract-spec', requireUserAuth, async (req: AuthenticatedRequest, 
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /builds
  * Create a new build for the authenticated user's agent
  * Now includes CompanySpec extraction before creation
  */
-router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.agent) {
       res.status(403).json({ error: 'No agent found for user' });
@@ -175,13 +175,13 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * PATCH /builds/:id
  * Update a build (rename, update activity)
  */
-router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.patch('/:id', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.agent) {
       res.status(403).json({ error: 'No agent found for user' });
@@ -215,13 +215,13 @@ router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Res
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * DELETE /builds/:id
  * Delete a build
  */
-router.delete('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.delete('/:id', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.agent) {
       res.status(403).json({ error: 'No agent found for user' });
@@ -248,13 +248,13 @@ router.delete('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Re
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /builds/:id
  * Get a specific build
  */
-router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/:id', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.agent) {
       res.status(403).json({ error: 'No agent found for user' });
@@ -283,6 +283,6 @@ router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Respo
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

@@ -9,7 +9,7 @@ const router = Router();
  * GET /contacts
  * List contacts for the agent
  */
-router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { business_id, status } = req.query;
 
@@ -27,13 +27,13 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /contacts
  * Create a new contact
  */
-router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { name, email, phone, company, business_id, status } = req.body;
 
@@ -61,13 +61,13 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * PATCH /contacts/:id
  * Update a contact
  */
-router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.patch('/:id', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { name, email, phone, company, status } = req.body;
 
@@ -87,13 +87,13 @@ router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Res
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /contacts/:id/interactions
  * Log an interaction with a contact
  */
-router.post('/:id/interactions', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/:id/interactions', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { interaction_type, notes } = req.body;
 
@@ -118,6 +118,6 @@ router.post('/:id/interactions', requireUserAuth, async (req: AuthenticatedReque
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

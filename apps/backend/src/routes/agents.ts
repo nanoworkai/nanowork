@@ -8,7 +8,7 @@ const router = Router();
  * GET /agents/me
  * Get the authenticated user's agent
  */
-router.get('/me', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/me', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     res.json(req.agent);
   } catch (error) {
@@ -18,6 +18,6 @@ router.get('/me', requireUserAuth, async (req: AuthenticatedRequest, res: Respon
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

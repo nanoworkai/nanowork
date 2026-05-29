@@ -1,0 +1,13 @@
+
+> web@0.0.0 build
+> bun run build.ts
+
+🏗️  Building with Bun...
+⚡ Processing Tailwind CSS...
+✅ Tailwind CSS processed
+📝 Injecting 9 environment variables into build
+✅ Build successful
+📦 Copying public assets...
+📝 Generating index.html...
+🎉 Build complete!
+📦 Output: /Users/jordan/Dev/nanowork-web/apps/web/dist

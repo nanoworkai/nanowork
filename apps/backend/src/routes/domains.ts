@@ -16,7 +16,7 @@ const router = Router();
  * POST /domains/subscribe
  * Create a Stripe subscription for a custom domain
  */
-router.post('/subscribe', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/subscribe', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { deploymentId, customDomain } = req.body;
     const userId = req.user?.id;
@@ -120,13 +120,13 @@ router.post('/subscribe', requireUserAuth, async (req: AuthenticatedRequest, res
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /domains/configure
  * Configure the custom domain with Cloudflare after payment
  */
-router.post('/configure', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/configure', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { deploymentId } = req.body;
     const userId = req.user?.id;
@@ -200,13 +200,13 @@ router.post('/configure', requireUserAuth, async (req: AuthenticatedRequest, res
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /domains/verify/:deploymentId
  * Check DNS verification status
  */
-router.get('/verify/:deploymentId', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/verify/:deploymentId', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { deploymentId } = req.params;
     const userId = req.user?.id;
@@ -281,13 +281,13 @@ router.get('/verify/:deploymentId', requireUserAuth, async (req: AuthenticatedRe
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * DELETE /domains/cancel/:deploymentId
  * Cancel domain subscription and remove from Cloudflare
  */
-router.delete('/cancel/:deploymentId', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.delete('/cancel/:deploymentId', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { deploymentId } = req.params;
     const userId = req.user?.id;
@@ -361,6 +361,6 @@ router.delete('/cancel/:deploymentId', requireUserAuth, async (req: Authenticate
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

@@ -51,7 +51,7 @@ export function getSupabase(): SupabaseClient {
       persistSession: false,
     },
     global: {
-      fetch: (...args) => fetch(...args),
+      fetch: fetch as any,
     },
     realtime: {
       transport: ws as any,

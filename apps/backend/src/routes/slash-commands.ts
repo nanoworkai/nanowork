@@ -9,7 +9,7 @@ const router = Router();
  * GET /slash-commands
  * Get all available slash commands
  */
-router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const sdk = getSlashCommandSDK();
     const commands = sdk.getAvailableCommands();
@@ -29,13 +29,13 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /slash-commands/init
  * Get system initialization message
  */
-router.get('/init', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/init', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const sdk = getSlashCommandSDK();
     const initMessage = sdk.getInitMessage();
@@ -48,13 +48,13 @@ router.get('/init', requireUserAuth, async (req: AuthenticatedRequest, res: Resp
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /slash-commands/:name
  * Get details for a specific command
  */
-router.get('/:name', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/:name', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { name } = req.params;
     const sdk = getSlashCommandSDK();
@@ -78,13 +78,13 @@ router.get('/:name', requireUserAuth, async (req: AuthenticatedRequest, res: Res
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /slash-commands/execute
  * Execute a slash command
  */
-router.post('/execute', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/execute', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { command, args = [] } = req.body;
 
@@ -113,13 +113,13 @@ router.post('/execute', requireUserAuth, async (req: AuthenticatedRequest, res: 
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /slash-commands/parse
  * Parse a slash command from user input
  */
-router.post('/parse', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/parse', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { input } = req.body;
 
@@ -152,6 +152,6 @@ router.post('/parse', requireUserAuth, async (req: AuthenticatedRequest, res: Re
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

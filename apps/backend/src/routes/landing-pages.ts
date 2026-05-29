@@ -17,7 +17,7 @@ const router = Router();
  * POST /landing-pages/generate
  * Generate a landing page for a business
  */
-router.post('/generate', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/generate', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { business_id } = req.body;
 
@@ -71,13 +71,13 @@ router.post('/generate', requireUserAuth, async (req: AuthenticatedRequest, res:
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /landing-pages/:id
  * Get a landing page
  */
-router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/:id', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const landingPage = await getLandingPage(req.params.id);
 
@@ -101,13 +101,13 @@ router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Respo
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /landing-pages/:id/deploy
  * Deploy a landing page to Cloudflare Pages
  */
-router.post('/:id/deploy', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/:id/deploy', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const landingPage = await getLandingPage(req.params.id);
 
@@ -150,6 +150,6 @@ router.post('/:id/deploy', requireUserAuth, async (req: AuthenticatedRequest, re
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

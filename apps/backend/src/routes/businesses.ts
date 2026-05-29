@@ -16,7 +16,7 @@ const router = Router();
  * GET /businesses
  * List all businesses for the authenticated agent
  */
-router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const businesses = await getBusinesses(req.agent!.id);
     res.json(businesses);
@@ -27,13 +27,13 @@ router.get('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /businesses
  * Create a new business
  */
-router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { idea_prompt, name, tagline } = req.body;
 
@@ -67,13 +67,13 @@ router.post('/', requireUserAuth, async (req: AuthenticatedRequest, res: Respons
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /businesses/:id
  * Get a single business with its deployments and stats
  */
-router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/:id', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const business = await getBusiness(req.params.id);
 
@@ -99,13 +99,13 @@ router.get('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Respo
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * PATCH /businesses/:id
  * Update a business
  */
-router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.patch('/:id', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const business = await getBusiness(req.params.id);
 
@@ -137,13 +137,13 @@ router.patch('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Res
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * DELETE /businesses/:id
  * Soft delete a business by archiving it
  */
-router.delete('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.delete('/:id', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const business = await getBusiness(req.params.id);
 
@@ -168,6 +168,6 @@ router.delete('/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Re
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

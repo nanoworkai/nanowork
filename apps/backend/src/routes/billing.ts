@@ -10,7 +10,7 @@ const router = Router();
  * POST /billing/portal
  * Create a Stripe Customer Portal session
  */
-router.post('/portal', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/portal', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
 
@@ -90,13 +90,13 @@ router.post('/portal', requireUserAuth, async (req: AuthenticatedRequest, res: R
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * GET /billing/info
  * Get current billing information for the user
  */
-router.get('/info', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/info', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
 
@@ -159,13 +159,13 @@ router.get('/info', requireUserAuth, async (req: AuthenticatedRequest, res: Resp
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * POST /billing/subscriptions
  * Create a new subscription for a plan upgrade
  */
-router.post('/subscriptions', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.post('/subscriptions', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const { priceId, plan } = req.body;
@@ -269,13 +269,13 @@ router.post('/subscriptions', requireUserAuth, async (req: AuthenticatedRequest,
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 /**
  * PATCH /billing/subscriptions/:id
  * Modify or cancel an existing subscription
  */
-router.patch('/subscriptions/:id', requireUserAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.patch('/subscriptions/:id', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const subscriptionId = req.params.id;
@@ -362,6 +362,6 @@ router.patch('/subscriptions/:id', requireUserAuth, async (req: AuthenticatedReq
       message: error instanceof Error ? error.message : 'unknown error',
     });
   }
-});
+}) as any);
 
 export default router;

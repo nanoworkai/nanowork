@@ -15,7 +15,7 @@ function getStripe(): StripeInstance | null {
   }
 
   stripe = new Stripe(apiKey, {
-    apiVersion: '2026-04-22.dahlia',
+    apiVersion: '2026-05-27.dahlia',
   });
 
   return stripe;

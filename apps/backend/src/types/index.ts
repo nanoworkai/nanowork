@@ -243,12 +243,15 @@ export interface CreditTransaction {
 export type NewCreditTransaction = Omit<CreditTransaction, 'id' | 'created_at'>;
 
 // Request/Response types
-import { Request } from 'express';
+import { Request, RequestHandler } from 'express';
 
 export interface AuthenticatedRequest extends Request {
   user: { id: string; email: string };
   agent: Agent;
 }
+
+// Type helper for authenticated route handlers
+export type AuthenticatedRequestHandler = RequestHandler<any, any, any, any, { user: { id: string; email: string }; agent: Agent }>
 
 // Company Specification types
 export * from './companySpec.js';
