@@ -33,3 +33,6 @@ node_modules
 # Build artifacts (historical root build or mis-targeted builds)
 /dist
 apps/web/dist/
+
+# Claude Code worktrees
+.claude/worktrees/
