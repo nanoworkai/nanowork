@@ -18,6 +18,11 @@ apps/api/.ruff_cache/
 node_modules
 *.local
 
+# Lock files (keep package-lock.json only)
+bun.lock
+yarn.lock
+pnpm-lock.yaml
+
 # IDE
 .idea
 .vscode/*
@@ -29,6 +34,8 @@ node_modules
 .env
 .env.local
 .env.*.local
+.env-backup/
+*.env.backup
 
 # Build artifacts (historical root build or mis-targeted builds)
 /dist
@@ -36,3 +43,8 @@ apps/web/dist/
 
 # Claude Code worktrees
 .claude/worktrees/
+
+# Deployment configs (keep only active platform)
+# Uncomment to ignore unused deployment configs:
+# vercel.json
+# wrangler.toml
