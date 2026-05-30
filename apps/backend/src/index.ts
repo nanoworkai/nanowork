@@ -29,6 +29,10 @@ import slashCommandsRouter from './routes/slash-commands';
 import { initializeWebSocketServer } from './services/websocketServer';
 import { initializeSlashCommandSDK } from './services/slashCommandSDK';
 
+// Import security middleware
+import { securityHeaders } from './middleware/security';
+import { generalRateLimiter } from './middleware/rateLimiting';
+
 // Validate required environment variables
 const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY'];
 
@@ -47,7 +51,13 @@ const PORT = process.env.PORT || 3000;
 // Stripe webhook needs raw body, so register it before express.json()
 app.use('/webhooks/stripe', express.raw({ type: 'application/json' }), stripeWebhookRouter);
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' })); // Limit request body size
+
+// Security headers
+app.use(securityHeaders);
+
+// General rate limiting (applies to all routes)
+app.use(generalRateLimiter);
 
 // CORS configuration - allow all production and development URLs
 const allowedOrigins = [

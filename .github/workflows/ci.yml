@@ -168,6 +168,48 @@ jobs:
           echo "✅ Backend structure valid"
 
   # ============================================================================
+  # SECURITY CHECKS
+  # ============================================================================
+  security-audit:
+    name: Security - NPM Audit
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        workspace:
+          - { name: 'Root', path: '.', node-version: '20' }
+          - { name: 'Web', path: 'apps/web', node-version: '20' }
+          - { name: 'Worker', path: 'apps/worker', node-version: '20' }
+          - { name: 'Backend', path: 'apps/backend', node-version: '20' }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.workspace.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.workspace.path }}
+        run: npm ci || npm install
+
+      - name: Run npm audit
+        working-directory: ${{ matrix.workspace.path }}
+        run: |
+          echo "Running security audit for ${{ matrix.workspace.name }}..."
+          npm audit --audit-level=moderate
+
+      - name: Check for high/critical vulnerabilities
+        working-directory: ${{ matrix.workspace.path }}
+        run: |
+          # Fail on high or critical vulnerabilities
+          npm audit --audit-level=high || {
+            echo "❌ High or critical vulnerabilities found in ${{ matrix.workspace.name }}"
+            exit 1
+          }
+          echo "✅ No high or critical vulnerabilities in ${{ matrix.workspace.name }}"
+
+  # ============================================================================
   # INTEGRATION CHECKS
   # ============================================================================
   monorepo-check:
@@ -187,7 +229,7 @@ jobs:
           # Check workspace structure
           test -d "apps/web" || { echo "❌ Missing apps/web"; exit 1; }
           test -d "apps/worker" || { echo "❌ Missing apps/worker"; exit 1; }
-          test -d "backend" || { echo "❌ Missing backend"; exit 1; }
+          test -d "apps/backend" || { echo "❌ Missing apps/backend"; exit 1; }
 
           echo "✅ Monorepo structure valid"
 
@@ -218,6 +260,7 @@ jobs:
       - worker-typecheck
       - backend-typecheck
       - backend-build
+      - security-audit
       - monorepo-check
     if: always()
     steps:
@@ -243,6 +286,11 @@ jobs:
 
           if [ "${{ needs.backend-typecheck.result }}" != "success" ]; then
             echo "❌ Backend TypeCheck failed"
+            exit 1
+          fi
+
+          if [ "${{ needs.security-audit.result }}" != "success" ]; then
+            echo "❌ Security Audit failed"
             exit 1
           fi
 

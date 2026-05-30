@@ -9,6 +9,9 @@ import {
 } from '../services/supabase';
 import { chat } from '../services/anthropic';
 import { storeMemory } from '../services/memory';
+import { validateConversationInput } from '../middleware/validation';
+import { rateLimitConversations } from '../middleware/rateLimiting';
+import { checkConversationCredits, deductOperationCredits } from '../middleware/costProtection';
 
 const router = Router();
 
@@ -39,7 +42,7 @@ router.get('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Respons
  * POST /conversations
  * Create or continue a conversation
  */
-router.post('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
+router.post('/', requireUserAuth, rateLimitConversations, checkConversationCredits, validateConversationInput, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { message, conversation_id, business_id } = req.body;
 
@@ -104,6 +107,16 @@ router.post('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Respon
         metadata: { conversation_id: conversation.id },
       }).catch((err) => console.error('Failed to store memory:', err));
     });
+
+    // Deduct credits after successful conversation
+    if (req.user?.id && (req as any).requiredCredits) {
+      await deductOperationCredits(
+        req.user.id,
+        (req as any).requiredCredits,
+        'conversation',
+        { conversation_id: conversation.id }
+      ).catch(err => console.error('Failed to deduct credits:', err));
+    }
 
     res.json({ reply, conversation_id: conversation.id });
   } catch (error) {

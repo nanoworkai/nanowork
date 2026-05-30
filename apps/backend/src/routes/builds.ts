@@ -4,6 +4,9 @@ import { requireUserAuth } from '../middleware/auth';
 import { AuthenticatedRequest } from '../types';
 import { getSupabase } from '../services/supabase';
 import { CompanySpecExtractor } from '../services/companySpecExtractor.js';
+import { validateBuildInput } from '../middleware/validation';
+import { rateLimitBuildCreation, rateLimitAIGeneration } from '../middleware/rateLimiting';
+import { checkBuildCreationCredits, deductOperationCredits, logAIOperation, MAX_TOKENS } from '../middleware/costProtection';
 
 const router = Router();
 
@@ -11,7 +14,7 @@ const router = Router();
  * POST /builds/generate-name
  * Generate an AI build name from a prompt
  */
-router.post('/generate-name', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
+router.post('/generate-name', requireUserAuth, rateLimitAIGeneration, validateBuildInput, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { prompt } = req.body;
 
@@ -43,6 +46,17 @@ Examples: "Dog Walking App", "Restaurant Booking System", "Fitness Tracker"`,
         },
       ],
     });
+
+    // Log AI operation for monitoring
+    if (req.user?.id) {
+      await logAIOperation(
+        req.user.id,
+        'generate_name',
+        message.usage.input_tokens,
+        message.usage.output_tokens,
+        1 // Estimated cost in cents
+      ).catch(err => console.error('Failed to log AI operation:', err));
+    }
 
     const textContent = message.content.find((block) => block.type === 'text');
     const name = textContent && 'text' in textContent
@@ -94,7 +108,7 @@ router.get('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Respons
  * POST /builds/extract-spec
  * Extract structured company specification from a prompt
  */
-router.post('/extract-spec', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
+router.post('/extract-spec', requireUserAuth, rateLimitAIGeneration, validateBuildInput, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { prompt } = req.body;
 
@@ -127,7 +141,7 @@ router.post('/extract-spec', requireUserAuth, (async (req: AuthenticatedRequest,
  * Create a new build for the authenticated user's agent
  * Now includes CompanySpec extraction before creation
  */
-router.post('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Response) => {
+router.post('/', requireUserAuth, rateLimitBuildCreation, checkBuildCreationCredits, validateBuildInput, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.agent) {
       res.status(403).json({ error: 'No agent found for user' });
@@ -165,6 +179,16 @@ router.post('/', requireUserAuth, (async (req: AuthenticatedRequest, res: Respon
 
     if (error || !data) {
       throw new Error(`Failed to create build: ${error?.message || 'unknown error'}`);
+    }
+
+    // Deduct credits after successful build creation
+    if (req.user?.id && (req as any).requiredCredits) {
+      await deductOperationCredits(
+        req.user.id,
+        (req as any).requiredCredits,
+        'build_creation',
+        { build_id: data.id, prompt: prompt.slice(0, 100) }
+      ).catch(err => console.error('Failed to deduct credits:', err));
     }
 
     res.json({ build: data, companySpec });

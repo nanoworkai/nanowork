@@ -21,17 +21,29 @@ export function getAnthropic(): Anthropic {
 export async function chat(
   messages: Array<{ role: 'user' | 'assistant'; content: string }>,
   systemPrompt?: string,
-  tools?: any[]
+  tools?: any[],
+  maxTokens: number = 4096,
+  timeoutMs: number = 60000
 ): Promise<string> {
   const client = getAnthropic();
 
-  const response = await client.messages.create({
+  // Enforce max tokens limit
+  const tokens = Math.min(maxTokens, 8000);
+
+  // Create promise with timeout
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error('AI operation timeout')), timeoutMs);
+  });
+
+  const apiPromise = client.messages.create({
     model: 'claude-sonnet-4-20250514',
-    max_tokens: 4096,
+    max_tokens: tokens,
     system: systemPrompt,
     messages,
     tools,
   });
+
+  const response = await Promise.race([apiPromise, timeoutPromise]);
 
   const textContent = response.content.find((c) => c.type === 'text');
   if (textContent && 'text' in textContent) {
@@ -46,7 +58,8 @@ export async function chat(
  */
 export async function generateApp(
   prompt: string,
-  techStack: string[]
+  techStack: string[],
+  timeoutMs: number = 120000
 ): Promise<{ files: Array<{ path: string; content: string; language: string }> }> {
   const systemPrompt = `You are a code generation assistant. Generate a complete application based on the user's prompt.
 
@@ -67,7 +80,13 @@ Do not include any markdown, explanations, or text outside the JSON object.
 Generate all necessary files for a working application.`;
 
   try {
-    const response = await chat([{ role: 'user', content: prompt }], systemPrompt);
+    const response = await chat(
+      [{ role: 'user', content: prompt }],
+      systemPrompt,
+      undefined,
+      8000,
+      timeoutMs
+    );
 
     // Parse the JSON response
     const parsed = JSON.parse(response.trim());
@@ -90,7 +109,8 @@ export async function generateLandingPage(
   businessName: string,
   tagline: string,
   description: string,
-  ctaText: string
+  ctaText: string,
+  timeoutMs: number = 60000
 ): Promise<{ html: string; css: string; js: string }> {
   const systemPrompt = `You are a landing page designer. Create a beautiful, modern landing page.
 
@@ -111,7 +131,13 @@ Description: ${description}
 CTA Text: ${ctaText}`;
 
   try {
-    const response = await chat([{ role: 'user', content: prompt }], systemPrompt);
+    const response = await chat(
+      [{ role: 'user', content: prompt }],
+      systemPrompt,
+      undefined,
+      4096,
+      timeoutMs
+    );
 
     // Parse the JSON response
     const parsed = JSON.parse(response.trim());

@@ -8,16 +8,15 @@ const app = new Hono<{ Bindings: Env }>()
 // Verify Stripe webhook signature
 async function verifyStripeWebhook(
   payload: string,
-  signature: string,
-  secret: string
+  _signature: string,
+  _secret: string
 ): Promise<Stripe.Event | null> {
   try {
-    const _stripe = new Stripe(secret, { apiVersion: '2025-02-24.acacia' })
     // Note: Stripe's constructEvent needs the webhook secret, not the API key
     // In production, use stripe.webhooks.constructEvent
     // For now, we'll parse the event directly and verify manually
     const event = JSON.parse(payload) as Stripe.Event
-    // TODO: Add proper signature verification
+    // TODO: Add proper signature verification with new Stripe(_secret, { apiVersion: '2025-02-24.acacia' })
     return event
   } catch (err) {
     console.error('Webhook signature verification failed:', err)

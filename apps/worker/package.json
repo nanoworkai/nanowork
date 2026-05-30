@@ -13,10 +13,10 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.52.0",
-    "@supabase/supabase-js": "^2.105.3",
+    "@anthropic-ai/sdk": "^0.100.1",
+    "@supabase/supabase-js": "^2.106.2",
     "hono": "^4.6.0",
-    "stripe": "^17.0.0"
+    "stripe": "^17.7.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250430.0",
@@ -28,6 +28,6 @@
     "eslint-plugin-import": "^2.31.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.19.1",
-    "wrangler": "^3.114.0"
+    "wrangler": "^4.95.0"
   }
 }

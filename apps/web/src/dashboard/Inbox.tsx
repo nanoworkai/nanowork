@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
 import { Mail, Inbox as InboxIcon, Send, Search, RefreshCw } from "lucide-react";
+import { sanitizeHtml } from "../lib/sanitize";
 
 interface EmailMessage {
   id: string;
@@ -289,7 +290,7 @@ export default function Inbox() {
                     {selectedEmail.body_html ? (
                       <div
                         className="prose prose-invert prose-sm max-w-none text-white/90 leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: selectedEmail.body_html }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(selectedEmail.body_html) }}
                       />
                     ) : (
                       <p className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap">

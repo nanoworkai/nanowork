@@ -375,6 +375,7 @@ export class AgentOrchestrator {
     onProgress: (progress: number, activity: string) => void
   ): Promise<any> {
     const anthropic = getAnthropic();
+    const MAX_TIMEOUT = 120000; // 2 minutes per agent
 
     // Simulate progress stages
     const stages = [
@@ -397,7 +398,12 @@ export class AgentOrchestrator {
     }, 2000);
 
     try {
-      const response = await anthropic.messages.create({
+      // Create timeout promise
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Agent operation timeout')), MAX_TIMEOUT);
+      });
+
+      const apiPromise = anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 8000,
         system: systemPrompt,
@@ -408,6 +414,8 @@ export class AgentOrchestrator {
           },
         ],
       });
+
+      const response = await Promise.race([apiPromise, timeoutPromise]);
 
       clearInterval(progressInterval);
       onProgress(90, 'Processing results...');
