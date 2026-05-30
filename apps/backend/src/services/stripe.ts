@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 
-type StripeInstance = ReturnType<typeof Stripe>;
+type StripeInstance = Stripe;
 
 let stripe: StripeInstance | null = null;
 
@@ -15,7 +15,7 @@ function getStripe(): StripeInstance | null {
   }
 
   stripe = new Stripe(apiKey, {
-    apiVersion: '2026-05-27.dahlia',
+    apiVersion: '2025-02-24.acacia',
   });
 
   return stripe;

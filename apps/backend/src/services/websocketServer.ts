@@ -188,7 +188,7 @@ export class WebSocketServer {
         .then(() => {
           console.log(`Removed subscription for user ${ws.userId} from build ${buildId}`);
         })
-        .catch(error => {
+        .catch((error: Error) => {
           console.error('Failed to remove WebSocket subscription:', error);
         });
     }

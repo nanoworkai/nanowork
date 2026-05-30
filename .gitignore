@@ -30,12 +30,16 @@ pnpm-lock.yaml
 *.swp
 .DS_Store
 
-# Env
+# Env - NEVER commit these files
 .env
 .env.local
+.env.production.local
+.env.development.local
 .env.*.local
 .env-backup/
 *.env.backup
+.dev.vars
+*.dev.vars
 
 # Build artifacts (historical root build or mis-targeted builds)
 /dist
