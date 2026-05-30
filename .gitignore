@@ -40,11 +40,15 @@ pnpm-lock.yaml
 *.env.backup
 .dev.vars
 *.dev.vars
+**/.dev.vars
+**/dev.vars
 
 # Build artifacts (historical root build or mis-targeted builds)
 /dist
 apps/web/dist/
 static/
+.wrangler/
+**/.wrangler/
 
 # Claude Code worktrees
 .claude/worktrees/
